@@ -897,7 +897,7 @@
         .getInitialData();
     } else if (state.gasApiUrl) {
       // 2. Lingkungan Vercel / GitHub: Mengambil LIVE data dari Apps Script Web App API
-      fetch(state.gasApiUrl + '?action=getInitialData', { method: 'GET', redirect: 'follow' })
+      fetch(state.gasApiUrl + '?action=getInitialData&_t=' + Date.now(), { method: 'GET', redirect: 'follow' })
         .then(function(response) {
           if (!response.ok) throw new Error('HTTP ' + response.status);
           return response.json();
@@ -2395,83 +2395,35 @@
       fixedRecords: [
         {
           id: '1',
-          totalCaseIsu: 'Indihome Los Merah Area Dago Atas Massal',
-          requestor: 'Call Center 147',
+          totalCaseIsu: 'Perhitungan Paket PDD (Juli 2026)',
+          requestor: 'Customer Care',
           status: 'Open',
-          followUpTo: 'Teknisi Witel Bandung',
+          followUpTo: 'Tim Billing & IT',
           bulan: 'Juli 2026',
           tanggal: '2026-07-23T10:00:00Z',
-          nama: 'Cluster Dago',
+          nama: 'Pelanggan IndiHome',
           nomorLayanan: '122556677889',
-          kategori: 'Los Merah Massal',
-          detail: 'Lampu LOS kedip merah massal 1 blok komplek perumahan Dago.',
-          pic: 'Witel Bandung',
+          kategori: 'Perhitungan Paket PDD',
+          detail: 'Perhitungan paket PDD bulan Juli 2026 memerlukan rekonsiliasi.',
+          pic: 'Tim Billing',
           terakhirUpdate: '2026-07-23T17:00:00Z',
           statusInformasi: 'Belum Ada Update'
         },
         {
           id: '2',
-          totalCaseIsu: 'Permintaan Relokasi Jalur Kabel Fiber Optic',
-          requestor: 'Sales D2D',
+          totalCaseIsu: 'Biaya IndiHome Smart (Agustus 2026)',
+          requestor: 'Customer Care',
           status: 'Open',
-          followUpTo: 'Tim Maintenance Lapangan',
-          bulan: 'Juli 2026',
-          tanggal: '2026-07-22T08:00:00Z',
-          nama: 'Gedung Wisma Niaga',
+          followUpTo: 'Tim Billing & IT',
+          bulan: 'Agustus 2026',
+          tanggal: '2026-08-20T08:00:00Z',
+          nama: 'Pelanggan IndiHome Smart',
           nomorLayanan: '122998877665',
-          kategori: 'Relokasi ODP',
-          detail: 'Relokasi kabel fiber akibat pelebaran jalan protokol kota.',
-          pic: 'Tim Lapangan',
-          terakhirUpdate: '2026-07-22T20:30:00Z',
+          kategori: 'Biaya IndiHome Smart',
+          detail: 'Penyesuaian tagihan biaya IndiHome Smart periode Agustus 2026.',
+          pic: 'Tim Billing',
+          terakhirUpdate: '2026-08-20T20:30:00Z',
           statusInformasi: 'Belum Ada Update'
-        },
-        {
-          id: '3',
-          totalCaseIsu: 'ONT Sering Restart & Redaman Tinggi',
-          requestor: 'Customer Care Online',
-          status: 'Closed',
-          followUpTo: 'Teknisi Datel Surabaya',
-          bulan: 'Agustus 2026',
-          tanggal: '2026-08-24T14:20:00Z',
-          nama: 'Hendra Wijaya',
-          nomorLayanan: '133499887766',
-          kategori: 'ONT Restart Berulang',
-          detail: 'Perangkat ONT sering reboot otomatis setiap 30 menit. Sudah dicoba ganti adaptor tetap sama.',
-          pic: 'Dewi CHO',
-          terakhirUpdate: '2026-08-25T02:20:00Z',
-          statusInformasi: 'Sudah Ditinjau'
-        },
-        {
-          id: '4',
-          totalCaseIsu: 'Gangguan Intermittent Internet Pelanggan Corporate HVC',
-          requestor: 'Helpdesk Regional',
-          status: 'InProgress',
-          followUpTo: 'Tim Splicing Lapangan',
-          bulan: 'Agustus 2026',
-          tanggal: '2026-08-20T08:30:00Z',
-          nama: 'PT Solusi Pratama',
-          nomorLayanan: '122876543210',
-          kategori: 'Link Degradation',
-          detail: 'Koneksi internet terputus berkala setiap jam sibuk.',
-          pic: 'Rizal CHO',
-          terakhirUpdate: '2026-08-20T09:30:00Z',
-          statusInformasi: 'Ada Update Baru'
-        },
-        {
-          id: '5',
-          totalCaseIsu: 'LOS Merah Massal ODP-GBL-04 (Fiber Cut)',
-          requestor: 'Helpdesk Regional',
-          status: 'InProgress',
-          followUpTo: 'Tim Splicing Lapangan',
-          bulan: 'Oktober 2026',
-          tanggal: '2026-10-25T08:30:00Z',
-          nama: 'PT Solusi Pratama',
-          nomorLayanan: '122876543210',
-          kategori: 'LOS Merah / Fiber Cut',
-          detail: 'Lampu indikator LOS merah kedap-kedip di OLT sejak pagi. Sambungan internet fiber putus total.',
-          pic: 'Rizal CHO',
-          terakhirUpdate: '2026-10-25T09:30:00Z',
-          statusInformasi: 'Ada Update Baru'
         }
       ],
       logs: [
@@ -2484,26 +2436,6 @@
           statusTerkait: 'InProgress',
           followUpTo: 'Tim Radio Optimization (RO)',
           timestamp: '2026-10-15T10:00:00Z'
-        },
-        {
-          logId: 'LOG-20261025-002',
-          ticketId: '5',
-          serviceType: 'FIXED',
-          author: 'Rizal CHO',
-          message: 'Ditemukan kabel distribusi 48 core terputus akibat pengerjaan galian drainase kota. Teknisi kabel sedang proses splicing.',
-          statusTerkait: 'InProgress',
-          followUpTo: 'Tim Splicing Lapangan',
-          timestamp: '2026-10-25T09:30:00Z'
-        },
-        {
-          logId: 'LOG-20260825-003',
-          ticketId: '3',
-          serviceType: 'FIXED',
-          author: 'Dewi CHO',
-          message: 'Teknisi lapangan telah melakukan penggantian unit ONT baru tipe ZTE F670L. Sinyal redaman RX normal di -18 dBm. Pelanggan telah konfirmasi internet lancar kembali.',
-          statusTerkait: 'Closed',
-          followUpTo: 'Teknisi Datel Surabaya',
-          timestamp: '2026-08-25T02:20:00Z'
         }
       ]
     };
