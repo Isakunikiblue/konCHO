@@ -184,6 +184,17 @@ function findBestSheet(ss, targetName) {
     }
   }
 
+  // Pass 4: Fallback untuk sheet Fixed jika nama tab berbeda (misal Sheet2, Indihome, dll)
+  if (candidates.length === 0 && isFixed) {
+    for (var s = 0; s < sheets.length; s++) {
+      var sClean = sheets[s].getName().toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (sClean.indexOf('mob') < 0 && sClean.indexOf('log') < 0) {
+        candidates.push(sheets[s]);
+        break;
+      }
+    }
+  }
+
   if (candidates.length === 0) return null;
   if (candidates.length === 1) return candidates[0];
 
@@ -486,6 +497,21 @@ function getSheetRecords(ss, sheetName, serviceType) {
     if (isRowEmpty) continue;
 
     var rawCase = caseIdx >= 0 && row[caseIdx] ? String(row[caseIdx]).trim() : '';
+
+    // Deteksi jika Kolom C kosong tapi teks isu berada di Kolom B atau D
+    if (!rawCase || rawCase === '' || rawCase === '-' || (!isNaN(rawCase) && String(rawCase).length < 5)) {
+      var candidateCols = [2, 1, 3, 0];
+      for (var cc = 0; cc < candidateCols.length; cc++) {
+        var colNum = candidateCols[cc];
+        if (colNum < row.length && row[colNum]) {
+          var cand = String(row[colNum]).trim();
+          if (cand && cand !== '-' && !parseMonthString(cand) && (isNaN(cand) || cand.length > 5)) {
+            rawCase = cand;
+            break;
+          }
+        }
+      }
+    }
 
     // =========================================================================
     // PENANGANAN BARIS MERGED CELL / CONTINUATION SUB-ITEM
@@ -935,12 +961,24 @@ function updateTicketStatus(ticketId, serviceType, newStatus, author) {
  * Helper Pencarian Indeks Header yang fleksibel
  */
 function findHeaderIndex(headers, candidateNames) {
-  for (var i = 0; i < headers.length; i++) {
-    var cleanHeader = String(headers[i]).toLowerCase().replace(/[^a-z0-9]/g, '');
-    for (var j = 0; j < candidateNames.length; j++) {
-      var candidate = candidateNames[j].toLowerCase().replace(/[^a-z0-9]/g, '');
-      if (cleanHeader === candidate || cleanHeader.indexOf(candidate) >= 0) {
+  if (!headers || !candidateNames) return -1;
+  // Pass 1: Exact matches by priority of candidateNames
+  for (var j = 0; j < candidateNames.length; j++) {
+    var candidate = candidateNames[j].toLowerCase().replace(/[^a-z0-9]/g, '');
+    for (var i = 0; i < headers.length; i++) {
+      var cleanHeader = String(headers[i] || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (cleanHeader === candidate) {
         return i;
+      }
+    }
+  }
+  // Pass 2: Substring matches by priority of candidateNames
+  for (var k = 0; k < candidateNames.length; k++) {
+    var candidateSub = candidateNames[k].toLowerCase().replace(/[^a-z0-9]/g, '');
+    for (var m = 0; m < headers.length; m++) {
+      var cleanHeaderSub = String(headers[m] || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+      if (cleanHeaderSub.indexOf(candidateSub) >= 0 || candidateSub.indexOf(cleanHeaderSub) >= 0) {
+        return m;
       }
     }
   }
