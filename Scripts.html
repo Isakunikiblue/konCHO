@@ -20,8 +20,9 @@
     mobileHeaders: [],
     fixedHeaders: [],
     activeServiceScope: 'ALL',      // 'ALL' | 'MOBILE' | 'FIXED'
-    activeMonthFilter: 'all',   // Default aktif: 'Oktober'
+    activeMonthFilter: 'all',   // Default aktif: 'all'
     activeStatusFilter: 'all',      // 'all' | 'Open' | 'InProgress' | 'Closed'
+    currentView: 'home',            // 'home' | 'detail' (Default: 'home' sesuai permintaan user)
     searchQuery: '',
     currentActionTicket: null,      // Tiket yang sedang ditargetkan oleh modal
     theme: localStorage.getItem('koncho_theme') || 'dark',
@@ -37,8 +38,10 @@
     
     btnOpenNewModal: document.getElementById('btnOpenNewModal'),
 
-    // Sidebar Kiri
-    sidebarNavBtns: document.querySelectorAll('.sidebar-nav-btn'),
+    // Sidebar Kiri: Navigasi Home & Detail
+    navHome: document.getElementById('navHome'),
+    navDetailCases: document.getElementById('navDetailCases'),
+    sidebarNavBtns: document.querySelectorAll('.sidebar-nav-btn[data-service]'),
     monthFilterSelect: document.getElementById('monthFilterSelect'),
     kpiNavBtns: document.querySelectorAll('.kpi-nav-btn'),
     countTotal: document.getElementById('countTotal'),
@@ -47,6 +50,8 @@
     countClosed: document.getElementById('countClosed'),
 
     // Area Utama Kanan
+    btnViewHome: document.getElementById('btnViewHome'),
+    btnViewDetail: document.getElementById('btnViewDetail'),
     searchInput: document.getElementById('searchInput'),
     btnClearSearch: document.getElementById('btnClearSearch'),
     activeScopeLabel: document.getElementById('activeScopeLabel'),
@@ -698,6 +703,38 @@
     var btnLogout = document.getElementById('btnLogout');
     if (btnLogout) btnLogout.addEventListener('click', handleLogout);
 
+    // 0. Navigasi Menu: Home (Sheet List) vs Detail Case
+    if (dom.navHome) {
+      dom.navHome.addEventListener('click', function() {
+        state.activeServiceScope = 'ALL';
+        state.activeStatusFilter = 'all';
+        dom.sidebarNavBtns.forEach(function(b) {
+          b.classList.toggle('active', b.getAttribute('data-service') === 'ALL');
+        });
+        dom.kpiNavBtns.forEach(function(b) {
+          b.classList.toggle('active', b.getAttribute('data-status') === 'all' || b.id === 'pillTotal');
+        });
+        updateScopeLabel();
+        updateKpiCounters();
+        setViewMode('home');
+      });
+    }
+    if (dom.navDetailCases) {
+      dom.navDetailCases.addEventListener('click', function() {
+        setViewMode('detail');
+      });
+    }
+    if (dom.btnViewHome) {
+      dom.btnViewHome.addEventListener('click', function() {
+        setViewMode('home');
+      });
+    }
+    if (dom.btnViewDetail) {
+      dom.btnViewDetail.addEventListener('click', function() {
+        setViewMode('detail');
+      });
+    }
+
     // 1. Theme Toggle
     if (dom.btnToggleTheme) {
       dom.btnToggleTheme.addEventListener('click', function() {
@@ -817,6 +854,21 @@
       dom.themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
     }
     localStorage.setItem('koncho_theme', theme);
+  }
+
+  function setViewMode(mode) {
+    state.currentView = mode;
+    if (dom.navHome) dom.navHome.classList.toggle('active', mode === 'home');
+    if (dom.navDetailCases) dom.navDetailCases.classList.toggle('active', mode === 'detail');
+    if (dom.btnViewHome) dom.btnViewHome.classList.toggle('active', mode === 'home');
+    if (dom.btnViewDetail) dom.btnViewDetail.classList.toggle('active', mode === 'detail');
+
+    var titleEl = document.getElementById('casesCardTitle');
+    if (titleEl) {
+      titleEl.textContent = mode === 'home' ? 'Home • List Isu CHO (Kolom C, H, J)' : 'Daftar Case Isu CHO';
+    }
+
+    renderCaseList();
   }
 
   function updateScopeLabel() {
@@ -1189,6 +1241,18 @@
     html += '</div>';
     html += '</div>';
 
+    // =========================================================================
+    // JIKA DALAM TAMPILAN HOME: TAMPILKAN LIST SPREADSHEET 4 KOLOM
+    // Sesuai instruksi: "yang dimasukkan adalah Main Issue kolom C, Status kolom H
+    // dan status Update Kolom J dan kasih kolom juga pembeda CHO Fixed, CHO Mobile yang lain-lain tidak usah dimasukkan"
+    // =========================================================================
+    if (state.currentView === 'home') {
+      html += renderHomeSheetTable(filtered);
+      dom.caseListContainer.innerHTML = html;
+      attachCardActionHandlers();
+      return;
+    }
+
     var isBerandaMode = (!state.activeStatusFilter || state.activeStatusFilter === 'all');
 
     filtered.forEach(function(item) {
@@ -1364,6 +1428,101 @@
 
     // Pasang Event Listeners
     attachCardActionHandlers();
+  }
+
+  /**
+   * =========================================================================
+   * RENDER HOME SHEET TABLE
+   * Tabel bergaya spreadsheet berisi persis 4 kolom sesuai permintaan user:
+   * 1. Unit (Pembeda CHO Fixed vs CHO Mobile)
+   * 2. Main Issue (Kolom C)
+   * 3. Status (Kolom H)
+   * 4. Status Update (Kolom J)
+   * (Yang lain-lain tidak dimasukkan agar bersih & fokus)
+   * =========================================================================
+   */
+  function renderHomeSheetTable(items) {
+    if (!items || items.length === 0) {
+      return '<div class="empty-card-state" style="margin-top:16px;">' +
+        '<div class="empty-icon">📁</div>' +
+        '<div class="empty-title">Tidak ada data case isu pada Home</div>' +
+        '<div class="empty-desc">Tidak ada data case yang sesuai dengan filter Unit (' + escapeHtml(state.activeServiceScope) + ') atau Periode saat ini.</div>' +
+        '</div>';
+    }
+
+    var currentRole = (state.authUser && state.authUser.role) ? state.authUser.role : 'Administrator';
+    var canUpdate = currentRole !== 'Inputer';
+
+    var html = '<div class="home-sheet-container">';
+    html += '<div class="home-sheet-card">';
+    html += '  <div class="home-table-responsive">';
+    html += '    <table class="home-sheet-table">';
+    html += '      <thead>';
+    html += '        <tr>';
+    html += '          <th style="width: 55px; text-align: center;">No</th>';
+    html += '          <th style="width: 140px; text-align: center;">Unit</th>';
+    html += '          <th style="min-width: 320px;">Main Issue (Kolom C)</th>';
+    html += '          <th style="width: 140px; text-align: center;">Status (Kolom H)</th>';
+    html += '          <th style="min-width: 320px;">Status Update (Kolom J)</th>';
+    html += '        </tr>';
+    html += '      </thead>';
+    html += '      <tbody>';
+
+    items.forEach(function(item, idx) {
+      var isMobile = item.serviceType === 'MOBILE';
+      var srvLabel = isMobile ? 'CHO Mobile' : 'CHO Fixed';
+      var srvClass = isMobile ? 'mobile' : 'fixed';
+
+      var stNorm = (item.status || 'Open').toLowerCase().replace(/[^a-z]/g, '');
+      var statusKey = 'open';
+      var statusLabel = 'Open';
+      if (stNorm.indexOf('progress') >= 0) {
+        statusKey = 'inprogress';
+        statusLabel = 'In Progress';
+      } else if (stNorm.indexOf('close') >= 0 || stNorm.indexOf('solve') >= 0 || stNorm.indexOf('selesai') >= 0) {
+        statusKey = 'closed';
+        statusLabel = 'Closed';
+      }
+
+      var mainIssueText = item.totalCaseIsu || item.mainIssue || '-';
+
+      // Status Update (Kolom J)
+      var statusUpdateText = item.statusInformasi || item.statusUpdate || item.inProgressNote || item.closedNote || item.progress || (statusKey === 'open' ? 'Belum Ada Update' : 'Update Sedang Berjalan');
+
+      html += '        <tr class="home-sheet-row" data-id="' + escapeHtml(item.id) + '" data-service="' + item.serviceType + '">';
+      html += '          <td style="text-align: center; font-weight: 700; color: var(--text-muted);">' + (idx + 1) + '</td>';
+      html += '          <td style="text-align: center;">';
+      html += '            <span class="badge-srv ' + srvClass + '">' + escapeHtml(srvLabel) + '</span>';
+      html += '          </td>';
+      html += '          <td class="home-col-main-issue">';
+      html += '            <div class="main-issue-title">' + escapeHtml(mainIssueText) + '</div>';
+      html += '          </td>';
+      html += '          <td style="text-align: center;">';
+      if (canUpdate) {
+        if (statusKey === 'open') {
+          html += '            <span class="badge-status-pill ' + statusKey + ' btn-trigger-inprog" data-id="' + escapeHtml(item.id) + '" style="cursor:pointer;" title="Klik untuk proses (In Progress)">' + escapeHtml(statusLabel) + ' ✏️</span>';
+        } else if (statusKey === 'inprogress') {
+          html += '            <span class="badge-status-pill ' + statusKey + ' btn-trigger-closed" data-id="' + escapeHtml(item.id) + '" style="cursor:pointer;" title="Klik untuk selesaikan (Closed)">' + escapeHtml(statusLabel) + ' ✏️</span>';
+        } else {
+          html += '            <span class="badge-status-pill ' + statusKey + ' btn-trigger-reopen" data-id="' + escapeHtml(item.id) + '" style="cursor:pointer;" title="Klik untuk buka kembali">' + escapeHtml(statusLabel) + '</span>';
+        }
+      } else {
+        html += '            <span class="badge-status-pill ' + statusKey + '">' + escapeHtml(statusLabel) + '</span>';
+      }
+      html += '          </td>';
+      html += '          <td class="home-col-status-update">';
+      html += '            <div class="status-update-text">' + escapeHtml(statusUpdateText) + '</div>';
+      html += '          </td>';
+      html += '        </tr>';
+    });
+
+    html += '      </tbody>';
+    html += '    </table>';
+    html += '  </div>';
+    html += '</div>';
+    html += '</div>';
+
+    return html;
   }
 
   /**
@@ -2235,136 +2394,7 @@
           terakhirUpdate: '2026-10-10T14:45:00Z',
           statusInformasi: 'Belum Ada Update'
         }      ],
-      fixedRecords: [
-        {
-          id: '1',
-          totalCaseIsu: 'LOS Merah Massal ODP-GBL-04 (Fiber Cut)',
-          requestor: 'Helpdesk Regional',
-          status: 'InProgress',
-          followUpTo: 'Tim Splicing Lapangan',
-          bulan: 'Oktober 2026',
-          tanggal: '2026-10-25T08:30:00Z',
-          nama: 'PT Solusi Pratama',
-          nomorLayanan: '122876543210',
-          kategori: 'LOS Merah / Fiber Cut',
-          detail: 'Lampu indikator LOS merah kedap-kedip di OLT sejak pagi. Sambungan internet fiber putus total.',
-          pic: 'Rizal CHO',
-          terakhirUpdate: '2026-10-25T09:30:00Z',
-          statusInformasi: 'Ada Update Baru'
-        },
-        {
-          id: '2',
-          totalCaseIsu: 'ONT Sering Restart & Redaman Tinggi',
-          requestor: 'Customer Care Online',
-          status: 'Closed',
-          followUpTo: 'Teknisi Datel Surabaya',
-          bulan: 'Agustus 2026',
-          tanggal: '2026-08-24T14:20:00Z',
-          nama: 'Hendra Wijaya',
-          nomorLayanan: '133499887766',
-          kategori: 'ONT Restart Berulang',
-          detail: 'Perangkat ONT sering reboot otomatis setiap 30 menit. Sudah dicoba ganti adaptor tetap sama.',
-          pic: 'Dewi CHO',
-          terakhirUpdate: '2026-08-25T02:20:00Z',
-          statusInformasi: 'Sudah Ditinjau'
-        },
-        {
-          id: '3',
-          totalCaseIsu: 'Indihome Los Merah Area Dago Atas Massal',
-          requestor: 'Call Center 147',
-          status: 'Open',
-          followUpTo: 'Teknisi Witel Bandung',
-          bulan: 'Juli 2026',
-          tanggal: '2026-07-23T10:00:00Z',
-          nama: 'Cluster Dago',
-          nomorLayanan: '122556677889',
-          kategori: 'Los Merah Massal',
-          detail: 'Lampu LOS kedip merah massal 1 blok komplek perumahan Dago.',
-          pic: 'Witel Bandung',
-          terakhirUpdate: '2026-07-23T17:00:00Z',
-          statusInformasi: 'Belum Ada Update'
-        },
-        {
-          id: '4',
-          totalCaseIsu: 'Permintaan Relokasi Jalur Kabel Fiber Optic',
-          requestor: 'Sales D2D',
-          status: 'Open',
-          followUpTo: 'Tim Maintenance Lapangan',
-          bulan: 'Juli 2026',
-          tanggal: '2026-07-22T08:00:00Z',
-          nama: 'Gedung Wisma Niaga',
-          nomorLayanan: '122998877665',
-          kategori: 'Relokasi ODP',
-          detail: 'Relokasi kabel fiber akibat pelebaran jalan protokol kota.',
-          pic: 'Tim Lapangan',
-          terakhirUpdate: '2026-07-22T20:30:00Z',
-          statusInformasi: 'Belum Ada Update'
-        },
-        {
-          id: '5',
-          totalCaseIsu: 'Gangguan Intermittent Internet Pelanggan Corporate HVC',
-          requestor: 'Helpdesk Regional',
-          status: 'InProgress',
-          followUpTo: 'Tim Splicing Lapangan',
-          bulan: 'Oktober 2026',
-          tanggal: '2026-10-25T08:30:00Z',
-          nama: 'PT Solusi Pratama',
-          nomorLayanan: '122876543210',
-          kategori: 'LOS Merah / Fiber Cut',
-          detail: 'Lampu indikator LOS merah kedap-kedip di OLT sejak pagi. Sambungan internet fiber putus total.',
-          pic: 'Rizal CHO',
-          terakhirUpdate: '2026-10-25T09:30:00Z',
-          statusInformasi: 'Ada Update Baru'
-        },
-        {
-          id: '2',
-          totalCaseIsu: 'ONT Sering Restart & Redaman Tinggi',
-          requestor: 'Customer Care Online',
-          status: 'Closed',
-          followUpTo: 'Teknisi Datel Surabaya',
-          bulan: 'Oktober 2026',
-          tanggal: '2026-10-24T14:20:00Z',
-          nama: 'Hendra Wijaya',
-          nomorLayanan: '133499887766',
-          kategori: 'ONT Restart Berulang',
-          detail: 'Perangkat ONT sering reboot otomatis setiap 30 menit. Sudah dicoba ganti adaptor tetap sama.',
-          pic: 'Dewi CHO',
-          terakhirUpdate: '2026-10-25T02:20:00Z',
-          statusInformasi: 'Sudah Ditinjau'
-        },
-        {
-          id: '3',
-          totalCaseIsu: 'Indihome Los Merah Area Dago Atas Massal',
-          requestor: 'Call Center 147',
-          status: 'Open',
-          followUpTo: 'Teknisi Witel Bandung',
-          bulan: 'Oktober 2026',
-          tanggal: '2026-10-23T10:00:00Z',
-          nama: 'Cluster Dago',
-          nomorLayanan: '122556677889',
-          kategori: 'Mass Disruptive',
-          detail: 'Lampu LOS kedip merah massal 1 blok komplek perumahan Dago.',
-          pic: 'Tim Fixed',
-          terakhirUpdate: '2026-10-23T10:00:00Z',
-          statusInformasi: 'Belum Ada Update'
-        },
-        {
-          id: '4',
-          totalCaseIsu: 'Permintaan Relokasi Jalur Kabel Fiber Optic',
-          requestor: 'Sales B2B',
-          status: 'Open',
-          followUpTo: 'Tim Maintenance Lapangan',
-          bulan: 'Oktober 2026',
-          tanggal: '2026-10-22T13:30:00Z',
-          nama: 'Gedung Wisma Niaga',
-          nomorLayanan: '122998877665',
-          kategori: 'Relokasi OSP',
-          detail: 'Relokasi kabel fiber akibat pelebaran jalan protokol kota.',
-          pic: 'Tim Fixed',
-          terakhirUpdate: '2026-10-22T13:30:00Z',
-          statusInformasi: 'Belum Ada Update'
-        }
-      ],
+      fixedRecords: [],
       logs: [
         {
           logId: 'LOG-20261015-001',
@@ -2375,26 +2405,6 @@
           statusTerkait: 'InProgress',
           followUpTo: 'Tim Radio Optimization (RO)',
           timestamp: '2026-10-15T10:00:00Z'
-        },
-        {
-          logId: 'LOG-20261025-002',
-          ticketId: '1',
-          serviceType: 'FIXED',
-          author: 'Rizal CHO',
-          message: 'Ditemukan kabel distribusi 48 core terputus akibat pengerjaan galian drainase kota. Teknisi kabel sedang proses splicing.',
-          statusTerkait: 'InProgress',
-          followUpTo: 'Tim Splicing Lapangan',
-          timestamp: '2026-10-25T09:30:00Z'
-        },
-        {
-          logId: 'LOG-20261025-003',
-          ticketId: '2',
-          serviceType: 'FIXED',
-          author: 'Dewi CHO',
-          message: 'Teknisi lapangan telah melakukan penggantian unit ONT baru tipe ZTE F670L. Sinyal redaman RX normal di -18 dBm. Pelanggan telah konfirmasi internet lancar kembali.',
-          statusTerkait: 'Closed',
-          followUpTo: 'Teknisi Datel Surabaya',
-          timestamp: '2026-10-25T02:20:00Z'
         }
       ]
     };

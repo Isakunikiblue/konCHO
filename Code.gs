@@ -257,10 +257,12 @@ function ensureTrackingColumns(sheet) {
   var headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
   
   var needsStatusInfo = !headers.some(function(h) { 
-    return String(h).toLowerCase().replace(/[^a-z]/g, '') === 'statusinformasi'; 
+    var cleanH = String(h).toLowerCase().replace(/[^a-z]/g, '');
+    return cleanH === 'statusinformasi' || cleanH === 'statusupdate'; 
   });
   var needsLastUpdate = !headers.some(function(h) { 
-    return String(h).toLowerCase().replace(/[^a-z]/g, '') === 'terakhirupdate'; 
+    var cleanL = String(h).toLowerCase().replace(/[^a-z]/g, '');
+    return cleanL === 'terakhirupdate' || cleanL === 'lastupdate'; 
   });
   
   if (needsStatusInfo) {
@@ -456,7 +458,10 @@ function getSheetRecords(ss, sheetName, serviceType) {
   var followUpIdx = findHeaderIndex(headers, ['follow up to', 'follow up', 'followup', 'follow_up_to', 'tindak lanjut ke', 'tindak lanjut']);
   if (followUpIdx < 0 && headers.length > 8) followUpIdx = 8; // Kolom I fallback
 
-  var monthColIdx = findHeaderIndex(headers, ['bulan - tahun', 'bulan', 'month', 'periode', 'period', 'tahun']);
+  var monthColIdx = findHeaderIndex(headers, ['bulan - tahun', 'bulan-tahun', 'bulan', 'month', 'periode', 'period', 'tahun']);
+  if (monthColIdx < 0 && headers.length > 1) {
+    monthColIdx = 1; // Kolom B fallback
+  }
   var dateIdx = findHeaderIndex(headers, ['tanggal_lapor', 'tanggal', 'tgl', 'created_at', 'date', 'timestamp', 'waktu']);
   var nameIdx = findHeaderIndex(headers, ['nama_pelanggan', 'nama', 'customer_name', 'pelanggan', 'akun', 'customer']);
   var numIdx = findHeaderIndex(headers, ['nomor_msisdn', 'nomor_internet_pstn', 'msisdn', 'no_layanan', 'no_internet', 'telepon', 'nomor', 'inet']);
