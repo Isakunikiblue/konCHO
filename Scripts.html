@@ -144,6 +144,300 @@
     }
   }
 
+    // =========================================================================
+  // SISTEM KELOLA PENGGUNA (USER MANAGEMENT) - KHUSUS ROLE ADMINISTRATOR
+  // =========================================================================
+  var DEFAULT_USER_ACCOUNTS = [
+    {
+      username: 'admin_koncho',
+      name: 'Administrator Utama',
+      role: 'Administrator',
+      password: 'koncho123',
+      createdAt: '2026-10-01'
+    },
+    {
+      username: 'facilitator_cho',
+      name: 'Dimas (CHO Facilitator)',
+      role: 'Facilitator',
+      password: 'koncho123',
+      createdAt: '2026-10-05'
+    },
+    {
+      username: 'inputer_cho',
+      name: 'Siti (CHO Inputer)',
+      role: 'Inputer',
+      password: 'koncho123',
+      createdAt: '2026-10-10'
+    }
+  ];
+
+  function getStoredUserAccounts() {
+    try {
+      var raw = localStorage.getItem('koncho_user_accounts');
+      if (raw) {
+        var parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length > 0) {
+          return parsed;
+        }
+      }
+    } catch (e) {}
+    saveStoredUserAccounts(DEFAULT_USER_ACCOUNTS);
+    return DEFAULT_USER_ACCOUNTS;
+  }
+
+  function saveStoredUserAccounts(list) {
+    try {
+      localStorage.setItem('koncho_user_accounts', JSON.stringify(list));
+    } catch (e) {}
+  }
+
+  // Buka Modal Kelola User
+  function openManageUsersModal() {
+    renderUserMgmtList();
+    hideUserForm();
+    var modal = document.getElementById('modalManageUsers');
+    if (modal) modal.classList.add('active');
+  }
+
+  function closeManageUsersModal() {
+    var modal = document.getElementById('modalManageUsers');
+    if (modal) modal.classList.remove('active');
+  }
+
+  // Render Tabel Daftar User
+  function renderUserMgmtList() {
+    var tbody = document.getElementById('userMgmtTableBody');
+    var countEl = document.getElementById('userCountTotal');
+    if (!tbody) return;
+
+    var users = getStoredUserAccounts();
+    if (countEl) {
+      countEl.textContent = 'Total: ' + users.length + ' Pengguna';
+    }
+
+    var currentUsername = (state.authUser && (state.authUser.username || state.authUser.name)) ? (state.authUser.username || state.authUser.name) : 'admin_koncho';
+
+    if (users.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:24px; color:#94a3b8;">Belum ada pengguna terdaftar</td></tr>';
+      return;
+    }
+
+    var html = '';
+    users.forEach(function(u) {
+      var isCurrent = u.username.toLowerCase() === currentUsername.toLowerCase();
+      var roleIcon = '👑';
+      var roleBadgeClass = 'role-admin';
+      if (u.role === 'Facilitator') {
+        roleIcon = '🛠️';
+        roleBadgeClass = 'role-facilitator';
+      } else if (u.role === 'Inputer') {
+        roleIcon = '📝';
+        roleBadgeClass = 'role-inputer';
+      }
+
+      var isRootAdmin = u.username.toLowerCase() === 'admin_koncho';
+
+      html += '<tr>';
+      html += '  <td>';
+      html += '    <div class="user-badge-cell">';
+      html += '      <div class="user-cell-avatar">' + roleIcon + '</div>';
+      html += '      <div>';
+      html += '        <span class="user-cell-username">@' + escapeHtml(u.username) + '</span>';
+      if (isCurrent) {
+        html += '        <span class="user-tag-current">Akun Anda</span>';
+      }
+      html += '      </div>';
+      html += '    </div>';
+      html += '  </td>';
+      html += '  <td><strong>' + escapeHtml(u.name || '-') + '</strong></td>';
+      html += '  <td><span class="badge-role ' + roleBadgeClass + '">' + roleIcon + ' ' + escapeHtml(u.role) + '</span></td>';
+      html += '  <td><code style="background:rgba(0,0,0,0.3); padding:3px 8px; border-radius:6px; font-size:12px; color:#f6c84c;">' + escapeHtml(u.password || '••••••••') + '</code></td>';
+      html += '  <td style="text-align: right; white-space: nowrap;">';
+      html += '    <button type="button" class="btn-table-action btn-table-edit" onclick="editUserAccount(\'' + escapeHtml(u.username) + '\')" title="Edit Akun">';
+      html += '      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
+      html += '      <span>Edit</span>';
+      html += '    </button>';
+      if (isRootAdmin || isCurrent) {
+        html += '    <button type="button" class="btn-table-action btn-table-delete" disabled title="' + (isRootAdmin ? 'Admin utama tidak dapat dihapus' : 'Tidak dapat menghapus akun yang sedang aktif') + '">';
+        html += '      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';
+        html += '      <span>Hapus</span>';
+        html += '    </button>';
+      } else {
+        html += '    <button type="button" class="btn-table-action btn-table-delete" onclick="deleteUserAccount(\'' + escapeHtml(u.username) + '\')" title="Hapus Akun">';
+        html += '      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="3 6 5 6 21 6"/><path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"/></svg>';
+        html += '      <span>Hapus</span>';
+        html += '    </button>';
+      }
+      html += '  </td>';
+      html += '</tr>';
+    });
+    tbody.innerHTML = html;
+  }
+
+  // Tampilkan / Sembunyikan Form Tambah User
+  function showAddUserForm() {
+    var card = document.getElementById('userFormCard');
+    var title = document.getElementById('userFormTitle');
+    var sub = document.getElementById('userFormSub');
+    var orig = document.getElementById('userEditOriginalUsername');
+    var uInp = document.getElementById('inpUserUsername');
+    var nameInp = document.getElementById('inpUserFullName');
+    var roleInp = document.getElementById('inpUserRole');
+    var passInp = document.getElementById('inpUserPassword');
+    var lblToggle = document.getElementById('lblToggleAddUser');
+
+    if (title) title.textContent = 'Tambah Pengguna Baru';
+    if (sub) sub.textContent = 'Isi form di bawah untuk membuat kredensial akun baru';
+    if (orig) orig.value = '';
+    if (uInp) { uInp.value = ''; uInp.readOnly = false; }
+    if (nameInp) nameInp.value = '';
+    if (roleInp) roleInp.value = 'Facilitator';
+    if (passInp) passInp.value = 'koncho123';
+    if (lblToggle) lblToggle.textContent = 'Tutup Form';
+    if (card) {
+      card.style.display = 'block';
+      if (uInp) uInp.focus();
+    }
+  }
+
+  function hideUserForm() {
+    var card = document.getElementById('userFormCard');
+    var lblToggle = document.getElementById('lblToggleAddUser');
+    if (card) card.style.display = 'none';
+    if (lblToggle) lblToggle.textContent = '+ Tambah Pengguna Baru';
+  }
+
+  function toggleAddUserForm() {
+    var card = document.getElementById('userFormCard');
+    if (card && card.style.display === 'block') {
+      hideUserForm();
+    } else {
+      showAddUserForm();
+    }
+  }
+
+  // Edit User
+  window.editUserAccount = function(username) {
+    var users = getStoredUserAccounts();
+    var found = users.find(function(u) { return u.username.toLowerCase() === username.toLowerCase(); });
+    if (!found) {
+      showToast('Pengguna tidak ditemukan!', 'error');
+      return;
+    }
+
+    var card = document.getElementById('userFormCard');
+    var title = document.getElementById('userFormTitle');
+    var sub = document.getElementById('userFormSub');
+    var orig = document.getElementById('userEditOriginalUsername');
+    var uInp = document.getElementById('inpUserUsername');
+    var nameInp = document.getElementById('inpUserFullName');
+    var roleInp = document.getElementById('inpUserRole');
+    var passInp = document.getElementById('inpUserPassword');
+    var lblToggle = document.getElementById('lblToggleAddUser');
+
+    if (title) title.textContent = 'Edit Pengguna: @' + found.username;
+    if (sub) sub.textContent = 'Perbarui nama lengkap, peran (role), atau kata sandi';
+    if (orig) orig.value = found.username;
+    if (uInp) {
+      uInp.value = found.username;
+      uInp.readOnly = true;
+    }
+    if (nameInp) nameInp.value = found.name || '';
+    if (roleInp) roleInp.value = found.role || 'Facilitator';
+    if (passInp) passInp.value = found.password || '';
+    if (lblToggle) lblToggle.textContent = 'Tutup Form Edit';
+    if (card) {
+      card.style.display = 'block';
+      if (nameInp) nameInp.focus();
+    }
+  };
+
+  // Simpan Pengguna (Create / Update)
+  function handleSaveUserAccount(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    var orig = (document.getElementById('userEditOriginalUsername') ? document.getElementById('userEditOriginalUsername').value : '').trim();
+    var username = (document.getElementById('inpUserUsername') ? document.getElementById('inpUserUsername').value : '').trim();
+    var name = (document.getElementById('inpUserFullName') ? document.getElementById('inpUserFullName').value : '').trim();
+    var role = (document.getElementById('inpUserRole') ? document.getElementById('inpUserRole').value : 'Facilitator').trim();
+    var password = (document.getElementById('inpUserPassword') ? document.getElementById('inpUserPassword').value : '').trim();
+
+    if (!username) {
+      showToast('Harap masukkan Nama Pengguna (Username)!', 'warning');
+      return;
+    }
+    if (!name) {
+      showToast('Harap masukkan Nama Lengkap!', 'warning');
+      return;
+    }
+    if (!password) {
+      showToast('Harap tentukan Kata Sandi (Password)!', 'warning');
+      return;
+    }
+
+    var users = getStoredUserAccounts();
+
+    if (orig) {
+      // Mode Edit
+      var idx = users.findIndex(function(u) { return u.username.toLowerCase() === orig.toLowerCase(); });
+      if (idx !== -1) {
+        users[idx].name = name;
+        users[idx].role = role;
+        users[idx].password = password;
+        saveStoredUserAccounts(users);
+        showToast('Akun @' + orig + ' berhasil diperbarui!', 'success');
+
+        // Jika mengedit akun yang sedang login, update sesi langsung
+        if (state.authUser && (state.authUser.username === orig || state.authUser.name === orig)) {
+          state.authUser.name = name;
+          state.authUser.role = role;
+          try { localStorage.setItem('koncho_auth_user', JSON.stringify(state.authUser)); } catch(err){}
+          applyRolePermissions();
+        }
+      }
+    } else {
+      // Mode Create Baru
+      var exists = users.some(function(u) { return u.username.toLowerCase() === username.toLowerCase(); });
+      if (exists) {
+        showToast('Username @' + username + ' sudah digunakan! Gunakan username lain.', 'error');
+        return;
+      }
+
+      users.push({
+        username: username,
+        name: name,
+        role: role,
+        password: password,
+        createdAt: new Date().toISOString().split('T')[0]
+      });
+      saveStoredUserAccounts(users);
+      showToast('Pengguna baru @' + username + ' (' + role + ') berhasil ditambahkan!', 'success');
+    }
+
+    hideUserForm();
+    renderUserMgmtList();
+  }
+
+  // Hapus Pengguna (Delete)
+  window.deleteUserAccount = function(username) {
+    if (username.toLowerCase() === 'admin_koncho') {
+      showToast('Akun admin_koncho adalah Administrator Utama dan tidak boleh dihapus!', 'warning');
+      return;
+    }
+    var currentUsername = (state.authUser && (state.authUser.username || state.authUser.name)) ? (state.authUser.username || state.authUser.name) : '';
+    if (username.toLowerCase() === currentUsername.toLowerCase()) {
+      showToast('Anda tidak dapat menghapus akun yang sedang aktif digunakan!', 'warning');
+      return;
+    }
+
+    if (confirm('Apakah Anda yakin ingin menghapus akun @' + username + '? Pengguna ini tidak akan dapat login lagi.')) {
+      var users = getStoredUserAccounts();
+      var filtered = users.filter(function(u) { return u.username.toLowerCase() !== username.toLowerCase(); });
+      saveStoredUserAccounts(filtered);
+      showToast('Pengguna @' + username + ' berhasil dihapus.', 'info');
+      renderUserMgmtList();
+    }
+  };
+
   function applyRolePermissions() {
     var role = (state.authUser && state.authUser.role) ? state.authUser.role : 'Administrator';
     
@@ -183,6 +477,17 @@
       } else {
         btnNew.style.display = 'inline-flex';
       }
+    }
+
+    // 3. Kontrol Menu Kelola User (KHUSUS ADMINISTRATOR):
+    var btnManageHeader = document.getElementById('btnManageUsers');
+    var sidebarAdminBlock = document.getElementById('sidebarAdminBlock');
+    if (role === 'Administrator') {
+      if (btnManageHeader) btnManageHeader.style.display = 'inline-flex';
+      if (sidebarAdminBlock) sidebarAdminBlock.style.display = 'block';
+    } else {
+      if (btnManageHeader) btnManageHeader.style.display = 'none';
+      if (sidebarAdminBlock) sidebarAdminBlock.style.display = 'none';
     }
   }
 
@@ -231,34 +536,36 @@
       return;
     }
 
-    var role = 'Administrator';
-    var uLower = username.toLowerCase();
+    var accounts = getStoredUserAccounts();
+    var found = accounts.find(function(a) {
+      return a.username.toLowerCase() === username.toLowerCase();
+    });
 
-    // Deteksi Role Berdasarkan Input
-    if (username === 'admin_koncho' || uLower.indexOf('admin') >= 0) {
-      role = 'Administrator';
-      if (password !== 'koncho123') {
+    var role = 'Administrator';
+    var displayName = username;
+
+    if (found) {
+      if (found.password && found.password !== password) {
+        showToast('Kata sandi salah untuk pengguna: @' + username, 'error');
+        if (passInp) passInp.focus();
+        return;
+      }
+      role = found.role || 'Administrator';
+      displayName = found.name || found.username;
+    } else {
+      var uLower = username.toLowerCase();
+      if (uLower.indexOf('facilitator') >= 0) {
+        role = 'Facilitator';
+      } else if (uLower.indexOf('input') >= 0) {
+        role = 'Inputer';
+      } else {
+        role = 'Administrator';
+      }
+      if (username === 'admin_koncho' && password !== 'koncho123') {
         showToast('Kata sandi salah! Password untuk admin_koncho adalah: koncho123', 'error');
         if (passInp) passInp.focus();
         return;
       }
-    } else if (username === 'facilitator_cho' || uLower.indexOf('facilitator') >= 0) {
-      role = 'Facilitator';
-      if (password !== 'koncho123') {
-        showToast('Kata sandi salah! Password untuk facilitator adalah: koncho123', 'error');
-        if (passInp) passInp.focus();
-        return;
-      }
-    } else if (username === 'inputer_cho' || uLower.indexOf('input') >= 0) {
-      role = 'Inputer';
-      if (password !== 'koncho123') {
-        showToast('Kata sandi salah! Password untuk inputer adalah: koncho123', 'error');
-        if (passInp) passInp.focus();
-        return;
-      }
-    } else {
-      // Default fallback
-      role = 'Administrator';
     }
 
     if (btnSubmit) {
@@ -268,7 +575,8 @@
 
     setTimeout(function() {
       state.authUser = {
-        name: username,
+        name: displayName,
+        username: username,
         role: role,
         loginTime: new Date().toISOString()
       };
@@ -280,7 +588,7 @@
         } catch (err) {}
       }
 
-      showToast('Selamat Datang di konCHO! Masuk sebagai ' + role + ' (' + username + ')', 'success');
+      showToast('Selamat Datang di konCHO! Masuk sebagai ' + role + ' (' + displayName + ')', 'success');
       showDashboardApp();
       renderCaseList();
 
@@ -360,6 +668,32 @@
         passInp.focus();
       });
     }
+
+    
+    // User Management Events (Khusus Role Administrator)
+    var btnManageHeader = document.getElementById('btnManageUsers');
+    if (btnManageHeader) btnManageHeader.addEventListener('click', openManageUsersModal);
+
+    var sidebarBtnManage = document.getElementById('sidebarBtnManageUsers');
+    if (sidebarBtnManage) sidebarBtnManage.addEventListener('click', openManageUsersModal);
+
+    var btnCloseManage = document.getElementById('btnCloseManageUsersModal');
+    if (btnCloseManage) btnCloseManage.addEventListener('click', closeManageUsersModal);
+
+    var btnDoneManage = document.getElementById('btnDoneManageUsers');
+    if (btnDoneManage) btnDoneManage.addEventListener('click', closeManageUsersModal);
+
+    var btnToggleAdd = document.getElementById('btnToggleAddUserForm');
+    if (btnToggleAdd) btnToggleAdd.addEventListener('click', toggleAddUserForm);
+
+    var btnCancelUser = document.getElementById('btnCancelUserForm');
+    if (btnCancelUser) btnCancelUser.addEventListener('click', hideUserForm);
+
+    var formUser = document.getElementById('formUserMgmt');
+    if (formUser) formUser.addEventListener('submit', handleSaveUserAccount);
+
+    var btnSaveUser = document.getElementById('btnSaveUser');
+    if (btnSaveUser) btnSaveUser.addEventListener('click', handleSaveUserAccount);
 
     var btnLogout = document.getElementById('btnLogout');
     if (btnLogout) btnLogout.addEventListener('click', handleLogout);
@@ -466,7 +800,7 @@
     if (dom.btnSubmitNewReport) dom.btnSubmitNewReport.addEventListener('click', handleSubmitNewReport);
 
     // Tutup modal jika klik di luar box modal
-    [dom.modalInProgress, dom.modalClosed, dom.modalLog, dom.newDataModal].forEach(function(m) {
+    [dom.modalInProgress, dom.modalClosed, dom.modalLog, dom.newDataModal, document.getElementById('modalManageUsers')].forEach(function(m) {
       if (!m) return;
       m.addEventListener('click', function(e) {
         if (e.target === m) {

@@ -1582,7 +1582,203 @@
     border-radius: var(--radius-sm);
   }
 
-    /* Tombol Logout pada Navbar Header */
+    
+  /* =========================================================================
+     ADMINISTRATOR KELOLA USER (HEADER, SIDEBAR & MODAL)
+     ========================================================================= */
+  .btn-hdr-admin {
+    background: rgba(246, 200, 76, 0.12) !important;
+    border-color: rgba(246, 200, 76, 0.38) !important;
+    color: #f6c84c !important;
+    font-weight: 700;
+  }
+  .btn-hdr-admin:hover {
+    background: rgba(246, 200, 76, 0.22) !important;
+    border-color: #f6c84c !important;
+    color: #fde047 !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(246, 200, 76, 0.25);
+  }
+
+  .admin-nav-btn {
+    border-color: rgba(246, 200, 76, 0.3) !important;
+  }
+  .admin-nav-btn:hover {
+    border-color: #f6c84c !important;
+    background: rgba(246, 200, 76, 0.1) !important;
+  }
+
+  .user-mgmt-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 16px;
+    padding-bottom: 14px;
+    border-bottom: 1px solid var(--border-color);
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .user-mgmt-stats {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  .user-mgmt-stat-pill {
+    font-size: 12px;
+    font-weight: 700;
+    color: #f6c84c;
+    background: rgba(246, 200, 76, 0.12);
+    border: 1px solid rgba(246, 200, 76, 0.28);
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
+  }
+  .user-mgmt-stat-hint {
+    font-size: 11.5px;
+    color: var(--text-muted);
+  }
+
+  .user-form-card {
+    background: var(--bg-elevated);
+    border: 1px solid rgba(246, 200, 76, 0.32);
+    border-radius: var(--radius-md);
+    padding: 18px 20px;
+    margin-bottom: 20px;
+    animation: fadeIn 0.2s ease;
+  }
+  .user-form-header {
+    margin-bottom: 14px;
+  }
+  .user-form-header h3 {
+    margin: 0 0 4px 0;
+    font-size: 15px;
+    font-weight: 800;
+    color: #f8fafc;
+  }
+  .user-form-sub {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+  .user-form-actions {
+    display: flex;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 14px;
+    padding-top: 12px;
+    border-top: 1px dashed var(--border-color);
+  }
+
+  .user-table-wrap {
+    overflow-x: auto;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--bg-card);
+  }
+  .user-mgmt-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+    text-align: left;
+  }
+  .user-mgmt-table th {
+    background: var(--bg-elevated);
+    padding: 10px 14px;
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--text-secondary);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    border-bottom: 1px solid var(--border-color);
+  }
+  .user-mgmt-table td {
+    padding: 12px 14px;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-primary);
+    vertical-align: middle;
+  }
+  .user-mgmt-table tr:last-child td {
+    border-bottom: none;
+  }
+  .user-mgmt-table tr:hover td {
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .user-badge-cell {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .user-cell-avatar {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: var(--bg-elevated);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 13px;
+    border: 1px solid var(--border-color);
+  }
+  .user-cell-username {
+    font-weight: 700;
+    color: #f8fafc;
+  }
+  .user-tag-current {
+    font-size: 9.5px;
+    font-weight: 700;
+    color: #10b981;
+    background: rgba(16, 185, 129, 0.12);
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid rgba(16, 185, 129, 0.3);
+    margin-left: 6px;
+  }
+
+  .btn-table-action {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    padding: 5px 10px;
+    border-radius: var(--radius-sm);
+    font-size: 11.5px;
+    font-weight: 600;
+    cursor: pointer;
+    border: 1px solid transparent;
+    transition: var(--transition);
+  }
+  .btn-table-edit {
+    background: rgba(99, 102, 241, 0.12);
+    color: #818cf8;
+    border-color: rgba(99, 102, 241, 0.3);
+  }
+  .btn-table-edit:hover {
+    background: rgba(99, 102, 241, 0.22);
+    border-color: #818cf8;
+    color: #c7d2fe;
+  }
+  .btn-table-delete {
+    background: rgba(239, 68, 68, 0.1);
+    color: #f87171;
+    border-color: rgba(239, 68, 68, 0.25);
+    margin-left: 6px;
+  }
+  .btn-table-delete:hover {
+    background: rgba(239, 68, 68, 0.22);
+    border-color: #ef4444;
+    color: #fca5a5;
+  }
+  .btn-table-delete:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+    pointer-events: none;
+  }
+
+  .gold-kicker {
+    color: #f6c84c !important;
+  }
+
+  /* Tombol Logout pada Navbar Header */
   .btn-logout {
     display: inline-flex;
     align-items: center;
