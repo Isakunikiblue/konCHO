@@ -122,10 +122,90 @@
   var selectedNewService = 'MOBILE';
 
   /**
+   * =========================================================================
+   * OTENTIKASI & HALAMAN LOGIN (SESSION MANAGEMENT)
+   * =========================================================================
+   */
+  function initAuth() {
+    var savedUser = localStorage.getItem('koncho_auth_user');
+    if (savedUser) {
+      try {
+        state.authUser = JSON.parse(savedUser);
+      } catch (e) {
+        state.authUser = { name: savedUser, role: 'Complaint Handling Officer' };
+      }
+      showDashboardApp();
+    } else {
+      showLoginScreen();
+    }
+  }
+
+  function showDashboardApp() {
+    var loginEl = document.getElementById('loginView');
+    var appEl = document.getElementById('appView');
+    var nameEl = document.getElementById('hdrUserName');
+    if (nameEl && state.authUser) {
+      nameEl.textContent = state.authUser.name || 'CHO Officer';
+    }
+    if (loginEl) loginEl.style.display = 'none';
+    if (appEl) appEl.style.display = 'flex';
+  }
+
+  function showLoginScreen() {
+    var loginEl = document.getElementById('loginView');
+    var appEl = document.getElementById('appView');
+    if (appEl) appEl.style.display = 'none';
+    if (loginEl) loginEl.style.display = 'flex';
+  }
+
+  function handleLoginSubmit(e) {
+    if (e && e.preventDefault) e.preventDefault();
+    var userInp = document.getElementById('loginUsername');
+    var btnSubmit = document.getElementById('btnLoginSubmit');
+    
+    var username = (userInp && userInp.value ? userInp.value : '').trim();
+    if (!username) username = 'Dimas (CHO Officer)';
+
+    if (btnSubmit) {
+      btnSubmit.innerHTML = '<span>Memverifikasi...</span>';
+      btnSubmit.style.opacity = '0.7';
+    }
+
+    setTimeout(function() {
+      state.authUser = {
+        name: username,
+        role: 'Complaint Handling Officer',
+        loginTime: new Date().toISOString()
+      };
+      localStorage.setItem('koncho_auth_user', JSON.stringify(state.authUser));
+      if (btnSubmit) {
+        btnSubmit.innerHTML = '<span>Masuk ke Dashboard</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
+        btnSubmit.style.opacity = '1';
+      }
+      showDashboardApp();
+      showToast('Selamat Datang di konCHO, ' + username + '!', 'success');
+    }, 350);
+  }
+
+  function handleQuickLogin() {
+    var userInp = document.getElementById('loginUsername');
+    if (userInp) userInp.value = 'Dimas (CHO Officer)';
+    handleLoginSubmit();
+  }
+
+  function handleLogout() {
+    localStorage.removeItem('koncho_auth_user');
+    state.authUser = null;
+    showLoginScreen();
+    showToast('Anda telah keluar dari sistem konCHO.', 'info');
+  }
+
+  /**
    * Inisialisasi Aplikasi
    */
   function init() {
     applyTheme(state.theme);
+    initAuth();
     bindEvents();
     loadApplicationData();
   }
@@ -134,6 +214,14 @@
    * Binding Event Listeners
    */
   function bindEvents() {
+    // 0. Otentikasi & Login Event Listeners
+    var loginForm = document.getElementById('loginForm');
+    if (loginForm) loginForm.addEventListener('submit', handleLoginSubmit);
+    var btnQuickLogin = document.getElementById('btnQuickLoginOfficer');
+    if (btnQuickLogin) btnQuickLogin.addEventListener('click', handleQuickLogin);
+    var btnLogout = document.getElementById('btnLogout');
+    if (btnLogout) btnLogout.addEventListener('click', handleLogout);
+
     // 1. Theme Toggle
     if (dom.btnToggleTheme) {
       dom.btnToggleTheme.addEventListener('click', function() {
@@ -171,12 +259,23 @@
       });
     }
 
-    // 5. Sidebar Kiri: Status KPI (Total, Open, In Progress, Closed)
+    // 5. Sidebar Kiri: Status KPI (Beranda, Open, In Progress, Closed)
     dom.kpiNavBtns.forEach(function(btn) {
       btn.addEventListener('click', function() {
         dom.kpiNavBtns.forEach(function(b) { b.classList.remove('active'); });
         btn.classList.add('active');
-        state.activeStatusFilter = btn.getAttribute('data-status') || 'all';
+        var st = btn.getAttribute('data-status') || 'all';
+        state.activeStatusFilter = st;
+
+        // Jika klik Beranda (data-status === 'all'), otomatis aktifkan cakupan kedua layanan (CHO Mobile & Fixed)
+        if (st === 'all') {
+          state.activeServiceScope = 'ALL';
+          dom.sidebarNavBtns.forEach(function(b) { b.classList.remove('active'); });
+          var navAllBtn = document.getElementById('navAll');
+          if (navAllBtn) navAllBtn.classList.add('active');
+          updateScopeLabel();
+          updateKpiCounters();
+        }
         renderCaseList();
       });
     });
@@ -534,20 +633,63 @@
     }
 
     var html = '';
+
+    // =========================================================================
+    // BERANDA EXECUTIVE KPI SUMMARY CARDS
+    // Tampil untuk memantau secara keseluruhan berapa yang Open, In Progress, Closed
+    // =========================================================================
+    var totalAll = filtered.length;
+    var openCount = filtered.filter(function(i) { return itemMatchesStatus(i, 'Open'); }).length;
+    var inprogCount = filtered.filter(function(i) { return itemMatchesStatus(i, 'InProgress'); }).length;
+    var closedCount = filtered.filter(function(i) { return itemMatchesStatus(i, 'Closed'); }).length;
+
+    var openMob = filtered.filter(function(i) { return i.serviceType === 'MOBILE' && itemMatchesStatus(i, 'Open'); }).length;
+    var openFix = filtered.filter(function(i) { return i.serviceType === 'FIXED' && itemMatchesStatus(i, 'Open'); }).length;
+    var inprogMob = filtered.filter(function(i) { return i.serviceType === 'MOBILE' && itemMatchesStatus(i, 'InProgress'); }).length;
+    var inprogFix = filtered.filter(function(i) { return i.serviceType === 'FIXED' && itemMatchesStatus(i, 'InProgress'); }).length;
+    var closedMob = filtered.filter(function(i) { return i.serviceType === 'MOBILE' && itemMatchesStatus(i, 'Closed'); }).length;
+    var closedFix = filtered.filter(function(i) { return i.serviceType === 'FIXED' && itemMatchesStatus(i, 'Closed'); }).length;
+
+    html += '<div class="beranda-kpi-grid">';
+    html += '<div class="beranda-kpi-card kpi-card-total" data-quick-filter="all" title="Klik untuk menampilkan semua kasus">';
+    html += '<div class="beranda-kpi-title"><span>🏠 Beranda (Total Kasus)</span><span style="font-size:14px;">📦</span></div>';
+    html += '<div class="beranda-kpi-num">' + totalAll + '</div>';
+    html += '<div class="beranda-kpi-sub">Konsolidasi CHO Mobile & Fixed</div>';
+    html += '</div>';
+
+    html += '<div class="beranda-kpi-card kpi-card-open" data-quick-filter="Open" title="Klik untuk filter kasus Open">';
+    html += '<div class="beranda-kpi-title"><span>🟡 Open (Kolom H)</span><span style="font-size:12px;">⏳</span></div>';
+    html += '<div class="beranda-kpi-num">' + openCount + '</div>';
+    html += '<div class="beranda-kpi-sub">' + openMob + ' Mobile • ' + openFix + ' Fixed</div>';
+    html += '</div>';
+
+    html += '<div class="beranda-kpi-card kpi-card-inprog" data-quick-filter="InProgress" title="Klik untuk filter kasus In Progress">';
+    html += '<div class="beranda-kpi-title"><span>🔵 In Progress (Kolom H)</span><span style="font-size:12px;">⚙️</span></div>';
+    html += '<div class="beranda-kpi-num">' + inprogCount + '</div>';
+    html += '<div class="beranda-kpi-sub">' + inprogMob + ' Mobile • ' + inprogFix + ' Fixed</div>';
+    html += '</div>';
+
+    html += '<div class="beranda-kpi-card kpi-card-closed" data-quick-filter="Closed" title="Klik untuk filter kasus Closed">';
+    html += '<div class="beranda-kpi-title"><span>🟢 Closed (Kolom H)</span><span style="font-size:12px;">✅</span></div>';
+    html += '<div class="beranda-kpi-num">' + closedCount + '</div>';
+    html += '<div class="beranda-kpi-sub">' + closedMob + ' Mobile • ' + closedFix + ' Fixed</div>';
+    html += '</div>';
+    html += '</div>';
+
     filtered.forEach(function(item) {
       var srvClass = item.serviceType === 'MOBILE' ? 'mobile' : 'fixed';
       var stNorm = (item.status || 'Open').toLowerCase().replace(/[^a-z]/g, '');
       var statusKey = 'open';
-      var statusLabel = '🟡 Open';
+      var statusLabel = 'Open';
       var cardStatusClass = 'status-open';
 
       if (stNorm.indexOf('progress') >= 0) {
         statusKey = 'inprogress';
-        statusLabel = '🔵 In Progress';
+        statusLabel = 'In Progress';
         cardStatusClass = 'status-inprogress';
       } else if (stNorm.indexOf('close') >= 0 || stNorm.indexOf('solve') >= 0 || stNorm.indexOf('selesai') >= 0) {
         statusKey = 'closed';
-        statusLabel = '🟢 Closed';
+        statusLabel = 'Closed';
         cardStatusClass = 'status-closed';
       }
 
@@ -561,11 +703,11 @@
       html += '<div class="case-row-header">';
       html += '<div class="case-row-badges">';
       html += '<span class="badge-id">Kasus #' + escapeHtml(item.id) + '</span>';
-      html += '<span class="badge-srv ' + srvClass + '">' + item.serviceType + '</span>';
+      html += '<span class="badge-srv ' + srvClass + '">CHO ' + item.serviceType + '</span>';
       if (item.bulan) {
         html += '<span class="badge-month">📅 ' + escapeHtml(item.bulan) + '</span>';
       }
-      html += '<span class="badge-status-pill ' + statusKey + '">' + statusLabel + '</span>';
+      html += '<span class="badge-status-pill ' + statusKey + '"><span style="font-size:10px; opacity:0.85; margin-right:4px;">Kol. H:</span>' + statusLabel + '</span>';
       html += '</div>';
 
       html += '<div class="case-row-time">';
@@ -573,8 +715,13 @@
       html += '</div>';
       html += '</div>';
 
-      // 2. Judul Kasus (Kolom B - Total Case Isu yang masuk)
+      // 2. Main Issue (Kolom C)
+      html += '<div class="case-col-c-box">';
+      html += '<div style="display:flex; align-items:center; gap:6px;">';
+      html += '<span class="col-indicator-tag tag-col-c">Kolom C • Main Issue</span>';
+      html += '</div>';
       html += '<div class="case-row-title">' + escapeHtml(item.totalCaseIsu || 'Isu Kasus CHO') + '</div>';
+      html += '</div>';
 
       // 3. Meta Data (Requestor Kolom G & Follow Up To Kolom I & Akun)
       html += '<div class="case-row-meta">';
@@ -585,40 +732,34 @@
       html += '<div class="meta-item followup"><span style="font-size:12px;">🎯</span> Follow Up To (Kol. I): <strong>' + escapeHtml(followVal) + '</strong></div>';
 
       if (item.nomorLayanan && item.nomorLayanan !== '-') {
-        html += '<div class="meta-item"><span style="font-size:12px;">📱</span> Akun: <strong>' + escapeHtml(item.nomorLayanan) + '</strong> ' + (item.nama && item.nama !== '-' ? '(' + escapeHtml(item.nama) + ')' : '') + '</div>';
+        html += '<div class="meta-item"><span style="font-size:12px;">💳</span> Akun: <strong>' + escapeHtml(item.nomorLayanan) + '</strong> ' + (item.nama && item.nama !== '-' ? '(' + escapeHtml(item.nama) + ')' : '') + '</div>';
       }
       html += '</div>';
 
-      // 4. Kotak Keterangan Status Terkini
+      // 4. Status Update (Kolom J) & Keterangan Terkini
+      var statusUpdateText = item.statusInformasi || item.statusUpdate || 'Belum Ada Update';
+      var updateContent = item.inProgressNote || item.closedNote || item.progress || item.detail || 'Belum ada catatan update pada kolom J.';
+      var isNewUpdate = statusUpdateText === 'Ada Update Baru' || (statusKey === 'inprogress');
+
+      html += '<div class="case-col-j-box">';
+      html += '<div class="col-j-header">';
+      html += '<div class="col-j-left">';
+      html += '<span class="col-indicator-tag tag-col-j">Kolom J • Status Update</span>';
+      html += '<span class="col-j-pill ' + (isNewUpdate ? 'has-new-update' : '') + '">' + escapeHtml(statusUpdateText) + '</span>';
       if (statusKey === 'inprogress') {
-        var progNote = item.inProgressNote || item.detail || 'Sedang dalam penanganan teknis.';
         var progBy = item.inProgressBy || item.pic || 'PIC Lapangan';
-        html += '<div class="case-note-box note-box-inprogress">';
-        html += '<div class="note-box-header">';
-        html += '<span class="note-label">🔵 Keterangan In Progress</span>';
-        html += '<span class="note-author-info">Ditindaklanjuti oleh: <strong>' + escapeHtml(progBy) + '</strong></span>';
-        html += '</div>';
-        html += '<div class="note-content-text">' + escapeHtml(progNote) + '</div>';
-        html += '</div>';
+        html += '<span style="font-size:11px; color:var(--text-muted);">PIC: <strong>' + escapeHtml(progBy) + '</strong></span>';
       } else if (statusKey === 'closed') {
-        var clNote = item.closedNote || item.detail || 'Kasus telah diselesaikan.';
         var clBy = item.closedBy || item.pic || 'CHO Team';
-        html += '<div class="case-note-box note-box-closed">';
-        html += '<div class="note-box-header">';
-        html += '<span class="note-label">🟢 Keterangan Penyelesaian (Closed)</span>';
-        html += '<span class="note-author-info">Di-Closed Oleh: <strong>' + escapeHtml(clBy) + '</strong></span>';
-        html += '</div>';
-        html += '<div class="note-content-text">' + escapeHtml(clNote) + '</div>';
-        html += '</div>';
-      } else {
-        html += '<div class="case-note-box note-box-open">';
-        html += '<div class="note-box-header">';
-        html += '<span class="note-label">🟡 Detail Kendala Awal (Open)</span>';
-        html += '<span class="note-author-info">Pelapor: ' + escapeHtml(item.requestor || 'Requestor') + '</span>';
-        html += '</div>';
-        html += '<div class="note-content-text">' + escapeHtml(item.detail || item.totalCaseIsu || 'Belum ada catatan kendala.') + '</div>';
-        html += '</div>';
+        html += '<span style="font-size:11px; color:var(--text-muted);">Di-Closed: <strong>' + escapeHtml(clBy) + '</strong></span>';
       }
+      html += '</div>';
+      html += '<div class="col-j-time">';
+      html += 'Waktu: <strong>' + formatDisplayTime(item.terakhirUpdate || item.tanggal) + '</strong>';
+      html += '</div>';
+      html += '</div>';
+      html += '<div class="col-j-text">' + escapeHtml(updateContent) + '</div>';
+      html += '</div>';
 
       // 5. Tombol Aksi Langsung pada Baris Kasus
       html += '<div class="case-row-actions">';
@@ -650,7 +791,7 @@
         html += '</button>';
       } else if (statusKey === 'closed') {
         html += '<span style="font-size:12.5px; font-weight:700; color:var(--status-closed-color); display:inline-flex; align-items:center; gap:5px; margin-right:4px;">';
-        html += '✅ Kasus Telah Ditutup';
+        html += '✓ Kasus Telah Ditutup';
         html += '</span>';
 
         html += '<button class="btn-act btn-act-reopen btn-trigger-reopen" data-id="' + escapeHtml(item.id) + '" data-target="InProgress">';
@@ -687,6 +828,22 @@
    * Pasang Event Handler pada tombol di setiap baris kasus
    */
   function attachCardActionHandlers() {
+    // 0. Quick Filter KPI Cards di Beranda
+    dom.caseListContainer.querySelectorAll('.beranda-kpi-card').forEach(function(card) {
+      card.addEventListener('click', function() {
+        var targetSt = card.getAttribute('data-quick-filter');
+        if (!targetSt) return;
+        state.activeStatusFilter = targetSt;
+        dom.kpiNavBtns.forEach(function(b) {
+          b.classList.remove('active');
+          if (b.getAttribute('data-status') === targetSt || (targetSt === 'all' && b.id === 'pillTotal')) {
+            b.classList.add('active');
+          }
+        });
+        renderCaseList();
+      });
+    });
+
     // 1. Tombol In Progress
     dom.caseListContainer.querySelectorAll('.btn-trigger-inprog').forEach(function(btn) {
       btn.addEventListener('click', function(e) {

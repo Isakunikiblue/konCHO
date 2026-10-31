@@ -460,7 +460,8 @@ function getSheetRecords(ss, sheetName, serviceType) {
   var catIdx = findHeaderIndex(headers, ['kategori_keluhan', 'kategori_kendala', 'kategori']);
   var picIdx = findHeaderIndex(headers, ['pic_handling', 'pic', 'petugas']);
   var lastUpdateIdx = findHeaderIndex(headers, ['terakhir_update', 'last_update', 'update_terakhir']);
-  var statusInfoIdx = findHeaderIndex(headers, ['status_informasi', 'update_status', 'ada_update', 'status_info']);
+  var statusInfoIdx = findHeaderIndex(headers, ['status update', 'status_update', 'status informasi', 'status_informasi', 'update_status', 'ada_update', 'status_info', 'update info', 'keterangan update']);
+  if (statusInfoIdx < 0 && headers.length > 9) statusInfoIdx = 9; // Kolom J fallback (index 9)
 
   // Mulai baca data dari baris setelah headerRowIdx
   for (var i = headerRowIdx + 1; i < allValues.length; i++) {
@@ -601,6 +602,7 @@ function getSheetRecords(ss, sheetName, serviceType) {
       pic: picIdx >= 0 && row[picIdx] ? String(row[picIdx]).trim() : rawReq,
       terakhirUpdate: lastUpdateIdx >= 0 && row[lastUpdateIdx] ? formatDate(row[lastUpdateIdx]) : '',
       statusInformasi: statusInfoIdx >= 0 && row[statusInfoIdx] ? String(row[statusInfoIdx]).trim() : 'Belum Ada Update',
+      statusUpdate: statusInfoIdx >= 0 && row[statusInfoIdx] ? String(row[statusInfoIdx]).trim() : 'Belum Ada Update',
       rawRowData: {}
     };
 
@@ -805,7 +807,8 @@ function postCommunicationUpdate(payload) {
         if (followUpIdx < 0 && headers.length > 8) followUpIdx = 8; // Kolom I fallback
 
         var lastUpdateIdx = findHeaderIndex(headers, ['terakhir_update', 'last_update', 'update_terakhir']);
-        var statusInfoIdx = findHeaderIndex(headers, ['status_informasi', 'update_status', 'ada_update', 'status_info']);
+        var statusInfoIdx = findHeaderIndex(headers, ['status update', 'status_update', 'status informasi', 'status_informasi', 'update_status', 'ada_update', 'status_info', 'update info', 'keterangan update']);
+        if (statusInfoIdx < 0 && headers.length > 9) statusInfoIdx = 9; // Kolom J fallback
         
         var idValues = targetSheet.getRange(2, idIdx + 1, lastRow - 1, 1).getValues();
         var targetRowIndex = -1;
@@ -889,7 +892,8 @@ function markTicketAsReviewed(ticketId, serviceType) {
     var lastCol = sheet.getLastColumn();
     var headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0].map(function(h) { return String(h).trim(); });
     var idIdx = findHeaderIndex(headers, ['id_tiket', 'id', 'notiket', 'no_tiket', 'ticket_id']);
-    var statusInfoIdx = findHeaderIndex(headers, ['status_informasi', 'update_status', 'ada_update', 'status_info']);
+    var statusInfoIdx = findHeaderIndex(headers, ['status update', 'status_update', 'status informasi', 'status_informasi', 'update_status', 'ada_update', 'status_info', 'update info']);
+    if (statusInfoIdx < 0 && headers.length > 9) statusInfoIdx = 9; // Kolom J fallback
     
     if (idIdx < 0 || statusInfoIdx < 0) return { success: false, error: 'Kolom tidak ditemukan' };
     
