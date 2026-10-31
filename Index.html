@@ -1,0 +1,3615 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>konCHO - Konsolidasi Complaint Handling Officer</title>
+  <link rel="icon" type="image/png" href="data:image/png;base64,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">
+  <!-- Google Fonts: Plus Jakarta Sans -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <style>
+  :root {
+    --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+
+    /* Theme: Dark (Default) */
+    --bg-app: #0b0f19;
+    --bg-card: #151d2f;
+    --bg-card-hover: #1c263c;
+    --bg-elevated: #1e293f;
+    --bg-input: #0f172a;
+    --border-color: #27354f;
+    --border-subtle: #1c263a;
+
+    --text-primary: #f8fafc;
+    --text-secondary: #94a3b8;
+    --text-muted: #64748b;
+
+    --primary-color: #6366f1;
+    --primary-hover: #4f46e5;
+    --primary-light: rgba(99, 102, 241, 0.16);
+
+    /* Service Colors */
+    --mobile-color: #c084fc;
+    --mobile-bg: rgba(192, 132, 252, 0.16);
+    --mobile-border: rgba(192, 132, 252, 0.35);
+
+    --fixed-color: #38bdf8;
+    --fixed-bg: rgba(56, 189, 248, 0.16);
+    --fixed-border: rgba(56, 189, 248, 0.35);
+
+    /* Status Colors */
+    --status-open-color: #fbbf24;
+    --status-open-bg: rgba(251, 191, 36, 0.14);
+    --status-open-border: rgba(251, 191, 36, 0.35);
+
+    --status-prog-color: #60a5fa;
+    --status-prog-bg: rgba(96, 165, 250, 0.14);
+    --status-prog-border: rgba(96, 165, 250, 0.35);
+
+    --status-closed-color: #34d399;
+    --status-closed-bg: rgba(52, 211, 153, 0.14);
+    --status-closed-border: rgba(52, 211, 153, 0.35);
+
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.35), 0 2px 4px -2px rgba(0, 0, 0, 0.25);
+    --shadow-lg: 0 10px 20px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+
+    --radius-sm: 6px;
+    --radius-md: 10px;
+    --radius-lg: 14px;
+    --radius-full: 9999px;
+    --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
+  }
+
+  /* Light Theme */
+  [data-theme="light"] {
+    --bg-app: #f1f5f9;
+    --bg-card: #ffffff;
+    --bg-card-hover: #f8fafc;
+    --bg-elevated: #f1f5f9;
+    --bg-input: #ffffff;
+    --border-color: #e2e8f0;
+    --border-subtle: #cbd5e1;
+
+    --text-primary: #0f172a;
+    --text-secondary: #475569;
+    --text-muted: #94a3b8;
+
+    --primary-color: #4f46e5;
+    --primary-hover: #4338ca;
+    --primary-light: rgba(79, 70, 229, 0.12);
+
+    --mobile-color: #9333ea;
+    --mobile-bg: rgba(147, 51, 234, 0.12);
+    --mobile-border: rgba(147, 51, 234, 0.28);
+
+    --fixed-color: #0284c7;
+    --fixed-bg: rgba(2, 132, 199, 0.12);
+    --fixed-border: rgba(2, 132, 199, 0.28);
+
+    --status-open-color: #d97706;
+    --status-open-bg: rgba(217, 119, 6, 0.12);
+    --status-open-border: rgba(217, 119, 6, 0.28);
+
+    --status-prog-color: #2563eb;
+    --status-prog-bg: rgba(37, 99, 235, 0.12);
+    --status-prog-border: rgba(37, 99, 235, 0.28);
+
+    --status-closed-color: #059669;
+    --status-closed-bg: rgba(5, 150, 105, 0.12);
+    --status-closed-border: rgba(5, 150, 105, 0.28);
+
+    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
+    --shadow-lg: 0 10px 20px -3px rgba(0, 0, 0, 0.12);
+  }
+
+  /* Reset & Base */
+  * {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: var(--font-sans);
+  }
+
+  html {
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  body {
+    background-color: var(--bg-app);
+    color: var(--text-primary);
+    min-height: 100%;
+    display: flex;
+    flex-direction: column;
+    overflow-x: hidden;
+    overflow-y: auto;
+    -webkit-font-smoothing: antialiased;
+  }
+
+  /* Scrollbar - Lebar 10px, jelas terlihat, dan nyaman di-scroll */
+  ::-webkit-scrollbar {
+    width: 10px;
+    height: 10px;
+  }
+  ::-webkit-scrollbar-track {
+    background: var(--bg-app);
+  }
+  ::-webkit-scrollbar-thumb {
+    background: var(--border-color);
+    border-radius: var(--radius-full);
+    border: 2px solid var(--bg-app);
+  }
+  ::-webkit-scrollbar-thumb:hover {
+    background: var(--primary-color);
+  }
+
+  /* =========================================================================
+     1. TOP HEADER
+     ========================================================================= */
+  .app-header {
+    height: 66px;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 24px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    box-shadow: var(--shadow-sm);
+  }
+
+  .header-left {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .brand-box {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 2px;
+  }
+
+  .brand-logo-wrap {
+    display: inline-flex;
+    align-items: center;
+    line-height: 1;
+    transition: var(--transition);
+  }
+
+  .brand-logo-img {
+    height: 35px;
+    width: auto;
+    display: block;
+    object-fit: contain;
+    filter: drop-shadow(0 2px 5px rgba(0, 0, 0, 0.35));
+  }
+
+  [data-theme="light"] .brand-logo-wrap {
+    background: #172c4e;
+    padding: 3px 10px;
+    border-radius: 8px;
+    box-shadow: 0 2px 6px rgba(0, 0, 0, 0.12);
+  }
+  [data-theme="light"] .brand-logo-img {
+    height: 30px;
+    filter: none;
+  }
+
+  .brand-sub {
+    font-size: 11px;
+    color: var(--text-muted);
+    font-weight: 600;
+    letter-spacing: 0.3px;
+  }
+
+  .db-status-pill {
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    padding: 4px 12px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-full);
+    font-size: 11.5px;
+    color: var(--text-secondary);
+    font-weight: 500;
+    margin-left: 8px;
+  }
+
+  .status-indicator-dot {
+    width: 8px;
+    height: 8px;
+    background: #10b981;
+    border-radius: 50%;
+    box-shadow: 0 0 8px #10b981;
+  }
+
+  .header-actions {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+
+  .btn-hdr {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  .btn-hdr:hover {
+    background: var(--bg-card-hover);
+    border-color: var(--text-muted);
+    transform: translateY(-1px);
+  }
+
+  .btn-hdr.btn-primary {
+    background: linear-gradient(135deg, var(--primary-color), #4f46e5);
+    color: #ffffff;
+    border: none;
+    box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
+  }
+  .btn-hdr.btn-primary:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 6px 16px rgba(99, 102, 241, 0.45);
+  }
+
+  /* =========================================================================
+     2. APP LAYOUT: SIDEBAR KIRI + AREA UTAMA KANAN
+     ========================================================================= */
+  .app-layout {
+    flex: 1;
+    display: flex;
+    min-height: calc(100vh - 66px);
+  }
+
+  /* -------------------------------------------------------------------------
+     SIDEBAR KIRI (SEBELAH KIRI)
+     Memuat: Semua Layanan, Bulan, dan Total Kasus
+     ------------------------------------------------------------------------- */
+  .sidebar-left {
+    width: 270px;
+    background: var(--bg-card);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    padding: 20px 16px;
+    gap: 22px;
+    flex-shrink: 0;
+    position: sticky;
+    top: 66px;
+    height: calc(100vh - 66px);
+    overflow-y: auto;
+    z-index: 30;
+  }
+
+  .sidebar-block {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+
+  .sidebar-block-title {
+    font-size: 11px;
+    font-weight: 750;
+    text-transform: uppercase;
+    letter-spacing: 0.7px;
+    color: var(--text-muted);
+    padding: 0 4px;
+  }
+
+  /* Nav List Layanan */
+  .sidebar-nav-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .sidebar-nav-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    border-radius: var(--radius-md);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    user-select: none;
+    text-align: left;
+    width: 100%;
+  }
+  .sidebar-nav-btn:hover {
+    background: var(--bg-card-hover);
+    color: var(--text-primary);
+    border-color: var(--text-muted);
+    transform: translateX(2px);
+  }
+  .sidebar-nav-btn.active {
+    background: var(--primary-light);
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+    font-weight: 700;
+    box-shadow: 0 0 0 1px var(--primary-color);
+  }
+
+  .nav-btn-left {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .nav-icon {
+    font-size: 14px;
+    line-height: 1;
+  }
+
+  .nav-badge {
+    font-size: 10.5px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: var(--radius-full);
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+  }
+  .nav-badge.srv-mobile {
+    color: var(--mobile-color);
+    border-color: var(--mobile-border);
+    background: var(--mobile-bg);
+  }
+  .nav-badge.srv-fixed {
+    color: var(--fixed-color);
+    border-color: var(--fixed-border);
+    background: var(--fixed-bg);
+  }
+
+  /* Month Selector di Sidebar */
+  .sidebar-month-box {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 4px 10px;
+    transition: var(--transition);
+  }
+  .sidebar-month-box:hover {
+    border-color: var(--primary-color);
+  }
+
+  .month-select-wrap {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+  }
+  .sidebar-month-select {
+    width: 100%;
+    background: transparent;
+    border: none;
+    color: var(--text-primary);
+    font-size: 13px;
+    font-weight: 700;
+    padding: 6px 0;
+    outline: none;
+    cursor: pointer;
+  }
+  .sidebar-month-select option {
+    background: var(--bg-card);
+    color: var(--text-primary);
+  }
+
+  /* Status KPI List di Sidebar */
+  .sidebar-kpi-list {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .kpi-nav-btn {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 9px 12px;
+    border-radius: var(--radius-md);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+    user-select: none;
+    text-align: left;
+    width: 100%;
+  }
+  .kpi-nav-btn:hover {
+    background: var(--bg-card-hover);
+    color: var(--text-primary);
+    transform: translateX(2px);
+  }
+
+  .kpi-nav-left {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .kpi-dot {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+  }
+  .dot-open { background: var(--status-open-color); box-shadow: 0 0 6px var(--status-open-color); }
+  .dot-inprogress { background: var(--status-prog-color); box-shadow: 0 0 6px var(--status-prog-color); }
+  .dot-closed { background: var(--status-closed-color); box-shadow: 0 0 6px var(--status-closed-color); }
+
+  .kpi-count-badge {
+    font-size: 12px;
+    font-weight: 800;
+    padding: 2px 8px;
+    border-radius: var(--radius-full);
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+  }
+
+  /* Active KPI button styling */
+  .kpi-nav-btn.total.active {
+    background: var(--primary-light);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    font-weight: 700;
+  }
+  .kpi-nav-btn.total.active .kpi-count-badge {
+    background: var(--primary-color);
+    color: #ffffff;
+    border-color: var(--primary-color);
+  }
+
+  .kpi-nav-btn.open.active {
+    background: var(--status-open-bg);
+    border-color: var(--status-open-color);
+    color: var(--status-open-color);
+    font-weight: 700;
+  }
+  .kpi-nav-btn.open.active .kpi-count-badge {
+    background: var(--status-open-color);
+    color: #000000;
+    border-color: var(--status-open-color);
+  }
+
+  .kpi-nav-btn.inprogress.active {
+    background: var(--status-prog-bg);
+    border-color: var(--status-prog-color);
+    color: var(--status-prog-color);
+    font-weight: 700;
+  }
+  .kpi-nav-btn.inprogress.active .kpi-count-badge {
+    background: var(--status-prog-color);
+    color: #ffffff;
+    border-color: var(--status-prog-color);
+  }
+
+  .kpi-nav-btn.closed.active {
+    background: var(--status-closed-bg);
+    border-color: var(--status-closed-color);
+    color: var(--status-closed-color);
+    font-weight: 700;
+  }
+  .kpi-nav-btn.closed.active .kpi-count-badge {
+    background: var(--status-closed-color);
+    color: #ffffff;
+    border-color: var(--status-closed-color);
+  }
+
+  .sidebar-footer-info {
+    margin-top: auto;
+    padding-top: 10px;
+  }
+  .sheet-info-card {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 10px 12px;
+    font-size: 11px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    color: var(--text-muted);
+  }
+  .sheet-info-title {
+    font-weight: 700;
+    color: var(--text-secondary);
+  }
+  .sheet-info-desc code {
+    color: var(--primary-color);
+    font-weight: 600;
+  }
+
+  /* -------------------------------------------------------------------------
+     AREA UTAMA KANAN (MAIN CONTENT)
+     Memuat: Search Bar + Satu Card Tunggal Wadah Semua Kasus
+     ------------------------------------------------------------------------- */
+  .content-main {
+    flex: 1;
+    min-width: 0;
+    padding: 22px 28px 80px 28px;
+    display: flex;
+    flex-direction: column;
+    gap: 18px;
+  }
+
+  .content-header-bar {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 14px;
+    flex-wrap: wrap;
+  }
+
+  .search-box-large {
+    flex: 1;
+    min-width: 280px;
+    position: relative;
+    display: flex;
+    align-items: center;
+  }
+
+  .search-icon {
+    position: absolute;
+    left: 14px;
+    color: var(--text-muted);
+    pointer-events: none;
+    display: flex;
+    align-items: center;
+  }
+
+  .search-input-field {
+    width: 100%;
+    padding: 10px 40px 10px 40px;
+    border-radius: var(--radius-md);
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    font-size: 13.5px;
+    outline: none;
+    transition: var(--transition);
+    box-shadow: var(--shadow-sm);
+  }
+  .search-input-field:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px var(--primary-light);
+  }
+
+  .btn-clear-search {
+    position: absolute;
+    right: 12px;
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 13px;
+    cursor: pointer;
+    padding: 4px;
+  }
+  .btn-clear-search:hover {
+    color: var(--text-primary);
+  }
+
+  .active-scope-pill {
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    padding: 7px 14px;
+    border-radius: var(--radius-full);
+    box-shadow: var(--shadow-sm);
+    white-space: nowrap;
+  }
+
+  /* =========================================================================
+     3. UNIFIED CASES CARD (SATU CARD UTAMA TUNGGAL)
+     Kasus 1 dan 2 dst dibuat dalam satu card saja (Unified Group Card)
+     ========================================================================= */
+  .unified-cases-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow-sm);
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+  }
+
+  .cases-card-header {
+    padding: 18px 24px;
+    background: var(--bg-card);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+
+  .header-card-left {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .cases-card-title {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--text-primary);
+    letter-spacing: -0.2px;
+  }
+
+  .cases-count-badge {
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--primary-color);
+    background: var(--primary-light);
+    border: 1px solid rgba(99, 102, 241, 0.25);
+    padding: 3px 10px;
+    border-radius: var(--radius-full);
+  }
+
+  .header-card-right .hint-text {
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  /* Body Card Tunggal */
+  .cases-card-body {
+    display: flex;
+    flex-direction: column;
+  }
+
+  /* Baris Item Kasus di dalam Card Tunggal (Divided by borders) */
+  .case-item-row {
+    padding: 22px 24px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+    transition: var(--transition);
+    position: relative;
+    background: var(--bg-card);
+  }
+  .case-item-row:last-child {
+    border-bottom: none;
+  }
+  .case-item-row:hover {
+    background: var(--bg-card-hover);
+  }
+
+  /* Status Border Kiri */
+  .case-item-row.status-open {
+    border-left: 4px solid var(--status-open-color);
+  }
+  .case-item-row.status-inprogress {
+    border-left: 4px solid var(--status-prog-color);
+  }
+  .case-item-row.status-closed {
+    border-left: 4px solid var(--status-closed-color);
+  }
+
+  /* Header Baris Item Kasus */
+  .case-row-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .case-row-badges {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .badge-id {
+    font-size: 12px;
+    font-weight: 800;
+    color: var(--text-primary);
+    background: var(--bg-elevated);
+    padding: 3px 9px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+  }
+
+  .badge-srv {
+    font-size: 11px;
+    font-weight: 700;
+    padding: 3px 9px;
+    border-radius: var(--radius-sm);
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+  }
+  .badge-srv.mobile {
+    background: var(--mobile-bg);
+    color: var(--mobile-color);
+    border: 1px solid var(--mobile-border);
+  }
+  .badge-srv.fixed {
+    background: var(--fixed-bg);
+    color: var(--fixed-color);
+    border: 1px solid var(--fixed-border);
+  }
+
+  .badge-month {
+    font-size: 11px;
+    font-weight: 600;
+    color: var(--text-muted);
+    background: var(--bg-elevated);
+    padding: 3px 8px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+  }
+
+  .badge-status-pill {
+    font-size: 11.5px;
+    font-weight: 700;
+    padding: 3px 10px;
+    border-radius: var(--radius-full);
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+  }
+  .badge-status-pill.open {
+    background: var(--status-open-bg);
+    color: var(--status-open-color);
+    border: 1px solid var(--status-open-border);
+  }
+  .badge-status-pill.inprogress {
+    background: var(--status-prog-bg);
+    color: var(--status-prog-color);
+    border: 1px solid var(--status-prog-border);
+  }
+  .badge-status-pill.closed {
+    background: var(--status-closed-bg);
+    color: var(--status-closed-color);
+    border: 1px solid var(--status-closed-border);
+  }
+
+  .case-row-time {
+    font-size: 12px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  /* Judul Kasus (Kolom B - Total Case Isu yang masuk) */
+  .case-row-title {
+    font-size: 16.5px;
+    font-weight: 750;
+    color: var(--text-primary);
+    line-height: 1.4;
+    letter-spacing: -0.2px;
+  }
+
+  /* Meta Attributes: Requestor (Kolom G) & Follow Up To (Kolom I) */
+  .case-row-meta {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    font-size: 12.5px;
+  }
+
+  .meta-item {
+    display: inline-flex;
+    align-items: center;
+    gap: 5px;
+    color: var(--text-secondary);
+    background: var(--bg-elevated);
+    padding: 4px 10px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+  }
+  .meta-item strong {
+    color: var(--text-primary);
+    font-weight: 600;
+  }
+  .meta-item.followup strong {
+    color: var(--fixed-color);
+  }
+
+  /* Kotak Keterangan Status Callout Box */
+  .case-note-box {
+    border-radius: var(--radius-md);
+    padding: 12px 16px;
+    font-size: 13px;
+    line-height: 1.5;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .note-box-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+
+  .note-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+
+  .note-author-info {
+    font-size: 12px;
+    font-weight: 500;
+  }
+
+  .note-content-text {
+    font-size: 13.5px;
+    color: var(--text-primary);
+    white-space: pre-wrap;
+    word-break: break-word;
+  }
+
+  /* Note Box Themes */
+  .note-box-open {
+    background: rgba(245, 158, 11, 0.08);
+    border: 1px solid rgba(245, 158, 11, 0.22);
+  }
+  .note-box-open .note-label { color: var(--status-open-color); }
+  .note-box-open .note-author-info { color: var(--text-muted); }
+
+  .note-box-inprogress {
+    background: rgba(59, 130, 246, 0.09);
+    border: 1px solid rgba(59, 130, 246, 0.28);
+  }
+  .note-box-inprogress .note-label { color: var(--status-prog-color); }
+  .note-box-inprogress .note-author-info { color: var(--text-secondary); }
+  .note-box-inprogress .note-author-info strong { color: var(--status-prog-color); }
+
+  .note-box-closed {
+    background: rgba(16, 185, 129, 0.09);
+    border: 1px solid rgba(16, 185, 129, 0.28);
+  }
+  .note-box-closed .note-label { color: var(--status-closed-color); }
+  .note-box-closed .note-author-info { color: var(--text-secondary); }
+  .note-box-closed .note-author-info strong { color: var(--status-closed-color); }
+
+  /* Tombol Aksi di Baris Kasus */
+  .case-row-actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding-top: 6px;
+  }
+
+  .action-primary-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .action-secondary-group {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .btn-act {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    font-size: 12.5px;
+    font-weight: 600;
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: var(--transition);
+    user-select: none;
+    border: 1px solid transparent;
+  }
+  .btn-act:hover {
+    transform: translateY(-1px);
+    box-shadow: var(--shadow-sm);
+  }
+
+  .btn-act-inprogress {
+    background: var(--status-prog-bg);
+    color: var(--status-prog-color);
+    border-color: var(--status-prog-border);
+  }
+  .btn-act-inprogress:hover {
+    background: var(--status-prog-color);
+    color: #ffffff;
+  }
+
+  .btn-act-closed {
+    background: var(--status-closed-bg);
+    color: var(--status-closed-color);
+    border-color: var(--status-closed-border);
+  }
+  .btn-act-closed:hover {
+    background: var(--status-closed-color);
+    color: #ffffff;
+  }
+
+  .btn-act-reopen {
+    background: var(--status-open-bg);
+    color: var(--status-open-color);
+    border-color: var(--status-open-border);
+  }
+  .btn-act-reopen:hover {
+    background: var(--status-open-color);
+    color: #000000;
+  }
+
+  .btn-act-update {
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+    border-color: var(--border-color);
+  }
+  .btn-act-update:hover {
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+  }
+
+  .btn-act-log {
+    background: var(--bg-elevated);
+    color: var(--text-secondary);
+    border-color: var(--border-color);
+  }
+  .btn-act-log:hover {
+    color: var(--text-primary);
+    border-color: var(--text-muted);
+  }
+
+  /* Footer Card Tunggal */
+  .cases-card-footer {
+    padding: 14px 24px;
+    background: var(--bg-card);
+    border-top: 1px solid var(--border-color);
+    font-size: 12.5px;
+    color: var(--text-muted);
+    font-weight: 500;
+  }
+
+  /* Empty State di dalam Card */
+  .empty-card-state {
+    padding: 60px 20px;
+    text-align: center;
+    color: var(--text-muted);
+  }
+  .empty-icon {
+    font-size: 38px;
+    margin-bottom: 12px;
+  }
+  .empty-title {
+    font-size: 16px;
+    font-weight: 700;
+    color: var(--text-primary);
+    margin-bottom: 6px;
+  }
+  .empty-desc {
+    font-size: 13px;
+    max-width: 360px;
+    margin: 0 auto;
+    line-height: 1.5;
+  }
+
+  /* =========================================================================
+     4. MODAL DIALOGS
+     ========================================================================= */
+  .modal-backdrop {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.72);
+    backdrop-filter: blur(4px);
+    display: none;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+    z-index: 100;
+    animation: fadeIn 0.2s ease;
+  }
+  .modal-backdrop.active {
+    display: flex;
+  }
+
+  .modal-dialog {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
+    width: 100%;
+    max-width: 600px;
+    max-height: 90vh;
+    display: flex;
+    flex-direction: column;
+    box-shadow: var(--shadow-lg);
+    overflow: hidden;
+    animation: scaleIn 0.22s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .modal-dialog.modal-lg {
+    max-width: 760px;
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+  }
+  @keyframes scaleIn {
+    from { transform: scale(0.96) translateY(10px); opacity: 0; }
+    to { transform: scale(1) translateY(0); opacity: 1; }
+  }
+
+  .modal-head {
+    padding: 18px 22px;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: flex-start;
+    justify-content: space-between;
+    gap: 12px;
+  }
+
+  .modal-kicker {
+    font-size: 11.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    margin-bottom: 4px;
+    color: var(--primary-color);
+  }
+  .modal-kicker.blue-kicker { color: var(--status-prog-color); }
+  .modal-kicker.green-kicker { color: var(--status-closed-color); }
+
+  .modal-title {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1.3;
+  }
+
+  .modal-close-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 16px;
+    cursor: pointer;
+    padding: 4px 8px;
+    border-radius: var(--radius-sm);
+    line-height: 1;
+    transition: var(--transition);
+  }
+  .modal-close-btn:hover {
+    background: var(--bg-elevated);
+    color: var(--text-primary);
+  }
+
+  .modal-body {
+    padding: 20px 22px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .modal-foot {
+    padding: 16px 22px;
+    border-top: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    background: var(--bg-card);
+  }
+
+  /* Modal Info Box */
+  .modal-info-box {
+    border-radius: var(--radius-md);
+    padding: 12px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .modal-info-box.blue-info-box {
+    background: rgba(59, 130, 246, 0.08);
+    border: 1px solid rgba(59, 130, 246, 0.25);
+  }
+  .modal-info-box.green-info-box {
+    background: rgba(16, 185, 129, 0.08);
+    border: 1px solid rgba(16, 185, 129, 0.25);
+  }
+
+  .info-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 12px;
+  }
+  .info-badge {
+    font-size: 10px;
+    font-weight: 700;
+    padding: 2px 7px;
+    border-radius: var(--radius-sm);
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+  }
+  .info-id {
+    font-weight: 800;
+    color: var(--text-primary);
+  }
+  .info-req {
+    color: var(--text-secondary);
+  }
+  .info-issue {
+    font-size: 14px;
+    font-weight: 700;
+    color: var(--text-primary);
+    line-height: 1.35;
+  }
+
+  /* Form Elements */
+  .form-group {
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+
+  .form-row-2 {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 14px;
+  }
+
+  .form-label {
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-secondary);
+  }
+  .req-star {
+    color: #ef4444;
+  }
+
+  .form-control {
+    background: var(--bg-input);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 9px 12px;
+    color: var(--text-primary);
+    font-size: 13.5px;
+    outline: none;
+    transition: var(--transition);
+  }
+  .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px var(--primary-light);
+  }
+
+  textarea.form-control {
+    min-height: 80px;
+    resize: vertical;
+    line-height: 1.45;
+  }
+
+  .form-hint {
+    font-size: 11.5px;
+    color: var(--text-muted);
+    line-height: 1.4;
+  }
+
+  .modal-service-toggle {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+
+  .service-toggle-btn {
+    padding: 10px 14px;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  .service-toggle-btn:hover {
+    color: var(--text-primary);
+    border-color: var(--text-muted);
+  }
+  .service-toggle-btn.active {
+    background: var(--primary-light);
+    border-color: var(--primary-color);
+    color: var(--primary-color);
+    font-weight: 700;
+  }
+
+  .btn-secondary {
+    padding: 8px 16px;
+    border-radius: var(--radius-md);
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    font-size: 13px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  .btn-secondary:hover {
+    background: var(--bg-card-hover);
+    color: var(--text-primary);
+  }
+
+  .btn-primary {
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    padding: 9px 18px;
+    border-radius: var(--radius-md);
+    background: linear-gradient(135deg, var(--primary-color), #4f46e5);
+    border: none;
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    transition: var(--transition);
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.35);
+  }
+  .btn-primary:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(99, 102, 241, 0.45);
+  }
+  .btn-primary:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+    transform: none;
+  }
+
+  .btn-save-inprogress {
+    background: linear-gradient(135deg, #2563eb, #3b82f6);
+    box-shadow: 0 2px 8px rgba(37, 99, 235, 0.35);
+  }
+  .btn-save-inprogress:hover {
+    box-shadow: 0 4px 14px rgba(37, 99, 235, 0.45);
+  }
+
+  .btn-save-closed {
+    background: linear-gradient(135deg, #059669, #10b981);
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+  }
+  .btn-save-closed:hover {
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.45);
+  }
+
+  /* Log Modal Timeline */
+  .log-case-banner {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+  }
+  .banner-field {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+  .field-k {
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text-muted);
+    text-transform: uppercase;
+    letter-spacing: 0.4px;
+  }
+  .field-v-bold {
+    font-size: 14.5px;
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  .banner-grid-4 {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+    gap: 10px;
+    font-size: 12.5px;
+  }
+
+  .log-timeline-container {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    max-height: 280px;
+    overflow-y: auto;
+    padding-right: 4px;
+  }
+
+  .log-timeline-item {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    padding: 10px 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .log-item-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+  }
+  .log-item-author {
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  .log-item-time {
+    color: var(--text-muted);
+  }
+  .log-item-msg {
+    font-size: 13px;
+    color: var(--text-primary);
+    white-space: pre-wrap;
+  }
+  .log-item-badges {
+    display: flex;
+    gap: 6px;
+    margin-top: 4px;
+  }
+
+  .log-quick-add {
+    margin-top: 10px;
+    padding-top: 14px;
+    border-top: 1px solid var(--border-color);
+  }
+  .quick-add-row {
+    display: flex;
+    gap: 10px;
+  }
+
+  /* Toast Notification */
+  .toast-container {
+    position: fixed;
+    bottom: 24px;
+    right: 24px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    z-index: 200;
+    pointer-events: none;
+  }
+
+  .toast {
+    pointer-events: auto;
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+    padding: 12px 18px;
+    border-radius: var(--radius-md);
+    box-shadow: var(--shadow-lg);
+    font-size: 13px;
+    font-weight: 600;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    animation: toastIn 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  .toast.success { border-left: 4px solid #10b981; }
+  .toast.error { border-left: 4px solid #ef4444; }
+  .toast.info { border-left: 4px solid var(--primary-color); }
+
+  @keyframes toastIn {
+    from { opacity: 0; transform: translateY(12px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  /* Responsive Rules */
+  @media (max-width: 900px) {
+    .app-layout {
+      flex-direction: column;
+    }
+    .sidebar-left {
+      width: 100%;
+      height: auto;
+      position: static;
+      border-right: none;
+      border-bottom: 1px solid var(--border-color);
+      overflow-y: visible;
+    }
+    .content-main {
+      padding: 16px;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .app-header {
+      padding: 0 14px;
+    }
+    .db-status-pill {
+      display: none;
+    }
+    .form-row-2 {
+      grid-template-columns: 1fr;
+    }
+    .case-row-header {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .case-row-actions {
+      flex-direction: column;
+      align-items: flex-start;
+    }
+    .action-primary-group {
+      width: 100%;
+    }
+    .action-secondary-group {
+      width: 100%;
+      justify-content: flex-end;
+    }
+  }
+</style>
+
+</head>
+<body data-theme="dark">
+
+  <!-- =========================================================================
+       1. TOP APP HEADER
+       ========================================================================= -->
+  <header class="app-header">
+    <div class="header-left">
+      <div class="brand-box">
+        <div class="brand-logo-wrap" title="KONCHO — KONsolidasi CHO">
+          <img src="data:image/png;base64,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" alt="KONCHO — KONsolidasi CHO" class="brand-logo-img">
+        </div>
+        <p class="brand-sub">Complaint Handling Officer • Mobile & Fixed</p>
+      </div>
+      <div class="db-status-pill" title="Terhubung langsung ke Google Spreadsheet">
+        <span class="status-indicator-dot"></span>
+        <span id="connStatusText">Connected: Sheet 1bqisp...</span>
+      </div>
+    </div>
+
+    <div class="header-actions">
+      <button class="btn-hdr" id="btnRefresh" title="Muat Ulang Data dari Google Sheet">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
+        <span>Refresh</span>
+      </button>
+
+      <button class="btn-hdr" id="btnToggleTheme" title="Ganti Tema Gelap / Terang">
+        <span id="themeIcon">☀️</span>
+      </button>
+
+      <button class="btn-hdr btn-primary" id="btnOpenNewModal">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+        <span>+ Input Kasus Baru</span>
+      </button>
+    </div>
+  </header>
+
+  <!-- =========================================================================
+       2. WORKSPACE LAYOUT: SIDEBAR KIRI + AREA UTAMA KANAN
+       ========================================================================= -->
+  <div class="app-layout">
+    
+    <!-- =====================================================================
+         PANEL KIRI (SIDEBAR): LAYANAN, BULAN & TOTAL STATUS KASUS
+         ===================================================================== -->
+    <aside class="sidebar-left">
+      
+      <!-- Section 1: Filter Layanan -->
+      <div class="sidebar-block">
+        <div class="sidebar-block-title">
+          <span>Layanan Database</span>
+        </div>
+        <div class="sidebar-nav-list" role="tablist">
+          <button class="sidebar-nav-btn active" data-service="ALL">
+            <div class="nav-btn-left">
+              <span class="nav-icon">📊</span>
+              <span class="nav-text">Semua Layanan</span>
+            </div>
+            <span class="nav-badge" id="badgeServiceAll">ALL</span>
+          </button>
+
+          <button class="sidebar-nav-btn" data-service="MOBILE">
+            <div class="nav-btn-left">
+              <span class="nav-icon">📱</span>
+              <span class="nav-text">CHO Mobile</span>
+            </div>
+            <span class="nav-badge srv-mobile">Mobile</span>
+          </button>
+
+          <button class="sidebar-nav-btn" data-service="FIXED">
+            <div class="nav-btn-left">
+              <span class="nav-icon">🌐</span>
+              <span class="nav-text">CHO Fixed</span>
+            </div>
+            <span class="nav-badge srv-fixed">Fixed</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Section 2: Periode Bulan -->
+      <div class="sidebar-block">
+        <div class="sidebar-block-title">
+          <span>Periode Bulan</span>
+        </div>
+        <div class="sidebar-month-box">
+          <div class="month-select-wrap">
+            <span class="month-icon">📅</span>
+            <select id="monthFilterSelect" class="sidebar-month-select" title="Pilih Periode Bulan">
+              <option value="all">Semua Bulan</option>
+              <option value="Oktober" selected>Oktober 2026</option>
+              <option value="September">September 2026</option>
+              <option value="Agustus">Agustus 2026</option>
+              <option value="Juli">Juli 2026</option>
+              <option value="Juni">Juni 2026</option>
+              <option value="Mei">Mei 2026</option>
+              <option value="April">April 2026</option>
+              <option value="Maret">Maret 2026</option>
+              <option value="Februari">Februari 2026</option>
+              <option value="Januari">Januari 2026</option>
+              <option value="November">November 2026</option>
+              <option value="Desember">Desember 2026</option>
+            </select>
+          </div>
+        </div>
+      </div>
+
+      <!-- Section 3: Ringkasan Status Kasus (KPI Interaktif) -->
+      <div class="sidebar-block">
+        <div class="sidebar-block-title">
+          <span>Status Kasus (Kolom H)</span>
+        </div>
+        <div class="sidebar-kpi-list">
+          <button class="kpi-nav-btn total active" data-status="all" id="pillTotal" title="Tampilkan Semua Kasus">
+            <div class="kpi-nav-left">
+              <span class="kpi-symbol">📦</span>
+              <span class="kpi-nav-label">Total Kasus</span>
+            </div>
+            <span class="kpi-count-badge" id="countTotal">0</span>
+          </button>
+
+          <button class="kpi-nav-btn open" data-status="Open" id="pillOpen" title="Filter Kasus Status Open">
+            <div class="kpi-nav-left">
+              <span class="kpi-dot dot-open"></span>
+              <span class="kpi-nav-label">Open</span>
+            </div>
+            <span class="kpi-count-badge badge-open" id="countOpen">0</span>
+          </button>
+
+          <button class="kpi-nav-btn inprogress" data-status="InProgress" id="pillInProgress" title="Filter Kasus Status In Progress">
+            <div class="kpi-nav-left">
+              <span class="kpi-dot dot-inprogress"></span>
+              <span class="kpi-nav-label">In Progress</span>
+            </div>
+            <span class="kpi-count-badge badge-inprogress" id="countInProgress">0</span>
+          </button>
+
+          <button class="kpi-nav-btn closed" data-status="Closed" id="pillClosed" title="Filter Kasus Status Closed">
+            <div class="kpi-nav-left">
+              <span class="kpi-dot dot-closed"></span>
+              <span class="kpi-nav-label">Closed</span>
+            </div>
+            <span class="kpi-count-badge badge-closed" id="countClosed">0</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Section 4: Info Database Spreadsheet -->
+      <div class="sidebar-footer-info">
+        <div class="sheet-info-card">
+          <div class="sheet-info-title">📊 Database Terhubung</div>
+          <div class="sheet-info-desc">Spreadsheet: <code>1bqispkT4gfY...</code></div>
+          <div class="sheet-info-sub">Layanan: CHO Mobile, CHO Fixed & Log_Komunikasi</div>
+        </div>
+      </div>
+
+    </aside>
+
+    <!-- =====================================================================
+         AREA UTAMA KANAN: SEARCH BAR & SATU CARD BESAR BERISI SELURUH KASUS
+         ===================================================================== -->
+    <main class="content-main">
+      
+      <!-- Top Search & Active Filter Banner -->
+      <div class="content-header-bar">
+        <div class="search-box-large">
+          <span class="search-icon">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><circle cx="11" cy="11" r="8"/><path d="m21 21-4.3-4.3"/></svg>
+          </span>
+          <input type="text" id="searchInput" class="search-input-field" placeholder="Cari Isu (Kol. B), Requestor (Kol. G), Follow Up (Kol. I), Akun, atau Keterangan...">
+          <button id="btnClearSearch" class="btn-clear-search" style="display:none;" title="Bersihkan Pencarian">✕</button>
+        </div>
+
+        <div class="active-scope-pill" id="activeScopeLabel">
+          Layanan: Semua Layanan • Periode: Oktober 2026
+        </div>
+      </div>
+
+      <!-- ===================================================================
+           SATU CARD TUNGGAL UNTUK SEMUA KASUS (UNIFIED CASES CONTAINER)
+           Semua Kasus 1, 2, dst berada di dalam satu card ini
+           =================================================================== -->
+      <div class="unified-cases-card">
+        
+        <!-- Header Card Tunggal -->
+        <div class="cases-card-header">
+          <div class="header-card-left">
+            <h2 class="cases-card-title">Daftar Kasus Isu CHO</h2>
+            <span class="cases-count-badge" id="caseCountBadge">Memuat kasus...</span>
+          </div>
+          <div class="header-card-right">
+            <span class="hint-text">💡 Klik tombol status pada baris kasus untuk memproses atau menyelesaikan</span>
+          </div>
+        </div>
+
+        <!-- Body Card Tunggal: Wadah seluruh baris kasus (Kasus 1, 2, 3...) -->
+        <div class="cases-card-body" id="caseListContainer">
+          <!-- Rendered dynamically by Scripts.html -->
+        </div>
+
+        <!-- Footer Card Tunggal -->
+        <div class="cases-card-footer">
+          <span id="footerSummaryText">Total kasus ditampilkan</span>
+        </div>
+
+      </div>
+
+    </main>
+
+  </div>
+
+  <!-- =========================================================================
+       3. MODAL: FORM PENGISIAN IN PROGRESS
+       (Jika In Progress maka ada form pengisian In Progress diisi keterangan)
+       ========================================================================= -->
+  <div class="modal-backdrop" id="modalInProgress">
+    <div class="modal-dialog">
+      <div class="modal-head">
+        <div class="modal-title-wrap">
+          <div class="modal-kicker blue-kicker">
+            <span class="kpi-dot dot-inprogress"></span> Form Pengisian In Progress
+          </div>
+          <h2 class="modal-title" id="inProgressModalTitle">Proses Kasus: -</h2>
+        </div>
+        <button class="modal-close-btn" id="btnCloseInProgressModal" title="Tutup">✕</button>
+      </div>
+
+      <div class="modal-body">
+        
+        <!-- Info Ringkas Tiket -->
+        <div class="modal-info-box blue-info-box">
+          <div class="info-row">
+            <span class="info-badge" id="inProgressBadgeService">MOBILE</span>
+            <span class="info-id" id="inProgressTicketId">Kasus #1</span>
+            <span class="info-req">Requestor: <strong id="inProgressRequestor">-</strong></span>
+          </div>
+          <div class="info-issue" id="inProgressIssueText">-</div>
+        </div>
+
+        <!-- Form Inputs -->
+        <div class="form-group">
+          <label class="form-label" for="inProgressMessage">
+            Keterangan / Catatan Tindak Lanjut In Progress <span class="req-star">*</span>
+          </label>
+          <textarea id="inProgressMessage" class="form-control" rows="4" placeholder="Tuliskan catatan koordinasi teknis, langkah penanganan yang sedang berjalan, atau analisa kendala..."></textarea>
+          <span class="form-hint">Keterangan ini akan otomatis tersimpan ke sheet <strong>Log_Komunikasi</strong> dan database.</span>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label" for="inProgressAuthor">
+              PIC / Petugas Pelaksana <span class="req-star">*</span>
+            </label>
+            <input type="text" id="inProgressAuthor" class="form-control" placeholder="Contoh: Dimas (RO) / NOC CHO">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="inProgressFollowUp">
+              Follow Up To (Kolom I)
+            </label>
+            <input type="text" id="inProgressFollowUp" class="form-control" placeholder="Contoh: Tim RO, Tim Splicing Lapangan...">
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-foot">
+        <button class="btn-secondary" id="btnCancelInProgress">Batal</button>
+        <button class="btn-primary btn-save-inprogress" id="btnSubmitInProgress">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>Simpan & Ubah ke In Progress</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       4. MODAL: FORM PENGISIAN CLOSED
+       (Ketika akan Closed ada pengisian keterangan Closed & di closed oleh user siapa)
+       ========================================================================= -->
+  <div class="modal-backdrop" id="modalClosed">
+    <div class="modal-dialog">
+      <div class="modal-head">
+        <div class="modal-title-wrap">
+          <div class="modal-kicker green-kicker">
+            <span class="kpi-dot dot-closed"></span> Form Penyelesaian Kasus (Closed)
+          </div>
+          <h2 class="modal-title" id="closedModalTitle">Selesaikan Kasus (Closed): -</h2>
+        </div>
+        <button class="modal-close-btn" id="btnCloseClosedModal" title="Tutup">✕</button>
+      </div>
+
+      <div class="modal-body">
+        
+        <!-- Info Ringkas Tiket -->
+        <div class="modal-info-box green-info-box">
+          <div class="info-row">
+            <span class="info-badge" id="closedBadgeService">MOBILE</span>
+            <span class="info-id" id="closedTicketId">Kasus #1</span>
+            <span class="info-req">Requestor: <strong id="closedRequestor">-</strong></span>
+          </div>
+          <div class="info-issue" id="closedIssueText">-</div>
+        </div>
+
+        <!-- Form Inputs -->
+        <div class="form-group">
+          <label class="form-label" for="closedMessage">
+            Keterangan Closed / Solusi Penyelesaian <span class="req-star">*</span>
+          </label>
+          <textarea id="closedMessage" class="form-control" rows="4" placeholder="Jelaskan secara rinci solusi penyelesaian, hasil perbaikan, root cause kendala, atau konfirmasi bahwa layanan pelanggan sudah normal..."></textarea>
+          <span class="form-hint">Keterangan penyelesaian akan direkam sebagai catatan final kasus di sheet <strong>Log_Komunikasi</strong>.</span>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label" for="closedByUser">
+              Di-Closed Oleh (Nama User) <span class="req-star">*</span>
+            </label>
+            <input type="text" id="closedByUser" class="form-control" placeholder="Contoh: Budi Santoso (CHO Specialist) / Ani (Care)">
+            <span class="form-hint">Identitas user/petugas yang bertanggung jawab menutup tiket.</span>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="closedFollowUp">
+              Follow Up Terakhir (Kolom I)
+            </label>
+            <input type="text" id="closedFollowUp" class="form-control" placeholder="Contoh: Selesai / Tim Maintenance">
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-foot">
+        <button class="btn-secondary" id="btnCancelClosed">Batal</button>
+        <button class="btn-primary btn-save-closed" id="btnSubmitClosed">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>Tutup Kasus Sekarang (Closed)</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       5. MODAL: RIWAYAT LOG KOMUNIKASI & DETAIL LENGKAP KASUS
+       ========================================================================= -->
+  <div class="modal-backdrop" id="modalLog">
+    <div class="modal-dialog modal-lg">
+      <div class="modal-head">
+        <div class="modal-title-wrap">
+          <div class="modal-kicker">📜 Riwayat Komunikasi & Log Status</div>
+          <h2 class="modal-title" id="logModalTitle">Log Kasus: -</h2>
+        </div>
+        <button class="modal-close-btn" id="btnCloseLogModal" title="Tutup">✕</button>
+      </div>
+
+      <div class="modal-body">
+        
+        <!-- Info Banner Kasus -->
+        <div class="log-case-banner">
+          <div class="banner-field">
+            <span class="field-k">Total Case Isu (Kolom B):</span>
+            <span class="field-v-bold" id="logDetailIssue">-</span>
+          </div>
+          <div class="banner-grid-4">
+            <div><span class="field-k">Requestor:</span> <strong id="logDetailReq">-</strong></div>
+            <div><span class="field-k">Follow Up:</span> <strong id="logDetailFollowUp">-</strong></div>
+            <div><span class="field-k">Layanan:</span> <strong id="logDetailService">-</strong></div>
+            <div><span class="field-k">Status:</span> <strong id="logDetailStatus">-</strong></div>
+          </div>
+        </div>
+
+        <!-- Timeline Log Komunikasi -->
+        <h4 style="font-size:13px; font-weight:700; margin:16px 0 10px 0; color:var(--text-secondary); text-transform:uppercase; letter-spacing:0.5px;">Kronologis & Catatan Update</h4>
+        <div class="log-timeline-container" id="logTimelineContainer">
+          <!-- Rendered dynamically -->
+        </div>
+
+        <!-- Quick Append Note -->
+        <div class="log-quick-add">
+          <h4 style="font-size:12.5px; font-weight:700; margin-bottom:8px; color:var(--text-primary);">Tambah Catatan Tambahan</h4>
+          <div class="quick-add-row">
+            <input type="text" id="logQuickAuthor" class="form-control" placeholder="Nama Anda" style="max-width:180px;">
+            <input type="text" id="logQuickMessage" class="form-control" placeholder="Tulis catatan atau update di sini...">
+            <button class="btn-primary" id="btnSubmitQuickLog" style="white-space:nowrap;">Kirim Catatan</button>
+          </div>
+        </div>
+
+      </div>
+
+      <div class="modal-foot">
+        <button class="btn-secondary" id="btnCloseLogFooter">Tutup</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- =========================================================================
+       6. MODAL: INPUT KASUS BARU
+       ========================================================================= -->
+  <div class="modal-backdrop" id="newDataModal">
+    <div class="modal-dialog">
+      <div class="modal-head">
+        <div class="modal-title-wrap">
+          <div class="modal-kicker">Tambah Data Laporan</div>
+          <h2 class="modal-title">Input Kasus Isu CHO Baru</h2>
+        </div>
+        <button class="modal-close-btn" id="btnCloseModal" title="Tutup">✕</button>
+      </div>
+
+      <div class="modal-body">
+        
+        <!-- Toggle Tipe Layanan -->
+        <div class="form-group">
+          <label class="form-label">Pilih Sheet Database Layanan <span class="req-star">*</span></label>
+          <div class="modal-service-toggle">
+            <button type="button" class="service-toggle-btn active" id="toggleMobile">
+              📱 CHO Mobile
+            </button>
+            <button type="button" class="service-toggle-btn" id="toggleFixed">
+              🌐 CHO Fixed
+            </button>
+          </div>
+        </div>
+
+        <!-- Kolom B: Total Case Isu -->
+        <div class="form-group">
+          <label class="form-label" for="inputCaseIssue">
+            Total Case Isu yang Masuk (Kolom B) <span class="req-star">*</span>
+          </label>
+          <input type="text" id="inputCaseIssue" class="form-control" placeholder="Contoh: Kendala charge MU pada paket bundling...">
+        </div>
+
+        <div class="form-row-2">
+          <!-- Kolom G: Requestor -->
+          <div class="form-group">
+            <label class="form-label" for="inputRequestor">
+              Requestor / Pemohon (Kolom G) <span class="req-star">*</span>
+            </label>
+            <input type="text" id="inputRequestor" class="form-control" placeholder="Contoh: Dimas (B2B Care) / Call Center 188">
+          </div>
+
+          <!-- Kolom I: Follow up to -->
+          <div class="form-group">
+            <label class="form-label" for="inputFollowUp">
+              Follow Up To (Kolom I) <span class="req-star">*</span>
+            </label>
+            <input type="text" id="inputFollowUp" class="form-control" placeholder="Contoh: Tim RO / Tim Splicing Lapangan">
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <!-- Kolom H: Status Awal -->
+          <div class="form-group">
+            <label class="form-label" for="inputStatus">
+              Status Awal (Kolom H)
+            </label>
+            <select id="inputStatus" class="form-control">
+              <option value="Open" selected>Open</option>
+              <option value="InProgress">InProgress</option>
+              <option value="Closed">Closed</option>
+            </select>
+          </div>
+
+          <!-- Nomor Layanan -->
+          <div class="form-group">
+            <label class="form-label" id="lblNomorLayanan" for="inputNomorLayanan">
+              Nomor MSISDN Pelanggan <span class="req-star">*</span>
+            </label>
+            <input type="text" id="inputNomorLayanan" class="form-control" placeholder="Contoh: 081234567890">
+          </div>
+        </div>
+
+        <div class="form-row-2">
+          <div class="form-group">
+            <label class="form-label" for="inputNamaPelanggan">Nama Pelanggan / Akun</label>
+            <input type="text" id="inputNamaPelanggan" class="form-control" placeholder="Contoh: PT Solusi Finansial">
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" id="lblWilayah" for="inputWilayah">Regional / Cluster</label>
+            <input type="text" id="inputWilayah" class="form-control" placeholder="Contoh: Regional 2 / Sudirman">
+          </div>
+        </div>
+
+        <!-- Detail Kendala -->
+        <div class="form-group">
+          <label class="form-label" for="inputDetail">Detail Kendala Awal</label>
+          <textarea id="inputDetail" class="form-control" rows="3" placeholder="Deskripsikan detail kendala kasus awal..."></textarea>
+        </div>
+
+      </div>
+
+      <div class="modal-foot">
+        <button class="btn-secondary" id="btnCancelModal">Batal</button>
+        <button class="btn-primary" id="btnSubmitNewReport">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
+          <span>Simpan ke Database</span>
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Toast Notification Container -->
+  <div class="toast-container" id="toastContainer"></div>
+
+  <!-- Include Client JavaScript -->
+  <script>
+/**
+ * =========================================================================
+ * konCHO - Client Side JavaScript Controller
+ * Unified Card Case List View, Left Sidebar Controls, Status Transitions,
+ * In Progress Note Modal, Closed Note & Closed-By User Modal.
+ * =========================================================================
+ */
+
+(function() {
+  'use strict';
+
+  // Application State
+  var state = {
+    isGasEnvironment: typeof google !== 'undefined' && google.script && google.script.run,
+    // Google Apps Script Web App Deployment URL (digunakan saat di-deploy ke Vercel / GitHub)
+    gasApiUrl: 'https://script.google.com/macros/s/AKfycbxXTAY8AeF3VyvSgFWgUEMsYMbXBimb8VUZQAns0EGue4F-rgah_0tenQpyaS4V8TFFRw/exec',
+    records: [],
+    logs: [],
+    mobileHeaders: [],
+    fixedHeaders: [],
+    activeServiceScope: 'ALL',      // 'ALL' | 'MOBILE' | 'FIXED'
+    activeMonthFilter: 'Oktober',   // Default aktif: 'Oktober'
+    activeStatusFilter: 'all',      // 'all' | 'Open' | 'InProgress' | 'Closed'
+    searchQuery: '',
+    currentActionTicket: null,      // Tiket yang sedang ditargetkan oleh modal
+    theme: localStorage.getItem('koncho_theme') || 'dark',
+    defaultAuthor: localStorage.getItem('koncho_pic_name') || ''
+  };
+
+  // DOM Elements Cache
+  var dom = {
+    // Top Bar
+    btnRefresh: document.getElementById('btnRefresh'),
+    btnToggleTheme: document.getElementById('btnToggleTheme'),
+    themeIcon: document.getElementById('themeIcon'),
+    connStatusText: document.getElementById('connStatusText'),
+    btnOpenNewModal: document.getElementById('btnOpenNewModal'),
+
+    // Sidebar Kiri
+    sidebarNavBtns: document.querySelectorAll('.sidebar-nav-btn'),
+    monthFilterSelect: document.getElementById('monthFilterSelect'),
+    kpiNavBtns: document.querySelectorAll('.kpi-nav-btn'),
+    countTotal: document.getElementById('countTotal'),
+    countOpen: document.getElementById('countOpen'),
+    countInProgress: document.getElementById('countInProgress'),
+    countClosed: document.getElementById('countClosed'),
+
+    // Area Utama Kanan
+    searchInput: document.getElementById('searchInput'),
+    btnClearSearch: document.getElementById('btnClearSearch'),
+    activeScopeLabel: document.getElementById('activeScopeLabel'),
+    caseListContainer: document.getElementById('caseListContainer'),
+    caseCountBadge: document.getElementById('caseCountBadge'),
+    footerSummaryText: document.getElementById('footerSummaryText'),
+
+    // Modal In Progress
+    modalInProgress: document.getElementById('modalInProgress'),
+    btnCloseInProgressModal: document.getElementById('btnCloseInProgressModal'),
+    btnCancelInProgress: document.getElementById('btnCancelInProgress'),
+    btnSubmitInProgress: document.getElementById('btnSubmitInProgress'),
+    inProgressModalTitle: document.getElementById('inProgressModalTitle'),
+    inProgressBadgeService: document.getElementById('inProgressBadgeService'),
+    inProgressTicketId: document.getElementById('inProgressTicketId'),
+    inProgressRequestor: document.getElementById('inProgressRequestor'),
+    inProgressIssueText: document.getElementById('inProgressIssueText'),
+    inProgressMessage: document.getElementById('inProgressMessage'),
+    inProgressAuthor: document.getElementById('inProgressAuthor'),
+    inProgressFollowUp: document.getElementById('inProgressFollowUp'),
+
+    // Modal Closed
+    modalClosed: document.getElementById('modalClosed'),
+    btnCloseClosedModal: document.getElementById('btnCloseClosedModal'),
+    btnCancelClosed: document.getElementById('btnCancelClosed'),
+    btnSubmitClosed: document.getElementById('btnSubmitClosed'),
+    closedModalTitle: document.getElementById('closedModalTitle'),
+    closedBadgeService: document.getElementById('closedBadgeService'),
+    closedTicketId: document.getElementById('closedTicketId'),
+    closedRequestor: document.getElementById('closedRequestor'),
+    closedIssueText: document.getElementById('closedIssueText'),
+    closedMessage: document.getElementById('closedMessage'),
+    closedByUser: document.getElementById('closedByUser'),
+    closedFollowUp: document.getElementById('closedFollowUp'),
+
+    // Modal Log Komunikasi
+    modalLog: document.getElementById('modalLog'),
+    btnCloseLogModal: document.getElementById('btnCloseLogModal'),
+    btnCloseLogFooter: document.getElementById('btnCloseLogFooter'),
+    logModalTitle: document.getElementById('logModalTitle'),
+    logDetailIssue: document.getElementById('logDetailIssue'),
+    logDetailReq: document.getElementById('logDetailReq'),
+    logDetailFollowUp: document.getElementById('logDetailFollowUp'),
+    logDetailService: document.getElementById('logDetailService'),
+    logDetailStatus: document.getElementById('logDetailStatus'),
+    logTimelineContainer: document.getElementById('logTimelineContainer'),
+    logQuickAuthor: document.getElementById('logQuickAuthor'),
+    logQuickMessage: document.getElementById('logQuickMessage'),
+    btnSubmitQuickLog: document.getElementById('btnSubmitQuickLog'),
+
+    // Modal Input Baru
+    newDataModal: document.getElementById('newDataModal'),
+    btnCloseModal: document.getElementById('btnCloseModal'),
+    btnCancelModal: document.getElementById('btnCancelModal'),
+    btnSubmitNewReport: document.getElementById('btnSubmitNewReport'),
+    toggleMobile: document.getElementById('toggleMobile'),
+    toggleFixed: document.getElementById('toggleFixed'),
+    inputCaseIssue: document.getElementById('inputCaseIssue'),
+    inputRequestor: document.getElementById('inputRequestor'),
+    inputStatus: document.getElementById('inputStatus'),
+    inputFollowUp: document.getElementById('inputFollowUp'),
+    lblNomorLayanan: document.getElementById('lblNomorLayanan'),
+    lblWilayah: document.getElementById('lblWilayah'),
+    inputNomorLayanan: document.getElementById('inputNomorLayanan'),
+    inputNamaPelanggan: document.getElementById('inputNamaPelanggan'),
+    inputWilayah: document.getElementById('inputWilayah'),
+    inputDetail: document.getElementById('inputDetail'),
+
+    // Toast
+    toastContainer: document.getElementById('toastContainer')
+  };
+
+  var selectedNewService = 'MOBILE';
+
+  /**
+   * Inisialisasi Aplikasi
+   */
+  function init() {
+    applyTheme(state.theme);
+    bindEvents();
+    loadApplicationData();
+  }
+
+  /**
+   * Binding Event Listeners
+   */
+  function bindEvents() {
+    // 1. Theme Toggle
+    if (dom.btnToggleTheme) {
+      dom.btnToggleTheme.addEventListener('click', function() {
+        var next = state.theme === 'dark' ? 'light' : 'dark';
+        applyTheme(next);
+      });
+    }
+
+    // 2. Refresh Button
+    if (dom.btnRefresh) {
+      dom.btnRefresh.addEventListener('click', function() {
+        loadApplicationData(true);
+      });
+    }
+
+    // 3. Sidebar Kiri: Layanan Filter (Semua, Mobile, Fixed)
+    dom.sidebarNavBtns.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        dom.sidebarNavBtns.forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        state.activeServiceScope = btn.getAttribute('data-service') || 'ALL';
+        updateScopeLabel();
+        updateKpiCounters();
+        renderCaseList();
+      });
+    });
+
+    // 4. Sidebar Kiri: Periode Bulan
+    if (dom.monthFilterSelect) {
+      dom.monthFilterSelect.addEventListener('change', function(e) {
+        state.activeMonthFilter = e.target.value;
+        updateScopeLabel();
+        updateKpiCounters();
+        renderCaseList();
+      });
+    }
+
+    // 5. Sidebar Kiri: Status KPI (Total, Open, In Progress, Closed)
+    dom.kpiNavBtns.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        dom.kpiNavBtns.forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        state.activeStatusFilter = btn.getAttribute('data-status') || 'all';
+        renderCaseList();
+      });
+    });
+
+    // 6. Pencarian Teks
+    if (dom.searchInput) {
+      dom.searchInput.addEventListener('input', function(e) {
+        state.searchQuery = e.target.value.toLowerCase().trim();
+        if (dom.btnClearSearch) {
+          dom.btnClearSearch.style.display = state.searchQuery ? 'block' : 'none';
+        }
+        renderCaseList();
+      });
+    }
+    if (dom.btnClearSearch) {
+      dom.btnClearSearch.addEventListener('click', function() {
+        dom.searchInput.value = '';
+        state.searchQuery = '';
+        dom.btnClearSearch.style.display = 'none';
+        renderCaseList();
+        dom.searchInput.focus();
+      });
+    }
+
+    // 7. Modal In Progress Events
+    if (dom.btnCloseInProgressModal) dom.btnCloseInProgressModal.addEventListener('click', closeInProgressModal);
+    if (dom.btnCancelInProgress) dom.btnCancelInProgress.addEventListener('click', closeInProgressModal);
+    if (dom.btnSubmitInProgress) dom.btnSubmitInProgress.addEventListener('click', handleSaveInProgress);
+
+    // 8. Modal Closed Events
+    if (dom.btnCloseClosedModal) dom.btnCloseClosedModal.addEventListener('click', closeClosedModal);
+    if (dom.btnCancelClosed) dom.btnCancelClosed.addEventListener('click', closeClosedModal);
+    if (dom.btnSubmitClosed) dom.btnSubmitClosed.addEventListener('click', handleSaveClosed);
+
+    // 9. Modal Log Events
+    if (dom.btnCloseLogModal) dom.btnCloseLogModal.addEventListener('click', closeLogModal);
+    if (dom.btnCloseLogFooter) dom.btnCloseLogFooter.addEventListener('click', closeLogModal);
+    if (dom.btnSubmitQuickLog) dom.btnSubmitQuickLog.addEventListener('click', handleSaveQuickLog);
+
+    // 10. Modal Input Kasus Baru Events
+    if (dom.btnOpenNewModal) dom.btnOpenNewModal.addEventListener('click', openNewModal);
+    if (dom.btnCloseModal) dom.btnCloseModal.addEventListener('click', closeNewModal);
+    if (dom.btnCancelModal) dom.btnCancelModal.addEventListener('click', closeNewModal);
+    if (dom.toggleMobile) dom.toggleMobile.addEventListener('click', function() { setNewModalService('MOBILE'); });
+    if (dom.toggleFixed) dom.toggleFixed.addEventListener('click', function() { setNewModalService('FIXED'); });
+    if (dom.btnSubmitNewReport) dom.btnSubmitNewReport.addEventListener('click', handleSubmitNewReport);
+
+    // Tutup modal jika klik di luar box modal
+    [dom.modalInProgress, dom.modalClosed, dom.modalLog, dom.newDataModal].forEach(function(m) {
+      if (!m) return;
+      m.addEventListener('click', function(e) {
+        if (e.target === m) {
+          m.classList.remove('active');
+        }
+      });
+    });
+  }
+
+  function applyTheme(theme) {
+    state.theme = theme;
+    document.body.setAttribute('data-theme', theme);
+    if (dom.themeIcon) {
+      dom.themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+    }
+    localStorage.setItem('koncho_theme', theme);
+  }
+
+  function updateScopeLabel() {
+    if (!dom.activeScopeLabel) return;
+    var srvText = 'Semua Layanan';
+    if (state.activeServiceScope === 'MOBILE') srvText = 'CHO Mobile';
+    else if (state.activeServiceScope === 'FIXED') srvText = 'CHO Fixed';
+
+    var monthText = state.activeMonthFilter === 'all' ? 'Semua Periode' : state.activeMonthFilter;
+    dom.activeScopeLabel.textContent = 'Layanan: ' + srvText + ' • Periode: ' + monthText;
+  }
+
+  /**
+   * Load Data dari Backend Google Apps Script (Langsung atau via Live REST API di Vercel)
+   */
+  function loadApplicationData(showToastAlert) {
+    showToast('Memuat data dari Google Sheet...', 'info');
+
+    if (state.isGasEnvironment) {
+      // 1. Lingkungan Internal Google Apps Script
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (res && res.success) {
+            processLoadedData(res);
+            if (showToastAlert) showToast('Data berhasil diperbarui dari Spreadsheet!', 'success');
+          } else {
+            showToast('Gagal memuat: ' + (res ? res.error : 'Unknown'), 'error');
+          }
+        })
+        .withFailureHandler(function(err) {
+          showToast('Koneksi Apps Script error: ' + err.message, 'error');
+        })
+        .getInitialData();
+    } else if (state.gasApiUrl) {
+      // 2. Lingkungan Vercel / GitHub: Mengambil LIVE data dari Apps Script Web App API
+      fetch(state.gasApiUrl + '?action=getInitialData', { method: 'GET', redirect: 'follow' })
+        .then(function(response) {
+          if (!response.ok) throw new Error('HTTP ' + response.status);
+          return response.json();
+        })
+        .then(function(res) {
+          if (res && res.success) {
+            processLoadedData(res);
+            if (dom.connStatusText) dom.connStatusText.textContent = 'Live API: Sheet 1bqisp...';
+            if (showToastAlert) showToast('Data live terhubung dari Google Spreadsheet!', 'success');
+          } else {
+            console.warn('API returned error, using fallback:', res);
+            loadFallbackData(showToastAlert);
+          }
+        })
+        .catch(function(err) {
+          console.warn('Fetch live API unavailable, using simulation fallback:', err);
+          loadFallbackData(showToastAlert);
+        });
+    } else {
+      loadFallbackData(showToastAlert);
+    }
+  }
+
+  function loadFallbackData(showToastAlert) {
+    setTimeout(function() {
+      var mock = generateMockData();
+      processLoadedData(mock);
+      if (dom.connStatusText) dom.connStatusText.textContent = 'Demo Mode (Simulation)';
+      if (showToastAlert) showToast('Data simulasi dimuat!', 'info');
+    }, 250);
+  }
+
+  /**
+   * Proses data dari spreadsheet dan hubungkan keterangan log terbaru
+   */
+  function processLoadedData(data) {
+    state.mobileHeaders = data.mobileHeaders || [];
+    state.fixedHeaders = data.fixedHeaders || [];
+    state.logs = data.logs || [];
+
+    var mob = (data.mobileRecords || []).map(function(r) { r.serviceType = 'MOBILE'; return r; });
+    var fix = (data.fixedRecords || []).map(function(r) { r.serviceType = 'FIXED'; return r; });
+
+    var all = mob.concat(fix);
+
+    // Hubungkan catatan in progress dan closed terbaru dari log komunikasi
+    all.forEach(function(ticket) {
+      enrichTicketWithLogs(ticket, state.logs);
+    });
+
+    state.records = all;
+
+    // Urutkan tiket: yang terbaru di atas
+    state.records.sort(function(a, b) {
+      var dateA = new Date(a.terakhirUpdate || a.tanggal || 0).getTime();
+      var dateB = new Date(b.terakhirUpdate || b.tanggal || 0).getTime();
+      return dateB - dateA;
+    });
+
+    populateMonthDropdown();
+    updateScopeLabel();
+    updateKpiCounters();
+    renderCaseList();
+  }
+
+  /**
+   * Menghubungkan tiket dengan log terbaru untuk In Progress & Closed
+   */
+  function enrichTicketWithLogs(ticket, logs) {
+    var ticketLogs = logs.filter(function(l) { return l.ticketId === ticket.id; });
+    
+    // Cari log InProgress terbaru
+    var inProgLog = ticketLogs.find(function(l) { return l.statusTerkait === 'InProgress'; });
+    if (inProgLog) {
+      ticket.inProgressNote = inProgLog.message;
+      ticket.inProgressBy = inProgLog.author;
+      ticket.inProgressTime = inProgLog.timestamp;
+    }
+
+    // Cari log Closed terbaru
+    var closedLog = ticketLogs.find(function(l) { return l.statusTerkait === 'Closed'; });
+    if (closedLog) {
+      ticket.closedNote = closedLog.message;
+      ticket.closedBy = closedLog.author;
+      ticket.closedTime = closedLog.timestamp;
+    }
+  }
+
+  /**
+   * Mengisi Opsi Dropdown Bulan secara dinamis
+   */
+  function populateMonthDropdown() {
+    if (!dom.monthFilterSelect) return;
+
+    var distinctMonths = [];
+    state.records.forEach(function(r) {
+      if (r.bulan && distinctMonths.indexOf(r.bulan) < 0) {
+        distinctMonths.push(r.bulan);
+      }
+    });
+
+    if (distinctMonths.length === 0) {
+      distinctMonths.push('Oktober 2026');
+    }
+
+    var cur = state.activeMonthFilter || 'Oktober';
+    var html = '<option value="all"' + (cur === 'all' ? ' selected' : '') + '>Semua Bulan</option>';
+    distinctMonths.forEach(function(m) {
+      var isSel = (cur === m || m.toLowerCase().indexOf(cur.toLowerCase()) >= 0);
+      html += '<option value="' + escapeHtml(m) + '"' + (isSel ? ' selected' : '') + '>' + escapeHtml(m) + '</option>';
+    });
+
+    dom.monthFilterSelect.innerHTML = html;
+  }
+
+  /**
+   * Hitung dan Update Angka pada Status KPI di Sidebar Kiri
+   */
+  function updateKpiCounters() {
+    var monthFilter = state.activeMonthFilter;
+    var scope = state.activeServiceScope;
+
+    var counts = {
+      total: 0,
+      open: 0,
+      inProgress: 0,
+      closed: 0
+    };
+
+    state.records.forEach(function(item) {
+      if (!itemMatchesMonth(item, monthFilter)) return;
+      if (scope === 'MOBILE' && item.serviceType !== 'MOBILE') return;
+      if (scope === 'FIXED' && item.serviceType !== 'FIXED') return;
+
+      counts.total++;
+      if (itemMatchesStatus(item, 'Open')) counts.open++;
+      else if (itemMatchesStatus(item, 'InProgress')) counts.inProgress++;
+      else if (itemMatchesStatus(item, 'Closed')) counts.closed++;
+    });
+
+    if (dom.countTotal) dom.countTotal.textContent = counts.total;
+    if (dom.countOpen) dom.countOpen.textContent = counts.open;
+    if (dom.countInProgress) dom.countInProgress.textContent = counts.inProgress;
+    if (dom.countClosed) dom.countClosed.textContent = counts.closed;
+  }
+
+  /**
+   * Helper: Filter Pemeriksaan Bulan
+   */
+  function itemMatchesMonth(item, selectedMonth) {
+    if (!selectedMonth || selectedMonth === 'all') return true;
+    var sel = selectedMonth.toLowerCase().trim();
+    var b = String(item.bulan || '').toLowerCase();
+    var tgl = String(item.tanggal || '').toLowerCase();
+    var det = String(item.detail || '').toLowerCase();
+    var isu = String(item.totalCaseIsu || '').toLowerCase();
+    
+    // Substring match
+    if (b.indexOf(sel) >= 0 || tgl.indexOf(sel) >= 0 || det.indexOf(sel) >= 0 || isu.indexOf(sel) >= 0) return true;
+    
+    // Base month check (e.g. 'oktober' from 'Oktober 2026')
+    var baseMonth = sel.split(' ')[0];
+    if (baseMonth && (b.indexOf(baseMonth) >= 0 || tgl.indexOf(baseMonth) >= 0)) return true;
+    
+    return false;
+  }
+
+  /**
+   * Helper: Filter Pemeriksaan Status
+   */
+  function itemMatchesStatus(item, targetStatus) {
+    if (!targetStatus || targetStatus === 'all') return true;
+    var st = (item.status || 'Open').toLowerCase().replace(/[^a-z]/g, '');
+    var target = targetStatus.toLowerCase().replace(/[^a-z]/g, '');
+    if (target === 'open') return st === 'open' || st === 'new';
+    if (target === 'inprogress') return st.indexOf('progress') >= 0;
+    if (target === 'closed') return st.indexOf('close') >= 0 || st.indexOf('solve') >= 0 || st.indexOf('selesai') >= 0;
+    return st === target;
+  }
+
+  /**
+   * =========================================================================
+   * RENDER UTAMA: SEMUA KASUS DI DALAM SATU CARD BESAR TUNGGAL
+   * (Kasus 1, 2, dst dibuat dalam satu card terpadu yang rapi)
+   * =========================================================================
+   */
+  function renderCaseList() {
+    var filtered = state.records.filter(function(item) {
+      // 1. Filter Periode Bulan
+      if (!itemMatchesMonth(item, state.activeMonthFilter)) return false;
+
+      // 2. Filter Layanan (Mobile vs Fixed vs Semua)
+      if (state.activeServiceScope === 'MOBILE' && item.serviceType !== 'MOBILE') return false;
+      if (state.activeServiceScope === 'FIXED' && item.serviceType !== 'FIXED') return false;
+
+      // 3. Filter Status (All, Open, InProgress, Closed)
+      if (state.activeStatusFilter && state.activeStatusFilter !== 'all') {
+        if (!itemMatchesStatus(item, state.activeStatusFilter)) return false;
+      }
+
+      // 4. Pencarian Teks
+      if (state.searchQuery) {
+        var q = state.searchQuery;
+        var match = (item.id || '').toLowerCase().indexOf(q) >= 0 ||
+                    (item.totalCaseIsu || '').toLowerCase().indexOf(q) >= 0 ||
+                    (item.requestor || '').toLowerCase().indexOf(q) >= 0 ||
+                    (item.followUpTo || '').toLowerCase().indexOf(q) >= 0 ||
+                    (item.nama || '').toLowerCase().indexOf(q) >= 0 ||
+                    (item.nomorLayanan || '').toLowerCase().indexOf(q) >= 0 ||
+                    (item.status || '').toLowerCase().indexOf(q) >= 0 ||
+                    (item.detail || '').toLowerCase().indexOf(q) >= 0 ||
+                    (item.inProgressNote || '').toLowerCase().indexOf(q) >= 0 ||
+                    (item.closedNote || '').toLowerCase().indexOf(q) >= 0 ||
+                    (item.closedBy || '').toLowerCase().indexOf(q) >= 0;
+        if (!match) return false;
+      }
+
+      return true;
+    });
+
+    // Update Header & Footer Card Tunggal
+    if (dom.caseCountBadge) {
+      dom.caseCountBadge.textContent = filtered.length + ' Kasus Ditemukan';
+    }
+    if (dom.footerSummaryText) {
+      var srvLabel = state.activeServiceScope === 'ALL' ? 'Semua Layanan' : (state.activeServiceScope === 'MOBILE' ? 'CHO Mobile' : 'CHO Fixed');
+      var monthLabel = state.activeMonthFilter === 'all' ? 'Semua Bulan' : state.activeMonthFilter;
+      dom.footerSummaryText.textContent = 'Menampilkan ' + filtered.length + ' kasus • ' + srvLabel + ' • Periode: ' + monthLabel;
+    }
+
+    if (filtered.length === 0) {
+      dom.caseListContainer.innerHTML = 
+        '<div class="empty-card-state">' +
+          '<div class="empty-icon">🔍</div>' +
+          '<div class="empty-title">Tidak ada kasus yang sesuai kriteria filter</div>' +
+          '<div class="empty-desc">Coba sesuaikan pilihan Layanan, Bulan, atau Status di sidebar sebelah kiri.<br>' +
+          '<button id="btnQuickAllMonths" style="margin-top:12px; padding:6px 14px; background:var(--primary-color); color:#fff; border:none; border-radius:6px; cursor:pointer; font-weight:700; font-size:12px;">📅 Tampilkan Semua Bulan</button>' +
+          '</div>' +
+        '</div>';
+      var btnAll = document.getElementById('btnQuickAllMonths');
+      if (btnAll) {
+        btnAll.addEventListener('click', function() {
+          state.activeMonthFilter = 'all';
+          state.activeStatusFilter = 'all';
+          if (dom.monthFilterSelect) dom.monthFilterSelect.value = 'all';
+          dom.kpiNavBtns.forEach(function(b) { b.classList.remove('active'); });
+          if (dom.pillTotal) dom.pillTotal.classList.add('active');
+          updateScopeLabel();
+          updateKpiCounters();
+          renderCaseList();
+        });
+      }
+      return;
+    }
+
+    var html = '';
+    filtered.forEach(function(item) {
+      var srvClass = item.serviceType === 'MOBILE' ? 'mobile' : 'fixed';
+      var stNorm = (item.status || 'Open').toLowerCase().replace(/[^a-z]/g, '');
+      var statusKey = 'open';
+      var statusLabel = '🟡 Open';
+      var cardStatusClass = 'status-open';
+
+      if (stNorm.indexOf('progress') >= 0) {
+        statusKey = 'inprogress';
+        statusLabel = '🔵 In Progress';
+        cardStatusClass = 'status-inprogress';
+      } else if (stNorm.indexOf('close') >= 0 || stNorm.indexOf('solve') >= 0 || stNorm.indexOf('selesai') >= 0) {
+        statusKey = 'closed';
+        statusLabel = '🟢 Closed';
+        cardStatusClass = 'status-closed';
+      }
+
+      var ticketLogs = state.logs.filter(function(l) { return l.ticketId === item.id; });
+      var logCount = ticketLogs.length;
+
+      // Baris Kasus di dalam Satu Card Tunggal
+      html += '<div class="case-item-row ' + cardStatusClass + '" data-id="' + escapeHtml(item.id) + '" data-service="' + item.serviceType + '">';
+
+      // 1. Header Baris Item
+      html += '<div class="case-row-header">';
+      html += '<div class="case-row-badges">';
+      html += '<span class="badge-id">Kasus #' + escapeHtml(item.id) + '</span>';
+      html += '<span class="badge-srv ' + srvClass + '">' + item.serviceType + '</span>';
+      if (item.bulan) {
+        html += '<span class="badge-month">📅 ' + escapeHtml(item.bulan) + '</span>';
+      }
+      html += '<span class="badge-status-pill ' + statusKey + '">' + statusLabel + '</span>';
+      html += '</div>';
+
+      html += '<div class="case-row-time">';
+      html += '<span>Terakhir Update: <strong>' + formatDisplayTime(item.terakhirUpdate || item.tanggal) + '</strong></span>';
+      html += '</div>';
+      html += '</div>';
+
+      // 2. Judul Kasus (Kolom B - Total Case Isu yang masuk)
+      html += '<div class="case-row-title">' + escapeHtml(item.totalCaseIsu || 'Isu Kasus CHO') + '</div>';
+
+      // 3. Meta Data (Requestor Kolom G & Follow Up To Kolom I & Akun)
+      html += '<div class="case-row-meta">';
+      var reqVal = item.requestor && item.requestor !== '-' ? item.requestor : 'Belum Diisi';
+      html += '<div class="meta-item"><span style="font-size:12px;">👤</span> Requestor (Kol. G): <strong>' + escapeHtml(reqVal) + '</strong></div>';
+
+      var followVal = item.followUpTo && item.followUpTo !== '-' ? item.followUpTo : 'Belum Ditentukan';
+      html += '<div class="meta-item followup"><span style="font-size:12px;">🎯</span> Follow Up To (Kol. I): <strong>' + escapeHtml(followVal) + '</strong></div>';
+
+      if (item.nomorLayanan && item.nomorLayanan !== '-') {
+        html += '<div class="meta-item"><span style="font-size:12px;">📱</span> Akun: <strong>' + escapeHtml(item.nomorLayanan) + '</strong> ' + (item.nama && item.nama !== '-' ? '(' + escapeHtml(item.nama) + ')' : '') + '</div>';
+      }
+      html += '</div>';
+
+      // 4. Kotak Keterangan Status Terkini
+      if (statusKey === 'inprogress') {
+        var progNote = item.inProgressNote || item.detail || 'Sedang dalam penanganan teknis.';
+        var progBy = item.inProgressBy || item.pic || 'PIC Lapangan';
+        html += '<div class="case-note-box note-box-inprogress">';
+        html += '<div class="note-box-header">';
+        html += '<span class="note-label">🔵 Keterangan In Progress</span>';
+        html += '<span class="note-author-info">Ditindaklanjuti oleh: <strong>' + escapeHtml(progBy) + '</strong></span>';
+        html += '</div>';
+        html += '<div class="note-content-text">' + escapeHtml(progNote) + '</div>';
+        html += '</div>';
+      } else if (statusKey === 'closed') {
+        var clNote = item.closedNote || item.detail || 'Kasus telah diselesaikan.';
+        var clBy = item.closedBy || item.pic || 'CHO Team';
+        html += '<div class="case-note-box note-box-closed">';
+        html += '<div class="note-box-header">';
+        html += '<span class="note-label">🟢 Keterangan Penyelesaian (Closed)</span>';
+        html += '<span class="note-author-info">Di-Closed Oleh: <strong>' + escapeHtml(clBy) + '</strong></span>';
+        html += '</div>';
+        html += '<div class="note-content-text">' + escapeHtml(clNote) + '</div>';
+        html += '</div>';
+      } else {
+        html += '<div class="case-note-box note-box-open">';
+        html += '<div class="note-box-header">';
+        html += '<span class="note-label">🟡 Detail Kendala Awal (Open)</span>';
+        html += '<span class="note-author-info">Pelapor: ' + escapeHtml(item.requestor || 'Requestor') + '</span>';
+        html += '</div>';
+        html += '<div class="note-content-text">' + escapeHtml(item.detail || item.totalCaseIsu || 'Belum ada catatan kendala.') + '</div>';
+        html += '</div>';
+      }
+
+      // 5. Tombol Aksi Langsung pada Baris Kasus
+      html += '<div class="case-row-actions">';
+      html += '<div class="action-primary-group">';
+
+      if (statusKey === 'open') {
+        html += '<button class="btn-act btn-act-inprogress btn-trigger-inprog" data-id="' + escapeHtml(item.id) + '">';
+        html += '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>';
+        html += '<span>Proses (In Progress)</span>';
+        html += '</button>';
+
+        html += '<button class="btn-act btn-act-closed btn-trigger-closed" data-id="' + escapeHtml(item.id) + '">';
+        html += '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+        html += '<span>Selesaikan (Closed)</span>';
+        html += '</button>';
+      } else if (statusKey === 'inprogress') {
+        html += '<button class="btn-act btn-act-closed btn-trigger-closed" data-id="' + escapeHtml(item.id) + '">';
+        html += '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+        html += '<span>Selesaikan Kasus (Closed)</span>';
+        html += '</button>';
+
+        html += '<button class="btn-act btn-act-update btn-trigger-inprog" data-id="' + escapeHtml(item.id) + '" data-update="true">';
+        html += '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>';
+        html += '<span>+ Update Keterangan</span>';
+        html += '</button>';
+
+        html += '<button class="btn-act btn-act-reopen btn-trigger-reopen" data-id="' + escapeHtml(item.id) + '" data-target="Open">';
+        html += '<span>↩️ Buka Kembali ke Open</span>';
+        html += '</button>';
+      } else if (statusKey === 'closed') {
+        html += '<span style="font-size:12.5px; font-weight:700; color:var(--status-closed-color); display:inline-flex; align-items:center; gap:5px; margin-right:4px;">';
+        html += '✅ Kasus Telah Ditutup';
+        html += '</span>';
+
+        html += '<button class="btn-act btn-act-reopen btn-trigger-reopen" data-id="' + escapeHtml(item.id) + '" data-target="InProgress">';
+        html += '<span>🔄 Buka Kembali (Reopen)</span>';
+        html += '</button>';
+      }
+
+      html += '</div>';
+
+      // Secondary Actions: Riwayat Log & Salin
+      html += '<div class="action-secondary-group">';
+      html += '<button class="btn-act btn-act-log btn-trigger-log" data-id="' + escapeHtml(item.id) + '" title="Lihat Riwayat Lengkap">';
+      html += '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
+      html += '<span>Riwayat Log (' + logCount + ')</span>';
+      html += '</button>';
+
+      html += '<button class="btn-act btn-act-log btn-trigger-copy" data-id="' + escapeHtml(item.id) + '" title="Salin Ringkasan Kasus">';
+      html += '<span>📋 Salin</span>';
+      html += '</button>';
+
+      html += '</div>';
+      html += '</div>';
+
+      html += '</div>'; // End case-item-row
+    });
+
+    dom.caseListContainer.innerHTML = html;
+
+    // Pasang Event Listeners
+    attachCardActionHandlers();
+  }
+
+  /**
+   * Pasang Event Handler pada tombol di setiap baris kasus
+   */
+  function attachCardActionHandlers() {
+    // 1. Tombol In Progress
+    dom.caseListContainer.querySelectorAll('.btn-trigger-inprog').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var id = btn.getAttribute('data-id');
+        var isUpdate = btn.getAttribute('data-update') === 'true';
+        openInProgressModal(id, isUpdate);
+      });
+    });
+
+    // 2. Tombol Closed
+    dom.caseListContainer.querySelectorAll('.btn-trigger-closed').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var id = btn.getAttribute('data-id');
+        openClosedModal(id);
+      });
+    });
+
+    // 3. Tombol Reopen
+    dom.caseListContainer.querySelectorAll('.btn-trigger-reopen').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var id = btn.getAttribute('data-id');
+        var targetSt = btn.getAttribute('data-target') || 'Open';
+        handleQuickReopen(id, targetSt);
+      });
+    });
+
+    // 4. Tombol Riwayat Log
+    dom.caseListContainer.querySelectorAll('.btn-trigger-log').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var id = btn.getAttribute('data-id');
+        openLogModal(id);
+      });
+    });
+
+    // 5. Tombol Salin Ringkasan
+    dom.caseListContainer.querySelectorAll('.btn-trigger-copy').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var id = btn.getAttribute('data-id');
+        copyCaseSummary(id);
+      });
+    });
+  }
+
+  /**
+   * =========================================================================
+   * LOGIKA FORM PENGISIAN IN PROGRESS (MODAL)
+   * =========================================================================
+   */
+  function openInProgressModal(ticketId, isUpdateOnly) {
+    var ticket = state.records.find(function(r) { return r.id === ticketId; });
+    if (!ticket) return;
+
+    state.currentActionTicket = ticket;
+
+    dom.inProgressModalTitle.textContent = isUpdateOnly ? 'Update Catatan In Progress' : 'Ubah Status ke In Progress';
+    dom.inProgressTicketId.textContent = 'Kasus #' + ticket.id;
+    dom.inProgressBadgeService.textContent = ticket.serviceType;
+    dom.inProgressBadgeService.className = 'info-badge ' + (ticket.serviceType === 'MOBILE' ? 'badge-srv mobile' : 'badge-srv fixed');
+    dom.inProgressRequestor.textContent = ticket.requestor || '-';
+    dom.inProgressIssueText.textContent = ticket.totalCaseIsu || '-';
+
+    dom.inProgressMessage.value = '';
+    dom.inProgressAuthor.value = state.defaultAuthor || localStorage.getItem('koncho_pic_name') || '';
+    dom.inProgressFollowUp.value = ticket.followUpTo && ticket.followUpTo !== '-' ? ticket.followUpTo : '';
+
+    dom.modalInProgress.classList.add('active');
+    setTimeout(function() { dom.inProgressMessage.focus(); }, 100);
+  }
+
+  function closeInProgressModal() {
+    dom.modalInProgress.classList.remove('active');
+    state.currentActionTicket = null;
+  }
+
+  function handleSaveInProgress() {
+    var ticket = state.currentActionTicket;
+    if (!ticket) return;
+
+    var message = dom.inProgressMessage.value.trim();
+    var author = dom.inProgressAuthor.value.trim();
+    var followUp = dom.inProgressFollowUp.value.trim();
+
+    if (!message) {
+      showToast('Harap isi Keterangan / Catatan In Progress!', 'error');
+      dom.inProgressMessage.focus();
+      return;
+    }
+    if (!author) {
+      showToast('Harap isi Nama PIC / Petugas Pelaksana!', 'error');
+      dom.inProgressAuthor.focus();
+      return;
+    }
+
+    state.defaultAuthor = author;
+    localStorage.setItem('koncho_pic_name', author);
+
+    dom.btnSubmitInProgress.disabled = true;
+    dom.btnSubmitInProgress.innerHTML = '<span>Menyimpan ke Sheet...</span>';
+
+    var payload = {
+      ticketId: ticket.id,
+      serviceType: ticket.serviceType,
+      author: author,
+      message: message,
+      newStatus: 'InProgress',
+      followUpTo: followUp || ticket.followUpTo
+    };
+
+    if (state.isGasEnvironment) {
+      google.script.run
+        .withSuccessHandler(function(res) {
+          dom.btnSubmitInProgress.disabled = false;
+          dom.btnSubmitInProgress.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>Simpan & Ubah ke In Progress</span>';
+
+          if (res && res.success) {
+            applyInProgressUpdateLocal(ticket, payload, res.log);
+            closeInProgressModal();
+            showToast('Kasus #' + ticket.id + ' berhasil diubah ke In Progress!', 'success');
+          } else {
+            showToast('Gagal update: ' + (res ? res.error : 'Unknown'), 'error');
+          }
+        })
+        .withFailureHandler(function(err) {
+          dom.btnSubmitInProgress.disabled = false;
+          dom.btnSubmitInProgress.innerHTML = '<span>Simpan & Ubah ke In Progress</span>';
+          showToast('Error Apps Script: ' + err.message, 'error');
+        })
+        .postCommunicationUpdate(payload);
+    } else {
+      // Sync ke Google Apps Script Web App via POST jika URL tersedia (Vercel / GitHub)
+      if (state.gasApiUrl) {
+        try {
+          fetch(state.gasApiUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: 'postCommunicationUpdate', data: payload })
+          });
+        } catch (e) {
+          console.warn('Sync POST error:', e);
+        }
+      }
+
+      setTimeout(function() {
+        dom.btnSubmitInProgress.disabled = false;
+        dom.btnSubmitInProgress.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>Simpan & Ubah ke In Progress</span>';
+
+        var simLog = {
+          logId: 'LOG-SIM-' + Math.floor(1000 + Math.random() * 9000),
+          ticketId: payload.ticketId,
+          serviceType: payload.serviceType,
+          author: payload.author,
+          message: payload.message,
+          statusTerkait: 'InProgress',
+          followUpTo: payload.followUpTo,
+          timestamp: new Date().toISOString()
+        };
+        applyInProgressUpdateLocal(ticket, payload, simLog);
+        closeInProgressModal();
+        showToast('Kasus #' + ticket.id + ' berhasil diubah ke In Progress!', 'success');
+      }, 350);
+    }
+  }
+
+  function applyInProgressUpdateLocal(ticket, payload, logObj) {
+    state.logs.unshift(logObj);
+    ticket.status = 'InProgress';
+    ticket.inProgressNote = payload.message;
+    ticket.inProgressBy = payload.author;
+    ticket.inProgressTime = logObj.timestamp;
+    if (payload.followUpTo) ticket.followUpTo = payload.followUpTo;
+    ticket.terakhirUpdate = logObj.timestamp;
+    ticket.statusInformasi = 'Ada Update Baru';
+
+    updateKpiCounters();
+    renderCaseList();
+  }
+
+  /**
+   * =========================================================================
+   * LOGIKA FORM PENGISIAN CLOSED (MODAL)
+   * (Keterangan Closed & Di-closed oleh user siapa)
+   * =========================================================================
+   */
+  function openClosedModal(ticketId) {
+    var ticket = state.records.find(function(r) { return r.id === ticketId; });
+    if (!ticket) return;
+
+    state.currentActionTicket = ticket;
+
+    dom.closedModalTitle.textContent = 'Selesaikan Kasus (Closed)';
+    dom.closedTicketId.textContent = 'Kasus #' + ticket.id;
+    dom.closedBadgeService.textContent = ticket.serviceType;
+    dom.closedBadgeService.className = 'info-badge ' + (ticket.serviceType === 'MOBILE' ? 'badge-srv mobile' : 'badge-srv fixed');
+    dom.closedRequestor.textContent = ticket.requestor || '-';
+    dom.closedIssueText.textContent = ticket.totalCaseIsu || '-';
+
+    dom.closedMessage.value = '';
+    dom.closedByUser.value = state.defaultAuthor || localStorage.getItem('koncho_pic_name') || '';
+    dom.closedFollowUp.value = ticket.followUpTo && ticket.followUpTo !== '-' ? ticket.followUpTo : 'Selesai';
+
+    dom.modalClosed.classList.add('active');
+    setTimeout(function() { dom.closedMessage.focus(); }, 100);
+  }
+
+  function closeClosedModal() {
+    dom.modalClosed.classList.remove('active');
+    state.currentActionTicket = null;
+  }
+
+  function handleSaveClosed() {
+    var ticket = state.currentActionTicket;
+    if (!ticket) return;
+
+    var message = dom.closedMessage.value.trim();
+    var closedByUser = dom.closedByUser.value.trim();
+    var followUp = dom.closedFollowUp.value.trim();
+
+    if (!message) {
+      showToast('Harap isi Keterangan Closed / Solusi Penyelesaian!', 'error');
+      dom.closedMessage.focus();
+      return;
+    }
+    if (!closedByUser) {
+      showToast('Harap isi nama user yang menutup tiket (Di-Closed Oleh)!', 'error');
+      dom.closedByUser.focus();
+      return;
+    }
+
+    state.defaultAuthor = closedByUser;
+    localStorage.setItem('koncho_pic_name', closedByUser);
+
+    dom.btnSubmitClosed.disabled = true;
+    dom.btnSubmitClosed.innerHTML = '<span>Menutup Kasus di Sheet...</span>';
+
+    var payload = {
+      ticketId: ticket.id,
+      serviceType: ticket.serviceType,
+      author: closedByUser,
+      closedBy: closedByUser,
+      message: message,
+      newStatus: 'Closed',
+      followUpTo: followUp || ticket.followUpTo
+    };
+
+    if (state.isGasEnvironment) {
+      google.script.run
+        .withSuccessHandler(function(res) {
+          dom.btnSubmitClosed.disabled = false;
+          dom.btnSubmitClosed.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>Tutup Kasus Sekarang (Closed)</span>';
+
+          if (res && res.success) {
+            applyClosedUpdateLocal(ticket, payload, res.log);
+            closeClosedModal();
+            showToast('Kasus #' + ticket.id + ' berhasil di-Closed oleh ' + closedByUser + '!', 'success');
+          } else {
+            showToast('Gagal closed: ' + (res ? res.error : 'Unknown'), 'error');
+          }
+        })
+        .withFailureHandler(function(err) {
+          dom.btnSubmitClosed.disabled = false;
+          dom.btnSubmitClosed.innerHTML = '<span>Tutup Kasus Sekarang (Closed)</span>';
+          showToast('Error Apps Script: ' + err.message, 'error');
+        })
+        .postCommunicationUpdate(payload);
+    } else {
+      // Sync ke Google Apps Script Web App via POST jika URL tersedia (Vercel / GitHub)
+      if (state.gasApiUrl) {
+        try {
+          fetch(state.gasApiUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: 'postCommunicationUpdate', data: payload })
+          });
+        } catch (e) {
+          console.warn('Sync POST error:', e);
+        }
+      }
+
+      setTimeout(function() {
+        dom.btnSubmitClosed.disabled = false;
+        dom.btnSubmitClosed.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>Tutup Kasus Sekarang (Closed)</span>';
+
+        var simLog = {
+          logId: 'LOG-SIM-' + Math.floor(1000 + Math.random() * 9000),
+          ticketId: payload.ticketId,
+          serviceType: payload.serviceType,
+          author: payload.closedBy,
+          message: payload.message,
+          statusTerkait: 'Closed',
+          followUpTo: payload.followUpTo,
+          timestamp: new Date().toISOString()
+        };
+        applyClosedUpdateLocal(ticket, payload, simLog);
+        closeClosedModal();
+        showToast('Kasus #' + ticket.id + ' berhasil di-Closed oleh ' + closedByUser + '!', 'success');
+      }, 350);
+    }
+  }
+
+  function applyClosedUpdateLocal(ticket, payload, logObj) {
+    state.logs.unshift(logObj);
+    ticket.status = 'Closed';
+    ticket.closedNote = payload.message;
+    ticket.closedBy = payload.closedBy;
+    ticket.closedTime = logObj.timestamp;
+    if (payload.followUpTo) ticket.followUpTo = payload.followUpTo;
+    ticket.terakhirUpdate = logObj.timestamp;
+    ticket.statusInformasi = 'Closed';
+
+    updateKpiCounters();
+    renderCaseList();
+  }
+
+  /**
+   * Reopen / Kembalikan Status
+   */
+  function handleQuickReopen(ticketId, targetStatus) {
+    var ticket = state.records.find(function(r) { return r.id === ticketId; });
+    if (!ticket) return;
+
+    var author = state.defaultAuthor || localStorage.getItem('koncho_pic_name') || 'CHO Operator';
+    var note = 'Membuka kembali kasus ke status: ' + targetStatus;
+
+    var payload = {
+      ticketId: ticket.id,
+      serviceType: ticket.serviceType,
+      author: author,
+      message: note,
+      newStatus: targetStatus,
+      followUpTo: ticket.followUpTo
+    };
+
+    if (state.isGasEnvironment) {
+      google.script.run
+        .withSuccessHandler(function(res) {
+          ticket.status = targetStatus;
+          ticket.terakhirUpdate = new Date().toISOString();
+          ticket.statusInformasi = 'Ada Update Baru';
+          if (res && res.log) state.logs.unshift(res.log);
+          updateKpiCounters();
+          renderCaseList();
+          showToast('Kasus #' + ticket.id + ' status diubah ke ' + targetStatus, 'success');
+        })
+        .postCommunicationUpdate(payload);
+    } else {
+      ticket.status = targetStatus;
+      ticket.terakhirUpdate = new Date().toISOString();
+      state.logs.unshift({
+        logId: 'LOG-SIM-' + Math.floor(1000 + Math.random() * 9000),
+        ticketId: ticket.id,
+        serviceType: ticket.serviceType,
+        author: author,
+        message: note,
+        statusTerkait: targetStatus,
+        followUpTo: ticket.followUpTo,
+        timestamp: new Date().toISOString()
+      });
+      updateKpiCounters();
+      renderCaseList();
+      showToast('Kasus #' + ticket.id + ' dibuka kembali ke ' + targetStatus + ' (Preview)', 'success');
+    }
+  }
+
+  /**
+   * =========================================================================
+   * RIWAYAT LOG KOMUNIKASI & TIMELINE DETAIL
+   * =========================================================================
+   */
+  function openLogModal(ticketId) {
+    var ticket = state.records.find(function(r) { return r.id === ticketId; });
+    if (!ticket) return;
+
+    state.currentActionTicket = ticket;
+
+    dom.logModalTitle.textContent = 'Riwayat Kasus #' + ticket.id + ' (' + ticket.serviceType + ')';
+    dom.logDetailIssue.textContent = ticket.totalCaseIsu || '-';
+    dom.logDetailReq.textContent = ticket.requestor || '-';
+    dom.logDetailFollowUp.textContent = ticket.followUpTo || '-';
+    dom.logDetailService.textContent = ticket.serviceType;
+    dom.logDetailStatus.textContent = ticket.status || 'Open';
+
+    dom.logQuickAuthor.value = state.defaultAuthor || localStorage.getItem('koncho_pic_name') || '';
+    dom.logQuickMessage.value = '';
+
+    renderTimelineLogs(ticket);
+
+    dom.modalLog.classList.add('active');
+  }
+
+  function closeLogModal() {
+    dom.modalLog.classList.remove('active');
+    state.currentActionTicket = null;
+  }
+
+  function renderTimelineLogs(ticket) {
+    var ticketLogs = state.logs.filter(function(l) { return l.ticketId === ticket.id; });
+
+    if (ticketLogs.length === 0) {
+      dom.logTimelineContainer.innerHTML = 
+        '<div style="text-align:center; padding:24px; color:var(--text-muted); font-size:13px;">' +
+        'Belum ada catatan log komunikasi untuk kasus ini.' +
+        '</div>';
+      return;
+    }
+
+    var html = '';
+    ticketLogs.forEach(function(l) {
+      var badgeHtml = '';
+      if (l.statusTerkait) {
+        badgeHtml += '<span class="info-badge">Status: ' + escapeHtml(l.statusTerkait) + '</span>';
+      }
+      if (l.followUpTo) {
+        badgeHtml += '<span class="info-badge" style="color:var(--fixed-color);">Follow Up: ' + escapeHtml(l.followUpTo) + '</span>';
+      }
+
+      html += '<div class="log-timeline-item">';
+      html += '<div class="log-item-header">';
+      html += '<span class="log-item-author">👤 ' + escapeHtml(l.author || 'CHO Staff') + '</span>';
+      html += '<span class="log-item-time">' + formatDisplayTime(l.timestamp) + '</span>';
+      html += '</div>';
+      html += '<div class="log-item-msg">' + escapeHtml(l.message) + '</div>';
+      if (badgeHtml) {
+        html += '<div class="log-item-badges">' + badgeHtml + '</div>';
+      }
+      html += '</div>';
+    });
+
+    dom.logTimelineContainer.innerHTML = html;
+  }
+
+  function handleSaveQuickLog() {
+    var ticket = state.currentActionTicket;
+    if (!ticket) return;
+
+    var author = dom.logQuickAuthor.value.trim();
+    var msg = dom.logQuickMessage.value.trim();
+
+    if (!msg) {
+      showToast('Harap tuliskan catatan update!', 'error');
+      dom.logQuickMessage.focus();
+      return;
+    }
+    if (!author) {
+      showToast('Harap isi nama pengirim!', 'error');
+      dom.logQuickAuthor.focus();
+      return;
+    }
+
+    state.defaultAuthor = author;
+    localStorage.setItem('koncho_pic_name', author);
+
+    var payload = {
+      ticketId: ticket.id,
+      serviceType: ticket.serviceType,
+      author: author,
+      message: msg,
+      newStatus: ticket.status,
+      followUpTo: ticket.followUpTo
+    };
+
+    dom.btnSubmitQuickLog.disabled = true;
+    dom.btnSubmitQuickLog.textContent = 'Mengirim...';
+
+    if (state.isGasEnvironment) {
+      google.script.run
+        .withSuccessHandler(function(res) {
+          dom.btnSubmitQuickLog.disabled = false;
+          dom.btnSubmitQuickLog.textContent = 'Kirim Catatan';
+          if (res && res.success) {
+            state.logs.unshift(res.log);
+            dom.logQuickMessage.value = '';
+            renderTimelineLogs(ticket);
+            renderCaseList();
+            showToast('Catatan berhasil ditambahkan!', 'success');
+          }
+        })
+        .postCommunicationUpdate(payload);
+    } else {
+      setTimeout(function() {
+        dom.btnSubmitQuickLog.disabled = false;
+        dom.btnSubmitQuickLog.textContent = 'Kirim Catatan';
+        state.logs.unshift({
+          logId: 'LOG-SIM-' + Math.floor(1000 + Math.random() * 9000),
+          ticketId: ticket.id,
+          serviceType: ticket.serviceType,
+          author: author,
+          message: msg,
+          statusTerkait: ticket.status,
+          followUpTo: ticket.followUpTo,
+          timestamp: new Date().toISOString()
+        });
+        dom.logQuickMessage.value = '';
+        renderTimelineLogs(ticket);
+        renderCaseList();
+        showToast('Catatan tersimpan (Preview)!', 'success');
+      }, 250);
+    }
+  }
+
+  /**
+   * Salin Ringkasan Kasus ke Clipboard
+   */
+  function copyCaseSummary(ticketId) {
+    var ticket = state.records.find(function(r) { return r.id === ticketId; });
+    if (!ticket) return;
+
+    var text = '📋 *RINGKASAN KASUS konCHO*\n' +
+      'ID: Kasus #' + ticket.id + ' (' + ticket.serviceType + ')\n' +
+      'Isu Kasus (Kol. B): ' + (ticket.totalCaseIsu || '-') + '\n' +
+      'Requestor (Kol. G): ' + (ticket.requestor || '-') + '\n' +
+      'Status (Kol. H): ' + (ticket.status || 'Open') + '\n' +
+      'Follow Up To (Kol. I): ' + (ticket.followUpTo || '-') + '\n';
+
+    if (ticket.status === 'InProgress' && ticket.inProgressNote) {
+      text += 'Catatan In Progress: ' + ticket.inProgressNote + ' (oleh: ' + ticket.inProgressBy + ')\n';
+    } else if (ticket.status === 'Closed' && ticket.closedNote) {
+      text += 'Keterangan Closed: ' + ticket.closedNote + ' (Di-Closed oleh: ' + ticket.closedBy + ')\n';
+    } else if (ticket.detail) {
+      text += 'Detail Kendala: ' + ticket.detail + '\n';
+    }
+
+    text += 'Waktu Update: ' + formatDisplayTime(ticket.terakhirUpdate || ticket.tanggal) + '\n\n' +
+      'Google Sheet: https://docs.google.com/spreadsheets/d/1bqispkT4gfY7GJ38ruVxqyuBk3ChdORDd2E5AiBYuDc/edit';
+
+    navigator.clipboard.writeText(text).then(function() {
+      showToast('Ringkasan Kasus #' + ticket.id + ' disalin ke Clipboard!', 'success');
+    }).catch(function() {
+      showToast('Gagal menyalin ringkasan', 'error');
+    });
+  }
+
+  /**
+   * =========================================================================
+   * MODAL INPUT KASUS BARU
+   * =========================================================================
+   */
+  function openNewModal() {
+    setNewModalService('MOBILE');
+    dom.newDataModal.classList.add('active');
+    dom.inputCaseIssue.focus();
+  }
+
+  function closeNewModal() {
+    dom.newDataModal.classList.remove('active');
+  }
+
+  function setNewModalService(srv) {
+    selectedNewService = srv;
+    if (srv === 'MOBILE') {
+      dom.toggleMobile.classList.add('active');
+      dom.toggleFixed.classList.remove('active');
+      dom.lblNomorLayanan.textContent = 'Nomor MSISDN Pelanggan *';
+      dom.lblWilayah.textContent = 'Regional / Cluster';
+      dom.inputNomorLayanan.placeholder = 'Contoh: 081234567890';
+      dom.inputWilayah.placeholder = 'Contoh: Regional 2 / Sudirman';
+    } else {
+      dom.toggleFixed.classList.add('active');
+      dom.toggleMobile.classList.remove('active');
+      dom.lblNomorLayanan.textContent = 'Nomor Internet / PSTN *';
+      dom.lblWilayah.textContent = 'Witel / Datel / ODP';
+      dom.inputNomorLayanan.placeholder = 'Contoh: 122456789012';
+      dom.inputWilayah.placeholder = 'Contoh: Witel Bandung / ODP-BDG-01';
+    }
+  }
+
+  function handleSubmitNewReport() {
+    var issue = dom.inputCaseIssue.value.trim();
+    var req = dom.inputRequestor.value.trim();
+    var st = dom.inputStatus.value;
+    var follow = dom.inputFollowUp.value.trim();
+    var nomor = dom.inputNomorLayanan.value.trim();
+    var nama = dom.inputNamaPelanggan.value.trim();
+    var wil = dom.inputWilayah.value.trim();
+    var detail = dom.inputDetail.value.trim();
+
+    if (!issue) {
+      showToast('Harap isi Total Case Isu yang Masuk (Kolom B)!', 'error');
+      dom.inputCaseIssue.focus();
+      return;
+    }
+    if (!req) {
+      showToast('Harap isi Requestor (Kolom G)!', 'error');
+      dom.inputRequestor.focus();
+      return;
+    }
+    if (!follow) {
+      showToast('Harap isi Follow Up To (Kolom I)!', 'error');
+      dom.inputFollowUp.focus();
+      return;
+    }
+    if (!nomor) {
+      showToast('Harap isi Nomor Layanan / MSISDN / Internet!', 'error');
+      dom.inputNomorLayanan.focus();
+      return;
+    }
+
+    var payload = {
+      serviceType: selectedNewService,
+      totalCaseIsu: issue,
+      requestor: req,
+      status: st,
+      followUpTo: follow,
+      nomorLayanan: nomor,
+      namaPelanggan: nama,
+      detail: detail || issue,
+      pic: req,
+      customFields: {
+        'Regional_Cluster': wil,
+        'Witel_Datel': wil
+      }
+    };
+
+    dom.btnSubmitNewReport.disabled = true;
+    dom.btnSubmitNewReport.innerHTML = '<span>Menyimpan ke Sheet...</span>';
+
+    if (state.isGasEnvironment) {
+      google.script.run
+        .withSuccessHandler(function(res) {
+          dom.btnSubmitNewReport.disabled = false;
+          dom.btnSubmitNewReport.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>Simpan ke Database</span>';
+
+          if (res && res.success) {
+            closeNewModal();
+            resetNewForm();
+            showToast(res.message, 'success');
+            loadApplicationData(false);
+          } else {
+            showToast('Gagal menyimpan: ' + (res ? res.error : 'Unknown'), 'error');
+          }
+        })
+        .withFailureHandler(function(err) {
+          dom.btnSubmitNewReport.disabled = false;
+          dom.btnSubmitNewReport.innerHTML = '<span>Simpan ke Database</span>';
+          showToast('Error Apps Script: ' + err.message, 'error');
+        })
+        .submitNewData(payload);
+    } else {
+      // Sync ke Google Apps Script Web App via POST jika URL tersedia (Vercel / GitHub)
+      if (state.gasApiUrl) {
+        try {
+          fetch(state.gasApiUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: 'submitNewData', data: payload })
+          });
+        } catch (e) {
+          console.warn('Sync POST error:', e);
+        }
+      }
+
+      setTimeout(function() {
+        dom.btnSubmitNewReport.disabled = false;
+        dom.btnSubmitNewReport.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>Simpan ke Database</span>';
+
+        var newId = String(state.records.length + 1);
+        var simRecord = {
+          id: newId,
+          serviceType: selectedNewService,
+          totalCaseIsu: issue,
+          requestor: req,
+          status: st,
+          followUpTo: follow,
+          bulan: state.activeMonthFilter !== 'all' ? state.activeMonthFilter : 'Oktober 2026',
+          tanggal: new Date().toISOString(),
+          nama: nama || '-',
+          nomorLayanan: nomor,
+          detail: detail || issue,
+          pic: req,
+          terakhirUpdate: new Date().toISOString(),
+          statusInformasi: 'Ada Update Baru'
+        };
+
+        state.records.unshift(simRecord);
+        closeNewModal();
+        resetNewForm();
+        updateKpiCounters();
+        renderCaseList();
+        showToast('Kasus #' + newId + ' berhasil ditambahkan!', 'success');
+      }, 350);
+    }
+  }
+
+  function resetNewForm() {
+    dom.inputCaseIssue.value = '';
+    dom.inputRequestor.value = '';
+    dom.inputFollowUp.value = '';
+    dom.inputNomorLayanan.value = '';
+    dom.inputNamaPelanggan.value = '';
+    dom.inputWilayah.value = '';
+    dom.inputDetail.value = '';
+    dom.inputStatus.value = 'Open';
+  }
+
+  /**
+   * Utilities & Toast
+   */
+  function showToast(msg, type) {
+    type = type || 'info';
+    var toast = document.createElement('div');
+    toast.className = 'toast ' + type;
+    toast.innerHTML = '<span>' + escapeHtml(msg) + '</span>';
+    dom.toastContainer.appendChild(toast);
+
+    setTimeout(function() {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(12px)';
+      toast.style.transition = 'all 0.25s ease';
+      setTimeout(function() {
+        if (toast.parentNode) toast.parentNode.removeChild(toast);
+      }, 250);
+    }, 3500);
+  }
+
+  function escapeHtml(text) {
+    if (!text) return '';
+    return String(text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function formatDisplayTime(dateString) {
+    if (!dateString) return '-';
+    var d = new Date(dateString);
+    if (isNaN(d.getTime())) return String(dateString);
+
+    var now = new Date();
+    var isToday = d.toDateString() === now.toDateString();
+
+    var hours = String(d.getHours()).padStart(2, '0');
+    var mins = String(d.getMinutes()).padStart(2, '0');
+
+    if (isToday) {
+      return hours + ':' + mins + ' WIB (Hari ini)';
+    }
+
+    var months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+    return d.getDate() + ' ' + months[d.getMonth()] + ', ' + hours + ':' + mins + ' WIB';
+  }
+
+  /**
+   * Mock Data Generator
+   * Data Sheet Mobile Bulan Oktober: 4 Kasus (3 Open, 1 InProgress)
+   */
+  function generateMockData() {
+    return {
+      success: true,
+      mobileHeaders: ['ID_Tiket', 'Total Case Isu yang masuk', 'Nomor_MSISDN', 'Nama_Pelanggan', 'Regional_Cluster', 'Kategori_Keluhan', 'Requestor', 'Status', 'Follow up to', 'Detail_Kendala', 'Terakhir_Update', 'Status_Informasi'],
+      fixedHeaders: ['ID_Tiket', 'Total Case Isu yang masuk', 'Nomor_Internet_PSTN', 'Nama_Pelanggan', 'Witel_Datel', 'Kategori_Kendala', 'Requestor', 'Status', 'Follow up to', 'Detail_Kendala', 'Terakhir_Update', 'Status_Informasi'],
+      mobileRecords: [
+        {
+          id: '1',
+          totalCaseIsu: 'Kendala charge MU pada paket bundling',
+          requestor: 'Dimas (B2B Care)',
+          status: 'InProgress',
+          followUpTo: 'Tim Radio Optimization (RO)',
+          bulan: 'Oktober 2026',
+          tanggal: '2026-10-15T08:30:00Z',
+          nama: 'PT Solusi Finansial (Corporate)',
+          nomorLayanan: '081288992211',
+          kategori: 'Bundling MU',
+          detail: 'Pelanggan sudah aktivasi paket bundling namun masih dikenakan MU, baik aktivasi dari channel digipos atau HVC.\n\nNeed Support:\n• Perbaikan sistem untuk pelanggan dengan paket bundling tidak dikenakan charge MU',
+          progress: 'Remove MU berdasarkan KMI2230926841 dan pengajuan adjustment',
+          pic: 'Tim Mobile',
+          terakhirUpdate: '2026-10-15T10:00:00Z',
+          statusInformasi: 'Ada Update Baru'
+        },
+        {
+          id: '2',
+          totalCaseIsu: 'SMOOA – Tidak diperpanjang otomatis. Add Remove member berkendala.',
+          requestor: 'Call Center 188',
+          status: 'Open',
+          followUpTo: 'IT Core Pool',
+          bulan: 'Oktober 2026',
+          tanggal: '2026-10-13T09:15:00Z',
+          nama: 'Siti Rahma',
+          nomorLayanan: '082155443322',
+          kategori: 'SMOOA Auto Renew',
+          detail: 'Kuota SMOOA tidak diperpanjang otomatis dan kendala add/remove SMOOATotal Volume tiket keluhan SMOOA dari tanggal 1 – 13 Oktober 2026, total volume keluhan tercatat 335 tiket. Tiket open didominasi keluhan Kuota Otomatis Tidak Diperpanjang dengan total keluhan 76 tiket dan 19 tiket masih open di pool IT. Keluhan yang lain adalah Tidak bisa menambahkan/menghapus member sebanyak 29 tiket.\n\nNeed Support:\n• Optimalisasi proses fixing secara masalah seluruh MSISDN yang terimpact kuota tidak diperpanjang otomatis.\n• Perbaikan tools DSC agar dapat add/remove member via DSC',
+          progress: 'Eskalasi ke IT',
+          pic: 'Tim Mobile',
+          terakhirUpdate: '2026-10-13T09:15:00Z',
+          statusInformasi: 'Belum Ada Update'
+        },
+        {
+          id: '3',
+          totalCaseIsu: 'Kendala akses log notifikasi Selena',
+          requestor: 'Helpdesk Selena',
+          status: 'Open',
+          followUpTo: 'Tim Backend Selena',
+          bulan: 'Oktober 2026',
+          tanggal: '2026-10-12T11:20:00Z',
+          nama: '-',
+          nomorLayanan: '081377889900',
+          kategori: 'Selena Log',
+          detail: 'Log aktivasi paket/ transfer pulsa prepaid tidak dapat dilakukan saat pengecekan notifikasi sistem.\n\nNeed Support:\n• Approval pengajuan keyword selena app_nois',
+          progress: 'Escalate to IT untuk mendapatkan log aktivasi/transfer pulsa',
+          pic: 'Tim Mobile',
+          terakhirUpdate: '2026-10-12T11:20:00Z',
+          statusInformasi: 'Belum Ada Update'
+        },
+        {
+          id: '4',
+          totalCaseIsu: 'Double Aktivasi Paket RoaMAX',
+          requestor: 'GraPARI Online',
+          status: 'Open',
+          followUpTo: 'Billing Roaming',
+          bulan: 'Oktober 2026',
+          tanggal: '2026-10-10T14:45:00Z',
+          nama: 'Ahmad Fauzi',
+          nomorLayanan: '081122334455',
+          kategori: 'RoaMAX',
+          detail: 'Pelanggan melakukan aktivasi Paket RoaMAX namun menerima notifikasi Maaf request Anda tidak bisa kami proses, kemudian melakukan aktivasi ulang dan menyebabkan double aktivasi. Sample: https://prnt.sc/OnC_JQ7q8lp3\n\nNeed Support:\n• Auto refund/adjustment jika terjadi double aktivasi paket yang sama dalam range 60 menit',
+          progress: 'Remove paket dan pengajuan adjustment mengacu source KM1216012510',
+          pic: 'Tim Mobile',
+          terakhirUpdate: '2026-10-10T14:45:00Z',
+          statusInformasi: 'Belum Ada Update'
+        }      ],
+      fixedRecords: [
+        {
+          id: '1',
+          totalCaseIsu: 'LOS Merah Massal ODP-GBL-04 (Fiber Cut)',
+          requestor: 'Helpdesk Regional',
+          status: 'InProgress',
+          followUpTo: 'Tim Splicing Lapangan',
+          bulan: 'Oktober 2026',
+          tanggal: '2026-10-25T08:30:00Z',
+          nama: 'PT Solusi Pratama',
+          nomorLayanan: '122876543210',
+          kategori: 'LOS Merah / Fiber Cut',
+          detail: 'Lampu indikator LOS merah kedap-kedip di OLT sejak pagi. Sambungan internet fiber putus total.',
+          pic: 'Rizal CHO',
+          terakhirUpdate: '2026-10-25T09:30:00Z',
+          statusInformasi: 'Ada Update Baru'
+        },
+        {
+          id: '2',
+          totalCaseIsu: 'ONT Sering Restart & Redaman Tinggi',
+          requestor: 'Customer Care Online',
+          status: 'Closed',
+          followUpTo: 'Teknisi Datel Surabaya',
+          bulan: 'Oktober 2026',
+          tanggal: '2026-10-24T14:20:00Z',
+          nama: 'Hendra Wijaya',
+          nomorLayanan: '133499887766',
+          kategori: 'ONT Restart Berulang',
+          detail: 'Perangkat ONT sering reboot otomatis setiap 30 menit. Sudah dicoba ganti adaptor tetap sama.',
+          pic: 'Dewi CHO',
+          terakhirUpdate: '2026-10-25T02:20:00Z',
+          statusInformasi: 'Sudah Ditinjau'
+        },
+        {
+          id: '3',
+          totalCaseIsu: 'Indihome Los Merah Area Dago Atas Massal',
+          requestor: 'Call Center 147',
+          status: 'Open',
+          followUpTo: 'Teknisi Witel Bandung',
+          bulan: 'Oktober 2026',
+          tanggal: '2026-10-23T10:00:00Z',
+          nama: 'Cluster Dago',
+          nomorLayanan: '122556677889',
+          kategori: 'Mass Disruptive',
+          detail: 'Lampu LOS kedip merah massal 1 blok komplek perumahan Dago.',
+          pic: 'Tim Fixed',
+          terakhirUpdate: '2026-10-23T10:00:00Z',
+          statusInformasi: 'Belum Ada Update'
+        },
+        {
+          id: '4',
+          totalCaseIsu: 'Permintaan Relokasi Jalur Kabel Fiber Optic',
+          requestor: 'Sales B2B',
+          status: 'Open',
+          followUpTo: 'Tim Maintenance Lapangan',
+          bulan: 'Oktober 2026',
+          tanggal: '2026-10-22T13:30:00Z',
+          nama: 'Gedung Wisma Niaga',
+          nomorLayanan: '122998877665',
+          kategori: 'Relokasi OSP',
+          detail: 'Relokasi kabel fiber akibat pelebaran jalan protokol kota.',
+          pic: 'Tim Fixed',
+          terakhirUpdate: '2026-10-22T13:30:00Z',
+          statusInformasi: 'Belum Ada Update'
+        }
+      ],
+      logs: [
+        {
+          logId: 'LOG-20261015-001',
+          ticketId: '1',
+          serviceType: 'MOBILE',
+          author: 'Dimas (RO)',
+          message: 'Telah dikoordinasikan dengan tim Billing & Core System terkait penyesuaian charging engine. Tim RO sedang melakukan optimasi parameter.',
+          statusTerkait: 'InProgress',
+          followUpTo: 'Tim Radio Optimization (RO)',
+          timestamp: '2026-10-15T10:00:00Z'
+        },
+        {
+          logId: 'LOG-20261025-002',
+          ticketId: '1',
+          serviceType: 'FIXED',
+          author: 'Rizal CHO',
+          message: 'Ditemukan kabel distribusi 48 core terputus akibat pengerjaan galian drainase kota. Teknisi kabel sedang proses splicing.',
+          statusTerkait: 'InProgress',
+          followUpTo: 'Tim Splicing Lapangan',
+          timestamp: '2026-10-25T09:30:00Z'
+        },
+        {
+          logId: 'LOG-20261025-003',
+          ticketId: '2',
+          serviceType: 'FIXED',
+          author: 'Dewi CHO',
+          message: 'Teknisi lapangan telah melakukan penggantian unit ONT baru tipe ZTE F670L. Sinyal redaman RX normal di -18 dBm. Pelanggan telah konfirmasi internet lancar kembali.',
+          statusTerkait: 'Closed',
+          followUpTo: 'Teknisi Datel Surabaya',
+          timestamp: '2026-10-25T02:20:00Z'
+        }
+      ]
+    };
+  }
+
+  // Bootstrap saat DOM siap
+  document.addEventListener('DOMContentLoaded', init);
+
+})();
+</script>
+
+</body>
+</html>

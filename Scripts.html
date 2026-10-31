@@ -1,0 +1,1623 @@
+<script>
+/**
+ * =========================================================================
+ * konCHO - Client Side JavaScript Controller
+ * Unified Card Case List View, Left Sidebar Controls, Status Transitions,
+ * In Progress Note Modal, Closed Note & Closed-By User Modal.
+ * =========================================================================
+ */
+
+(function() {
+  'use strict';
+
+  // Application State
+  var state = {
+    isGasEnvironment: typeof google !== 'undefined' && google.script && google.script.run,
+    // Google Apps Script Web App Deployment URL (digunakan saat di-deploy ke Vercel / GitHub)
+    gasApiUrl: 'https://script.google.com/macros/s/AKfycbxXTAY8AeF3VyvSgFWgUEMsYMbXBimb8VUZQAns0EGue4F-rgah_0tenQpyaS4V8TFFRw/exec',
+    records: [],
+    logs: [],
+    mobileHeaders: [],
+    fixedHeaders: [],
+    activeServiceScope: 'ALL',      // 'ALL' | 'MOBILE' | 'FIXED'
+    activeMonthFilter: 'Oktober',   // Default aktif: 'Oktober'
+    activeStatusFilter: 'all',      // 'all' | 'Open' | 'InProgress' | 'Closed'
+    searchQuery: '',
+    currentActionTicket: null,      // Tiket yang sedang ditargetkan oleh modal
+    theme: localStorage.getItem('koncho_theme') || 'dark',
+    defaultAuthor: localStorage.getItem('koncho_pic_name') || ''
+  };
+
+  // DOM Elements Cache
+  var dom = {
+    // Top Bar
+    btnRefresh: document.getElementById('btnRefresh'),
+    btnToggleTheme: document.getElementById('btnToggleTheme'),
+    themeIcon: document.getElementById('themeIcon'),
+    connStatusText: document.getElementById('connStatusText'),
+    btnOpenNewModal: document.getElementById('btnOpenNewModal'),
+
+    // Sidebar Kiri
+    sidebarNavBtns: document.querySelectorAll('.sidebar-nav-btn'),
+    monthFilterSelect: document.getElementById('monthFilterSelect'),
+    kpiNavBtns: document.querySelectorAll('.kpi-nav-btn'),
+    countTotal: document.getElementById('countTotal'),
+    countOpen: document.getElementById('countOpen'),
+    countInProgress: document.getElementById('countInProgress'),
+    countClosed: document.getElementById('countClosed'),
+
+    // Area Utama Kanan
+    searchInput: document.getElementById('searchInput'),
+    btnClearSearch: document.getElementById('btnClearSearch'),
+    activeScopeLabel: document.getElementById('activeScopeLabel'),
+    caseListContainer: document.getElementById('caseListContainer'),
+    caseCountBadge: document.getElementById('caseCountBadge'),
+    footerSummaryText: document.getElementById('footerSummaryText'),
+
+    // Modal In Progress
+    modalInProgress: document.getElementById('modalInProgress'),
+    btnCloseInProgressModal: document.getElementById('btnCloseInProgressModal'),
+    btnCancelInProgress: document.getElementById('btnCancelInProgress'),
+    btnSubmitInProgress: document.getElementById('btnSubmitInProgress'),
+    inProgressModalTitle: document.getElementById('inProgressModalTitle'),
+    inProgressBadgeService: document.getElementById('inProgressBadgeService'),
+    inProgressTicketId: document.getElementById('inProgressTicketId'),
+    inProgressRequestor: document.getElementById('inProgressRequestor'),
+    inProgressIssueText: document.getElementById('inProgressIssueText'),
+    inProgressMessage: document.getElementById('inProgressMessage'),
+    inProgressAuthor: document.getElementById('inProgressAuthor'),
+    inProgressFollowUp: document.getElementById('inProgressFollowUp'),
+
+    // Modal Closed
+    modalClosed: document.getElementById('modalClosed'),
+    btnCloseClosedModal: document.getElementById('btnCloseClosedModal'),
+    btnCancelClosed: document.getElementById('btnCancelClosed'),
+    btnSubmitClosed: document.getElementById('btnSubmitClosed'),
+    closedModalTitle: document.getElementById('closedModalTitle'),
+    closedBadgeService: document.getElementById('closedBadgeService'),
+    closedTicketId: document.getElementById('closedTicketId'),
+    closedRequestor: document.getElementById('closedRequestor'),
+    closedIssueText: document.getElementById('closedIssueText'),
+    closedMessage: document.getElementById('closedMessage'),
+    closedByUser: document.getElementById('closedByUser'),
+    closedFollowUp: document.getElementById('closedFollowUp'),
+
+    // Modal Log Komunikasi
+    modalLog: document.getElementById('modalLog'),
+    btnCloseLogModal: document.getElementById('btnCloseLogModal'),
+    btnCloseLogFooter: document.getElementById('btnCloseLogFooter'),
+    logModalTitle: document.getElementById('logModalTitle'),
+    logDetailIssue: document.getElementById('logDetailIssue'),
+    logDetailReq: document.getElementById('logDetailReq'),
+    logDetailFollowUp: document.getElementById('logDetailFollowUp'),
+    logDetailService: document.getElementById('logDetailService'),
+    logDetailStatus: document.getElementById('logDetailStatus'),
+    logTimelineContainer: document.getElementById('logTimelineContainer'),
+    logQuickAuthor: document.getElementById('logQuickAuthor'),
+    logQuickMessage: document.getElementById('logQuickMessage'),
+    btnSubmitQuickLog: document.getElementById('btnSubmitQuickLog'),
+
+    // Modal Input Baru
+    newDataModal: document.getElementById('newDataModal'),
+    btnCloseModal: document.getElementById('btnCloseModal'),
+    btnCancelModal: document.getElementById('btnCancelModal'),
+    btnSubmitNewReport: document.getElementById('btnSubmitNewReport'),
+    toggleMobile: document.getElementById('toggleMobile'),
+    toggleFixed: document.getElementById('toggleFixed'),
+    inputCaseIssue: document.getElementById('inputCaseIssue'),
+    inputRequestor: document.getElementById('inputRequestor'),
+    inputStatus: document.getElementById('inputStatus'),
+    inputFollowUp: document.getElementById('inputFollowUp'),
+    lblNomorLayanan: document.getElementById('lblNomorLayanan'),
+    lblWilayah: document.getElementById('lblWilayah'),
+    inputNomorLayanan: document.getElementById('inputNomorLayanan'),
+    inputNamaPelanggan: document.getElementById('inputNamaPelanggan'),
+    inputWilayah: document.getElementById('inputWilayah'),
+    inputDetail: document.getElementById('inputDetail'),
+
+    // Toast
+    toastContainer: document.getElementById('toastContainer')
+  };
+
+  var selectedNewService = 'MOBILE';
+
+  /**
+   * Inisialisasi Aplikasi
+   */
+  function init() {
+    applyTheme(state.theme);
+    bindEvents();
+    loadApplicationData();
+  }
+
+  /**
+   * Binding Event Listeners
+   */
+  function bindEvents() {
+    // 1. Theme Toggle
+    if (dom.btnToggleTheme) {
+      dom.btnToggleTheme.addEventListener('click', function() {
+        var next = state.theme === 'dark' ? 'light' : 'dark';
+        applyTheme(next);
+      });
+    }
+
+    // 2. Refresh Button
+    if (dom.btnRefresh) {
+      dom.btnRefresh.addEventListener('click', function() {
+        loadApplicationData(true);
+      });
+    }
+
+    // 3. Sidebar Kiri: Layanan Filter (Semua, Mobile, Fixed)
+    dom.sidebarNavBtns.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        dom.sidebarNavBtns.forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        state.activeServiceScope = btn.getAttribute('data-service') || 'ALL';
+        updateScopeLabel();
+        updateKpiCounters();
+        renderCaseList();
+      });
+    });
+
+    // 4. Sidebar Kiri: Periode Bulan
+    if (dom.monthFilterSelect) {
+      dom.monthFilterSelect.addEventListener('change', function(e) {
+        state.activeMonthFilter = e.target.value;
+        updateScopeLabel();
+        updateKpiCounters();
+        renderCaseList();
+      });
+    }
+
+    // 5. Sidebar Kiri: Status KPI (Total, Open, In Progress, Closed)
+    dom.kpiNavBtns.forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        dom.kpiNavBtns.forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        state.activeStatusFilter = btn.getAttribute('data-status') || 'all';
+        renderCaseList();
+      });
+    });
+
+    // 6. Pencarian Teks
+    if (dom.searchInput) {
+      dom.searchInput.addEventListener('input', function(e) {
+        state.searchQuery = e.target.value.toLowerCase().trim();
+        if (dom.btnClearSearch) {
+          dom.btnClearSearch.style.display = state.searchQuery ? 'block' : 'none';
+        }
+        renderCaseList();
+      });
+    }
+    if (dom.btnClearSearch) {
+      dom.btnClearSearch.addEventListener('click', function() {
+        dom.searchInput.value = '';
+        state.searchQuery = '';
+        dom.btnClearSearch.style.display = 'none';
+        renderCaseList();
+        dom.searchInput.focus();
+      });
+    }
+
+    // 7. Modal In Progress Events
+    if (dom.btnCloseInProgressModal) dom.btnCloseInProgressModal.addEventListener('click', closeInProgressModal);
+    if (dom.btnCancelInProgress) dom.btnCancelInProgress.addEventListener('click', closeInProgressModal);
+    if (dom.btnSubmitInProgress) dom.btnSubmitInProgress.addEventListener('click', handleSaveInProgress);
+
+    // 8. Modal Closed Events
+    if (dom.btnCloseClosedModal) dom.btnCloseClosedModal.addEventListener('click', closeClosedModal);
+    if (dom.btnCancelClosed) dom.btnCancelClosed.addEventListener('click', closeClosedModal);
+    if (dom.btnSubmitClosed) dom.btnSubmitClosed.addEventListener('click', handleSaveClosed);
+
+    // 9. Modal Log Events
+    if (dom.btnCloseLogModal) dom.btnCloseLogModal.addEventListener('click', closeLogModal);
+    if (dom.btnCloseLogFooter) dom.btnCloseLogFooter.addEventListener('click', closeLogModal);
+    if (dom.btnSubmitQuickLog) dom.btnSubmitQuickLog.addEventListener('click', handleSaveQuickLog);
+
+    // 10. Modal Input Kasus Baru Events
+    if (dom.btnOpenNewModal) dom.btnOpenNewModal.addEventListener('click', openNewModal);
+    if (dom.btnCloseModal) dom.btnCloseModal.addEventListener('click', closeNewModal);
+    if (dom.btnCancelModal) dom.btnCancelModal.addEventListener('click', closeNewModal);
+    if (dom.toggleMobile) dom.toggleMobile.addEventListener('click', function() { setNewModalService('MOBILE'); });
+    if (dom.toggleFixed) dom.toggleFixed.addEventListener('click', function() { setNewModalService('FIXED'); });
+    if (dom.btnSubmitNewReport) dom.btnSubmitNewReport.addEventListener('click', handleSubmitNewReport);
+
+    // Tutup modal jika klik di luar box modal
+    [dom.modalInProgress, dom.modalClosed, dom.modalLog, dom.newDataModal].forEach(function(m) {
+      if (!m) return;
+      m.addEventListener('click', function(e) {
+        if (e.target === m) {
+          m.classList.remove('active');
+        }
+      });
+    });
+  }
+
+  function applyTheme(theme) {
+    state.theme = theme;
+    document.body.setAttribute('data-theme', theme);
+    if (dom.themeIcon) {
+      dom.themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
+    }
+    localStorage.setItem('koncho_theme', theme);
+  }
+
+  function updateScopeLabel() {
+    if (!dom.activeScopeLabel) return;
+    var srvText = 'Semua Layanan';
+    if (state.activeServiceScope === 'MOBILE') srvText = 'CHO Mobile';
+    else if (state.activeServiceScope === 'FIXED') srvText = 'CHO Fixed';
+
+    var monthText = state.activeMonthFilter === 'all' ? 'Semua Periode' : state.activeMonthFilter;
+    dom.activeScopeLabel.textContent = 'Layanan: ' + srvText + ' • Periode: ' + monthText;
+  }
+
+  /**
+   * Load Data dari Backend Google Apps Script (Langsung atau via Live REST API di Vercel)
+   */
+  function loadApplicationData(showToastAlert) {
+    showToast('Memuat data dari Google Sheet...', 'info');
+
+    if (state.isGasEnvironment) {
+      // 1. Lingkungan Internal Google Apps Script
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (res && res.success) {
+            processLoadedData(res);
+            if (showToastAlert) showToast('Data berhasil diperbarui dari Spreadsheet!', 'success');
+          } else {
+            showToast('Gagal memuat: ' + (res ? res.error : 'Unknown'), 'error');
+          }
+        })
+        .withFailureHandler(function(err) {
+          showToast('Koneksi Apps Script error: ' + err.message, 'error');
+        })
+        .getInitialData();
+    } else if (state.gasApiUrl) {
+      // 2. Lingkungan Vercel / GitHub: Mengambil LIVE data dari Apps Script Web App API
+      fetch(state.gasApiUrl + '?action=getInitialData', { method: 'GET', redirect: 'follow' })
+        .then(function(response) {
+          if (!response.ok) throw new Error('HTTP ' + response.status);
+          return response.json();
+        })
+        .then(function(res) {
+          if (res && res.success) {
+            processLoadedData(res);
+            if (dom.connStatusText) dom.connStatusText.textContent = 'Live API: Sheet 1bqisp...';
+            if (showToastAlert) showToast('Data live terhubung dari Google Spreadsheet!', 'success');
+          } else {
+            console.warn('API returned error, using fallback:', res);
+            loadFallbackData(showToastAlert);
+          }
+        })
+        .catch(function(err) {
+          console.warn('Fetch live API unavailable, using simulation fallback:', err);
+          loadFallbackData(showToastAlert);
+        });
+    } else {
+      loadFallbackData(showToastAlert);
+    }
+  }
+
+  function loadFallbackData(showToastAlert) {
+    setTimeout(function() {
+      var mock = generateMockData();
+      processLoadedData(mock);
+      if (dom.connStatusText) dom.connStatusText.textContent = 'Demo Mode (Simulation)';
+      if (showToastAlert) showToast('Data simulasi dimuat!', 'info');
+    }, 250);
+  }
+
+  /**
+   * Proses data dari spreadsheet dan hubungkan keterangan log terbaru
+   */
+  function processLoadedData(data) {
+    state.mobileHeaders = data.mobileHeaders || [];
+    state.fixedHeaders = data.fixedHeaders || [];
+    state.logs = data.logs || [];
+
+    var mob = (data.mobileRecords || []).map(function(r) { r.serviceType = 'MOBILE'; return r; });
+    var fix = (data.fixedRecords || []).map(function(r) { r.serviceType = 'FIXED'; return r; });
+
+    var all = mob.concat(fix);
+
+    // Hubungkan catatan in progress dan closed terbaru dari log komunikasi
+    all.forEach(function(ticket) {
+      enrichTicketWithLogs(ticket, state.logs);
+    });
+
+    state.records = all;
+
+    // Urutkan tiket: yang terbaru di atas
+    state.records.sort(function(a, b) {
+      var dateA = new Date(a.terakhirUpdate || a.tanggal || 0).getTime();
+      var dateB = new Date(b.terakhirUpdate || b.tanggal || 0).getTime();
+      return dateB - dateA;
+    });
+
+    populateMonthDropdown();
+    updateScopeLabel();
+    updateKpiCounters();
+    renderCaseList();
+  }
+
+  /**
+   * Menghubungkan tiket dengan log terbaru untuk In Progress & Closed
+   */
+  function enrichTicketWithLogs(ticket, logs) {
+    var ticketLogs = logs.filter(function(l) { return l.ticketId === ticket.id; });
+    
+    // Cari log InProgress terbaru
+    var inProgLog = ticketLogs.find(function(l) { return l.statusTerkait === 'InProgress'; });
+    if (inProgLog) {
+      ticket.inProgressNote = inProgLog.message;
+      ticket.inProgressBy = inProgLog.author;
+      ticket.inProgressTime = inProgLog.timestamp;
+    }
+
+    // Cari log Closed terbaru
+    var closedLog = ticketLogs.find(function(l) { return l.statusTerkait === 'Closed'; });
+    if (closedLog) {
+      ticket.closedNote = closedLog.message;
+      ticket.closedBy = closedLog.author;
+      ticket.closedTime = closedLog.timestamp;
+    }
+  }
+
+  /**
+   * Mengisi Opsi Dropdown Bulan secara dinamis
+   */
+  function populateMonthDropdown() {
+    if (!dom.monthFilterSelect) return;
+
+    var distinctMonths = [];
+    state.records.forEach(function(r) {
+      if (r.bulan && distinctMonths.indexOf(r.bulan) < 0) {
+        distinctMonths.push(r.bulan);
+      }
+    });
+
+    if (distinctMonths.length === 0) {
+      distinctMonths.push('Oktober 2026');
+    }
+
+    var cur = state.activeMonthFilter || 'Oktober';
+    var html = '<option value="all"' + (cur === 'all' ? ' selected' : '') + '>Semua Bulan</option>';
+    distinctMonths.forEach(function(m) {
+      var isSel = (cur === m || m.toLowerCase().indexOf(cur.toLowerCase()) >= 0);
+      html += '<option value="' + escapeHtml(m) + '"' + (isSel ? ' selected' : '') + '>' + escapeHtml(m) + '</option>';
+    });
+
+    dom.monthFilterSelect.innerHTML = html;
+  }
+
+  /**
+   * Hitung dan Update Angka pada Status KPI di Sidebar Kiri
+   */
+  function updateKpiCounters() {
+    var monthFilter = state.activeMonthFilter;
+    var scope = state.activeServiceScope;
+
+    var counts = {
+      total: 0,
+      open: 0,
+      inProgress: 0,
+      closed: 0
+    };
+
+    state.records.forEach(function(item) {
+      if (!itemMatchesMonth(item, monthFilter)) return;
+      if (scope === 'MOBILE' && item.serviceType !== 'MOBILE') return;
+      if (scope === 'FIXED' && item.serviceType !== 'FIXED') return;
+
+      counts.total++;
+      if (itemMatchesStatus(item, 'Open')) counts.open++;
+      else if (itemMatchesStatus(item, 'InProgress')) counts.inProgress++;
+      else if (itemMatchesStatus(item, 'Closed')) counts.closed++;
+    });
+
+    if (dom.countTotal) dom.countTotal.textContent = counts.total;
+    if (dom.countOpen) dom.countOpen.textContent = counts.open;
+    if (dom.countInProgress) dom.countInProgress.textContent = counts.inProgress;
+    if (dom.countClosed) dom.countClosed.textContent = counts.closed;
+  }
+
+  /**
+   * Helper: Filter Pemeriksaan Bulan
+   */
+  function itemMatchesMonth(item, selectedMonth) {
+    if (!selectedMonth || selectedMonth === 'all') return true;
+    var sel = selectedMonth.toLowerCase().trim();
+    var b = String(item.bulan || '').toLowerCase();
+    var tgl = String(item.tanggal || '').toLowerCase();
+    var det = String(item.detail || '').toLowerCase();
+    var isu = String(item.totalCaseIsu || '').toLowerCase();
+    
+    // Substring match
+    if (b.indexOf(sel) >= 0 || tgl.indexOf(sel) >= 0 || det.indexOf(sel) >= 0 || isu.indexOf(sel) >= 0) return true;
+    
+    // Base month check (e.g. 'oktober' from 'Oktober 2026')
+    var baseMonth = sel.split(' ')[0];
+    if (baseMonth && (b.indexOf(baseMonth) >= 0 || tgl.indexOf(baseMonth) >= 0)) return true;
+    
+    return false;
+  }
+
+  /**
+   * Helper: Filter Pemeriksaan Status
+   */
+  function itemMatchesStatus(item, targetStatus) {
+    if (!targetStatus || targetStatus === 'all') return true;
+    var st = (item.status || 'Open').toLowerCase().replace(/[^a-z]/g, '');
+    var target = targetStatus.toLowerCase().replace(/[^a-z]/g, '');
+    if (target === 'open') return st === 'open' || st === 'new';
+    if (target === 'inprogress') return st.indexOf('progress') >= 0;
+    if (target === 'closed') return st.indexOf('close') >= 0 || st.indexOf('solve') >= 0 || st.indexOf('selesai') >= 0;
+    return st === target;
+  }
+
+  /**
+   * =========================================================================
+   * RENDER UTAMA: SEMUA KASUS DI DALAM SATU CARD BESAR TUNGGAL
+   * (Kasus 1, 2, dst dibuat dalam satu card terpadu yang rapi)
+   * =========================================================================
+   */
+  function renderCaseList() {
+    var filtered = state.records.filter(function(item) {
+      // 1. Filter Periode Bulan
+      if (!itemMatchesMonth(item, state.activeMonthFilter)) return false;
+
+      // 2. Filter Layanan (Mobile vs Fixed vs Semua)
+      if (state.activeServiceScope === 'MOBILE' && item.serviceType !== 'MOBILE') return false;
+      if (state.activeServiceScope === 'FIXED' && item.serviceType !== 'FIXED') return false;
+
+      // 3. Filter Status (All, Open, InProgress, Closed)
+      if (state.activeStatusFilter && state.activeStatusFilter !== 'all') {
+        if (!itemMatchesStatus(item, state.activeStatusFilter)) return false;
+      }
+
+      // 4. Pencarian Teks
+      if (state.searchQuery) {
+        var q = state.searchQuery;
+        var match = (item.id || '').toLowerCase().indexOf(q) >= 0 ||
+                    (item.totalCaseIsu || '').toLowerCase().indexOf(q) >= 0 ||
+                    (item.requestor || '').toLowerCase().indexOf(q) >= 0 ||
+                    (item.followUpTo || '').toLowerCase().indexOf(q) >= 0 ||
+                    (item.nama || '').toLowerCase().indexOf(q) >= 0 ||
+                    (item.nomorLayanan || '').toLowerCase().indexOf(q) >= 0 ||
+                    (item.status || '').toLowerCase().indexOf(q) >= 0 ||
+                    (item.detail || '').toLowerCase().indexOf(q) >= 0 ||
+                    (item.inProgressNote || '').toLowerCase().indexOf(q) >= 0 ||
+                    (item.closedNote || '').toLowerCase().indexOf(q) >= 0 ||
+                    (item.closedBy || '').toLowerCase().indexOf(q) >= 0;
+        if (!match) return false;
+      }
+
+      return true;
+    });
+
+    // Update Header & Footer Card Tunggal
+    if (dom.caseCountBadge) {
+      dom.caseCountBadge.textContent = filtered.length + ' Kasus Ditemukan';
+    }
+    if (dom.footerSummaryText) {
+      var srvLabel = state.activeServiceScope === 'ALL' ? 'Semua Layanan' : (state.activeServiceScope === 'MOBILE' ? 'CHO Mobile' : 'CHO Fixed');
+      var monthLabel = state.activeMonthFilter === 'all' ? 'Semua Bulan' : state.activeMonthFilter;
+      dom.footerSummaryText.textContent = 'Menampilkan ' + filtered.length + ' kasus • ' + srvLabel + ' • Periode: ' + monthLabel;
+    }
+
+    if (filtered.length === 0) {
+      dom.caseListContainer.innerHTML = 
+        '<div class="empty-card-state">' +
+          '<div class="empty-icon">🔍</div>' +
+          '<div class="empty-title">Tidak ada kasus yang sesuai kriteria filter</div>' +
+          '<div class="empty-desc">Coba sesuaikan pilihan Layanan, Bulan, atau Status di sidebar sebelah kiri.<br>' +
+          '<button id="btnQuickAllMonths" style="margin-top:12px; padding:6px 14px; background:var(--primary-color); color:#fff; border:none; border-radius:6px; cursor:pointer; font-weight:700; font-size:12px;">📅 Tampilkan Semua Bulan</button>' +
+          '</div>' +
+        '</div>';
+      var btnAll = document.getElementById('btnQuickAllMonths');
+      if (btnAll) {
+        btnAll.addEventListener('click', function() {
+          state.activeMonthFilter = 'all';
+          state.activeStatusFilter = 'all';
+          if (dom.monthFilterSelect) dom.monthFilterSelect.value = 'all';
+          dom.kpiNavBtns.forEach(function(b) { b.classList.remove('active'); });
+          if (dom.pillTotal) dom.pillTotal.classList.add('active');
+          updateScopeLabel();
+          updateKpiCounters();
+          renderCaseList();
+        });
+      }
+      return;
+    }
+
+    var html = '';
+    filtered.forEach(function(item) {
+      var srvClass = item.serviceType === 'MOBILE' ? 'mobile' : 'fixed';
+      var stNorm = (item.status || 'Open').toLowerCase().replace(/[^a-z]/g, '');
+      var statusKey = 'open';
+      var statusLabel = '🟡 Open';
+      var cardStatusClass = 'status-open';
+
+      if (stNorm.indexOf('progress') >= 0) {
+        statusKey = 'inprogress';
+        statusLabel = '🔵 In Progress';
+        cardStatusClass = 'status-inprogress';
+      } else if (stNorm.indexOf('close') >= 0 || stNorm.indexOf('solve') >= 0 || stNorm.indexOf('selesai') >= 0) {
+        statusKey = 'closed';
+        statusLabel = '🟢 Closed';
+        cardStatusClass = 'status-closed';
+      }
+
+      var ticketLogs = state.logs.filter(function(l) { return l.ticketId === item.id; });
+      var logCount = ticketLogs.length;
+
+      // Baris Kasus di dalam Satu Card Tunggal
+      html += '<div class="case-item-row ' + cardStatusClass + '" data-id="' + escapeHtml(item.id) + '" data-service="' + item.serviceType + '">';
+
+      // 1. Header Baris Item
+      html += '<div class="case-row-header">';
+      html += '<div class="case-row-badges">';
+      html += '<span class="badge-id">Kasus #' + escapeHtml(item.id) + '</span>';
+      html += '<span class="badge-srv ' + srvClass + '">' + item.serviceType + '</span>';
+      if (item.bulan) {
+        html += '<span class="badge-month">📅 ' + escapeHtml(item.bulan) + '</span>';
+      }
+      html += '<span class="badge-status-pill ' + statusKey + '">' + statusLabel + '</span>';
+      html += '</div>';
+
+      html += '<div class="case-row-time">';
+      html += '<span>Terakhir Update: <strong>' + formatDisplayTime(item.terakhirUpdate || item.tanggal) + '</strong></span>';
+      html += '</div>';
+      html += '</div>';
+
+      // 2. Judul Kasus (Kolom B - Total Case Isu yang masuk)
+      html += '<div class="case-row-title">' + escapeHtml(item.totalCaseIsu || 'Isu Kasus CHO') + '</div>';
+
+      // 3. Meta Data (Requestor Kolom G & Follow Up To Kolom I & Akun)
+      html += '<div class="case-row-meta">';
+      var reqVal = item.requestor && item.requestor !== '-' ? item.requestor : 'Belum Diisi';
+      html += '<div class="meta-item"><span style="font-size:12px;">👤</span> Requestor (Kol. G): <strong>' + escapeHtml(reqVal) + '</strong></div>';
+
+      var followVal = item.followUpTo && item.followUpTo !== '-' ? item.followUpTo : 'Belum Ditentukan';
+      html += '<div class="meta-item followup"><span style="font-size:12px;">🎯</span> Follow Up To (Kol. I): <strong>' + escapeHtml(followVal) + '</strong></div>';
+
+      if (item.nomorLayanan && item.nomorLayanan !== '-') {
+        html += '<div class="meta-item"><span style="font-size:12px;">📱</span> Akun: <strong>' + escapeHtml(item.nomorLayanan) + '</strong> ' + (item.nama && item.nama !== '-' ? '(' + escapeHtml(item.nama) + ')' : '') + '</div>';
+      }
+      html += '</div>';
+
+      // 4. Kotak Keterangan Status Terkini
+      if (statusKey === 'inprogress') {
+        var progNote = item.inProgressNote || item.detail || 'Sedang dalam penanganan teknis.';
+        var progBy = item.inProgressBy || item.pic || 'PIC Lapangan';
+        html += '<div class="case-note-box note-box-inprogress">';
+        html += '<div class="note-box-header">';
+        html += '<span class="note-label">🔵 Keterangan In Progress</span>';
+        html += '<span class="note-author-info">Ditindaklanjuti oleh: <strong>' + escapeHtml(progBy) + '</strong></span>';
+        html += '</div>';
+        html += '<div class="note-content-text">' + escapeHtml(progNote) + '</div>';
+        html += '</div>';
+      } else if (statusKey === 'closed') {
+        var clNote = item.closedNote || item.detail || 'Kasus telah diselesaikan.';
+        var clBy = item.closedBy || item.pic || 'CHO Team';
+        html += '<div class="case-note-box note-box-closed">';
+        html += '<div class="note-box-header">';
+        html += '<span class="note-label">🟢 Keterangan Penyelesaian (Closed)</span>';
+        html += '<span class="note-author-info">Di-Closed Oleh: <strong>' + escapeHtml(clBy) + '</strong></span>';
+        html += '</div>';
+        html += '<div class="note-content-text">' + escapeHtml(clNote) + '</div>';
+        html += '</div>';
+      } else {
+        html += '<div class="case-note-box note-box-open">';
+        html += '<div class="note-box-header">';
+        html += '<span class="note-label">🟡 Detail Kendala Awal (Open)</span>';
+        html += '<span class="note-author-info">Pelapor: ' + escapeHtml(item.requestor || 'Requestor') + '</span>';
+        html += '</div>';
+        html += '<div class="note-content-text">' + escapeHtml(item.detail || item.totalCaseIsu || 'Belum ada catatan kendala.') + '</div>';
+        html += '</div>';
+      }
+
+      // 5. Tombol Aksi Langsung pada Baris Kasus
+      html += '<div class="case-row-actions">';
+      html += '<div class="action-primary-group">';
+
+      if (statusKey === 'open') {
+        html += '<button class="btn-act btn-act-inprogress btn-trigger-inprog" data-id="' + escapeHtml(item.id) + '">';
+        html += '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>';
+        html += '<span>Proses (In Progress)</span>';
+        html += '</button>';
+
+        html += '<button class="btn-act btn-act-closed btn-trigger-closed" data-id="' + escapeHtml(item.id) + '">';
+        html += '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+        html += '<span>Selesaikan (Closed)</span>';
+        html += '</button>';
+      } else if (statusKey === 'inprogress') {
+        html += '<button class="btn-act btn-act-closed btn-trigger-closed" data-id="' + escapeHtml(item.id) + '">';
+        html += '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+        html += '<span>Selesaikan Kasus (Closed)</span>';
+        html += '</button>';
+
+        html += '<button class="btn-act btn-act-update btn-trigger-inprog" data-id="' + escapeHtml(item.id) + '" data-update="true">';
+        html += '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>';
+        html += '<span>+ Update Keterangan</span>';
+        html += '</button>';
+
+        html += '<button class="btn-act btn-act-reopen btn-trigger-reopen" data-id="' + escapeHtml(item.id) + '" data-target="Open">';
+        html += '<span>↩️ Buka Kembali ke Open</span>';
+        html += '</button>';
+      } else if (statusKey === 'closed') {
+        html += '<span style="font-size:12.5px; font-weight:700; color:var(--status-closed-color); display:inline-flex; align-items:center; gap:5px; margin-right:4px;">';
+        html += '✅ Kasus Telah Ditutup';
+        html += '</span>';
+
+        html += '<button class="btn-act btn-act-reopen btn-trigger-reopen" data-id="' + escapeHtml(item.id) + '" data-target="InProgress">';
+        html += '<span>🔄 Buka Kembali (Reopen)</span>';
+        html += '</button>';
+      }
+
+      html += '</div>';
+
+      // Secondary Actions: Riwayat Log & Salin
+      html += '<div class="action-secondary-group">';
+      html += '<button class="btn-act btn-act-log btn-trigger-log" data-id="' + escapeHtml(item.id) + '" title="Lihat Riwayat Lengkap">';
+      html += '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
+      html += '<span>Riwayat Log (' + logCount + ')</span>';
+      html += '</button>';
+
+      html += '<button class="btn-act btn-act-log btn-trigger-copy" data-id="' + escapeHtml(item.id) + '" title="Salin Ringkasan Kasus">';
+      html += '<span>📋 Salin</span>';
+      html += '</button>';
+
+      html += '</div>';
+      html += '</div>';
+
+      html += '</div>'; // End case-item-row
+    });
+
+    dom.caseListContainer.innerHTML = html;
+
+    // Pasang Event Listeners
+    attachCardActionHandlers();
+  }
+
+  /**
+   * Pasang Event Handler pada tombol di setiap baris kasus
+   */
+  function attachCardActionHandlers() {
+    // 1. Tombol In Progress
+    dom.caseListContainer.querySelectorAll('.btn-trigger-inprog').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var id = btn.getAttribute('data-id');
+        var isUpdate = btn.getAttribute('data-update') === 'true';
+        openInProgressModal(id, isUpdate);
+      });
+    });
+
+    // 2. Tombol Closed
+    dom.caseListContainer.querySelectorAll('.btn-trigger-closed').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var id = btn.getAttribute('data-id');
+        openClosedModal(id);
+      });
+    });
+
+    // 3. Tombol Reopen
+    dom.caseListContainer.querySelectorAll('.btn-trigger-reopen').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var id = btn.getAttribute('data-id');
+        var targetSt = btn.getAttribute('data-target') || 'Open';
+        handleQuickReopen(id, targetSt);
+      });
+    });
+
+    // 4. Tombol Riwayat Log
+    dom.caseListContainer.querySelectorAll('.btn-trigger-log').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var id = btn.getAttribute('data-id');
+        openLogModal(id);
+      });
+    });
+
+    // 5. Tombol Salin Ringkasan
+    dom.caseListContainer.querySelectorAll('.btn-trigger-copy').forEach(function(btn) {
+      btn.addEventListener('click', function(e) {
+        e.stopPropagation();
+        var id = btn.getAttribute('data-id');
+        copyCaseSummary(id);
+      });
+    });
+  }
+
+  /**
+   * =========================================================================
+   * LOGIKA FORM PENGISIAN IN PROGRESS (MODAL)
+   * =========================================================================
+   */
+  function openInProgressModal(ticketId, isUpdateOnly) {
+    var ticket = state.records.find(function(r) { return r.id === ticketId; });
+    if (!ticket) return;
+
+    state.currentActionTicket = ticket;
+
+    dom.inProgressModalTitle.textContent = isUpdateOnly ? 'Update Catatan In Progress' : 'Ubah Status ke In Progress';
+    dom.inProgressTicketId.textContent = 'Kasus #' + ticket.id;
+    dom.inProgressBadgeService.textContent = ticket.serviceType;
+    dom.inProgressBadgeService.className = 'info-badge ' + (ticket.serviceType === 'MOBILE' ? 'badge-srv mobile' : 'badge-srv fixed');
+    dom.inProgressRequestor.textContent = ticket.requestor || '-';
+    dom.inProgressIssueText.textContent = ticket.totalCaseIsu || '-';
+
+    dom.inProgressMessage.value = '';
+    dom.inProgressAuthor.value = state.defaultAuthor || localStorage.getItem('koncho_pic_name') || '';
+    dom.inProgressFollowUp.value = ticket.followUpTo && ticket.followUpTo !== '-' ? ticket.followUpTo : '';
+
+    dom.modalInProgress.classList.add('active');
+    setTimeout(function() { dom.inProgressMessage.focus(); }, 100);
+  }
+
+  function closeInProgressModal() {
+    dom.modalInProgress.classList.remove('active');
+    state.currentActionTicket = null;
+  }
+
+  function handleSaveInProgress() {
+    var ticket = state.currentActionTicket;
+    if (!ticket) return;
+
+    var message = dom.inProgressMessage.value.trim();
+    var author = dom.inProgressAuthor.value.trim();
+    var followUp = dom.inProgressFollowUp.value.trim();
+
+    if (!message) {
+      showToast('Harap isi Keterangan / Catatan In Progress!', 'error');
+      dom.inProgressMessage.focus();
+      return;
+    }
+    if (!author) {
+      showToast('Harap isi Nama PIC / Petugas Pelaksana!', 'error');
+      dom.inProgressAuthor.focus();
+      return;
+    }
+
+    state.defaultAuthor = author;
+    localStorage.setItem('koncho_pic_name', author);
+
+    dom.btnSubmitInProgress.disabled = true;
+    dom.btnSubmitInProgress.innerHTML = '<span>Menyimpan ke Sheet...</span>';
+
+    var payload = {
+      ticketId: ticket.id,
+      serviceType: ticket.serviceType,
+      author: author,
+      message: message,
+      newStatus: 'InProgress',
+      followUpTo: followUp || ticket.followUpTo
+    };
+
+    if (state.isGasEnvironment) {
+      google.script.run
+        .withSuccessHandler(function(res) {
+          dom.btnSubmitInProgress.disabled = false;
+          dom.btnSubmitInProgress.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>Simpan & Ubah ke In Progress</span>';
+
+          if (res && res.success) {
+            applyInProgressUpdateLocal(ticket, payload, res.log);
+            closeInProgressModal();
+            showToast('Kasus #' + ticket.id + ' berhasil diubah ke In Progress!', 'success');
+          } else {
+            showToast('Gagal update: ' + (res ? res.error : 'Unknown'), 'error');
+          }
+        })
+        .withFailureHandler(function(err) {
+          dom.btnSubmitInProgress.disabled = false;
+          dom.btnSubmitInProgress.innerHTML = '<span>Simpan & Ubah ke In Progress</span>';
+          showToast('Error Apps Script: ' + err.message, 'error');
+        })
+        .postCommunicationUpdate(payload);
+    } else {
+      // Sync ke Google Apps Script Web App via POST jika URL tersedia (Vercel / GitHub)
+      if (state.gasApiUrl) {
+        try {
+          fetch(state.gasApiUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: 'postCommunicationUpdate', data: payload })
+          });
+        } catch (e) {
+          console.warn('Sync POST error:', e);
+        }
+      }
+
+      setTimeout(function() {
+        dom.btnSubmitInProgress.disabled = false;
+        dom.btnSubmitInProgress.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>Simpan & Ubah ke In Progress</span>';
+
+        var simLog = {
+          logId: 'LOG-SIM-' + Math.floor(1000 + Math.random() * 9000),
+          ticketId: payload.ticketId,
+          serviceType: payload.serviceType,
+          author: payload.author,
+          message: payload.message,
+          statusTerkait: 'InProgress',
+          followUpTo: payload.followUpTo,
+          timestamp: new Date().toISOString()
+        };
+        applyInProgressUpdateLocal(ticket, payload, simLog);
+        closeInProgressModal();
+        showToast('Kasus #' + ticket.id + ' berhasil diubah ke In Progress!', 'success');
+      }, 350);
+    }
+  }
+
+  function applyInProgressUpdateLocal(ticket, payload, logObj) {
+    state.logs.unshift(logObj);
+    ticket.status = 'InProgress';
+    ticket.inProgressNote = payload.message;
+    ticket.inProgressBy = payload.author;
+    ticket.inProgressTime = logObj.timestamp;
+    if (payload.followUpTo) ticket.followUpTo = payload.followUpTo;
+    ticket.terakhirUpdate = logObj.timestamp;
+    ticket.statusInformasi = 'Ada Update Baru';
+
+    updateKpiCounters();
+    renderCaseList();
+  }
+
+  /**
+   * =========================================================================
+   * LOGIKA FORM PENGISIAN CLOSED (MODAL)
+   * (Keterangan Closed & Di-closed oleh user siapa)
+   * =========================================================================
+   */
+  function openClosedModal(ticketId) {
+    var ticket = state.records.find(function(r) { return r.id === ticketId; });
+    if (!ticket) return;
+
+    state.currentActionTicket = ticket;
+
+    dom.closedModalTitle.textContent = 'Selesaikan Kasus (Closed)';
+    dom.closedTicketId.textContent = 'Kasus #' + ticket.id;
+    dom.closedBadgeService.textContent = ticket.serviceType;
+    dom.closedBadgeService.className = 'info-badge ' + (ticket.serviceType === 'MOBILE' ? 'badge-srv mobile' : 'badge-srv fixed');
+    dom.closedRequestor.textContent = ticket.requestor || '-';
+    dom.closedIssueText.textContent = ticket.totalCaseIsu || '-';
+
+    dom.closedMessage.value = '';
+    dom.closedByUser.value = state.defaultAuthor || localStorage.getItem('koncho_pic_name') || '';
+    dom.closedFollowUp.value = ticket.followUpTo && ticket.followUpTo !== '-' ? ticket.followUpTo : 'Selesai';
+
+    dom.modalClosed.classList.add('active');
+    setTimeout(function() { dom.closedMessage.focus(); }, 100);
+  }
+
+  function closeClosedModal() {
+    dom.modalClosed.classList.remove('active');
+    state.currentActionTicket = null;
+  }
+
+  function handleSaveClosed() {
+    var ticket = state.currentActionTicket;
+    if (!ticket) return;
+
+    var message = dom.closedMessage.value.trim();
+    var closedByUser = dom.closedByUser.value.trim();
+    var followUp = dom.closedFollowUp.value.trim();
+
+    if (!message) {
+      showToast('Harap isi Keterangan Closed / Solusi Penyelesaian!', 'error');
+      dom.closedMessage.focus();
+      return;
+    }
+    if (!closedByUser) {
+      showToast('Harap isi nama user yang menutup tiket (Di-Closed Oleh)!', 'error');
+      dom.closedByUser.focus();
+      return;
+    }
+
+    state.defaultAuthor = closedByUser;
+    localStorage.setItem('koncho_pic_name', closedByUser);
+
+    dom.btnSubmitClosed.disabled = true;
+    dom.btnSubmitClosed.innerHTML = '<span>Menutup Kasus di Sheet...</span>';
+
+    var payload = {
+      ticketId: ticket.id,
+      serviceType: ticket.serviceType,
+      author: closedByUser,
+      closedBy: closedByUser,
+      message: message,
+      newStatus: 'Closed',
+      followUpTo: followUp || ticket.followUpTo
+    };
+
+    if (state.isGasEnvironment) {
+      google.script.run
+        .withSuccessHandler(function(res) {
+          dom.btnSubmitClosed.disabled = false;
+          dom.btnSubmitClosed.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>Tutup Kasus Sekarang (Closed)</span>';
+
+          if (res && res.success) {
+            applyClosedUpdateLocal(ticket, payload, res.log);
+            closeClosedModal();
+            showToast('Kasus #' + ticket.id + ' berhasil di-Closed oleh ' + closedByUser + '!', 'success');
+          } else {
+            showToast('Gagal closed: ' + (res ? res.error : 'Unknown'), 'error');
+          }
+        })
+        .withFailureHandler(function(err) {
+          dom.btnSubmitClosed.disabled = false;
+          dom.btnSubmitClosed.innerHTML = '<span>Tutup Kasus Sekarang (Closed)</span>';
+          showToast('Error Apps Script: ' + err.message, 'error');
+        })
+        .postCommunicationUpdate(payload);
+    } else {
+      // Sync ke Google Apps Script Web App via POST jika URL tersedia (Vercel / GitHub)
+      if (state.gasApiUrl) {
+        try {
+          fetch(state.gasApiUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: 'postCommunicationUpdate', data: payload })
+          });
+        } catch (e) {
+          console.warn('Sync POST error:', e);
+        }
+      }
+
+      setTimeout(function() {
+        dom.btnSubmitClosed.disabled = false;
+        dom.btnSubmitClosed.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>Tutup Kasus Sekarang (Closed)</span>';
+
+        var simLog = {
+          logId: 'LOG-SIM-' + Math.floor(1000 + Math.random() * 9000),
+          ticketId: payload.ticketId,
+          serviceType: payload.serviceType,
+          author: payload.closedBy,
+          message: payload.message,
+          statusTerkait: 'Closed',
+          followUpTo: payload.followUpTo,
+          timestamp: new Date().toISOString()
+        };
+        applyClosedUpdateLocal(ticket, payload, simLog);
+        closeClosedModal();
+        showToast('Kasus #' + ticket.id + ' berhasil di-Closed oleh ' + closedByUser + '!', 'success');
+      }, 350);
+    }
+  }
+
+  function applyClosedUpdateLocal(ticket, payload, logObj) {
+    state.logs.unshift(logObj);
+    ticket.status = 'Closed';
+    ticket.closedNote = payload.message;
+    ticket.closedBy = payload.closedBy;
+    ticket.closedTime = logObj.timestamp;
+    if (payload.followUpTo) ticket.followUpTo = payload.followUpTo;
+    ticket.terakhirUpdate = logObj.timestamp;
+    ticket.statusInformasi = 'Closed';
+
+    updateKpiCounters();
+    renderCaseList();
+  }
+
+  /**
+   * Reopen / Kembalikan Status
+   */
+  function handleQuickReopen(ticketId, targetStatus) {
+    var ticket = state.records.find(function(r) { return r.id === ticketId; });
+    if (!ticket) return;
+
+    var author = state.defaultAuthor || localStorage.getItem('koncho_pic_name') || 'CHO Operator';
+    var note = 'Membuka kembali kasus ke status: ' + targetStatus;
+
+    var payload = {
+      ticketId: ticket.id,
+      serviceType: ticket.serviceType,
+      author: author,
+      message: note,
+      newStatus: targetStatus,
+      followUpTo: ticket.followUpTo
+    };
+
+    if (state.isGasEnvironment) {
+      google.script.run
+        .withSuccessHandler(function(res) {
+          ticket.status = targetStatus;
+          ticket.terakhirUpdate = new Date().toISOString();
+          ticket.statusInformasi = 'Ada Update Baru';
+          if (res && res.log) state.logs.unshift(res.log);
+          updateKpiCounters();
+          renderCaseList();
+          showToast('Kasus #' + ticket.id + ' status diubah ke ' + targetStatus, 'success');
+        })
+        .postCommunicationUpdate(payload);
+    } else {
+      ticket.status = targetStatus;
+      ticket.terakhirUpdate = new Date().toISOString();
+      state.logs.unshift({
+        logId: 'LOG-SIM-' + Math.floor(1000 + Math.random() * 9000),
+        ticketId: ticket.id,
+        serviceType: ticket.serviceType,
+        author: author,
+        message: note,
+        statusTerkait: targetStatus,
+        followUpTo: ticket.followUpTo,
+        timestamp: new Date().toISOString()
+      });
+      updateKpiCounters();
+      renderCaseList();
+      showToast('Kasus #' + ticket.id + ' dibuka kembali ke ' + targetStatus + ' (Preview)', 'success');
+    }
+  }
+
+  /**
+   * =========================================================================
+   * RIWAYAT LOG KOMUNIKASI & TIMELINE DETAIL
+   * =========================================================================
+   */
+  function openLogModal(ticketId) {
+    var ticket = state.records.find(function(r) { return r.id === ticketId; });
+    if (!ticket) return;
+
+    state.currentActionTicket = ticket;
+
+    dom.logModalTitle.textContent = 'Riwayat Kasus #' + ticket.id + ' (' + ticket.serviceType + ')';
+    dom.logDetailIssue.textContent = ticket.totalCaseIsu || '-';
+    dom.logDetailReq.textContent = ticket.requestor || '-';
+    dom.logDetailFollowUp.textContent = ticket.followUpTo || '-';
+    dom.logDetailService.textContent = ticket.serviceType;
+    dom.logDetailStatus.textContent = ticket.status || 'Open';
+
+    dom.logQuickAuthor.value = state.defaultAuthor || localStorage.getItem('koncho_pic_name') || '';
+    dom.logQuickMessage.value = '';
+
+    renderTimelineLogs(ticket);
+
+    dom.modalLog.classList.add('active');
+  }
+
+  function closeLogModal() {
+    dom.modalLog.classList.remove('active');
+    state.currentActionTicket = null;
+  }
+
+  function renderTimelineLogs(ticket) {
+    var ticketLogs = state.logs.filter(function(l) { return l.ticketId === ticket.id; });
+
+    if (ticketLogs.length === 0) {
+      dom.logTimelineContainer.innerHTML = 
+        '<div style="text-align:center; padding:24px; color:var(--text-muted); font-size:13px;">' +
+        'Belum ada catatan log komunikasi untuk kasus ini.' +
+        '</div>';
+      return;
+    }
+
+    var html = '';
+    ticketLogs.forEach(function(l) {
+      var badgeHtml = '';
+      if (l.statusTerkait) {
+        badgeHtml += '<span class="info-badge">Status: ' + escapeHtml(l.statusTerkait) + '</span>';
+      }
+      if (l.followUpTo) {
+        badgeHtml += '<span class="info-badge" style="color:var(--fixed-color);">Follow Up: ' + escapeHtml(l.followUpTo) + '</span>';
+      }
+
+      html += '<div class="log-timeline-item">';
+      html += '<div class="log-item-header">';
+      html += '<span class="log-item-author">👤 ' + escapeHtml(l.author || 'CHO Staff') + '</span>';
+      html += '<span class="log-item-time">' + formatDisplayTime(l.timestamp) + '</span>';
+      html += '</div>';
+      html += '<div class="log-item-msg">' + escapeHtml(l.message) + '</div>';
+      if (badgeHtml) {
+        html += '<div class="log-item-badges">' + badgeHtml + '</div>';
+      }
+      html += '</div>';
+    });
+
+    dom.logTimelineContainer.innerHTML = html;
+  }
+
+  function handleSaveQuickLog() {
+    var ticket = state.currentActionTicket;
+    if (!ticket) return;
+
+    var author = dom.logQuickAuthor.value.trim();
+    var msg = dom.logQuickMessage.value.trim();
+
+    if (!msg) {
+      showToast('Harap tuliskan catatan update!', 'error');
+      dom.logQuickMessage.focus();
+      return;
+    }
+    if (!author) {
+      showToast('Harap isi nama pengirim!', 'error');
+      dom.logQuickAuthor.focus();
+      return;
+    }
+
+    state.defaultAuthor = author;
+    localStorage.setItem('koncho_pic_name', author);
+
+    var payload = {
+      ticketId: ticket.id,
+      serviceType: ticket.serviceType,
+      author: author,
+      message: msg,
+      newStatus: ticket.status,
+      followUpTo: ticket.followUpTo
+    };
+
+    dom.btnSubmitQuickLog.disabled = true;
+    dom.btnSubmitQuickLog.textContent = 'Mengirim...';
+
+    if (state.isGasEnvironment) {
+      google.script.run
+        .withSuccessHandler(function(res) {
+          dom.btnSubmitQuickLog.disabled = false;
+          dom.btnSubmitQuickLog.textContent = 'Kirim Catatan';
+          if (res && res.success) {
+            state.logs.unshift(res.log);
+            dom.logQuickMessage.value = '';
+            renderTimelineLogs(ticket);
+            renderCaseList();
+            showToast('Catatan berhasil ditambahkan!', 'success');
+          }
+        })
+        .postCommunicationUpdate(payload);
+    } else {
+      setTimeout(function() {
+        dom.btnSubmitQuickLog.disabled = false;
+        dom.btnSubmitQuickLog.textContent = 'Kirim Catatan';
+        state.logs.unshift({
+          logId: 'LOG-SIM-' + Math.floor(1000 + Math.random() * 9000),
+          ticketId: ticket.id,
+          serviceType: ticket.serviceType,
+          author: author,
+          message: msg,
+          statusTerkait: ticket.status,
+          followUpTo: ticket.followUpTo,
+          timestamp: new Date().toISOString()
+        });
+        dom.logQuickMessage.value = '';
+        renderTimelineLogs(ticket);
+        renderCaseList();
+        showToast('Catatan tersimpan (Preview)!', 'success');
+      }, 250);
+    }
+  }
+
+  /**
+   * Salin Ringkasan Kasus ke Clipboard
+   */
+  function copyCaseSummary(ticketId) {
+    var ticket = state.records.find(function(r) { return r.id === ticketId; });
+    if (!ticket) return;
+
+    var text = '📋 *RINGKASAN KASUS konCHO*\n' +
+      'ID: Kasus #' + ticket.id + ' (' + ticket.serviceType + ')\n' +
+      'Isu Kasus (Kol. B): ' + (ticket.totalCaseIsu || '-') + '\n' +
+      'Requestor (Kol. G): ' + (ticket.requestor || '-') + '\n' +
+      'Status (Kol. H): ' + (ticket.status || 'Open') + '\n' +
+      'Follow Up To (Kol. I): ' + (ticket.followUpTo || '-') + '\n';
+
+    if (ticket.status === 'InProgress' && ticket.inProgressNote) {
+      text += 'Catatan In Progress: ' + ticket.inProgressNote + ' (oleh: ' + ticket.inProgressBy + ')\n';
+    } else if (ticket.status === 'Closed' && ticket.closedNote) {
+      text += 'Keterangan Closed: ' + ticket.closedNote + ' (Di-Closed oleh: ' + ticket.closedBy + ')\n';
+    } else if (ticket.detail) {
+      text += 'Detail Kendala: ' + ticket.detail + '\n';
+    }
+
+    text += 'Waktu Update: ' + formatDisplayTime(ticket.terakhirUpdate || ticket.tanggal) + '\n\n' +
+      'Google Sheet: https://docs.google.com/spreadsheets/d/1bqispkT4gfY7GJ38ruVxqyuBk3ChdORDd2E5AiBYuDc/edit';
+
+    navigator.clipboard.writeText(text).then(function() {
+      showToast('Ringkasan Kasus #' + ticket.id + ' disalin ke Clipboard!', 'success');
+    }).catch(function() {
+      showToast('Gagal menyalin ringkasan', 'error');
+    });
+  }
+
+  /**
+   * =========================================================================
+   * MODAL INPUT KASUS BARU
+   * =========================================================================
+   */
+  function openNewModal() {
+    setNewModalService('MOBILE');
+    dom.newDataModal.classList.add('active');
+    dom.inputCaseIssue.focus();
+  }
+
+  function closeNewModal() {
+    dom.newDataModal.classList.remove('active');
+  }
+
+  function setNewModalService(srv) {
+    selectedNewService = srv;
+    if (srv === 'MOBILE') {
+      dom.toggleMobile.classList.add('active');
+      dom.toggleFixed.classList.remove('active');
+      dom.lblNomorLayanan.textContent = 'Nomor MSISDN Pelanggan *';
+      dom.lblWilayah.textContent = 'Regional / Cluster';
+      dom.inputNomorLayanan.placeholder = 'Contoh: 081234567890';
+      dom.inputWilayah.placeholder = 'Contoh: Regional 2 / Sudirman';
+    } else {
+      dom.toggleFixed.classList.add('active');
+      dom.toggleMobile.classList.remove('active');
+      dom.lblNomorLayanan.textContent = 'Nomor Internet / PSTN *';
+      dom.lblWilayah.textContent = 'Witel / Datel / ODP';
+      dom.inputNomorLayanan.placeholder = 'Contoh: 122456789012';
+      dom.inputWilayah.placeholder = 'Contoh: Witel Bandung / ODP-BDG-01';
+    }
+  }
+
+  function handleSubmitNewReport() {
+    var issue = dom.inputCaseIssue.value.trim();
+    var req = dom.inputRequestor.value.trim();
+    var st = dom.inputStatus.value;
+    var follow = dom.inputFollowUp.value.trim();
+    var nomor = dom.inputNomorLayanan.value.trim();
+    var nama = dom.inputNamaPelanggan.value.trim();
+    var wil = dom.inputWilayah.value.trim();
+    var detail = dom.inputDetail.value.trim();
+
+    if (!issue) {
+      showToast('Harap isi Total Case Isu yang Masuk (Kolom B)!', 'error');
+      dom.inputCaseIssue.focus();
+      return;
+    }
+    if (!req) {
+      showToast('Harap isi Requestor (Kolom G)!', 'error');
+      dom.inputRequestor.focus();
+      return;
+    }
+    if (!follow) {
+      showToast('Harap isi Follow Up To (Kolom I)!', 'error');
+      dom.inputFollowUp.focus();
+      return;
+    }
+    if (!nomor) {
+      showToast('Harap isi Nomor Layanan / MSISDN / Internet!', 'error');
+      dom.inputNomorLayanan.focus();
+      return;
+    }
+
+    var payload = {
+      serviceType: selectedNewService,
+      totalCaseIsu: issue,
+      requestor: req,
+      status: st,
+      followUpTo: follow,
+      nomorLayanan: nomor,
+      namaPelanggan: nama,
+      detail: detail || issue,
+      pic: req,
+      customFields: {
+        'Regional_Cluster': wil,
+        'Witel_Datel': wil
+      }
+    };
+
+    dom.btnSubmitNewReport.disabled = true;
+    dom.btnSubmitNewReport.innerHTML = '<span>Menyimpan ke Sheet...</span>';
+
+    if (state.isGasEnvironment) {
+      google.script.run
+        .withSuccessHandler(function(res) {
+          dom.btnSubmitNewReport.disabled = false;
+          dom.btnSubmitNewReport.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>Simpan ke Database</span>';
+
+          if (res && res.success) {
+            closeNewModal();
+            resetNewForm();
+            showToast(res.message, 'success');
+            loadApplicationData(false);
+          } else {
+            showToast('Gagal menyimpan: ' + (res ? res.error : 'Unknown'), 'error');
+          }
+        })
+        .withFailureHandler(function(err) {
+          dom.btnSubmitNewReport.disabled = false;
+          dom.btnSubmitNewReport.innerHTML = '<span>Simpan ke Database</span>';
+          showToast('Error Apps Script: ' + err.message, 'error');
+        })
+        .submitNewData(payload);
+    } else {
+      // Sync ke Google Apps Script Web App via POST jika URL tersedia (Vercel / GitHub)
+      if (state.gasApiUrl) {
+        try {
+          fetch(state.gasApiUrl, {
+            method: 'POST',
+            mode: 'no-cors',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify({ action: 'submitNewData', data: payload })
+          });
+        } catch (e) {
+          console.warn('Sync POST error:', e);
+        }
+      }
+
+      setTimeout(function() {
+        dom.btnSubmitNewReport.disabled = false;
+        dom.btnSubmitNewReport.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>Simpan ke Database</span>';
+
+        var newId = String(state.records.length + 1);
+        var simRecord = {
+          id: newId,
+          serviceType: selectedNewService,
+          totalCaseIsu: issue,
+          requestor: req,
+          status: st,
+          followUpTo: follow,
+          bulan: state.activeMonthFilter !== 'all' ? state.activeMonthFilter : 'Oktober 2026',
+          tanggal: new Date().toISOString(),
+          nama: nama || '-',
+          nomorLayanan: nomor,
+          detail: detail || issue,
+          pic: req,
+          terakhirUpdate: new Date().toISOString(),
+          statusInformasi: 'Ada Update Baru'
+        };
+
+        state.records.unshift(simRecord);
+        closeNewModal();
+        resetNewForm();
+        updateKpiCounters();
+        renderCaseList();
+        showToast('Kasus #' + newId + ' berhasil ditambahkan!', 'success');
+      }, 350);
+    }
+  }
+
+  function resetNewForm() {
+    dom.inputCaseIssue.value = '';
+    dom.inputRequestor.value = '';
+    dom.inputFollowUp.value = '';
+    dom.inputNomorLayanan.value = '';
+    dom.inputNamaPelanggan.value = '';
+    dom.inputWilayah.value = '';
+    dom.inputDetail.value = '';
+    dom.inputStatus.value = 'Open';
+  }
+
+  /**
+   * Utilities & Toast
+   */
+  function showToast(msg, type) {
+    type = type || 'info';
+    var toast = document.createElement('div');
+    toast.className = 'toast ' + type;
+    toast.innerHTML = '<span>' + escapeHtml(msg) + '</span>';
+    dom.toastContainer.appendChild(toast);
+
+    setTimeout(function() {
+      toast.style.opacity = '0';
+      toast.style.transform = 'translateY(12px)';
+      toast.style.transition = 'all 0.25s ease';
+      setTimeout(function() {
+        if (toast.parentNode) toast.parentNode.removeChild(toast);
+      }, 250);
+    }, 3500);
+  }
+
+  function escapeHtml(text) {
+    if (!text) return '';
+    return String(text)
+      .replace(/&/g, '&amp;')
+      .replace(/</g, '&lt;')
+      .replace(/>/g, '&gt;')
+      .replace(/"/g, '&quot;')
+      .replace(/'/g, '&#039;');
+  }
+
+  function formatDisplayTime(dateString) {
+    if (!dateString) return '-';
+    var d = new Date(dateString);
+    if (isNaN(d.getTime())) return String(dateString);
+
+    var now = new Date();
+    var isToday = d.toDateString() === now.toDateString();
+
+    var hours = String(d.getHours()).padStart(2, '0');
+    var mins = String(d.getMinutes()).padStart(2, '0');
+
+    if (isToday) {
+      return hours + ':' + mins + ' WIB (Hari ini)';
+    }
+
+    var months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+    return d.getDate() + ' ' + months[d.getMonth()] + ', ' + hours + ':' + mins + ' WIB';
+  }
+
+  /**
+   * Mock Data Generator
+   * Data Sheet Mobile Bulan Oktober: 4 Kasus (3 Open, 1 InProgress)
+   */
+  function generateMockData() {
+    return {
+      success: true,
+      mobileHeaders: ['ID_Tiket', 'Total Case Isu yang masuk', 'Nomor_MSISDN', 'Nama_Pelanggan', 'Regional_Cluster', 'Kategori_Keluhan', 'Requestor', 'Status', 'Follow up to', 'Detail_Kendala', 'Terakhir_Update', 'Status_Informasi'],
+      fixedHeaders: ['ID_Tiket', 'Total Case Isu yang masuk', 'Nomor_Internet_PSTN', 'Nama_Pelanggan', 'Witel_Datel', 'Kategori_Kendala', 'Requestor', 'Status', 'Follow up to', 'Detail_Kendala', 'Terakhir_Update', 'Status_Informasi'],
+      mobileRecords: [
+        {
+          id: '1',
+          totalCaseIsu: 'Kendala charge MU pada paket bundling',
+          requestor: 'Dimas (B2B Care)',
+          status: 'InProgress',
+          followUpTo: 'Tim Radio Optimization (RO)',
+          bulan: 'Oktober 2026',
+          tanggal: '2026-10-15T08:30:00Z',
+          nama: 'PT Solusi Finansial (Corporate)',
+          nomorLayanan: '081288992211',
+          kategori: 'Bundling MU',
+          detail: 'Pelanggan sudah aktivasi paket bundling namun masih dikenakan MU, baik aktivasi dari channel digipos atau HVC.\n\nNeed Support:\n• Perbaikan sistem untuk pelanggan dengan paket bundling tidak dikenakan charge MU',
+          progress: 'Remove MU berdasarkan KMI2230926841 dan pengajuan adjustment',
+          pic: 'Tim Mobile',
+          terakhirUpdate: '2026-10-15T10:00:00Z',
+          statusInformasi: 'Ada Update Baru'
+        },
+        {
+          id: '2',
+          totalCaseIsu: 'SMOOA – Tidak diperpanjang otomatis. Add Remove member berkendala.',
+          requestor: 'Call Center 188',
+          status: 'Open',
+          followUpTo: 'IT Core Pool',
+          bulan: 'Oktober 2026',
+          tanggal: '2026-10-13T09:15:00Z',
+          nama: 'Siti Rahma',
+          nomorLayanan: '082155443322',
+          kategori: 'SMOOA Auto Renew',
+          detail: 'Kuota SMOOA tidak diperpanjang otomatis dan kendala add/remove SMOOATotal Volume tiket keluhan SMOOA dari tanggal 1 – 13 Oktober 2026, total volume keluhan tercatat 335 tiket. Tiket open didominasi keluhan Kuota Otomatis Tidak Diperpanjang dengan total keluhan 76 tiket dan 19 tiket masih open di pool IT. Keluhan yang lain adalah Tidak bisa menambahkan/menghapus member sebanyak 29 tiket.\n\nNeed Support:\n• Optimalisasi proses fixing secara masalah seluruh MSISDN yang terimpact kuota tidak diperpanjang otomatis.\n• Perbaikan tools DSC agar dapat add/remove member via DSC',
+          progress: 'Eskalasi ke IT',
+          pic: 'Tim Mobile',
+          terakhirUpdate: '2026-10-13T09:15:00Z',
+          statusInformasi: 'Belum Ada Update'
+        },
+        {
+          id: '3',
+          totalCaseIsu: 'Kendala akses log notifikasi Selena',
+          requestor: 'Helpdesk Selena',
+          status: 'Open',
+          followUpTo: 'Tim Backend Selena',
+          bulan: 'Oktober 2026',
+          tanggal: '2026-10-12T11:20:00Z',
+          nama: '-',
+          nomorLayanan: '081377889900',
+          kategori: 'Selena Log',
+          detail: 'Log aktivasi paket/ transfer pulsa prepaid tidak dapat dilakukan saat pengecekan notifikasi sistem.\n\nNeed Support:\n• Approval pengajuan keyword selena app_nois',
+          progress: 'Escalate to IT untuk mendapatkan log aktivasi/transfer pulsa',
+          pic: 'Tim Mobile',
+          terakhirUpdate: '2026-10-12T11:20:00Z',
+          statusInformasi: 'Belum Ada Update'
+        },
+        {
+          id: '4',
+          totalCaseIsu: 'Double Aktivasi Paket RoaMAX',
+          requestor: 'GraPARI Online',
+          status: 'Open',
+          followUpTo: 'Billing Roaming',
+          bulan: 'Oktober 2026',
+          tanggal: '2026-10-10T14:45:00Z',
+          nama: 'Ahmad Fauzi',
+          nomorLayanan: '081122334455',
+          kategori: 'RoaMAX',
+          detail: 'Pelanggan melakukan aktivasi Paket RoaMAX namun menerima notifikasi Maaf request Anda tidak bisa kami proses, kemudian melakukan aktivasi ulang dan menyebabkan double aktivasi. Sample: https://prnt.sc/OnC_JQ7q8lp3\n\nNeed Support:\n• Auto refund/adjustment jika terjadi double aktivasi paket yang sama dalam range 60 menit',
+          progress: 'Remove paket dan pengajuan adjustment mengacu source KM1216012510',
+          pic: 'Tim Mobile',
+          terakhirUpdate: '2026-10-10T14:45:00Z',
+          statusInformasi: 'Belum Ada Update'
+        }      ],
+      fixedRecords: [
+        {
+          id: '1',
+          totalCaseIsu: 'LOS Merah Massal ODP-GBL-04 (Fiber Cut)',
+          requestor: 'Helpdesk Regional',
+          status: 'InProgress',
+          followUpTo: 'Tim Splicing Lapangan',
+          bulan: 'Oktober 2026',
+          tanggal: '2026-10-25T08:30:00Z',
+          nama: 'PT Solusi Pratama',
+          nomorLayanan: '122876543210',
+          kategori: 'LOS Merah / Fiber Cut',
+          detail: 'Lampu indikator LOS merah kedap-kedip di OLT sejak pagi. Sambungan internet fiber putus total.',
+          pic: 'Rizal CHO',
+          terakhirUpdate: '2026-10-25T09:30:00Z',
+          statusInformasi: 'Ada Update Baru'
+        },
+        {
+          id: '2',
+          totalCaseIsu: 'ONT Sering Restart & Redaman Tinggi',
+          requestor: 'Customer Care Online',
+          status: 'Closed',
+          followUpTo: 'Teknisi Datel Surabaya',
+          bulan: 'Oktober 2026',
+          tanggal: '2026-10-24T14:20:00Z',
+          nama: 'Hendra Wijaya',
+          nomorLayanan: '133499887766',
+          kategori: 'ONT Restart Berulang',
+          detail: 'Perangkat ONT sering reboot otomatis setiap 30 menit. Sudah dicoba ganti adaptor tetap sama.',
+          pic: 'Dewi CHO',
+          terakhirUpdate: '2026-10-25T02:20:00Z',
+          statusInformasi: 'Sudah Ditinjau'
+        },
+        {
+          id: '3',
+          totalCaseIsu: 'Indihome Los Merah Area Dago Atas Massal',
+          requestor: 'Call Center 147',
+          status: 'Open',
+          followUpTo: 'Teknisi Witel Bandung',
+          bulan: 'Oktober 2026',
+          tanggal: '2026-10-23T10:00:00Z',
+          nama: 'Cluster Dago',
+          nomorLayanan: '122556677889',
+          kategori: 'Mass Disruptive',
+          detail: 'Lampu LOS kedip merah massal 1 blok komplek perumahan Dago.',
+          pic: 'Tim Fixed',
+          terakhirUpdate: '2026-10-23T10:00:00Z',
+          statusInformasi: 'Belum Ada Update'
+        },
+        {
+          id: '4',
+          totalCaseIsu: 'Permintaan Relokasi Jalur Kabel Fiber Optic',
+          requestor: 'Sales B2B',
+          status: 'Open',
+          followUpTo: 'Tim Maintenance Lapangan',
+          bulan: 'Oktober 2026',
+          tanggal: '2026-10-22T13:30:00Z',
+          nama: 'Gedung Wisma Niaga',
+          nomorLayanan: '122998877665',
+          kategori: 'Relokasi OSP',
+          detail: 'Relokasi kabel fiber akibat pelebaran jalan protokol kota.',
+          pic: 'Tim Fixed',
+          terakhirUpdate: '2026-10-22T13:30:00Z',
+          statusInformasi: 'Belum Ada Update'
+        }
+      ],
+      logs: [
+        {
+          logId: 'LOG-20261015-001',
+          ticketId: '1',
+          serviceType: 'MOBILE',
+          author: 'Dimas (RO)',
+          message: 'Telah dikoordinasikan dengan tim Billing & Core System terkait penyesuaian charging engine. Tim RO sedang melakukan optimasi parameter.',
+          statusTerkait: 'InProgress',
+          followUpTo: 'Tim Radio Optimization (RO)',
+          timestamp: '2026-10-15T10:00:00Z'
+        },
+        {
+          logId: 'LOG-20261025-002',
+          ticketId: '1',
+          serviceType: 'FIXED',
+          author: 'Rizal CHO',
+          message: 'Ditemukan kabel distribusi 48 core terputus akibat pengerjaan galian drainase kota. Teknisi kabel sedang proses splicing.',
+          statusTerkait: 'InProgress',
+          followUpTo: 'Tim Splicing Lapangan',
+          timestamp: '2026-10-25T09:30:00Z'
+        },
+        {
+          logId: 'LOG-20261025-003',
+          ticketId: '2',
+          serviceType: 'FIXED',
+          author: 'Dewi CHO',
+          message: 'Teknisi lapangan telah melakukan penggantian unit ONT baru tipe ZTE F670L. Sinyal redaman RX normal di -18 dBm. Pelanggan telah konfirmasi internet lancar kembali.',
+          statusTerkait: 'Closed',
+          followUpTo: 'Teknisi Datel Surabaya',
+          timestamp: '2026-10-25T02:20:00Z'
+        }
+      ]
+    };
+  }
+
+  // Bootstrap saat DOM siap
+  document.addEventListener('DOMContentLoaded', init);
+
+})();
+</script>

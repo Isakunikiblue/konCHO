@@ -1,0 +1,12 @@
+# Operating System files
+.DS_Store
+Thumbs.db
+
+# Logs & temporary files
+*.log
+.system_generated/
+.user_uploaded/
+scratch/
+
+# Vercel
+.vercel
