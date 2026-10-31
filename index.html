@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
   <meta charset="UTF-8">
@@ -2492,6 +2492,41 @@
   }
 
   /* =========================================================================
+     HOME & DETAIL VIEW SWITCHER
+     ========================================================================= */
+  .view-switcher-pill {
+    display: inline-flex;
+    align-items: center;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-full);
+    padding: 3px;
+    gap: 4px;
+  }
+  .view-switch-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    border-radius: var(--radius-full);
+    border: none;
+    background: transparent;
+    color: var(--text-secondary);
+    font-size: 12.5px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  .view-switch-btn:hover {
+    color: var(--text-primary);
+  }
+  .view-switch-btn.active {
+    background: var(--primary-color);
+    color: #ffffff;
+    box-shadow: var(--shadow-sm);
+  }
+
+  /* =========================================================================
      HOME VIEW: SPREADSHEET-STYLE TABLE (MAIN ISSUE, STATUS, STATUS UPDATE, UNIT)
      ========================================================================= */
   .home-sheet-container {
@@ -2581,6 +2616,7 @@
     white-space: nowrap;
   }
 </style>
+
 
 
 
@@ -2932,11 +2968,18 @@
           <!-- Header Card Tunggal -->
           <div class="cases-card-header">
             <div class="header-card-left">
-              <h2 class="cases-card-title" id="casesCardTitle">Daftar Case Isu CHO (Mobile & Fixed)</h2>
+              <h2 class="cases-card-title" id="casesCardTitle">Home • List Isu CHO (Kolom C, H, J)</h2>
               <span class="cases-count-badge" id="caseCountBadge">Memuat kasus...</span>
             </div>
             <div class="header-card-right">
-              <span class="hint-text">💡 Konsolidasi Isu (Kolom B, C, H, J) • Mobile & Fixed</span>
+              <div class="view-switcher-pill" role="tablist">
+                <button class="view-switch-btn active" id="btnViewHome" data-view="home" title="Tampilan Sheet List (Kolom C, H, J & Pembeda Unit)">
+                  <span>📊 Home (Sheet)</span>
+                </button>
+                <button class="view-switch-btn" id="btnViewDetail" data-view="detail" title="Tampilan Lengkap Kartu Case">
+                  <span>🗂️ Detail Case</span>
+                </button>
+              </div>
             </div>
           </div>
 
@@ -3381,6 +3424,7 @@
     activeServiceScope: 'ALL',      // 'ALL' | 'MOBILE' | 'FIXED'
     activeMonthFilter: 'all',   // Default aktif: 'all'
     activeStatusFilter: 'all',      // 'all' | 'Open' | 'InProgress' | 'Closed'
+    currentView: 'home',            // 'home' | 'detail' (Default: 'home')
     searchQuery: '',
     currentActionTicket: null,      // Tiket yang sedang ditargetkan oleh modal
     theme: localStorage.getItem('koncho_theme') || 'dark',
@@ -3407,6 +3451,8 @@
     countClosed: document.getElementById('countClosed'),
 
     // Area Utama Kanan
+    btnViewHome: document.getElementById('btnViewHome'),
+    btnViewDetail: document.getElementById('btnViewDetail'),
     searchInput: document.getElementById('searchInput'),
     btnClearSearch: document.getElementById('btnClearSearch'),
     activeScopeLabel: document.getElementById('activeScopeLabel'),
@@ -4071,7 +4117,17 @@
         });
         updateScopeLabel();
         updateKpiCounters();
-        renderCaseList();
+        setViewMode('home');
+      });
+    }
+    if (dom.btnViewHome) {
+      dom.btnViewHome.addEventListener('click', function() {
+        setViewMode('home');
+      });
+    }
+    if (dom.btnViewDetail) {
+      dom.btnViewDetail.addEventListener('click', function() {
+        setViewMode('detail');
       });
     }
 
@@ -4194,6 +4250,20 @@
       dom.themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
     }
     localStorage.setItem('koncho_theme', theme);
+  }
+
+  function setViewMode(mode) {
+    state.currentView = mode;
+    if (dom.navHome) dom.navHome.classList.toggle('active', mode === 'home');
+    if (dom.btnViewHome) dom.btnViewHome.classList.toggle('active', mode === 'home');
+    if (dom.btnViewDetail) dom.btnViewDetail.classList.toggle('active', mode === 'detail');
+
+    var titleEl = document.getElementById('casesCardTitle');
+    if (titleEl) {
+      titleEl.textContent = mode === 'home' ? 'Home • List Isu CHO (Kolom C, H, J)' : 'Daftar Case Isu CHO';
+    }
+
+    renderCaseList();
   }
 
   function updateScopeLabel() {
@@ -4566,8 +4636,191 @@
     html += '</div>';
     html += '</div>';
 
-    // Render tabel spreadsheet Home dengan kolom No, Bulan, Unit, Main Issue, Status, Status Update
-    html += renderHomeSheetTable(filtered);
+    // =========================================================================
+    // JIKA DALAM TAMPILAN HOME: TAMPILKAN LIST SPREADSHEET
+    // Kolom: No, Bulan, Unit, Main Issue, Status, Status Update
+    // =========================================================================
+    if (state.currentView === 'home') {
+      html += renderHomeSheetTable(filtered);
+      dom.caseListContainer.innerHTML = html;
+      attachCardActionHandlers();
+      return;
+    }
+
+    // =========================================================================
+    // JIKA DALAM TAMPILAN DETAIL CASE: TAMPILKAN KARTU CASE LENGKAP
+    // =========================================================================
+    var isBerandaMode = (!state.activeStatusFilter || state.activeStatusFilter === 'all');
+
+    filtered.forEach(function(item) {
+      var srvClass = item.serviceType === 'MOBILE' ? 'mobile' : 'fixed';
+      var stNorm = (item.status || 'Open').toLowerCase().replace(/[^a-z]/g, '');
+      var statusKey = 'open';
+      var statusLabel = 'Open';
+      var cardStatusClass = 'status-open';
+
+      if (stNorm.indexOf('progress') >= 0) {
+        statusKey = 'inprogress';
+        statusLabel = 'In Progress';
+        cardStatusClass = 'status-inprogress';
+      } else if (stNorm.indexOf('close') >= 0 || stNorm.indexOf('solve') >= 0 || stNorm.indexOf('selesai') >= 0) {
+        statusKey = 'closed';
+        statusLabel = 'Closed';
+        cardStatusClass = 'status-closed';
+      }
+
+      var ticketLogs = state.logs.filter(function(l) { return l.ticketId === item.id; });
+      var logCount = ticketLogs.length;
+
+      // KOTAK PEMBEDA SETIAP CASE (Diberi border, background card, dan jarak pemisah antar case)
+      html += '<div class="case-item-row ' + cardStatusClass + '" data-id="' + escapeHtml(item.id) + '" data-service="' + item.serviceType + '">';
+
+      // 1. Header Kotak Case: Case #X, Unit (CHO Mobile/Fixed), Periode Bulan, Status Badge (Open/InProgress/Closed)
+      html += '<div class="case-row-header">';
+      html += '  <div class="case-row-badges">';
+      html += '    <span class="badge-id">Case #' + escapeHtml(item.id) + '</span>';
+      html += '    <span class="badge-srv ' + srvClass + '">CHO ' + item.serviceType + '</span>';
+      if (item.bulan) {
+        html += '    <span class="badge-month">📅 ' + escapeHtml(item.bulan) + '</span>';
+      }
+      html += '    <span class="badge-status-pill ' + statusKey + '">' + statusLabel + '</span>';
+      html += '  </div>';
+
+      html += '  <div class="case-row-time">';
+      html += '    <span>Terakhir Update: <strong>' + formatDisplayTime(item.terakhirUpdate || item.tanggal) + '</strong></span>';
+      html += '  </div>';
+      html += '</div>';
+
+      // 2. Main Issue (Kolom C) - Judul Utama Isu Kasus
+      html += '<div class="case-col-c-box">';
+      html += '  <div style="display:flex; align-items:center; gap:6px;">';
+      html += '    <span class="col-indicator-tag tag-col-c">Kolom C • Main Issue</span>';
+      html += '  </div>';
+      html += '  <div class="case-row-title" style="font-size:16px; font-weight:800; color:var(--text-primary); margin-top:4px;">' + escapeHtml(item.totalCaseIsu || 'Isu Case CHO') + '</div>';
+      html += '</div>';
+
+      // 3. Status Update (Kolom J) - Catatan Tindak Lanjut Terkini
+      var statusUpdateText = item.statusInformasi || item.statusUpdate || (statusKey === 'open' ? 'Belum Ada Update' : 'Update Sedang Berjalan');
+      var updateContent = item.inProgressNote || item.closedNote || item.progress || item.detail || 'Belum ada catatan update pada kolom J.';
+      var isNewUpdate = statusUpdateText === 'Ada Update Baru' || (statusKey === 'inprogress');
+
+      html += '<div class="case-col-j-box">';
+      html += '  <div class="col-j-header">';
+      html += '    <div class="col-j-left">';
+      html += '      <span class="col-indicator-tag tag-col-j">Kolom J • Status Update</span>';
+      html += '      <span class="col-j-pill ' + (isNewUpdate ? 'has-new-update' : '') + '">' + escapeHtml(statusUpdateText) + '</span>';
+      if (statusKey === 'inprogress') {
+        var progBy = item.inProgressBy || item.pic || 'PIC Lapangan';
+        html += '      <span style="font-size:11px; color:var(--text-muted);">PIC: <strong>' + escapeHtml(progBy) + '</strong></span>';
+      } else if (statusKey === 'closed') {
+        var clBy = item.closedBy || item.pic || 'CHO Team';
+        html += '      <span style="font-size:11px; color:var(--text-muted);">Di-Closed: <strong>' + escapeHtml(clBy) + '</strong></span>';
+      }
+      html += '    </div>';
+      html += '    <div class="col-j-time">';
+      html += '      Waktu: <strong>' + formatDisplayTime(item.terakhirUpdate || item.tanggal) + '</strong>';
+      html += '    </div>';
+      html += '  </div>';
+      html += '  <div class="col-j-text">' + escapeHtml(updateContent) + '</div>';
+      html += '</div>';
+
+      // 4. Metadata Detail (Requestor Kolom G & Follow Up To Kolom I & Akun):
+      // Pada mode Beranda dibuat ringkas / toggleable agar tampilan tetap simple dan fokus.
+      var reqVal = item.requestor && item.requestor !== '-' ? item.requestor : 'Belum Diisi';
+      var followVal = item.followUpTo && item.followUpTo !== '-' ? item.followUpTo : 'Belum Ditentukan';
+      var detailId = 'detailBox_' + item.id;
+
+      if (!isBerandaMode) {
+        // Tampilan Lengkap Saat Di Tab Status (Open / In Progress / Closed)
+        html += '<div class="case-row-meta">';
+        html += '  <div class="meta-item"><span style="font-size:12px;">👤</span> Requestor (Kol. G): <strong>' + escapeHtml(reqVal) + '</strong></div>';
+        html += '  <div class="meta-item followup"><span style="font-size:12px;">👥</span> Follow Up To (Kol. I): <strong>' + escapeHtml(followVal) + '</strong></div>';
+        if (item.nomorLayanan && item.nomorLayanan !== '-') {
+          html += '  <div class="meta-item"><span style="font-size:12px;">💳</span> Akun: <strong>' + escapeHtml(item.nomorLayanan) + '</strong> ' + (item.nama && item.nama !== '-' ? '(' + escapeHtml(item.nama) + ')' : '') + '</div>';
+        }
+        html += '</div>';
+      } else {
+        // Pada Beranda: Ringkas dengan toggle opsional jika ingin melihat requestor/akun
+        html += '<div id="' + detailId + '" class="case-row-meta" style="display:none; margin-top:2px; padding-top:8px; border-top:1px dashed var(--border-color);">';
+        html += '  <div class="meta-item"><span style="font-size:12px;">👤</span> Requestor: <strong>' + escapeHtml(reqVal) + '</strong></div>';
+        html += '  <div class="meta-item followup"><span style="font-size:12px;">👥</span> Follow Up To: <strong>' + escapeHtml(followVal) + '</strong></div>';
+        if (item.nomorLayanan && item.nomorLayanan !== '-') {
+          html += '  <div class="meta-item"><span style="font-size:12px;">💳</span> Akun: <strong>' + escapeHtml(item.nomorLayanan) + '</strong> ' + (item.nama && item.nama !== '-' ? '(' + escapeHtml(item.nama) + ')' : '') + '</div>';
+        }
+        html += '</div>';
+      }
+
+      // 5. Tombol Aksi Langsung pada Kotak Case
+      html += '<div class="case-row-actions">';
+      html += '  <div class="action-primary-group">';
+      if (isBerandaMode) {
+        html += '    <button type="button" class="btn-toggle-details" onclick="var el=document.getElementById(\'' + detailId + '\'); if(el) el.style.display=(el.style.display===\'none\' || !el.style.display)?\'flex\':\'none\';"><span>ℹ️ Detail Info</span></button>';
+      }
+
+      var currentRole = (state.authUser && state.authUser.role) ? state.authUser.role : 'Administrator';
+
+      if (currentRole === 'Inputer') {
+        // Role Inputer: HANYA BISA INPUT DATA, TIDAK BISA EDIT!
+        html += '<span class="badge-role-readonly" title="Role Inputer hanya berwenang menambah kasus baru, tidak dapat mengubah status.">';
+        html += '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+        html += '<span>Mode Inputer (Hanya Baca • Akses Edit Dibatasi)</span>';
+        html += '</span>';
+      } else {
+        // Role Administrator & Facilitator: BISA UPDATE STATUS SAMPAI CLOSED!
+        if (statusKey === 'open') {
+          html += '<button class="btn-act btn-act-inprogress btn-trigger-inprog" data-id="' + escapeHtml(item.id) + '">';
+          html += '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>';
+          html += '<span>Proses (In Progress)</span>';
+          html += '</button>';
+
+          html += '<button class="btn-act btn-act-closed btn-trigger-closed" data-id="' + escapeHtml(item.id) + '">';
+          html += '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+          html += '<span>Selesaikan (Closed)</span>';
+          html += '</button>';
+        } else if (statusKey === 'inprogress') {
+          html += '<button class="btn-act btn-act-closed btn-trigger-closed" data-id="' + escapeHtml(item.id) + '">';
+          html += '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+          html += '<span>Selesaikan Kasus (Closed)</span>';
+          html += '</button>';
+
+          html += '<button class="btn-act btn-act-update btn-trigger-inprog" data-id="' + escapeHtml(item.id) + '" data-update="true">';
+          html += '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>';
+          html += '<span>+ Update Keterangan</span>';
+          html += '</button>';
+
+          html += '<button class="btn-act btn-act-reopen btn-trigger-reopen" data-id="' + escapeHtml(item.id) + '" data-target="Open">';
+          html += '<span>↩️ Buka Kembali ke Open</span>';
+          html += '</button>';
+        } else if (statusKey === 'closed') {
+          html += '<span style="font-size:12.5px; font-weight:700; color:var(--status-closed-color); display:inline-flex; align-items:center; gap:5px; margin-right:4px;">';
+          html += '✓ Case Telah Ditutup';
+          html += '</span>';
+
+          html += '<button class="btn-act btn-act-reopen btn-trigger-reopen" data-id="' + escapeHtml(item.id) + '" data-target="InProgress">';
+          html += '<span>🔄 Buka Kembali (Reopen)</span>';
+          html += '</button>';
+        }
+      }
+
+      html += '</div>';
+
+      // Secondary Actions: Riwayat Log & Salin
+      html += '<div class="action-secondary-group">';
+      html += '<button class="btn-act btn-act-log btn-trigger-log" data-id="' + escapeHtml(item.id) + '" title="Lihat Riwayat Lengkap">';
+      html += '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>';
+      html += '<span>Riwayat Log (' + logCount + ')</span>';
+      html += '</button>';
+
+      html += '<button class="btn-act btn-act-log btn-trigger-copy" data-id="' + escapeHtml(item.id) + '" title="Salin Ringkasan Kasus">';
+      html += '<span>📋 Salin</span>';
+      html += '</button>';
+
+      html += '</div>';
+      html += '</div>';
+
+      html += '</div>'; // End case-item-row
+    });
+
     dom.caseListContainer.innerHTML = html;
     attachCardActionHandlers();
   }
@@ -5663,6 +5916,7 @@
 
 })();
 </script>
+
 
 </body>
 </html>
