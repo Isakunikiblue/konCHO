@@ -281,20 +281,39 @@
   }
 
   /* =========================================================================
-     2. APP LAYOUT: SIDEBAR KIRI + AREA UTAMA KANAN
+     2. APP LAYOUT: FULL WIDTH VERTICAL WRAPPER + SIDEBAR KIRI + AREA KANAN
      ========================================================================= */
+  .app-main-wrapper {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    min-height: 100vh;
+    background-color: var(--bg-app);
+    position: relative;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
   .app-layout {
     flex: 1;
-    display: flex;
-    min-height: calc(100vh - 66px);
+    display: flex !important;
+    flex-direction: row !important;
+    width: 100% !important;
+    min-height: calc(100vh - 72px);
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
   }
 
   /* -------------------------------------------------------------------------
-     SIDEBAR KIRI (SEBELAH KIRI)
+     SIDEBAR KIRI (SEBELAH KIRI FLUSH)
      Memuat: Semua Layanan, Bulan, dan Total Kasus
      ------------------------------------------------------------------------- */
   .sidebar-left {
     width: 270px;
+    min-width: 270px;
+    max-width: 270px;
     background: var(--bg-card);
     border-right: 1px solid var(--border-color);
     display: flex;
@@ -304,9 +323,11 @@
     flex-shrink: 0;
     position: sticky;
     top: 72px;
+    left: 0;
     height: calc(100vh - 72px);
     overflow-y: auto;
     z-index: 30;
+    box-sizing: border-box;
   }
 
   .sidebar-block {
@@ -1527,8 +1548,112 @@
     color: var(--text-primary);
   }
   .user-role {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 1px;
+  }
+  .badge-role {
     font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    padding: 1px 7px;
+    border-radius: var(--radius-full);
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    line-height: 1.3;
+  }
+  .role-admin {
+    background: rgba(139, 92, 246, 0.2);
+    color: #c4b5fd;
+    border: 1px solid rgba(139, 92, 246, 0.4);
+  }
+  .role-facilitator {
+    background: rgba(245, 158, 11, 0.2);
+    color: #fcd34d;
+    border: 1px solid rgba(245, 158, 11, 0.4);
+  }
+  .role-inputer {
+    background: rgba(16, 185, 129, 0.2);
+    color: #6ee7b7;
+    border: 1px solid rgba(16, 185, 129, 0.4);
+  }
+  .badge-role-readonly {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11.5px;
+    font-weight: 600;
     color: var(--text-muted);
+    background: var(--bg-elevated);
+    border: 1px dashed var(--border-color);
+    padding: 5px 12px;
+    border-radius: var(--radius-sm);
+  }
+
+  /* Preset Selector Peran pada Login Card */
+  .role-selector-wrap {
+    margin-bottom: 16px;
+  }
+  .role-selector-title {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .role-presets-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .btn-role-preset {
+    background: #0d1627;
+    border: 1px solid #1e293b;
+    border-radius: 10px;
+    padding: 10px 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: var(--transition);
+    color: #94a3b8;
+  }
+  .btn-role-preset:hover {
+    border-color: #6366f1;
+    background: #141f36;
+    transform: translateY(-1px);
+  }
+  .btn-role-preset.active {
+    border-color: #f6c84c;
+    background: rgba(246, 200, 76, 0.12);
+    box-shadow: 0 0 12px rgba(246, 200, 76, 0.25);
+    color: #f8fafc;
+  }
+  .btn-role-preset .role-icon {
+    font-size: 18px;
+    line-height: 1;
+  }
+  .btn-role-preset .role-info strong {
+    display: block;
+    font-size: 11px;
+    font-weight: 800;
+    color: #f1f5f9;
+  }
+  .btn-role-preset .role-info span {
+    display: block;
+    font-size: 9px;
+    opacity: 0.75;
+    line-height: 1.2;
+    margin-top: 2px;
   }
   .btn-logout {
     display: inline-flex;
@@ -1900,7 +2025,10 @@
 <body data-theme="dark">
 
   <!-- =========================================================================
-       HALAMAN LOGIN (AUTHENTICATION VIEW)
+       HALAMAN LOGIN (AUTHENTICATION VIEW DENGAN 3 ROLE)
+       - Administrator: admin_koncho / koncho123 (Buka Semua Akses)
+       - Facilitator: facilitator_cho / koncho123 (Update Status s/d Closed)
+       - Inputer: inputer_cho / koncho123 (Hanya Input Data, Tidak Bisa Edit)
        ========================================================================= -->
   <div id="loginView" class="login-view-container">
     <div class="login-card">
@@ -1913,15 +2041,46 @@
 
       <div class="login-welcome">
         <h2>Masuk ke Sistem konCHO</h2>
-        <p>Sistem Konsolidasi & Monitoring Kasus CHO Terpadu</p>
+        <p>Pilih akun peran (Role) atau masuk dengan user admin</p>
       </div>
 
       <form id="loginForm" class="login-form">
+        <!-- ROLE PRESET SELECTOR (ADMINISTRATOR, FACILITATOR, INPUTER) -->
+        <div class="role-selector-wrap">
+          <div class="role-selector-title">
+            <span>Pilih Peran Akun (Role):</span>
+            <span style="font-size:10px; color:#f6c84c; text-transform:none;">Klik untuk auto-fill</span>
+          </div>
+          <div class="role-presets-grid">
+            <button type="button" class="btn-role-preset active" data-role="Administrator" data-user="admin_koncho" data-pass="koncho123">
+              <span class="role-icon">👑</span>
+              <div class="role-info">
+                <strong>Admin</strong>
+                <span>Buka Semua Akses</span>
+              </div>
+            </button>
+            <button type="button" class="btn-role-preset" data-role="Facilitator" data-user="facilitator_cho" data-pass="koncho123">
+              <span class="role-icon">🛠️</span>
+              <div class="role-info">
+                <strong>Facilitator</strong>
+                <span>Update s/d Closed</span>
+              </div>
+            </button>
+            <button type="button" class="btn-role-preset" data-role="Inputer" data-user="inputer_cho" data-pass="koncho123">
+              <span class="role-icon">📝</span>
+              <div class="role-info">
+                <strong>Inputer</strong>
+                <span>Hanya Input Data</span>
+              </div>
+            </button>
+          </div>
+        </div>
+
         <div class="form-group">
-          <label class="form-label" for="loginUsername">Nama Pengguna / NIK / Email</label>
+          <label class="form-label" for="loginUsername">Nama Pengguna (Username)</label>
           <div class="input-with-icon">
             <svg class="input-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-            <input type="text" id="loginUsername" class="form-control" placeholder="Contoh: Dimas (CHO Officer)" value="Dimas (CHO Officer)" required autocomplete="username">
+            <input type="text" id="loginUsername" class="form-control" placeholder="admin_koncho" value="admin_koncho" required autocomplete="username">
           </div>
         </div>
 
@@ -1929,16 +2088,15 @@
           <label class="form-label" for="loginPassword">Kata Sandi (Password)</label>
           <div class="input-with-icon">
             <svg class="input-icon" viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-            <input type="password" id="loginPassword" class="form-control" placeholder="Masukkan kata sandi..." value="cho2026" required autocomplete="current-password">
+            <input type="password" id="loginPassword" class="form-control" placeholder="koncho123" value="koncho123" required autocomplete="current-password">
           </div>
         </div>
 
         <div class="login-options">
           <label class="remember-label">
             <input type="checkbox" id="loginRememberMe" checked>
-            <span>Ingat sesi saya</span>
+            <span>Ingat sesi login saya</span>
           </label>
-          <span style="font-size:11px; color:#38bdf8;">Role: Officer Mobile & Fixed</span>
         </div>
 
         <button type="submit" id="btnLoginSubmit" class="btn-login-submit">
@@ -1947,26 +2105,27 @@
         </button>
 
         <div class="demo-login-box">
-          <span class="demo-hint-text">Akses Cepat Pengguna:</span>
+          <span class="demo-hint-text">Login Cepat sebagai Administrator:</span>
           <button type="button" id="btnQuickLoginOfficer" class="btn-quick-login">
-            ⚡ Masuk Cepat sebagai Petugas CHO
+            ⚡ Masuk sebagai Admin (admin_koncho / koncho123)
           </button>
         </div>
       </form>
 
       <div class="login-footer">
         <span>konCHO • Konsolidasi CHO</span>
-        <span class="login-version">v2.4 Live Cloud</span>
+        <span class="login-version">v2.5 Role-Based Access</span>
       </div>
     </div>
   </div>
 
   <!-- =========================================================================
-       DASHBOARD UTAMA APLIKASI (Tampil jika terotentikasi)
+       DASHBOARD UTAMA APLIKASI
+       Layout Vertikal Presisi Penuh: Header di atas, Sidebar Kiri Flush di Kiri, Area Utama di Kanan
        ========================================================================= -->
-  <div id="appView" class="app-main-wrapper" style="display:none;">
+  <div id="appView" class="app-main-wrapper" style="display:none; flex-direction:column; width:100%;">
     
-    <!-- 1. TOP APP HEADER -->
+    <!-- 1. TOP APP HEADER (100% LEBAR LAYAR PENUH) -->
     <header class="app-header">
       <div class="header-left">
         <div class="brand-box">
@@ -1984,10 +2143,12 @@
       <div class="header-actions">
         <!-- User Profile Badge & Logout -->
         <div class="user-profile-badge" id="userProfileBadge">
-          <div class="user-avatar">👤</div>
+          <div class="user-avatar" id="hdrUserAvatar">👑</div>
           <div class="user-info">
-            <span class="user-name" id="hdrUserName">Dimas CHO</span>
-            <span class="user-role">Handling Officer</span>
+            <span class="user-name" id="hdrUserName">admin_koncho</span>
+            <div class="user-role" id="hdrUserRole">
+              <span class="badge-role role-admin">👑 Administrator</span>
+            </div>
           </div>
           <button type="button" class="btn-logout" id="btnLogout" title="Keluar dari Akun">
             <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
@@ -2004,6 +2165,7 @@
           <span id="themeIcon">☀️</span>
         </button>
 
+        <!-- Tombol Input Kasus Baru (Disediakan untuk Administrator & Inputer) -->
         <button class="btn-hdr btn-primary" id="btnOpenNewModal">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
           <span>+ Input Kasus Baru</span>
@@ -2011,10 +2173,10 @@
       </div>
     </header>
 
-    <!-- 2. WORKSPACE LAYOUT: SIDEBAR KIRI + AREA UTAMA KANAN -->
+    <!-- 2. WORKSPACE LAYOUT: SIDEBAR KIRI FLUSH + AREA UTAMA KANAN -->
     <div class="app-layout">
       
-      <!-- PANEL KIRI (SIDEBAR): LAYANAN, BULAN & TOTAL STATUS KASUS -->
+      <!-- PANEL KIRI (SIDEBAR): FLUSH KIRI TANPA GAP KOSONG -->
       <aside class="sidebar-left">
         
         <!-- Section 1: Filter Layanan -->
@@ -2073,7 +2235,7 @@
             <span>Status Kasus (Kolom H)</span>
           </div>
           <div class="sidebar-kpi-list">
-            <!-- PADA TOTAL KASUS DIGANTI NAMA MENJADI "BERANDA" -->
+            <!-- BERANDA (KONSOLIDASI MOBILE & FIXED) -->
             <button class="kpi-nav-btn total active" data-status="all" id="pillTotal" title="Beranda Rekap CHO (Mobile & Fixed)">
               <div class="kpi-nav-left">
                 <span class="kpi-symbol">🏠</span>
@@ -2580,10 +2742,14 @@
   };
 
   var selectedNewService = 'MOBILE';
+  var selectedRole = 'Administrator';
 
   /**
    * =========================================================================
-   * OTENTIKASI & HALAMAN LOGIN (SESSION MANAGEMENT)
+   * OTENTIKASI & HALAMAN LOGIN (SESSION MANAGEMENT DENGAN 3 ROLE)
+   * Role 1: Administrator (Akses Penuh: admin_koncho / koncho123)
+   * Role 2: Facilitator (Bisa Update Status s/d Closed: facilitator_cho / koncho123)
+   * Role 3: Inputer (Hanya Bisa Input Data, Tidak Bisa Edit: inputer_cho / koncho123)
    * =========================================================================
    */
   function initAuth() {
@@ -2592,7 +2758,7 @@
       try {
         state.authUser = JSON.parse(savedUser);
       } catch (e) {
-        state.authUser = { name: savedUser, role: 'Complaint Handling Officer' };
+        state.authUser = { name: savedUser, role: 'Administrator' };
       }
       showDashboardApp();
     } else {
@@ -2600,15 +2766,60 @@
     }
   }
 
+  function applyRolePermissions() {
+    var role = (state.authUser && state.authUser.role) ? state.authUser.role : 'Administrator';
+    
+    // 1. Profil Header
+    var nameEl = document.getElementById('hdrUserName');
+    var roleEl = document.getElementById('hdrUserRole');
+    var avatarEl = document.getElementById('hdrUserAvatar');
+
+    if (nameEl && state.authUser) {
+      nameEl.textContent = state.authUser.name || 'admin_koncho';
+    }
+    if (roleEl) {
+      var badgeClass = 'role-admin';
+      var badgeIcon = '👑';
+      if (role === 'Facilitator') {
+        badgeClass = 'role-facilitator';
+        badgeIcon = '🛠️';
+      } else if (role === 'Inputer') {
+        badgeClass = 'role-inputer';
+        badgeIcon = '📝';
+      }
+      roleEl.innerHTML = '<span class="badge-role ' + badgeClass + '">' + badgeIcon + ' ' + escapeHtml(role) + '</span>';
+    }
+    if (avatarEl) {
+      if (role === 'Administrator') avatarEl.textContent = '👑';
+      else if (role === 'Facilitator') avatarEl.textContent = '🛠️';
+      else avatarEl.textContent = '📝';
+    }
+
+    // 2. Kontrol Tombol Input Kasus Baru:
+    // Administrator & Inputer bisa input data baru.
+    // Facilitator TIDAK input data (khusus fasilitasi update s/d closed).
+    var btnNew = document.getElementById('btnOpenNewModal');
+    if (btnNew) {
+      if (role === 'Facilitator') {
+        btnNew.style.display = 'none';
+      } else {
+        btnNew.style.display = 'inline-flex';
+      }
+    }
+  }
+
   function showDashboardApp() {
     var loginEl = document.getElementById('loginView');
     var appEl = document.getElementById('appView');
-    var nameEl = document.getElementById('hdrUserName');
-    if (nameEl && state.authUser) {
-      nameEl.textContent = state.authUser.name || 'CHO Officer';
-    }
+    
+    applyRolePermissions();
+
     if (loginEl) loginEl.style.display = 'none';
-    if (appEl) appEl.style.display = 'flex';
+    if (appEl) {
+      appEl.style.display = 'flex';
+      appEl.style.flexDirection = 'column';
+      appEl.style.width = '100%';
+    }
   }
 
   function showLoginScreen() {
@@ -2621,20 +2832,43 @@
   function handleLoginSubmit(e) {
     if (e && e.preventDefault) e.preventDefault();
     var userInp = document.getElementById('loginUsername');
+    var passInp = document.getElementById('loginPassword');
     var btnSubmit = document.getElementById('btnLoginSubmit');
     
     var username = (userInp && userInp.value ? userInp.value : '').trim();
-    if (!username) username = 'Dimas (CHO Officer)';
+    var password = (passInp && passInp.value ? passInp.value : '').trim();
+
+    var role = selectedRole || 'Administrator';
+
+    // Deteksi Role Berdasarkan Input
+    if (username === 'admin_koncho' || username.toLowerCase().indexOf('admin') >= 0) {
+      role = 'Administrator';
+    } else if (username === 'facilitator_cho' || username.toLowerCase().indexOf('facilitator') >= 0) {
+      role = 'Facilitator';
+    } else if (username === 'inputer_cho' || username.toLowerCase().indexOf('input') >= 0) {
+      role = 'Inputer';
+    }
+
+    // Validasi Kata Sandi khusus admin_koncho
+    if (username === 'admin_koncho' && password && password !== 'koncho123') {
+      showToast('Kata sandi salah! Password untuk admin_koncho adalah: koncho123', 'error');
+      if (passInp) passInp.focus();
+      return;
+    }
+
+    if (!username) {
+      username = role === 'Administrator' ? 'admin_koncho' : (role === 'Facilitator' ? 'facilitator_cho' : 'inputer_cho');
+    }
 
     if (btnSubmit) {
-      btnSubmit.innerHTML = '<span>Memverifikasi...</span>';
+      btnSubmit.innerHTML = '<span>Memverifikasi Akses...</span>';
       btnSubmit.style.opacity = '0.7';
     }
 
     setTimeout(function() {
       state.authUser = {
         name: username,
-        role: 'Complaint Handling Officer',
+        role: role,
         loginTime: new Date().toISOString()
       };
       localStorage.setItem('koncho_auth_user', JSON.stringify(state.authUser));
@@ -2643,21 +2877,16 @@
         btnSubmit.style.opacity = '1';
       }
       showDashboardApp();
-      showToast('Selamat Datang di konCHO, ' + username + '!', 'success');
-    }, 350);
-  }
-
-  function handleQuickLogin() {
-    var userInp = document.getElementById('loginUsername');
-    if (userInp) userInp.value = 'Dimas (CHO Officer)';
-    handleLoginSubmit();
+      renderCaseList();
+      showToast('Selamat Datang di konCHO! Masuk sebagai ' + role + ' (' + username + ')', 'success');
+    }, 300);
   }
 
   function handleLogout() {
     localStorage.removeItem('koncho_auth_user');
     state.authUser = null;
     showLoginScreen();
-    showToast('Anda telah keluar dari sistem konCHO.', 'info');
+    showToast('Anda telah keluar dari akun konCHO.', 'info');
   }
 
   /**
@@ -2677,8 +2906,34 @@
     // 0. Otentikasi & Login Event Listeners
     var loginForm = document.getElementById('loginForm');
     if (loginForm) loginForm.addEventListener('submit', handleLoginSubmit);
+
+    // Role Presets pada Login Card (Admin, Facilitator, Inputer)
+    document.querySelectorAll('.btn-role-preset').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.btn-role-preset').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        selectedRole = btn.getAttribute('data-role') || 'Administrator';
+        var u = btn.getAttribute('data-user') || '';
+        var p = btn.getAttribute('data-pass') || '';
+        var userInp = document.getElementById('loginUsername');
+        var passInp = document.getElementById('loginPassword');
+        if (userInp) userInp.value = u;
+        if (passInp) passInp.value = p;
+      });
+    });
+
     var btnQuickLogin = document.getElementById('btnQuickLoginOfficer');
-    if (btnQuickLogin) btnQuickLogin.addEventListener('click', handleQuickLogin);
+    if (btnQuickLogin) {
+      btnQuickLogin.addEventListener('click', function() {
+        var userInp = document.getElementById('loginUsername');
+        var passInp = document.getElementById('loginPassword');
+        if (userInp) userInp.value = 'admin_koncho';
+        if (passInp) passInp.value = 'koncho123';
+        selectedRole = 'Administrator';
+        handleLoginSubmit();
+      });
+    }
+
     var btnLogout = document.getElementById('btnLogout');
     if (btnLogout) btnLogout.addEventListener('click', handleLogout);
 
@@ -3225,38 +3480,49 @@
       html += '<div class="case-row-actions">';
       html += '<div class="action-primary-group">';
 
-      if (statusKey === 'open') {
-        html += '<button class="btn-act btn-act-inprogress btn-trigger-inprog" data-id="' + escapeHtml(item.id) + '">';
-        html += '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>';
-        html += '<span>Proses (In Progress)</span>';
-        html += '</button>';
+      var currentRole = (state.authUser && state.authUser.role) ? state.authUser.role : 'Administrator';
 
-        html += '<button class="btn-act btn-act-closed btn-trigger-closed" data-id="' + escapeHtml(item.id) + '">';
-        html += '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
-        html += '<span>Selesaikan (Closed)</span>';
-        html += '</button>';
-      } else if (statusKey === 'inprogress') {
-        html += '<button class="btn-act btn-act-closed btn-trigger-closed" data-id="' + escapeHtml(item.id) + '">';
-        html += '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
-        html += '<span>Selesaikan Kasus (Closed)</span>';
-        html += '</button>';
-
-        html += '<button class="btn-act btn-act-update btn-trigger-inprog" data-id="' + escapeHtml(item.id) + '" data-update="true">';
-        html += '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>';
-        html += '<span>+ Update Keterangan</span>';
-        html += '</button>';
-
-        html += '<button class="btn-act btn-act-reopen btn-trigger-reopen" data-id="' + escapeHtml(item.id) + '" data-target="Open">';
-        html += '<span>↩️ Buka Kembali ke Open</span>';
-        html += '</button>';
-      } else if (statusKey === 'closed') {
-        html += '<span style="font-size:12.5px; font-weight:700; color:var(--status-closed-color); display:inline-flex; align-items:center; gap:5px; margin-right:4px;">';
-        html += '✓ Kasus Telah Ditutup';
+      if (currentRole === 'Inputer') {
+        // Role Inputer: HANYA BISA INPUT DATA, TIDAK BISA EDIT!
+        html += '<span class="badge-role-readonly" title="Role Inputer hanya berwenang menambah kasus baru, tidak dapat mengubah status.">';
+        html += '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+        html += '<span>Mode Inputer (Hanya Baca • Akses Edit Dibatasi)</span>';
         html += '</span>';
+      } else {
+        // Role Administrator & Facilitator: BISA UPDATE STATUS SAMPAI CLOSED!
+        if (statusKey === 'open') {
+          html += '<button class="btn-act btn-act-inprogress btn-trigger-inprog" data-id="' + escapeHtml(item.id) + '">';
+          html += '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>';
+          html += '<span>Proses (In Progress)</span>';
+          html += '</button>';
 
-        html += '<button class="btn-act btn-act-reopen btn-trigger-reopen" data-id="' + escapeHtml(item.id) + '" data-target="InProgress">';
-        html += '<span>🔄 Buka Kembali (Reopen)</span>';
-        html += '</button>';
+          html += '<button class="btn-act btn-act-closed btn-trigger-closed" data-id="' + escapeHtml(item.id) + '">';
+          html += '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+          html += '<span>Selesaikan (Closed)</span>';
+          html += '</button>';
+        } else if (statusKey === 'inprogress') {
+          html += '<button class="btn-act btn-act-closed btn-trigger-closed" data-id="' + escapeHtml(item.id) + '">';
+          html += '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+          html += '<span>Selesaikan Kasus (Closed)</span>';
+          html += '</button>';
+
+          html += '<button class="btn-act btn-act-update btn-trigger-inprog" data-id="' + escapeHtml(item.id) + '" data-update="true">';
+          html += '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>';
+          html += '<span>+ Update Keterangan</span>';
+          html += '</button>';
+
+          html += '<button class="btn-act btn-act-reopen btn-trigger-reopen" data-id="' + escapeHtml(item.id) + '" data-target="Open">';
+          html += '<span>↩️ Buka Kembali ke Open</span>';
+          html += '</button>';
+        } else if (statusKey === 'closed') {
+          html += '<span style="font-size:12.5px; font-weight:700; color:var(--status-closed-color); display:inline-flex; align-items:center; gap:5px; margin-right:4px;">';
+          html += '✓ Kasus Telah Ditutup';
+          html += '</span>';
+
+          html += '<button class="btn-act btn-act-reopen btn-trigger-reopen" data-id="' + escapeHtml(item.id) + '" data-target="InProgress">';
+          html += '<span>🔄 Buka Kembali (Reopen)</span>';
+          html += '</button>';
+        }
       }
 
       html += '</div>';
@@ -3358,6 +3624,10 @@
    * =========================================================================
    */
   function openInProgressModal(ticketId, isUpdateOnly) {
+    if (state.authUser && state.authUser.role === 'Inputer') {
+      showToast('Akses ditolak: Role Inputer hanya berwenang menambah kasus baru, tidak dapat mengubah status.', 'error');
+      return;
+    }
     var ticket = state.records.find(function(r) { return r.id === ticketId; });
     if (!ticket) return;
 
@@ -3494,6 +3764,10 @@
    * =========================================================================
    */
   function openClosedModal(ticketId) {
+    if (state.authUser && state.authUser.role === 'Inputer') {
+      showToast('Akses ditolak: Role Inputer tidak berwenang menyelesaikan/menutup status kasus.', 'error');
+      return;
+    }
     var ticket = state.records.find(function(r) { return r.id === ticketId; });
     if (!ticket) return;
 
@@ -3628,6 +3902,10 @@
    * Reopen / Kembalikan Status
    */
   function handleQuickReopen(ticketId, targetStatus) {
+    if (state.authUser && state.authUser.role === 'Inputer') {
+      showToast('Akses ditolak: Role Inputer tidak dapat membuka kembali atau mengubah status kasus.', 'error');
+      return;
+    }
     var ticket = state.records.find(function(r) { return r.id === ticketId; });
     if (!ticket) return;
 
@@ -3848,6 +4126,10 @@
    * =========================================================================
    */
   function openNewModal() {
+    if (state.authUser && state.authUser.role === 'Facilitator') {
+      showToast('Akses ditolak: Role Facilitator bertugas memfasilitasi status kasus hingga closed.', 'error');
+      return;
+    }
     setNewModalService('MOBILE');
     dom.newDataModal.classList.add('active');
     dom.inputCaseIssue.focus();
@@ -3877,6 +4159,11 @@
   }
 
   function handleSubmitNewReport() {
+    if (state.authUser && state.authUser.role === 'Facilitator') {
+      showToast('Akses ditolak: Role Facilitator tidak memiliki hak untuk menginput data kasus baru.', 'error');
+      closeNewModal();
+      return;
+    }
     var issue = dom.inputCaseIssue.value.trim();
     var req = dom.inputRequestor.value.trim();
     var st = dom.inputStatus.value;

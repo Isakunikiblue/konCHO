@@ -120,10 +120,14 @@
   };
 
   var selectedNewService = 'MOBILE';
+  var selectedRole = 'Administrator';
 
   /**
    * =========================================================================
-   * OTENTIKASI & HALAMAN LOGIN (SESSION MANAGEMENT)
+   * OTENTIKASI & HALAMAN LOGIN (SESSION MANAGEMENT DENGAN 3 ROLE)
+   * Role 1: Administrator (Akses Penuh: admin_koncho / koncho123)
+   * Role 2: Facilitator (Bisa Update Status s/d Closed: facilitator_cho / koncho123)
+   * Role 3: Inputer (Hanya Bisa Input Data, Tidak Bisa Edit: inputer_cho / koncho123)
    * =========================================================================
    */
   function initAuth() {
@@ -132,7 +136,7 @@
       try {
         state.authUser = JSON.parse(savedUser);
       } catch (e) {
-        state.authUser = { name: savedUser, role: 'Complaint Handling Officer' };
+        state.authUser = { name: savedUser, role: 'Administrator' };
       }
       showDashboardApp();
     } else {
@@ -140,15 +144,60 @@
     }
   }
 
+  function applyRolePermissions() {
+    var role = (state.authUser && state.authUser.role) ? state.authUser.role : 'Administrator';
+    
+    // 1. Profil Header
+    var nameEl = document.getElementById('hdrUserName');
+    var roleEl = document.getElementById('hdrUserRole');
+    var avatarEl = document.getElementById('hdrUserAvatar');
+
+    if (nameEl && state.authUser) {
+      nameEl.textContent = state.authUser.name || 'admin_koncho';
+    }
+    if (roleEl) {
+      var badgeClass = 'role-admin';
+      var badgeIcon = '👑';
+      if (role === 'Facilitator') {
+        badgeClass = 'role-facilitator';
+        badgeIcon = '🛠️';
+      } else if (role === 'Inputer') {
+        badgeClass = 'role-inputer';
+        badgeIcon = '📝';
+      }
+      roleEl.innerHTML = '<span class="badge-role ' + badgeClass + '">' + badgeIcon + ' ' + escapeHtml(role) + '</span>';
+    }
+    if (avatarEl) {
+      if (role === 'Administrator') avatarEl.textContent = '👑';
+      else if (role === 'Facilitator') avatarEl.textContent = '🛠️';
+      else avatarEl.textContent = '📝';
+    }
+
+    // 2. Kontrol Tombol Input Kasus Baru:
+    // Administrator & Inputer bisa input data baru.
+    // Facilitator TIDAK input data (khusus fasilitasi update s/d closed).
+    var btnNew = document.getElementById('btnOpenNewModal');
+    if (btnNew) {
+      if (role === 'Facilitator') {
+        btnNew.style.display = 'none';
+      } else {
+        btnNew.style.display = 'inline-flex';
+      }
+    }
+  }
+
   function showDashboardApp() {
     var loginEl = document.getElementById('loginView');
     var appEl = document.getElementById('appView');
-    var nameEl = document.getElementById('hdrUserName');
-    if (nameEl && state.authUser) {
-      nameEl.textContent = state.authUser.name || 'CHO Officer';
-    }
+    
+    applyRolePermissions();
+
     if (loginEl) loginEl.style.display = 'none';
-    if (appEl) appEl.style.display = 'flex';
+    if (appEl) {
+      appEl.style.display = 'flex';
+      appEl.style.flexDirection = 'column';
+      appEl.style.width = '100%';
+    }
   }
 
   function showLoginScreen() {
@@ -161,20 +210,43 @@
   function handleLoginSubmit(e) {
     if (e && e.preventDefault) e.preventDefault();
     var userInp = document.getElementById('loginUsername');
+    var passInp = document.getElementById('loginPassword');
     var btnSubmit = document.getElementById('btnLoginSubmit');
     
     var username = (userInp && userInp.value ? userInp.value : '').trim();
-    if (!username) username = 'Dimas (CHO Officer)';
+    var password = (passInp && passInp.value ? passInp.value : '').trim();
+
+    var role = selectedRole || 'Administrator';
+
+    // Deteksi Role Berdasarkan Input
+    if (username === 'admin_koncho' || username.toLowerCase().indexOf('admin') >= 0) {
+      role = 'Administrator';
+    } else if (username === 'facilitator_cho' || username.toLowerCase().indexOf('facilitator') >= 0) {
+      role = 'Facilitator';
+    } else if (username === 'inputer_cho' || username.toLowerCase().indexOf('input') >= 0) {
+      role = 'Inputer';
+    }
+
+    // Validasi Kata Sandi khusus admin_koncho
+    if (username === 'admin_koncho' && password && password !== 'koncho123') {
+      showToast('Kata sandi salah! Password untuk admin_koncho adalah: koncho123', 'error');
+      if (passInp) passInp.focus();
+      return;
+    }
+
+    if (!username) {
+      username = role === 'Administrator' ? 'admin_koncho' : (role === 'Facilitator' ? 'facilitator_cho' : 'inputer_cho');
+    }
 
     if (btnSubmit) {
-      btnSubmit.innerHTML = '<span>Memverifikasi...</span>';
+      btnSubmit.innerHTML = '<span>Memverifikasi Akses...</span>';
       btnSubmit.style.opacity = '0.7';
     }
 
     setTimeout(function() {
       state.authUser = {
         name: username,
-        role: 'Complaint Handling Officer',
+        role: role,
         loginTime: new Date().toISOString()
       };
       localStorage.setItem('koncho_auth_user', JSON.stringify(state.authUser));
@@ -183,21 +255,16 @@
         btnSubmit.style.opacity = '1';
       }
       showDashboardApp();
-      showToast('Selamat Datang di konCHO, ' + username + '!', 'success');
-    }, 350);
-  }
-
-  function handleQuickLogin() {
-    var userInp = document.getElementById('loginUsername');
-    if (userInp) userInp.value = 'Dimas (CHO Officer)';
-    handleLoginSubmit();
+      renderCaseList();
+      showToast('Selamat Datang di konCHO! Masuk sebagai ' + role + ' (' + username + ')', 'success');
+    }, 300);
   }
 
   function handleLogout() {
     localStorage.removeItem('koncho_auth_user');
     state.authUser = null;
     showLoginScreen();
-    showToast('Anda telah keluar dari sistem konCHO.', 'info');
+    showToast('Anda telah keluar dari akun konCHO.', 'info');
   }
 
   /**
@@ -217,8 +284,34 @@
     // 0. Otentikasi & Login Event Listeners
     var loginForm = document.getElementById('loginForm');
     if (loginForm) loginForm.addEventListener('submit', handleLoginSubmit);
+
+    // Role Presets pada Login Card (Admin, Facilitator, Inputer)
+    document.querySelectorAll('.btn-role-preset').forEach(function(btn) {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.btn-role-preset').forEach(function(b) { b.classList.remove('active'); });
+        btn.classList.add('active');
+        selectedRole = btn.getAttribute('data-role') || 'Administrator';
+        var u = btn.getAttribute('data-user') || '';
+        var p = btn.getAttribute('data-pass') || '';
+        var userInp = document.getElementById('loginUsername');
+        var passInp = document.getElementById('loginPassword');
+        if (userInp) userInp.value = u;
+        if (passInp) passInp.value = p;
+      });
+    });
+
     var btnQuickLogin = document.getElementById('btnQuickLoginOfficer');
-    if (btnQuickLogin) btnQuickLogin.addEventListener('click', handleQuickLogin);
+    if (btnQuickLogin) {
+      btnQuickLogin.addEventListener('click', function() {
+        var userInp = document.getElementById('loginUsername');
+        var passInp = document.getElementById('loginPassword');
+        if (userInp) userInp.value = 'admin_koncho';
+        if (passInp) passInp.value = 'koncho123';
+        selectedRole = 'Administrator';
+        handleLoginSubmit();
+      });
+    }
+
     var btnLogout = document.getElementById('btnLogout');
     if (btnLogout) btnLogout.addEventListener('click', handleLogout);
 
@@ -765,38 +858,49 @@
       html += '<div class="case-row-actions">';
       html += '<div class="action-primary-group">';
 
-      if (statusKey === 'open') {
-        html += '<button class="btn-act btn-act-inprogress btn-trigger-inprog" data-id="' + escapeHtml(item.id) + '">';
-        html += '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>';
-        html += '<span>Proses (In Progress)</span>';
-        html += '</button>';
+      var currentRole = (state.authUser && state.authUser.role) ? state.authUser.role : 'Administrator';
 
-        html += '<button class="btn-act btn-act-closed btn-trigger-closed" data-id="' + escapeHtml(item.id) + '">';
-        html += '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
-        html += '<span>Selesaikan (Closed)</span>';
-        html += '</button>';
-      } else if (statusKey === 'inprogress') {
-        html += '<button class="btn-act btn-act-closed btn-trigger-closed" data-id="' + escapeHtml(item.id) + '">';
-        html += '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
-        html += '<span>Selesaikan Kasus (Closed)</span>';
-        html += '</button>';
-
-        html += '<button class="btn-act btn-act-update btn-trigger-inprog" data-id="' + escapeHtml(item.id) + '" data-update="true">';
-        html += '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>';
-        html += '<span>+ Update Keterangan</span>';
-        html += '</button>';
-
-        html += '<button class="btn-act btn-act-reopen btn-trigger-reopen" data-id="' + escapeHtml(item.id) + '" data-target="Open">';
-        html += '<span>↩️ Buka Kembali ke Open</span>';
-        html += '</button>';
-      } else if (statusKey === 'closed') {
-        html += '<span style="font-size:12.5px; font-weight:700; color:var(--status-closed-color); display:inline-flex; align-items:center; gap:5px; margin-right:4px;">';
-        html += '✓ Kasus Telah Ditutup';
+      if (currentRole === 'Inputer') {
+        // Role Inputer: HANYA BISA INPUT DATA, TIDAK BISA EDIT!
+        html += '<span class="badge-role-readonly" title="Role Inputer hanya berwenang menambah kasus baru, tidak dapat mengubah status.">';
+        html += '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
+        html += '<span>Mode Inputer (Hanya Baca • Akses Edit Dibatasi)</span>';
         html += '</span>';
+      } else {
+        // Role Administrator & Facilitator: BISA UPDATE STATUS SAMPAI CLOSED!
+        if (statusKey === 'open') {
+          html += '<button class="btn-act btn-act-inprogress btn-trigger-inprog" data-id="' + escapeHtml(item.id) + '">';
+          html += '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polygon points="5 3 19 12 5 21 5 3"/></svg>';
+          html += '<span>Proses (In Progress)</span>';
+          html += '</button>';
 
-        html += '<button class="btn-act btn-act-reopen btn-trigger-reopen" data-id="' + escapeHtml(item.id) + '" data-target="InProgress">';
-        html += '<span>🔄 Buka Kembali (Reopen)</span>';
-        html += '</button>';
+          html += '<button class="btn-act btn-act-closed btn-trigger-closed" data-id="' + escapeHtml(item.id) + '">';
+          html += '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+          html += '<span>Selesaikan (Closed)</span>';
+          html += '</button>';
+        } else if (statusKey === 'inprogress') {
+          html += '<button class="btn-act btn-act-closed btn-trigger-closed" data-id="' + escapeHtml(item.id) + '">';
+          html += '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>';
+          html += '<span>Selesaikan Kasus (Closed)</span>';
+          html += '</button>';
+
+          html += '<button class="btn-act btn-act-update btn-trigger-inprog" data-id="' + escapeHtml(item.id) + '" data-update="true">';
+          html += '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>';
+          html += '<span>+ Update Keterangan</span>';
+          html += '</button>';
+
+          html += '<button class="btn-act btn-act-reopen btn-trigger-reopen" data-id="' + escapeHtml(item.id) + '" data-target="Open">';
+          html += '<span>↩️ Buka Kembali ke Open</span>';
+          html += '</button>';
+        } else if (statusKey === 'closed') {
+          html += '<span style="font-size:12.5px; font-weight:700; color:var(--status-closed-color); display:inline-flex; align-items:center; gap:5px; margin-right:4px;">';
+          html += '✓ Kasus Telah Ditutup';
+          html += '</span>';
+
+          html += '<button class="btn-act btn-act-reopen btn-trigger-reopen" data-id="' + escapeHtml(item.id) + '" data-target="InProgress">';
+          html += '<span>🔄 Buka Kembali (Reopen)</span>';
+          html += '</button>';
+        }
       }
 
       html += '</div>';
@@ -898,6 +1002,10 @@
    * =========================================================================
    */
   function openInProgressModal(ticketId, isUpdateOnly) {
+    if (state.authUser && state.authUser.role === 'Inputer') {
+      showToast('Akses ditolak: Role Inputer hanya berwenang menambah kasus baru, tidak dapat mengubah status.', 'error');
+      return;
+    }
     var ticket = state.records.find(function(r) { return r.id === ticketId; });
     if (!ticket) return;
 
@@ -1034,6 +1142,10 @@
    * =========================================================================
    */
   function openClosedModal(ticketId) {
+    if (state.authUser && state.authUser.role === 'Inputer') {
+      showToast('Akses ditolak: Role Inputer tidak berwenang menyelesaikan/menutup status kasus.', 'error');
+      return;
+    }
     var ticket = state.records.find(function(r) { return r.id === ticketId; });
     if (!ticket) return;
 
@@ -1168,6 +1280,10 @@
    * Reopen / Kembalikan Status
    */
   function handleQuickReopen(ticketId, targetStatus) {
+    if (state.authUser && state.authUser.role === 'Inputer') {
+      showToast('Akses ditolak: Role Inputer tidak dapat membuka kembali atau mengubah status kasus.', 'error');
+      return;
+    }
     var ticket = state.records.find(function(r) { return r.id === ticketId; });
     if (!ticket) return;
 
@@ -1388,6 +1504,10 @@
    * =========================================================================
    */
   function openNewModal() {
+    if (state.authUser && state.authUser.role === 'Facilitator') {
+      showToast('Akses ditolak: Role Facilitator bertugas memfasilitasi status kasus hingga closed.', 'error');
+      return;
+    }
     setNewModalService('MOBILE');
     dom.newDataModal.classList.add('active');
     dom.inputCaseIssue.focus();
@@ -1417,6 +1537,11 @@
   }
 
   function handleSubmitNewReport() {
+    if (state.authUser && state.authUser.role === 'Facilitator') {
+      showToast('Akses ditolak: Role Facilitator tidak memiliki hak untuk menginput data kasus baru.', 'error');
+      closeNewModal();
+      return;
+    }
     var issue = dom.inputCaseIssue.value.trim();
     var req = dom.inputRequestor.value.trim();
     var st = dom.inputStatus.value;

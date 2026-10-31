@@ -270,20 +270,39 @@
   }
 
   /* =========================================================================
-     2. APP LAYOUT: SIDEBAR KIRI + AREA UTAMA KANAN
+     2. APP LAYOUT: FULL WIDTH VERTICAL WRAPPER + SIDEBAR KIRI + AREA KANAN
      ========================================================================= */
+  .app-main-wrapper {
+    display: flex !important;
+    flex-direction: column !important;
+    width: 100% !important;
+    min-height: 100vh;
+    background-color: var(--bg-app);
+    position: relative;
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
   .app-layout {
     flex: 1;
-    display: flex;
-    min-height: calc(100vh - 66px);
+    display: flex !important;
+    flex-direction: row !important;
+    width: 100% !important;
+    min-height: calc(100vh - 72px);
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
   }
 
   /* -------------------------------------------------------------------------
-     SIDEBAR KIRI (SEBELAH KIRI)
+     SIDEBAR KIRI (SEBELAH KIRI FLUSH)
      Memuat: Semua Layanan, Bulan, dan Total Kasus
      ------------------------------------------------------------------------- */
   .sidebar-left {
     width: 270px;
+    min-width: 270px;
+    max-width: 270px;
     background: var(--bg-card);
     border-right: 1px solid var(--border-color);
     display: flex;
@@ -293,9 +312,11 @@
     flex-shrink: 0;
     position: sticky;
     top: 72px;
+    left: 0;
     height: calc(100vh - 72px);
     overflow-y: auto;
     z-index: 30;
+    box-sizing: border-box;
   }
 
   .sidebar-block {
@@ -1516,8 +1537,112 @@
     color: var(--text-primary);
   }
   .user-role {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 1px;
+  }
+  .badge-role {
     font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: 0.3px;
+    text-transform: uppercase;
+    padding: 1px 7px;
+    border-radius: var(--radius-full);
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+    line-height: 1.3;
+  }
+  .role-admin {
+    background: rgba(139, 92, 246, 0.2);
+    color: #c4b5fd;
+    border: 1px solid rgba(139, 92, 246, 0.4);
+  }
+  .role-facilitator {
+    background: rgba(245, 158, 11, 0.2);
+    color: #fcd34d;
+    border: 1px solid rgba(245, 158, 11, 0.4);
+  }
+  .role-inputer {
+    background: rgba(16, 185, 129, 0.2);
+    color: #6ee7b7;
+    border: 1px solid rgba(16, 185, 129, 0.4);
+  }
+  .badge-role-readonly {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 11.5px;
+    font-weight: 600;
     color: var(--text-muted);
+    background: var(--bg-elevated);
+    border: 1px dashed var(--border-color);
+    padding: 5px 12px;
+    border-radius: var(--radius-sm);
+  }
+
+  /* Preset Selector Peran pada Login Card */
+  .role-selector-wrap {
+    margin-bottom: 16px;
+  }
+  .role-selector-title {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: #94a3b8;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .role-presets-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 8px;
+  }
+  .btn-role-preset {
+    background: #0d1627;
+    border: 1px solid #1e293b;
+    border-radius: 10px;
+    padding: 10px 6px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    gap: 4px;
+    cursor: pointer;
+    transition: var(--transition);
+    color: #94a3b8;
+  }
+  .btn-role-preset:hover {
+    border-color: #6366f1;
+    background: #141f36;
+    transform: translateY(-1px);
+  }
+  .btn-role-preset.active {
+    border-color: #f6c84c;
+    background: rgba(246, 200, 76, 0.12);
+    box-shadow: 0 0 12px rgba(246, 200, 76, 0.25);
+    color: #f8fafc;
+  }
+  .btn-role-preset .role-icon {
+    font-size: 18px;
+    line-height: 1;
+  }
+  .btn-role-preset .role-info strong {
+    display: block;
+    font-size: 11px;
+    font-weight: 800;
+    color: #f1f5f9;
+  }
+  .btn-role-preset .role-info span {
+    display: block;
+    font-size: 9px;
+    opacity: 0.75;
+    line-height: 1.2;
+    margin-top: 2px;
   }
   .btn-logout {
     display: inline-flex;
