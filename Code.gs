@@ -12,43 +12,43 @@ var CONFIG = {
   SHEET_MOBILE: 'Mobile',
   SHEET_FIXED: 'Fixed',
   SHEET_LOG: 'Log_Komunikasi',
-  // Sesuai struktur kolom user:
-  // Kolom A: ID_Tiket / Tanggal
-  // Kolom B: Total Case Isu yang masuk
-  // Kolom C: Nomor_Layanan (MSISDN / Internet)
-  // Kolom D: Nama_Pelanggan
-  // Kolom E: Wilayah_Cluster
-  // Kolom F: Kategori_Keluhan
+  // Sesuai struktur kolom formulir dan sheet user:
+  // Kolom A: ID_Tiket / No
+  // Kolom B: Bulan - Tahun
+  // Kolom C: Case Isu yang Masuk
+  // Kolom D: Issue Details (Description)
+  // Kolom E: Progress & Quick Win (Temporary Solution)
+  // Kolom F: Need Support
   // Kolom G: Requestor
   // Kolom H: Status (Open, InProgress, Closed)
   // Kolom I: Follow up to
+  // Kolom J: Status Update
+  // Kolom K: Terakhir_Update
   DEFAULT_HEADERS_MOBILE: [
     'ID_Tiket', 
-    'Total Case Isu yang masuk', 
-    'Nomor_MSISDN', 
-    'Nama_Pelanggan', 
-    'Regional_Cluster', 
-    'Kategori_Keluhan', 
+    'Bulan - Tahun',
+    'Case Isu yang Masuk', 
+    'Issue Details (Description)', 
+    'Progress & Quick Win (Temporary Solution)', 
+    'Need Support', 
     'Requestor', 
     'Status', 
     'Follow up to', 
-    'Detail_Kendala', 
-    'Terakhir_Update', 
-    'Status_Informasi'
+    'Status Update', 
+    'Terakhir_Update'
   ],
   DEFAULT_HEADERS_FIXED: [
     'ID_Tiket', 
-    'Total Case Isu yang masuk', 
-    'Nomor_Internet_PSTN', 
-    'Nama_Pelanggan', 
-    'Witel_Datel', 
-    'Kategori_Kendala', 
+    'Bulan - Tahun',
+    'Case Isu yang Masuk', 
+    'Issue Details (Description)', 
+    'Progress & Quick Win (Temporary Solution)', 
+    'Need Support', 
     'Requestor', 
     'Status', 
     'Follow up to', 
-    'Detail_Kendala', 
-    'Terakhir_Update', 
-    'Status_Informasi'
+    'Status Update', 
+    'Terakhir_Update'
   ],
   DEFAULT_HEADERS_LOG: [
     'Log_ID', 'ID_Tiket', 'Tipe_Layanan', 'Pengirim', 'Pesan_Update', 
@@ -701,16 +701,22 @@ function getLogRecords(ss) {
 function submitNewData(payload) {
   try {
     var ss = getSpreadsheet();
-    var sheetName = payload.serviceType === 'MOBILE' ? CONFIG.SHEET_MOBILE : CONFIG.SHEET_FIXED;
-    var defaultHeaders = payload.serviceType === 'MOBILE' ? CONFIG.DEFAULT_HEADERS_MOBILE : CONFIG.DEFAULT_HEADERS_FIXED;
-    var sheet = ensureSheet(ss, sheetName, defaultHeaders);
+    var isFixed = (payload && payload.serviceType === 'FIXED');
+    var sheetName = isFixed ? CONFIG.SHEET_FIXED : CONFIG.SHEET_MOBILE;
+    var defaultHeaders = isFixed ? CONFIG.DEFAULT_HEADERS_FIXED : CONFIG.DEFAULT_HEADERS_MOBILE;
+    
+    // Cari sheet secara cerdas (mendukung 'Mobile', 'CHO Mobile', 'Fixed', 'CHO Fixed', dll)
+    var sheet = findBestSheet(ss, sheetName);
+    if (!sheet) {
+      sheet = ensureSheet(ss, sheetName, defaultHeaders);
+    }
     ensureTrackingColumns(sheet);
     
     var lastCol = sheet.getLastColumn();
     var headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0].map(function(h) { return String(h).trim(); });
     
     // Buat Ticket ID baru yang unik
-    var prefix = payload.serviceType === 'MOBILE' ? 'CHO-M' : 'CHO-F';
+    var prefix = isFixed ? 'CHO-F' : 'CHO-M';
     var now = new Date();
     var dateStr = Utilities.formatDate(now, Session.getScriptTimeZone() || 'Asia/Jakarta', 'yyyyMMdd');
     var randomSuffix = Math.floor(1000 + Math.random() * 9000);
@@ -718,25 +724,37 @@ function submitNewData(payload) {
     
     var formattedDate = Utilities.formatDate(now, Session.getScriptTimeZone() || 'Asia/Jakarta', 'yyyy-MM-dd HH:mm:ss');
     var finalStatus = normalizeStatus(payload.status || 'Open');
+    var defaultMonth = Utilities.formatDate(now, Session.getScriptTimeZone() || 'Asia/Jakarta', 'MMMM yyyy');
+    var selectedMonth = payload.bulan || defaultMonth;
 
-    // Susun baris baru sesuai urutan header yang ada di sheet
+    // Susun baris baru sesuai urutan header yang ada di sheet target (Mobile / Fixed)
     var newRow = [];
     for (var c = 0; c < headers.length; c++) {
       var headerNorm = headers[c].toLowerCase().replace(/[^a-z0-9]/g, '');
       var val = '';
       
-      if (headerNorm.indexOf('idtiket') >= 0 || headerNorm === 'id' || headerNorm === 'ticketid' || c === 0) {
+      if (headerNorm.indexOf('idtiket') >= 0 || headerNorm === 'id' || headerNorm === 'ticketid' || headerNorm === 'no' || c === 0) {
         val = ticketId;
-      } else if (headerNorm.indexOf('totalcase') >= 0 || headerNorm.indexOf('isu') >= 0 || c === 1) {
-        val = payload.totalCaseIsu || payload.detail || 'Isu Kasus CHO';
-      } else if (headerNorm.indexOf('requestor') >= 0 || c === 6) {
+      } else if (headerNorm.indexOf('bulan') >= 0 || headerNorm.indexOf('month') >= 0 || headerNorm.indexOf('periode') >= 0 || c === 1) {
+        val = selectedMonth;
+      } else if (headerNorm.indexOf('mainissue') >= 0 || headerNorm.indexOf('caseisu') >= 0 || headerNorm.indexOf('totalcase') >= 0 || headerNorm.indexOf('isu') >= 0 || c === 2) {
+        val = payload.totalCaseIsu || payload.caseIssue || payload.issue || 'Isu Kasus CHO';
+      } else if (headerNorm.indexOf('issuedetail') >= 0 || headerNorm.indexOf('description') >= 0 || headerNorm.indexOf('detail') >= 0 || headerNorm.indexOf('kendala') >= 0 || c === 3) {
+        val = payload.detail || payload.issueDetails || '';
+      } else if (headerNorm.indexOf('progress') >= 0 || headerNorm.indexOf('quickwin') >= 0 || headerNorm.indexOf('temporary') >= 0 || headerNorm.indexOf('solusi') >= 0 || c === 4) {
+        val = payload.progressQuickWin || payload.progress || '';
+      } else if (headerNorm.indexOf('needsupport') >= 0 || headerNorm.indexOf('support') >= 0 || headerNorm.indexOf('bantuan') >= 0 || c === 5) {
+        val = payload.needSupport || '';
+      } else if (headerNorm.indexOf('requestor') >= 0 || headerNorm.indexOf('pemohon') >= 0 || headerNorm.indexOf('pelapor') >= 0 || c === 6) {
         val = payload.requestor || payload.pic || 'Requestor';
-      } else if (headerNorm.indexOf('statusinformasi') >= 0) {
-        val = 'Laporan Baru';
+      } else if (headerNorm.indexOf('statusinformasi') >= 0 || headerNorm.indexOf('statusupdate') >= 0) {
+        val = (finalStatus === 'Open') ? 'Belum Ada Update' : 'Laporan Baru';
       } else if (headerNorm.indexOf('status') >= 0 || c === 7) {
         val = finalStatus;
       } else if (headerNorm.indexOf('followup') >= 0 || c === 8) {
         val = payload.followUpTo || '-';
+      } else if (headerNorm.indexOf('terakhirupdate') >= 0 || headerNorm.indexOf('lastupdate') >= 0) {
+        val = formattedDate;
       } else if (headerNorm.indexOf('tanggal') >= 0 || headerNorm.indexOf('date') >= 0) {
         val = formattedDate;
       } else if (headerNorm.indexOf('msisdn') >= 0 || headerNorm.indexOf('internet') >= 0 || headerNorm.indexOf('nomor') >= 0) {
@@ -745,12 +763,8 @@ function submitNewData(payload) {
         val = payload.namaPelanggan || '';
       } else if (headerNorm.indexOf('kategori') >= 0) {
         val = payload.kategori || '';
-      } else if (headerNorm.indexOf('detail') >= 0 || headerNorm.indexOf('kendala') >= 0) {
-        val = payload.detail || '';
       } else if (headerNorm.indexOf('pic') >= 0) {
         val = payload.pic || payload.requestor || 'CHO Team';
-      } else if (headerNorm.indexOf('terakhirupdate') >= 0) {
-        val = formattedDate;
       } else if (payload.customFields && payload.customFields[headers[c]] !== undefined) {
         val = payload.customFields[headers[c]];
       }
@@ -763,9 +777,10 @@ function submitNewData(payload) {
     // Rekam log awal di Log_Komunikasi
     var logSheet = ensureSheet(ss, CONFIG.SHEET_LOG, CONFIG.DEFAULT_HEADERS_LOG);
     var logId = 'LOG-' + dateStr + '-' + Math.floor(1000 + Math.random() * 9000);
-    var initialMessage = 'Laporan baru dibuat oleh Requestor: ' + (payload.requestor || '-') + 
-      '. Isu: ' + (payload.totalCaseIsu || payload.detail || '-') + 
-      ' [Follow up to: ' + (payload.followUpTo || '-') + ']';
+    var initialMessage = 'Laporan baru dibuat untuk Unit ' + (isFixed ? 'CHO Fixed' : 'CHO Mobile') + 
+      ' [Bulan: ' + selectedMonth + '] oleh Requestor: ' + (payload.requestor || '-') + 
+      '. Isu: ' + (payload.totalCaseIsu || payload.caseIssue || '-') + 
+      ' [Progress & Quick Win: ' + (payload.progressQuickWin || '-') + ']';
     
     logSheet.appendRow([
       logId,
@@ -781,8 +796,10 @@ function submitNewData(payload) {
     return {
       success: true,
       ticketId: ticketId,
+      serviceType: payload.serviceType,
+      sheetName: sheet.getName(),
       timestamp: formattedDate,
-      message: 'Kasus ' + ticketId + ' berhasil ditambahkan!'
+      message: 'Kasus ' + ticketId + ' berhasil ditambahkan ke sheet ' + sheet.getName() + '!'
     };
   } catch (err) {
     Logger.log('Error in submitNewData: ' + err.stack);

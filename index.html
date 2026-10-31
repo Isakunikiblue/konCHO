@@ -2625,6 +2625,7 @@
 
 
 
+
 </head>
 <body data-theme="dark">
 
@@ -3189,50 +3190,62 @@
 
         <div class="modal-body">
           
-          <!-- Toggle Tipe Layanan -->
+          <!-- Toggle Tipe Layanan (CHO Mobile vs CHO Fixed) -->
           <div class="form-group">
             <label class="form-label">Pilih Sheet Database Layanan <span class="req-star">*</span></label>
             <div class="modal-service-toggle">
               <button type="button" class="service-toggle-btn active" id="toggleMobile">
-                📱 CHO Mobile
+                📱 CHO Mobile (Sheet Mobile)
               </button>
               <button type="button" class="service-toggle-btn" id="toggleFixed">
-                🌐 CHO Fixed
+                🌐 CHO Fixed (Sheet Fixed)
               </button>
             </div>
           </div>
 
-          <!-- Kolom B: Total Case Isu -->
-          <div class="form-group">
-            <label class="form-label" for="inputCaseIssue">
-              Total Case Isu yang Masuk (Kolom B) <span class="req-star">*</span>
-            </label>
-            <input type="text" id="inputCaseIssue" class="form-control" placeholder="Contoh: Kendala charge MU pada paket bundling...">
-          </div>
-
+          <!-- Baris 1: Bulan - Tahun & Requestor -->
           <div class="form-row-2">
-            <!-- Kolom G: Requestor -->
+            <div class="form-group">
+              <label class="form-label" for="inputBulanTahun">
+                Bulan - Tahun <span class="req-star">*</span>
+              </label>
+              <select id="inputBulanTahun" class="form-control">
+                <option value="Januari 2026">Januari 2026</option>
+                <option value="Februari 2026">Februari 2026</option>
+                <option value="Maret 2026">Maret 2026</option>
+                <option value="April 2026">April 2026</option>
+                <option value="Mei 2026">Mei 2026</option>
+                <option value="Juni 2026">Juni 2026</option>
+                <option value="Juli 2026">Juli 2026</option>
+                <option value="Agustus 2026">Agustus 2026</option>
+                <option value="September 2026">September 2026</option>
+                <option value="Oktober 2026" selected>Oktober 2026</option>
+                <option value="November 2026">November 2026</option>
+                <option value="Desember 2026">Desember 2026</option>
+              </select>
+            </div>
+
             <div class="form-group">
               <label class="form-label" for="inputRequestor">
-                Requestor / Pemohon (Kolom G) <span class="req-star">*</span>
+                Requestor <span class="req-star">*</span>
               </label>
-              <input type="text" id="inputRequestor" class="form-control" placeholder="Contoh: Dimas (B2B Care) / Call Center 188">
-            </div>
-
-            <!-- Kolom I: Follow up to -->
-            <div class="form-group">
-              <label class="form-label" for="inputFollowUp">
-                Follow Up To (Kolom I) <span class="req-star">*</span>
-              </label>
-              <input type="text" id="inputFollowUp" class="form-control" placeholder="Contoh: Tim RO / Tim Splicing Lapangan">
+              <input type="text" id="inputRequestor" class="form-control" placeholder="Contoh: Dimas (B2B Care) / Call Center 188 / Customer Care">
             </div>
           </div>
 
+          <!-- Baris 2: Case Isu yang Masuk -->
+          <div class="form-group">
+            <label class="form-label" for="inputCaseIssue">
+              Case Isu yang Masuk <span class="req-star">*</span>
+            </label>
+            <input type="text" id="inputCaseIssue" class="form-control" placeholder="Contoh: Kendala charge MU pada paket bundling / Perhitungan Paket PDD...">
+          </div>
+
+          <!-- Baris 3: Status Awal & Progress & Quick Win (Temporary Solution) -->
           <div class="form-row-2">
-            <!-- Kolom H: Status Awal -->
             <div class="form-group">
               <label class="form-label" for="inputStatus">
-                Status Awal (Kolom H)
+                Status Awal
               </label>
               <select id="inputStatus" class="form-control">
                 <option value="Open" selected>Open</option>
@@ -3241,32 +3254,54 @@
               </select>
             </div>
 
-            <!-- Nomor Layanan -->
             <div class="form-group">
-              <label class="form-label" id="lblNomorLayanan" for="inputNomorLayanan">
-                Nomor MSISDN Pelanggan <span class="req-star">*</span>
+              <label class="form-label" for="inputProgressQuickWin">
+                Progress & Quick Win (Temporary Solution)
               </label>
-              <input type="text" id="inputNomorLayanan" class="form-control" placeholder="Contoh: 081234567890">
+              <input type="text" id="inputProgressQuickWin" class="form-control" placeholder="Contoh: Remove MU berdasarkan KMI... / Eskalasi ke IT">
             </div>
           </div>
 
-          <div class="form-row-2">
-            <div class="form-group">
-              <label class="form-label" for="inputNamaPelanggan">Nama Pelanggan / Akun</label>
-              <input type="text" id="inputNamaPelanggan" class="form-control" placeholder="Contoh: PT Solusi Finansial">
-            </div>
-
-            <div class="form-group">
-              <label class="form-label" id="lblWilayah" for="inputWilayah">Regional / Cluster</label>
-              <input type="text" id="inputWilayah" class="form-control" placeholder="Contoh: Regional 2 / Sudirman">
-            </div>
-          </div>
-
-          <!-- Detail Kendala -->
+          <!-- Baris 4: Issue Details (Description) -->
           <div class="form-group">
-            <label class="form-label" for="inputDetail">Detail Kendala Awal</label>
-            <textarea id="inputDetail" class="form-control" rows="3" placeholder="Deskripsikan detail kendala kasus awal..."></textarea>
+            <label class="form-label" for="inputDetail">
+              Issue Details (Description) <span class="req-star">*</span>
+            </label>
+            <textarea id="inputDetail" class="form-control" rows="3" placeholder="Deskripsikan detail kendala kasus secara lengkap..."></textarea>
           </div>
+
+          <!-- Baris 5: Need Support -->
+          <div class="form-group">
+            <label class="form-label" for="inputNeedSupport">
+              Need Support
+            </label>
+            <textarea id="inputNeedSupport" class="form-control" rows="2" placeholder="Contoh: Optimalisasi proses fixing secara berkala, approval pengajuan keyword..."></textarea>
+          </div>
+
+          <!-- Opsional: Informasi Tambahan -->
+          <details style="margin-top: 6px; margin-bottom: 6px; font-size: 13px;">
+            <summary style="cursor: pointer; color: var(--primary-color); font-weight: 600; padding: 4px 0;">+ Info Tambahan (Follow Up To, Nomor Layanan / Akun - Opsional)</summary>
+            <div class="form-row-2" style="margin-top: 8px;">
+              <div class="form-group">
+                <label class="form-label" for="inputFollowUp">Follow Up To</label>
+                <input type="text" id="inputFollowUp" class="form-control" placeholder="Contoh: Tim RO / Tim Splicing Lapangan">
+              </div>
+              <div class="form-group">
+                <label class="form-label" id="lblNomorLayanan" for="inputNomorLayanan">Nomor Layanan / Akun</label>
+                <input type="text" id="inputNomorLayanan" class="form-control" placeholder="Contoh: 081234567890 / 122556677889">
+              </div>
+            </div>
+            <div class="form-row-2">
+              <div class="form-group">
+                <label class="form-label" for="inputNamaPelanggan">Nama Pelanggan / Akun</label>
+                <input type="text" id="inputNamaPelanggan" class="form-control" placeholder="Contoh: PT Solusi Finansial">
+              </div>
+              <div class="form-group">
+                <label class="form-label" id="lblWilayah" for="inputWilayah">Regional / Cluster</label>
+                <input type="text" id="inputWilayah" class="form-control" placeholder="Contoh: Regional 2 / Sudirman">
+              </div>
+            </div>
+          </details>
 
         </div>
 
@@ -3511,16 +3546,19 @@
     btnSubmitNewReport: document.getElementById('btnSubmitNewReport'),
     toggleMobile: document.getElementById('toggleMobile'),
     toggleFixed: document.getElementById('toggleFixed'),
+    inputBulanTahun: document.getElementById('inputBulanTahun'),
     inputCaseIssue: document.getElementById('inputCaseIssue'),
     inputRequestor: document.getElementById('inputRequestor'),
     inputStatus: document.getElementById('inputStatus'),
+    inputProgressQuickWin: document.getElementById('inputProgressQuickWin'),
+    inputDetail: document.getElementById('inputDetail'),
+    inputNeedSupport: document.getElementById('inputNeedSupport'),
     inputFollowUp: document.getElementById('inputFollowUp'),
     lblNomorLayanan: document.getElementById('lblNomorLayanan'),
     lblWilayah: document.getElementById('lblWilayah'),
     inputNomorLayanan: document.getElementById('inputNomorLayanan'),
     inputNamaPelanggan: document.getElementById('inputNamaPelanggan'),
     inputWilayah: document.getElementById('inputWilayah'),
-    inputDetail: document.getElementById('inputDetail'),
 
     // Toast
     toastContainer: document.getElementById('toastContainer')
@@ -5506,9 +5544,18 @@
       showToast('Akses ditolak: Role Facilitator bertugas memfasilitasi status kasus hingga closed.', 'error');
       return;
     }
-    setNewModalService('MOBILE');
+    if (state.activeServiceScope === 'FIXED') {
+      setNewModalService('FIXED');
+    } else {
+      setNewModalService('MOBILE');
+    }
+    if (dom.inputBulanTahun && state.activeMonthFilter !== 'all') {
+      dom.inputBulanTahun.value = state.activeMonthFilter;
+    }
     dom.newDataModal.classList.add('active');
-    dom.inputCaseIssue.focus();
+    setTimeout(function() {
+      if (dom.inputCaseIssue) dom.inputCaseIssue.focus();
+    }, 150);
   }
 
   function closeNewModal() {
@@ -5520,17 +5567,17 @@
     if (srv === 'MOBILE') {
       dom.toggleMobile.classList.add('active');
       dom.toggleFixed.classList.remove('active');
-      dom.lblNomorLayanan.textContent = 'Nomor MSISDN Pelanggan *';
-      dom.lblWilayah.textContent = 'Regional / Cluster';
-      dom.inputNomorLayanan.placeholder = 'Contoh: 081234567890';
-      dom.inputWilayah.placeholder = 'Contoh: Regional 2 / Sudirman';
+      if (dom.lblNomorLayanan) dom.lblNomorLayanan.textContent = 'Nomor MSISDN Pelanggan';
+      if (dom.lblWilayah) dom.lblWilayah.textContent = 'Regional / Cluster';
+      if (dom.inputNomorLayanan) dom.inputNomorLayanan.placeholder = 'Contoh: 081234567890';
+      if (dom.inputWilayah) dom.inputWilayah.placeholder = 'Contoh: Regional 2 / Sudirman';
     } else {
       dom.toggleFixed.classList.add('active');
       dom.toggleMobile.classList.remove('active');
-      dom.lblNomorLayanan.textContent = 'Nomor Internet / PSTN *';
-      dom.lblWilayah.textContent = 'Witel / Datel / ODP';
-      dom.inputNomorLayanan.placeholder = 'Contoh: 122456789012';
-      dom.inputWilayah.placeholder = 'Contoh: Witel Bandung / ODP-BDG-01';
+      if (dom.lblNomorLayanan) dom.lblNomorLayanan.textContent = 'Nomor Internet / PSTN';
+      if (dom.lblWilayah) dom.lblWilayah.textContent = 'Witel / Datel / ODP';
+      if (dom.inputNomorLayanan) dom.inputNomorLayanan.placeholder = 'Contoh: 122456789012';
+      if (dom.inputWilayah) dom.inputWilayah.placeholder = 'Contoh: Witel Bandung / ODP-BDG-01';
     }
   }
 
@@ -5542,52 +5589,66 @@
     }
     var issue = dom.inputCaseIssue.value.trim();
     var req = dom.inputRequestor.value.trim();
+    var bulan = dom.inputBulanTahun ? dom.inputBulanTahun.value : (state.activeMonthFilter !== 'all' ? state.activeMonthFilter : 'Oktober 2026');
     var st = dom.inputStatus.value;
-    var follow = dom.inputFollowUp.value.trim();
-    var nomor = dom.inputNomorLayanan.value.trim();
-    var nama = dom.inputNamaPelanggan.value.trim();
-    var wil = dom.inputWilayah.value.trim();
-    var detail = dom.inputDetail.value.trim();
+    var progressQW = dom.inputProgressQuickWin ? dom.inputProgressQuickWin.value.trim() : '';
+    var detail = dom.inputDetail ? dom.inputDetail.value.trim() : '';
+    var needSupport = dom.inputNeedSupport ? dom.inputNeedSupport.value.trim() : '';
+    var follow = dom.inputFollowUp ? dom.inputFollowUp.value.trim() : '-';
+    var nomor = dom.inputNomorLayanan ? dom.inputNomorLayanan.value.trim() : '-';
+    var nama = dom.inputNamaPelanggan ? dom.inputNamaPelanggan.value.trim() : '-';
+    var wil = dom.inputWilayah ? dom.inputWilayah.value.trim() : '-';
 
     if (!issue) {
-      showToast('Harap isi Total Case Isu yang Masuk (Kolom B)!', 'error');
+      showToast('Harap isi Case Isu yang Masuk!', 'error');
       dom.inputCaseIssue.focus();
       return;
     }
     if (!req) {
-      showToast('Harap isi Requestor (Kolom G)!', 'error');
+      showToast('Harap isi Requestor!', 'error');
       dom.inputRequestor.focus();
       return;
     }
-    if (!follow) {
-      showToast('Harap isi Follow Up To (Kolom I)!', 'error');
-      dom.inputFollowUp.focus();
+    if (!bulan) {
+      showToast('Harap tentukan Bulan - Tahun!', 'error');
+      if (dom.inputBulanTahun) dom.inputBulanTahun.focus();
       return;
     }
-    if (!nomor) {
-      showToast('Harap isi Nomor Layanan / MSISDN / Internet!', 'error');
-      dom.inputNomorLayanan.focus();
+    if (!detail) {
+      showToast('Harap isi Issue Details (Description)!', 'error');
+      if (dom.inputDetail) dom.inputDetail.focus();
       return;
     }
 
     var payload = {
       serviceType: selectedNewService,
+      bulan: bulan,
       totalCaseIsu: issue,
+      caseIssue: issue,
       requestor: req,
       status: st,
+      progressQuickWin: progressQW,
+      progress: progressQW,
+      detail: detail,
+      issueDetails: detail,
+      needSupport: needSupport,
       followUpTo: follow,
       nomorLayanan: nomor,
       namaPelanggan: nama,
-      detail: detail || issue,
       pic: req,
       customFields: {
+        'Bulan - Tahun': bulan,
+        'Case Isu yang Masuk': issue,
+        'Progress & Quick Win (Temporary Solution)': progressQW,
+        'Need Support': needSupport,
+        'Issue Details (Description)': detail,
         'Regional_Cluster': wil,
         'Witel_Datel': wil
       }
     };
 
     dom.btnSubmitNewReport.disabled = true;
-    dom.btnSubmitNewReport.innerHTML = '<span>Menyimpan ke Sheet...</span>';
+    dom.btnSubmitNewReport.innerHTML = '<span>Menyimpan ke Sheet ' + (selectedNewService === 'MOBILE' ? 'Mobile' : 'Fixed') + '...</span>';
 
     if (state.isGasEnvironment) {
       google.script.run
@@ -5633,18 +5694,20 @@
         var simRecord = {
           id: newId,
           serviceType: selectedNewService,
+          bulan: bulan,
           totalCaseIsu: issue,
           requestor: req,
           status: st,
           followUpTo: follow,
-          bulan: state.activeMonthFilter !== 'all' ? state.activeMonthFilter : 'Oktober 2026',
           tanggal: new Date().toISOString(),
-          nama: nama || '-',
+          nama: nama,
           nomorLayanan: nomor,
-          detail: detail || issue,
+          detail: detail,
+          progress: progressQW,
+          needSupport: needSupport,
           pic: req,
           terakhirUpdate: new Date().toISOString(),
-          statusInformasi: 'Ada Update Baru'
+          statusInformasi: st === 'Open' ? 'Belum Ada Update' : 'Ada Update Baru'
         };
 
         state.records.unshift(simRecord);
@@ -5652,20 +5715,25 @@
         resetNewForm();
         updateKpiCounters();
         renderCaseList();
-        showToast('Kasus #' + newId + ' berhasil ditambahkan!', 'success');
+        showToast('Kasus #' + newId + ' berhasil ditambahkan ke ' + (selectedNewService === 'MOBILE' ? 'CHO Mobile' : 'CHO Fixed') + '!', 'success');
       }, 350);
     }
   }
 
   function resetNewForm() {
+    if (dom.inputBulanTahun) {
+      dom.inputBulanTahun.value = state.activeMonthFilter !== 'all' ? state.activeMonthFilter : 'Oktober 2026';
+    }
     dom.inputCaseIssue.value = '';
     dom.inputRequestor.value = '';
-    dom.inputFollowUp.value = '';
-    dom.inputNomorLayanan.value = '';
-    dom.inputNamaPelanggan.value = '';
-    dom.inputWilayah.value = '';
-    dom.inputDetail.value = '';
     dom.inputStatus.value = 'Open';
+    if (dom.inputProgressQuickWin) dom.inputProgressQuickWin.value = '';
+    if (dom.inputDetail) dom.inputDetail.value = '';
+    if (dom.inputNeedSupport) dom.inputNeedSupport.value = '';
+    if (dom.inputFollowUp) dom.inputFollowUp.value = '';
+    if (dom.inputNomorLayanan) dom.inputNomorLayanan.value = '';
+    if (dom.inputNamaPelanggan) dom.inputNamaPelanggan.value = '';
+    if (dom.inputWilayah) dom.inputWilayah.value = '';
   }
 
   /**
@@ -5849,6 +5917,7 @@
 
 })();
 </script>
+
 
 
 
