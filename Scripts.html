@@ -205,6 +205,10 @@
     var appEl = document.getElementById('appView');
     if (appEl) appEl.style.display = 'none';
     if (loginEl) loginEl.style.display = 'flex';
+    var userInp = document.getElementById('loginUsername');
+    var passInp = document.getElementById('loginPassword');
+    if (userInp) userInp.value = '';
+    if (passInp) passInp.value = '';
   }
 
   function handleLoginSubmit(e) {
@@ -216,26 +220,45 @@
     var username = (userInp && userInp.value ? userInp.value : '').trim();
     var password = (passInp && passInp.value ? passInp.value : '').trim();
 
-    var role = selectedRole || 'Administrator';
-
-    // Deteksi Role Berdasarkan Input
-    if (username === 'admin_koncho' || username.toLowerCase().indexOf('admin') >= 0) {
-      role = 'Administrator';
-    } else if (username === 'facilitator_cho' || username.toLowerCase().indexOf('facilitator') >= 0) {
-      role = 'Facilitator';
-    } else if (username === 'inputer_cho' || username.toLowerCase().indexOf('input') >= 0) {
-      role = 'Inputer';
+    if (!username) {
+      showToast('Harap masukkan Nama Pengguna (Username)!', 'warning');
+      if (userInp) userInp.focus();
+      return;
     }
-
-    // Validasi Kata Sandi khusus admin_koncho
-    if (username === 'admin_koncho' && password && password !== 'koncho123') {
-      showToast('Kata sandi salah! Password untuk admin_koncho adalah: koncho123', 'error');
+    if (!password) {
+      showToast('Harap masukkan Kata Sandi (Password)!', 'warning');
       if (passInp) passInp.focus();
       return;
     }
 
-    if (!username) {
-      username = role === 'Administrator' ? 'admin_koncho' : (role === 'Facilitator' ? 'facilitator_cho' : 'inputer_cho');
+    var role = 'Administrator';
+    var uLower = username.toLowerCase();
+
+    // Deteksi Role Berdasarkan Input
+    if (username === 'admin_koncho' || uLower.indexOf('admin') >= 0) {
+      role = 'Administrator';
+      if (password !== 'koncho123') {
+        showToast('Kata sandi salah! Password untuk admin_koncho adalah: koncho123', 'error');
+        if (passInp) passInp.focus();
+        return;
+      }
+    } else if (username === 'facilitator_cho' || uLower.indexOf('facilitator') >= 0) {
+      role = 'Facilitator';
+      if (password !== 'koncho123') {
+        showToast('Kata sandi salah! Password untuk facilitator adalah: koncho123', 'error');
+        if (passInp) passInp.focus();
+        return;
+      }
+    } else if (username === 'inputer_cho' || uLower.indexOf('input') >= 0) {
+      role = 'Inputer';
+      if (password !== 'koncho123') {
+        showToast('Kata sandi salah! Password untuk inputer adalah: koncho123', 'error');
+        if (passInp) passInp.focus();
+        return;
+      }
+    } else {
+      // Default fallback
+      role = 'Administrator';
     }
 
     if (btnSubmit) {
@@ -249,15 +272,23 @@
         role: role,
         loginTime: new Date().toISOString()
       };
-      localStorage.setItem('koncho_auth_user', JSON.stringify(state.authUser));
-      if (btnSubmit) {
-        btnSubmit.innerHTML = '<span>Masuk ke Dashboard</span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
-        btnSubmit.style.opacity = '1';
+      
+      var rememberMe = document.getElementById('loginRememberMe');
+      if (rememberMe && rememberMe.checked) {
+        try {
+          localStorage.setItem('koncho_auth_user', JSON.stringify(state.authUser));
+        } catch (err) {}
       }
+
+      showToast('Selamat Datang di konCHO! Masuk sebagai ' + role + ' (' + username + ')', 'success');
       showDashboardApp();
       renderCaseList();
-      showToast('Selamat Datang di konCHO! Masuk sebagai ' + role + ' (' + username + ')', 'success');
-    }, 300);
+
+      if (btnSubmit) {
+        btnSubmit.innerHTML = '<span>Sign In</span> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
+        btnSubmit.style.opacity = '1';
+      }
+    }, 350);
   }
 
   function handleLogout() {
@@ -285,30 +316,48 @@
     var loginForm = document.getElementById('loginForm');
     if (loginForm) loginForm.addEventListener('submit', handleLoginSubmit);
 
-    // Role Presets pada Login Card (Admin, Facilitator, Inputer)
-    document.querySelectorAll('.btn-role-preset').forEach(function(btn) {
-      btn.addEventListener('click', function() {
-        document.querySelectorAll('.btn-role-preset').forEach(function(b) { b.classList.remove('active'); });
-        btn.classList.add('active');
-        selectedRole = btn.getAttribute('data-role') || 'Administrator';
-        var u = btn.getAttribute('data-user') || '';
-        var p = btn.getAttribute('data-pass') || '';
-        var userInp = document.getElementById('loginUsername');
-        var passInp = document.getElementById('loginPassword');
-        if (userInp) userInp.value = u;
-        if (passInp) passInp.value = p;
-      });
+    // Lamp Animation Interactive Toggle (Pull Cord & Lamp Head)
+    var lampContainer = document.getElementById('lampContainer');
+    var lampPullCord = document.getElementById('lampPullCord');
+    var lampHead = document.getElementById('lampHead');
+    var isLampOn = true;
+
+    function toggleLamp() {
+      isLampOn = !isLampOn;
+      if (lampContainer) {
+        if (isLampOn) {
+          lampContainer.classList.remove('lamp-off');
+        } else {
+          lampContainer.classList.add('lamp-off');
+        }
+      }
+      if (lampPullCord) {
+        lampPullCord.style.transform = 'translateY(14px)';
+        setTimeout(function() {
+          lampPullCord.style.transform = '';
+        }, 220);
+      }
+    }
+
+    if (lampPullCord) lampPullCord.addEventListener('click', toggleLamp);
+    if (lampHead) lampHead.addEventListener('click', function(e) {
+      if (e.target.id === 'lampPullCord' || (e.target.closest && e.target.closest('#lampPullCord'))) return;
+      toggleLamp();
     });
 
-    var btnQuickLogin = document.getElementById('btnQuickLoginOfficer');
-    if (btnQuickLogin) {
-      btnQuickLogin.addEventListener('click', function() {
-        var userInp = document.getElementById('loginUsername');
-        var passInp = document.getElementById('loginPassword');
-        if (userInp) userInp.value = 'admin_koncho';
-        if (passInp) passInp.value = 'koncho123';
-        selectedRole = 'Administrator';
-        handleLoginSubmit();
+    // Password Visibility Toggle (Show / Hide Password Eye Icon)
+    var btnTogglePassword = document.getElementById('btnTogglePassword');
+    var passInp = document.getElementById('loginPassword');
+    var eyeIconShow = document.getElementById('eyeIconShow');
+    var eyeIconHide = document.getElementById('eyeIconHide');
+    if (btnTogglePassword && passInp) {
+      btnTogglePassword.addEventListener('click', function(e) {
+        e.preventDefault();
+        var isPass = passInp.type === 'password';
+        passInp.type = isPass ? 'text' : 'password';
+        if (eyeIconShow) eyeIconShow.style.display = isPass ? 'none' : 'block';
+        if (eyeIconHide) eyeIconHide.style.display = isPass ? 'block' : 'none';
+        passInp.focus();
       });
     }
 
