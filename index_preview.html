@@ -221,27 +221,9 @@
     letter-spacing: 0.3px;
   }
 
-  .db-status-pill {
-    display: flex;
-    align-items: center;
-    gap: 7px;
-    padding: 4px 12px;
-    background: var(--bg-elevated);
-    border: 1px solid var(--border-color);
-    border-radius: var(--radius-full);
-    font-size: 11.5px;
-    color: var(--text-secondary);
-    font-weight: 500;
-    margin-left: 8px;
-  }
+  
 
-  .status-indicator-dot {
-    width: 8px;
-    height: 8px;
-    background: #10b981;
-    border-radius: 50%;
-    box-shadow: 0 0 8px #10b981;
-  }
+  
 
   .header-actions {
     display: flex;
@@ -715,21 +697,96 @@
   }
 
   /* Baris Item Kasus di dalam Card Tunggal (Divided by borders) */
+  .cases-card-body {
+    padding: 20px 24px;
+    background: transparent;
+    display: flex;
+    flex-direction: column;
+    gap: 18px; /* Jarak pemisah antar kotak case */
+  }
   .case-item-row {
     padding: 22px 24px;
-    border-bottom: 1px solid var(--border-color);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-lg);
     display: flex;
     flex-direction: column;
     gap: 14px;
-    transition: var(--transition);
+    transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
     position: relative;
     background: var(--bg-card);
-  }
-  .case-item-row:last-child {
-    border-bottom: none;
+    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.04);
   }
   .case-item-row:hover {
     background: var(--bg-card-hover);
+    border-color: rgba(99, 102, 241, 0.38);
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.08);
+    transform: translateY(-2px);
+  }
+  [data-theme="dark"] .case-item-row {
+    background: #0d1627;
+    border-color: #1e293b;
+    box-shadow: 0 4px 20px rgba(0, 0, 0, 0.35);
+  }
+  [data-theme="dark"] .case-item-row:hover {
+    border-color: rgba(246, 200, 76, 0.4);
+    box-shadow: 0 8px 30px rgba(0, 0, 0, 0.55);
+  }
+  
+  /* Beranda Simplified Case Card Styles */
+  .beranda-simple-main-issue {
+    margin: 4px 0 2px 0;
+  }
+  .beranda-simple-main-issue h3 {
+    margin: 0;
+    font-size: 16.5px;
+    font-weight: 800;
+    color: var(--text-primary);
+    line-height: 1.4;
+  }
+  .beranda-status-update-box {
+    background: rgba(59, 130, 246, 0.08);
+    border: 1px solid rgba(59, 130, 246, 0.25);
+    border-radius: var(--radius-md);
+    padding: 12px 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .beranda-status-update-box.update-closed {
+    background: rgba(16, 185, 129, 0.08);
+    border-color: rgba(16, 185, 129, 0.25);
+  }
+  .beranda-status-update-box.update-open {
+    background: rgba(245, 158, 11, 0.08);
+    border-color: rgba(245, 158, 11, 0.25);
+  }
+  .beranda-status-update-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 11px;
+    font-weight: 700;
+  }
+  .beranda-status-update-text {
+    font-size: 13.5px;
+    color: var(--text-primary);
+    line-height: 1.45;
+  }
+  .btn-toggle-details {
+    background: none;
+    border: none;
+    color: var(--text-muted);
+    font-size: 11.5px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 4px 0;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    transition: color 0.2s;
+  }
+  .btn-toggle-details:hover {
+    color: var(--primary-color);
   }
 
   /* Status Border Kiri */
@@ -1490,9 +1547,7 @@
     .app-header {
       padding: 0 14px;
     }
-    .db-status-pill {
-      display: none;
-    }
+    
     .form-row-2 {
       grid-template-columns: 1fr;
     }
@@ -2421,8 +2476,7 @@
     background: #fbbf24;
     animation: pulseDot 1.5s infinite;
   }
-  @keyframes pulseDot {
-    0%, 100% { transform: scale(1); opacity: 1; }
+  
     50% { transform: scale(1.4); opacity: 0.5; }
   }
   .col-j-time {
@@ -2435,6 +2489,9 @@
     line-height: 1.5;
   }
 </style>
+
+
+
 
 
 
@@ -2563,10 +2620,7 @@
           </div>
           <p class="brand-sub">Complaint Handling Officer • Mobile & Fixed</p>
         </div>
-        <div class="db-status-pill" title="Terhubung langsung ke Google Spreadsheet">
-          <span class="status-indicator-dot"></span>
-          <span id="connStatusText">Connected: Sheet 1bqisp...</span>
-        </div>
+        
       </div>
 
       <div class="header-actions">
@@ -2603,7 +2657,7 @@
         <!-- Tombol Input Kasus Baru (Disediakan untuk Administrator & Inputer) -->
         <button class="btn-hdr btn-primary" id="btnOpenNewModal">
           <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-          <span>+ Input Kasus Baru</span>
+          <span>+ Input Case Baru</span>
         </button>
       </div>
     </header>
@@ -2617,13 +2671,13 @@
         <!-- Section 1: Filter Layanan -->
         <div class="sidebar-block">
           <div class="sidebar-block-title">
-            <span>Layanan Database</span>
+            <span>Unit</span>
           </div>
           <div class="sidebar-nav-list" role="tablist">
             <button class="sidebar-nav-btn active" data-service="ALL" data-sheet="ALL" id="navAll">
               <div class="nav-btn-left">
                 <span class="nav-icon">📊</span>
-                <span class="nav-text">Semua Layanan</span>
+                <span class="nav-text">Semua Unit</span>
               </div>
               <span class="nav-badge" id="badgeServiceAll">ALL</span>
             </button>
@@ -2654,12 +2708,19 @@
           <div class="sidebar-month-wrapper">
             <span class="month-icon">📅</span>
             <select id="monthFilterSelect" class="sidebar-month-select" aria-label="Filter Periode Bulan">
-              <option value="Oktober" selected>Oktober 2026</option>
-              <option value="September">September 2026</option>
-              <option value="Agustus">Agustus 2026</option>
-              <option value="Juli">Juli 2026</option>
+              <option value="all" selected>Semua Periode (Januari - Desember)</option>
+              <option value="Januari">Januari 2026</option>
+              <option value="Februari">Februari 2026</option>
+              <option value="Maret">Maret 2026</option>
+              <option value="April">April 2026</option>
+              <option value="Mei">Mei 2026</option>
               <option value="Juni">Juni 2026</option>
-              <option value="all">Semua Periode Bulan</option>
+              <option value="Juli">Juli 2026</option>
+              <option value="Agustus">Agustus 2026</option>
+              <option value="September">September 2026</option>
+              <option value="Oktober">Oktober 2026</option>
+              <option value="November">November 2026</option>
+              <option value="Desember">Desember 2026</option>
             </select>
           </div>
         </div>
@@ -2667,7 +2728,7 @@
         <!-- Section 3: Ringkasan Status Kasus (KPI Interaktif) -->
         <div class="sidebar-block">
           <div class="sidebar-block-title">
-            <span>Status Kasus (Kolom H)</span>
+            <span>Status Case (Kolom H)</span>
           </div>
           <div class="sidebar-kpi-list">
             <!-- BERANDA (KONSOLIDASI MOBILE & FIXED) -->
@@ -2761,7 +2822,7 @@
           <!-- Header Card Tunggal -->
           <div class="cases-card-header">
             <div class="header-card-left">
-              <h2 class="cases-card-title">Daftar Kasus Isu CHO</h2>
+              <h2 class="cases-card-title">Daftar Case Isu CHO</h2>
               <span class="cases-count-badge" id="caseCountBadge">Memuat kasus...</span>
             </div>
             <div class="header-card-right">
@@ -2967,7 +3028,7 @@
         <div class="modal-head">
           <div class="modal-title-wrap">
             <div class="modal-kicker">Tambah Data Laporan</div>
-            <h2 class="modal-title">Input Kasus Isu CHO Baru</h2>
+            <h2 class="modal-title">Input Case Isu CHO Baru</h2>
           </div>
           <button class="modal-close-btn" id="btnCloseModal" title="Tutup">✕</button>
         </div>
@@ -3208,7 +3269,7 @@
     mobileHeaders: [],
     fixedHeaders: [],
     activeServiceScope: 'ALL',      // 'ALL' | 'MOBILE' | 'FIXED'
-    activeMonthFilter: 'Oktober',   // Default aktif: 'Oktober'
+    activeMonthFilter: 'all',   // Default aktif: 'Oktober'
     activeStatusFilter: 'all',      // 'all' | 'Open' | 'InProgress' | 'Closed'
     searchQuery: '',
     currentActionTicket: null,      // Tiket yang sedang ditargetkan oleh modal
@@ -3222,7 +3283,7 @@
     btnRefresh: document.getElementById('btnRefresh'),
     btnToggleTheme: document.getElementById('btnToggleTheme'),
     themeIcon: document.getElementById('themeIcon'),
-    connStatusText: document.getElementById('connStatusText'),
+    
     btnOpenNewModal: document.getElementById('btnOpenNewModal'),
 
     // Sidebar Kiri
@@ -4009,12 +4070,12 @@
 
   function updateScopeLabel() {
     if (!dom.activeScopeLabel) return;
-    var srvText = 'Semua Layanan';
+    var srvText = 'Semua Unit';
     if (state.activeServiceScope === 'MOBILE') srvText = 'CHO Mobile';
     else if (state.activeServiceScope === 'FIXED') srvText = 'CHO Fixed';
 
-    var monthText = state.activeMonthFilter === 'all' ? 'Semua Periode' : state.activeMonthFilter;
-    dom.activeScopeLabel.textContent = 'Layanan: ' + srvText + ' • Periode: ' + monthText;
+    var monthText = state.activeMonthFilter === 'all' ? 'Semua Periode (Jan - Des)' : state.activeMonthFilter;
+    dom.activeScopeLabel.textContent = 'Unit: ' + srvText + ' • Periode: ' + monthText;
   }
 
   /**
@@ -4048,7 +4109,7 @@
         .then(function(res) {
           if (res && res.success) {
             processLoadedData(res);
-            if (dom.connStatusText) dom.connStatusText.textContent = 'Live API: Sheet 1bqisp...';
+            
             if (showToastAlert) showToast('Data live terhubung dari Google Spreadsheet!', 'success');
           } else {
             console.warn('API returned error, using fallback:', res);
@@ -4068,7 +4129,7 @@
     setTimeout(function() {
       var mock = generateMockData();
       processLoadedData(mock);
-      if (dom.connStatusText) dom.connStatusText.textContent = 'Demo Mode (Simulation)';
+      
       if (showToastAlert) showToast('Data simulasi dimuat!', 'info');
     }, 250);
   }
@@ -4135,22 +4196,27 @@
   function populateMonthDropdown() {
     if (!dom.monthFilterSelect) return;
 
-    var distinctMonths = [];
-    state.records.forEach(function(r) {
-      if (r.bulan && distinctMonths.indexOf(r.bulan) < 0) {
-        distinctMonths.push(r.bulan);
-      }
-    });
+    var monthList = [
+      { val: 'all', text: 'Semua Periode (Januari - Desember)' },
+      { val: 'Januari', text: 'Januari 2026' },
+      { val: 'Februari', text: 'Februari 2026' },
+      { val: 'Maret', text: 'Maret 2026' },
+      { val: 'April', text: 'April 2026' },
+      { val: 'Mei', text: 'Mei 2026' },
+      { val: 'Juni', text: 'Juni 2026' },
+      { val: 'Juli', text: 'Juli 2026' },
+      { val: 'Agustus', text: 'Agustus 2026' },
+      { val: 'September', text: 'September 2026' },
+      { val: 'Oktober', text: 'Oktober 2026' },
+      { val: 'November', text: 'November 2026' },
+      { val: 'Desember', text: 'Desember 2026' }
+    ];
 
-    if (distinctMonths.length === 0) {
-      distinctMonths.push('Oktober 2026');
-    }
-
-    var cur = state.activeMonthFilter || 'Oktober';
-    var html = '<option value="all"' + (cur === 'all' ? ' selected' : '') + '>Semua Bulan</option>';
-    distinctMonths.forEach(function(m) {
-      var isSel = (cur === m || m.toLowerCase().indexOf(cur.toLowerCase()) >= 0);
-      html += '<option value="' + escapeHtml(m) + '"' + (isSel ? ' selected' : '') + '>' + escapeHtml(m) + '</option>';
+    var cur = state.activeMonthFilter || 'all';
+    var html = '';
+    monthList.forEach(function(m) {
+      var isSel = (cur === m.val || cur.toLowerCase() === m.val.toLowerCase());
+      html += '<option value="' + m.val + '"' + (isSel ? ' selected' : '') + '>' + m.text + '</option>';
     });
 
     dom.monthFilterSelect.innerHTML = html;
@@ -4193,18 +4259,50 @@
   function itemMatchesMonth(item, selectedMonth) {
     if (!selectedMonth || selectedMonth === 'all') return true;
     var sel = selectedMonth.toLowerCase().trim();
-    var b = String(item.bulan || '').toLowerCase();
-    var tgl = String(item.tanggal || '').toLowerCase();
+    var b = String(item.bulan || '').toLowerCase().trim();
+    var tgl = String(item.tanggal || '').toLowerCase().trim();
     var det = String(item.detail || '').toLowerCase();
     var isu = String(item.totalCaseIsu || '').toLowerCase();
-    
-    // Substring match
-    if (b.indexOf(sel) >= 0 || tgl.indexOf(sel) >= 0 || det.indexOf(sel) >= 0 || isu.indexOf(sel) >= 0) return true;
-    
-    // Base month check (e.g. 'oktober' from 'Oktober 2026')
-    var baseMonth = sel.split(' ')[0];
-    if (baseMonth && (b.indexOf(baseMonth) >= 0 || tgl.indexOf(baseMonth) >= 0)) return true;
-    
+
+    // Kamus Lengkap Alias dan Singkatan Bulan (Januari s/d Desember)
+    var MONTH_ALIASES = {
+      'januari': ['januari', 'january', 'jan', 'jan-26', '01-26', '/01/', '-01-'],
+      'februari': ['februari', 'february', 'feb', 'feb-26', '02-26', '/02/', '-02-'],
+      'maret': ['maret', 'march', 'mar', 'mar-26', '03-26', '/03/', '-03-'],
+      'april': ['april', 'apr', 'apr-26', '04-26', '/04/', '-04-'],
+      'mei': ['mei', 'may', 'mei-26', 'may-26', '05-26', '/05/', '-05-'],
+      'juni': ['juni', 'june', 'jun', 'jun-26', '06-26', '/06/', '-06-'],
+      'juli': ['juli', 'july', 'jul', 'jul-26', '07-26', '/07/', '-07-'],
+      'agustus': ['agustus', 'august', 'agu', 'agt', 'aug', 'agu-26', 'agt-26', 'aug-26', '08-26', '/08/', '-08-'],
+      'september': ['september', 'sep', 'sept', 'sep-26', '09-26', '/09/', '-09-'],
+      'oktober': ['oktober', 'october', 'okt', 'oct', 'okt-26', 'oct-26', '10-26', '/10/', '-10-'],
+      'november': ['november', 'nov', 'nov-26', '11-26', '/11/', '-11-'],
+      'desember': ['desember', 'december', 'des', 'dec', 'des-26', 'dec-26', '12-26', '/12/', '-12-']
+    };
+
+    var targetKey = '';
+    for (var k in MONTH_ALIASES) {
+      if (sel.indexOf(k) >= 0 || MONTH_ALIASES[k].indexOf(sel) >= 0) {
+        targetKey = k;
+        break;
+      }
+    }
+
+    if (targetKey && MONTH_ALIASES[targetKey]) {
+      var aliases = MONTH_ALIASES[targetKey];
+      for (var i = 0; i < aliases.length; i++) {
+        var a = aliases[i];
+        if (b.indexOf(a) >= 0 || tgl.indexOf(a) >= 0) return true;
+      }
+      for (var j = 0; j < aliases.length; j++) {
+        var al = aliases[j];
+        if (al.length >= 3 && (det.indexOf(al) >= 0 || isu.indexOf(al) >= 0)) return true;
+      }
+    }
+
+    // Direct fallback match
+    if (b.indexOf(sel) >= 0 || tgl.indexOf(sel) >= 0) return true;
+
     return false;
   }
 
@@ -4261,23 +4359,23 @@
       return true;
     });
 
-    // Update Header & Footer Card Tunggal
+    // Update Header & Footer: 'Kasus' diganti 'Case'
     if (dom.caseCountBadge) {
-      dom.caseCountBadge.textContent = filtered.length + ' Kasus Ditemukan';
+      dom.caseCountBadge.textContent = filtered.length + ' Case Ditemukan';
     }
     if (dom.footerSummaryText) {
-      var srvLabel = state.activeServiceScope === 'ALL' ? 'Semua Layanan' : (state.activeServiceScope === 'MOBILE' ? 'CHO Mobile' : 'CHO Fixed');
-      var monthLabel = state.activeMonthFilter === 'all' ? 'Semua Bulan' : state.activeMonthFilter;
-      dom.footerSummaryText.textContent = 'Menampilkan ' + filtered.length + ' kasus • ' + srvLabel + ' • Periode: ' + monthLabel;
+      var srvLabel = state.activeServiceScope === 'ALL' ? 'Semua Unit' : (state.activeServiceScope === 'MOBILE' ? 'CHO Mobile' : 'CHO Fixed');
+      var monthLabel = state.activeMonthFilter === 'all' ? 'Semua Periode (Jan - Des)' : state.activeMonthFilter;
+      dom.footerSummaryText.textContent = 'Menampilkan ' + filtered.length + ' case • ' + srvLabel + ' • Periode: ' + monthLabel;
     }
 
     if (filtered.length === 0) {
       dom.caseListContainer.innerHTML = 
         '<div class="empty-card-state">' +
           '<div class="empty-icon">🔍</div>' +
-          '<div class="empty-title">Tidak ada kasus yang sesuai kriteria filter</div>' +
-          '<div class="empty-desc">Coba sesuaikan pilihan Layanan, Bulan, atau Status di sidebar sebelah kiri.<br>' +
-          '<button id="btnQuickAllMonths" style="margin-top:12px; padding:6px 14px; background:var(--primary-color); color:#fff; border:none; border-radius:6px; cursor:pointer; font-weight:700; font-size:12px;">📅 Tampilkan Semua Bulan</button>' +
+          '<div class="empty-title">Tidak ada case yang sesuai kriteria filter</div>' +
+          '<div class="empty-desc">Coba sesuaikan pilihan Unit, Periode Bulan, atau Status di sidebar sebelah kiri.<br>' +
+          '<button id="btnQuickAllMonths" style="margin-top:12px; padding:6px 14px; background:var(--primary-color); color:#fff; border:none; border-radius:6px; cursor:pointer; font-weight:700; font-size:12px;">📅 Tampilkan Semua Bulan (Jan - Des)</button>' +
           '</div>' +
         '</div>';
       var btnAll = document.getElementById('btnQuickAllMonths');
@@ -4316,7 +4414,7 @@
 
     html += '<div class="beranda-kpi-grid">';
     html += '<div class="beranda-kpi-card kpi-card-total" data-quick-filter="all" title="Klik untuk menampilkan semua kasus">';
-    html += '<div class="beranda-kpi-title"><span>🏠 Beranda (Total Kasus)</span><span style="font-size:14px;">📦</span></div>';
+    html += '<div class="beranda-kpi-title"><span>🏠 Beranda (Total Case)</span><span style="font-size:14px;">📦</span></div>';
     html += '<div class="beranda-kpi-num">' + totalAll + '</div>';
     html += '<div class="beranda-kpi-sub">Konsolidasi CHO Mobile & Fixed</div>';
     html += '</div>';
@@ -4340,6 +4438,8 @@
     html += '</div>';
     html += '</div>';
 
+    var isBerandaMode = (!state.activeStatusFilter || state.activeStatusFilter === 'all');
+
     filtered.forEach(function(item) {
       var srvClass = item.serviceType === 'MOBILE' ? 'mobile' : 'fixed';
       var stNorm = (item.status || 'Open').toLowerCase().replace(/[^a-z]/g, '');
@@ -4360,74 +4460,90 @@
       var ticketLogs = state.logs.filter(function(l) { return l.ticketId === item.id; });
       var logCount = ticketLogs.length;
 
-      // Baris Kasus di dalam Satu Card Tunggal
+      // KOTAK PEMBEDA SETIAP CASE (Diberi border, background card, dan jarak pemisah antar case)
       html += '<div class="case-item-row ' + cardStatusClass + '" data-id="' + escapeHtml(item.id) + '" data-service="' + item.serviceType + '">';
 
-      // 1. Header Baris Item
+      // 1. Header Kotak Case: Case #X, Unit (CHO Mobile/Fixed), Periode Bulan, Status Badge (Open/InProgress/Closed)
       html += '<div class="case-row-header">';
-      html += '<div class="case-row-badges">';
-      html += '<span class="badge-id">Kasus #' + escapeHtml(item.id) + '</span>';
-      html += '<span class="badge-srv ' + srvClass + '">CHO ' + item.serviceType + '</span>';
+      html += '  <div class="case-row-badges">';
+      html += '    <span class="badge-id">Case #' + escapeHtml(item.id) + '</span>';
+      html += '    <span class="badge-srv ' + srvClass + '">CHO ' + item.serviceType + '</span>';
       if (item.bulan) {
-        html += '<span class="badge-month">📅 ' + escapeHtml(item.bulan) + '</span>';
+        html += '    <span class="badge-month">📅 ' + escapeHtml(item.bulan) + '</span>';
       }
-      html += '<span class="badge-status-pill ' + statusKey + '"><span style="font-size:10px; opacity:0.85; margin-right:4px;">Kol. H:</span>' + statusLabel + '</span>';
+      html += '    <span class="badge-status-pill ' + statusKey + '">' + statusLabel + '</span>';
+      html += '  </div>';
+
+      html += '  <div class="case-row-time">';
+      html += '    <span>Terakhir Update: <strong>' + formatDisplayTime(item.terakhirUpdate || item.tanggal) + '</strong></span>';
+      html += '  </div>';
       html += '</div>';
 
-      html += '<div class="case-row-time">';
-      html += '<span>Terakhir Update: <strong>' + formatDisplayTime(item.terakhirUpdate || item.tanggal) + '</strong></span>';
-      html += '</div>';
-      html += '</div>';
-
-      // 2. Main Issue (Kolom C)
+      // 2. Main Issue (Kolom C) - Judul Utama Isu Kasus
       html += '<div class="case-col-c-box">';
-      html += '<div style="display:flex; align-items:center; gap:6px;">';
-      html += '<span class="col-indicator-tag tag-col-c">Kolom C • Main Issue</span>';
-      html += '</div>';
-      html += '<div class="case-row-title">' + escapeHtml(item.totalCaseIsu || 'Isu Kasus CHO') + '</div>';
-      html += '</div>';
-
-      // 3. Meta Data (Requestor Kolom G & Follow Up To Kolom I & Akun)
-      html += '<div class="case-row-meta">';
-      var reqVal = item.requestor && item.requestor !== '-' ? item.requestor : 'Belum Diisi';
-      html += '<div class="meta-item"><span style="font-size:12px;">👤</span> Requestor (Kol. G): <strong>' + escapeHtml(reqVal) + '</strong></div>';
-
-      var followVal = item.followUpTo && item.followUpTo !== '-' ? item.followUpTo : 'Belum Ditentukan';
-      html += '<div class="meta-item followup"><span style="font-size:12px;">🎯</span> Follow Up To (Kol. I): <strong>' + escapeHtml(followVal) + '</strong></div>';
-
-      if (item.nomorLayanan && item.nomorLayanan !== '-') {
-        html += '<div class="meta-item"><span style="font-size:12px;">💳</span> Akun: <strong>' + escapeHtml(item.nomorLayanan) + '</strong> ' + (item.nama && item.nama !== '-' ? '(' + escapeHtml(item.nama) + ')' : '') + '</div>';
-      }
+      html += '  <div style="display:flex; align-items:center; gap:6px;">';
+      html += '    <span class="col-indicator-tag tag-col-c">Kolom C • Main Issue</span>';
+      html += '  </div>';
+      html += '  <div class="case-row-title" style="font-size:16px; font-weight:800; color:var(--text-primary); margin-top:4px;">' + escapeHtml(item.totalCaseIsu || 'Isu Case CHO') + '</div>';
       html += '</div>';
 
-      // 4. Status Update (Kolom J) & Keterangan Terkini
-      var statusUpdateText = item.statusInformasi || item.statusUpdate || 'Belum Ada Update';
+      // 3. Status Update (Kolom J) - Catatan Tindak Lanjut Terkini
+      var statusUpdateText = item.statusInformasi || item.statusUpdate || (statusKey === 'open' ? 'Belum Ada Update' : 'Update Sedang Berjalan');
       var updateContent = item.inProgressNote || item.closedNote || item.progress || item.detail || 'Belum ada catatan update pada kolom J.';
       var isNewUpdate = statusUpdateText === 'Ada Update Baru' || (statusKey === 'inprogress');
 
       html += '<div class="case-col-j-box">';
-      html += '<div class="col-j-header">';
-      html += '<div class="col-j-left">';
-      html += '<span class="col-indicator-tag tag-col-j">Kolom J • Status Update</span>';
-      html += '<span class="col-j-pill ' + (isNewUpdate ? 'has-new-update' : '') + '">' + escapeHtml(statusUpdateText) + '</span>';
+      html += '  <div class="col-j-header">';
+      html += '    <div class="col-j-left">';
+      html += '      <span class="col-indicator-tag tag-col-j">Kolom J • Status Update</span>';
+      html += '      <span class="col-j-pill ' + (isNewUpdate ? 'has-new-update' : '') + '">' + escapeHtml(statusUpdateText) + '</span>';
       if (statusKey === 'inprogress') {
         var progBy = item.inProgressBy || item.pic || 'PIC Lapangan';
-        html += '<span style="font-size:11px; color:var(--text-muted);">PIC: <strong>' + escapeHtml(progBy) + '</strong></span>';
+        html += '      <span style="font-size:11px; color:var(--text-muted);">PIC: <strong>' + escapeHtml(progBy) + '</strong></span>';
       } else if (statusKey === 'closed') {
         var clBy = item.closedBy || item.pic || 'CHO Team';
-        html += '<span style="font-size:11px; color:var(--text-muted);">Di-Closed: <strong>' + escapeHtml(clBy) + '</strong></span>';
+        html += '      <span style="font-size:11px; color:var(--text-muted);">Di-Closed: <strong>' + escapeHtml(clBy) + '</strong></span>';
       }
-      html += '</div>';
-      html += '<div class="col-j-time">';
-      html += 'Waktu: <strong>' + formatDisplayTime(item.terakhirUpdate || item.tanggal) + '</strong>';
-      html += '</div>';
-      html += '</div>';
-      html += '<div class="col-j-text">' + escapeHtml(updateContent) + '</div>';
+      html += '    </div>';
+      html += '    <div class="col-j-time">';
+      html += '      Waktu: <strong>' + formatDisplayTime(item.terakhirUpdate || item.tanggal) + '</strong>';
+      html += '    </div>';
+      html += '  </div>';
+      html += '  <div class="col-j-text">' + escapeHtml(updateContent) + '</div>';
       html += '</div>';
 
-      // 5. Tombol Aksi Langsung pada Baris Kasus
+      // 4. Metadata Detail (Requestor Kolom G & Follow Up To Kolom I & Akun):
+      // Pada mode Beranda dibuat ringkas / toggleable agar tampilan tetap simple dan fokus.
+      var reqVal = item.requestor && item.requestor !== '-' ? item.requestor : 'Belum Diisi';
+      var followVal = item.followUpTo && item.followUpTo !== '-' ? item.followUpTo : 'Belum Ditentukan';
+      var detailId = 'detailBox_' + item.id;
+
+      if (!isBerandaMode) {
+        // Tampilan Lengkap Saat Di Tab Status (Open / In Progress / Closed)
+        html += '<div class="case-row-meta">';
+        html += '  <div class="meta-item"><span style="font-size:12px;">👤</span> Requestor (Kol. G): <strong>' + escapeHtml(reqVal) + '</strong></div>';
+        html += '  <div class="meta-item followup"><span style="font-size:12px;">🎯</span> Follow Up To (Kol. I): <strong>' + escapeHtml(followVal) + '</strong></div>';
+        if (item.nomorLayanan && item.nomorLayanan !== '-') {
+          html += '  <div class="meta-item"><span style="font-size:12px;">💳</span> Akun: <strong>' + escapeHtml(item.nomorLayanan) + '</strong> ' + (item.nama && item.nama !== '-' ? '(' + escapeHtml(item.nama) + ')' : '') + '</div>';
+        }
+        html += '</div>';
+      } else {
+        // Pada Beranda: Ringkas dengan toggle opsional jika ingin melihat requestor/akun
+        html += '<div id="' + detailId + '" class="case-row-meta" style="display:none; margin-top:2px; padding-top:8px; border-top:1px dashed var(--border-color);">';
+        html += '  <div class="meta-item"><span style="font-size:12px;">👤</span> Requestor: <strong>' + escapeHtml(reqVal) + '</strong></div>';
+        html += '  <div class="meta-item followup"><span style="font-size:12px;">🎯</span> Follow Up To: <strong>' + escapeHtml(followVal) + '</strong></div>';
+        if (item.nomorLayanan && item.nomorLayanan !== '-') {
+          html += '  <div class="meta-item"><span style="font-size:12px;">💳</span> Akun: <strong>' + escapeHtml(item.nomorLayanan) + '</strong> ' + (item.nama && item.nama !== '-' ? '(' + escapeHtml(item.nama) + ')' : '') + '</div>';
+        }
+        html += '</div>';
+      }
+
+      // 5. Tombol Aksi Langsung pada Kotak Case
       html += '<div class="case-row-actions">';
-      html += '<div class="action-primary-group">';
+      html += '  <div class="action-primary-group">';
+      if (isBerandaMode) {
+        html += '    <button type="button" class="btn-toggle-details" onclick="var el=document.getElementById(\'' + detailId + '\'); if(el) el.style.display=(el.style.display===\'none\' || !el.style.display)?\'flex\':\'none\';"><span>ℹ️ Detail Info</span></button>';
+      }
 
       var currentRole = (state.authUser && state.authUser.role) ? state.authUser.role : 'Administrator';
 
@@ -4465,7 +4581,7 @@
           html += '</button>';
         } else if (statusKey === 'closed') {
           html += '<span style="font-size:12.5px; font-weight:700; color:var(--status-closed-color); display:inline-flex; align-items:center; gap:5px; margin-right:4px;">';
-          html += '✓ Kasus Telah Ditutup';
+          html += '✓ Case Telah Ditutup';
           html += '</span>';
 
           html += '<button class="btn-act btn-act-reopen btn-trigger-reopen" data-id="' + escapeHtml(item.id) + '" data-target="InProgress">';
@@ -4583,7 +4699,7 @@
     state.currentActionTicket = ticket;
 
     dom.inProgressModalTitle.textContent = isUpdateOnly ? 'Update Catatan In Progress' : 'Ubah Status ke In Progress';
-    dom.inProgressTicketId.textContent = 'Kasus #' + ticket.id;
+    dom.inProgressTicketId.textContent = 'Case #' + ticket.id;
     dom.inProgressBadgeService.textContent = ticket.serviceType;
     dom.inProgressBadgeService.className = 'info-badge ' + (ticket.serviceType === 'MOBILE' ? 'badge-srv mobile' : 'badge-srv fixed');
     dom.inProgressRequestor.textContent = ticket.requestor || '-';
@@ -5391,6 +5507,70 @@
           requestor: 'Customer Care Online',
           status: 'Closed',
           followUpTo: 'Teknisi Datel Surabaya',
+          bulan: 'Agustus 2026',
+          tanggal: '2026-08-24T14:20:00Z',
+          nama: 'Hendra Wijaya',
+          nomorLayanan: '133499887766',
+          kategori: 'ONT Restart Berulang',
+          detail: 'Perangkat ONT sering reboot otomatis setiap 30 menit. Sudah dicoba ganti adaptor tetap sama.',
+          pic: 'Dewi CHO',
+          terakhirUpdate: '2026-08-25T02:20:00Z',
+          statusInformasi: 'Sudah Ditinjau'
+        },
+        {
+          id: '3',
+          totalCaseIsu: 'Indihome Los Merah Area Dago Atas Massal',
+          requestor: 'Call Center 147',
+          status: 'Open',
+          followUpTo: 'Teknisi Witel Bandung',
+          bulan: 'Juli 2026',
+          tanggal: '2026-07-23T10:00:00Z',
+          nama: 'Cluster Dago',
+          nomorLayanan: '122556677889',
+          kategori: 'Los Merah Massal',
+          detail: 'Lampu LOS kedip merah massal 1 blok komplek perumahan Dago.',
+          pic: 'Witel Bandung',
+          terakhirUpdate: '2026-07-23T17:00:00Z',
+          statusInformasi: 'Belum Ada Update'
+        },
+        {
+          id: '4',
+          totalCaseIsu: 'Permintaan Relokasi Jalur Kabel Fiber Optic',
+          requestor: 'Sales D2D',
+          status: 'Open',
+          followUpTo: 'Tim Maintenance Lapangan',
+          bulan: 'Juli 2026',
+          tanggal: '2026-07-22T08:00:00Z',
+          nama: 'Gedung Wisma Niaga',
+          nomorLayanan: '122998877665',
+          kategori: 'Relokasi ODP',
+          detail: 'Relokasi kabel fiber akibat pelebaran jalan protokol kota.',
+          pic: 'Tim Lapangan',
+          terakhirUpdate: '2026-07-22T20:30:00Z',
+          statusInformasi: 'Belum Ada Update'
+        },
+        {
+          id: '5',
+          totalCaseIsu: 'Gangguan Intermittent Internet Pelanggan Corporate HVC',
+          requestor: 'Helpdesk Regional',
+          status: 'InProgress',
+          followUpTo: 'Tim Splicing Lapangan',
+          bulan: 'Oktober 2026',
+          tanggal: '2026-10-25T08:30:00Z',
+          nama: 'PT Solusi Pratama',
+          nomorLayanan: '122876543210',
+          kategori: 'LOS Merah / Fiber Cut',
+          detail: 'Lampu indikator LOS merah kedap-kedip di OLT sejak pagi. Sambungan internet fiber putus total.',
+          pic: 'Rizal CHO',
+          terakhirUpdate: '2026-10-25T09:30:00Z',
+          statusInformasi: 'Ada Update Baru'
+        },
+        {
+          id: '2',
+          totalCaseIsu: 'ONT Sering Restart & Redaman Tinggi',
+          requestor: 'Customer Care Online',
+          status: 'Closed',
+          followUpTo: 'Teknisi Datel Surabaya',
           bulan: 'Oktober 2026',
           tanggal: '2026-10-24T14:20:00Z',
           nama: 'Hendra Wijaya',
@@ -5474,6 +5654,9 @@
 
 })();
 </script>
+
+
+
 
 
 

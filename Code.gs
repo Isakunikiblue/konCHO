@@ -338,7 +338,7 @@ function parseMonthString(val) {
     { name: 'Mei', regex: /mei|may/ },
     { name: 'Juni', regex: /juni|june|\bjun\b/ },
     { name: 'Juli', regex: /juli|july|\bjul\b/ },
-    { name: 'Agustus', regex: /agustus|august|\bagu\b|\baug\b/ },
+    { name: 'Agustus', regex: /agustus|august|\bagu\b|\baug\b|\bagt\b/ },
     { name: 'September', regex: /september|\bsep\b|\bsept\b/ },
     { name: 'Oktober', regex: /oktober|october|\bokt\b|\boct\b/ },
     { name: 'November', regex: /november|\bnov\b/ },
@@ -347,8 +347,11 @@ function parseMonthString(val) {
 
   for (var m = 0; m < monthRegexes.length; m++) {
     if (monthRegexes[m].regex.test(str)) {
-      var yearMatch = str.match(/\b(202\d)\b/);
-      var year = yearMatch ? yearMatch[1] : '2026';
+      var yearMatch = str.match(/\b(202\d)\b/) || str.match(/[-/](\d{2})\b/);
+      var year = '2026';
+      if (yearMatch) {
+        year = yearMatch[1].length === 2 ? ('20' + yearMatch[1]) : yearMatch[1];
+      }
       return monthRegexes[m].name + ' ' + year;
     }
   }
