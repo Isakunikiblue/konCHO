@@ -496,6 +496,13 @@
       if (btnManageHeader) btnManageHeader.style.display = 'none';
       if (sidebarAdminBlock) sidebarAdminBlock.style.display = 'none';
     }
+
+    // 4. Kontrol Tautan Database Terhubung (KHUSUS ADMINISTRATOR):
+    // Pada Role selain admin, 📊 Database Terhubung dihide saja
+    var sidebarSheetInfo = document.getElementById('sidebarSheetInfo') || document.querySelector('.sidebar-sheet-info');
+    if (sidebarSheetInfo) {
+      sidebarSheetInfo.style.display = (role === 'Administrator') ? 'block' : 'none';
+    }
   }
 
   function showDashboardApp() {
@@ -861,7 +868,7 @@
 
     var titleEl = document.getElementById('casesCardTitle');
     if (titleEl) {
-      titleEl.textContent = mode === 'home' ? 'Home • List Isu CHO (Kolom C, H, J)' : 'Daftar Case Isu CHO';
+      titleEl.textContent = mode === 'home' ? 'Home • List Isu CHO (Kolom C, D, H, J)' : 'Daftar Case Isu CHO';
     }
 
     renderCaseList();
@@ -1434,8 +1441,9 @@
    * 2. Bulan (Kolom B)
    * 3. Unit (Pembeda CHO Mobile vs CHO Fixed)
    * 4. Main Issue (Kolom C)
-   * 5. Status (Kolom H)
-   * 6. Status Update (Kolom J)
+   * 5. Issue Details (Kolom D)
+   * 6. Status (Kolom H)
+   * 7. Status Update (Kolom J)
    * =========================================================================
    */
   function renderHomeSheetTable(items) {
@@ -1457,11 +1465,12 @@
     html += '      <thead>';
     html += '        <tr>';
     html += '          <th style="width: 50px; text-align: center;">No</th>';
-    html += '          <th style="width: 140px; text-align: center;">Bulan</th>';
-    html += '          <th style="width: 130px; text-align: center;">Unit</th>';
-    html += '          <th style="min-width: 300px;">Main Issue (Kolom C)</th>';
+    html += '          <th style="width: 135px; text-align: center;">Bulan</th>';
+    html += '          <th style="width: 120px; text-align: center;">Unit</th>';
+    html += '          <th style="min-width: 250px;">Main Issue (Kolom C)</th>';
+    html += '          <th style="min-width: 270px;">Issue Details (Kolom D)</th>';
     html += '          <th style="width: 135px; text-align: center;">Status (Kolom H)</th>';
-    html += '          <th style="min-width: 300px;">Status Update (Kolom J)</th>';
+    html += '          <th style="min-width: 260px;">Status Update (Kolom J)</th>';
     html += '        </tr>';
     html += '      </thead>';
     html += '      <tbody>';
@@ -1483,6 +1492,7 @@
       }
 
       var mainIssueText = item.totalCaseIsu || item.mainIssue || '-';
+      var issueDetailsText = item.issueDetails || item.detail || item.keterangan || '-';
 
       // Status Update (Kolom J)
       var statusUpdateText = item.statusInformasi || item.statusUpdate || item.inProgressNote || item.closedNote || item.progress || (statusKey === 'open' ? 'Belum Ada Update' : 'Update Sedang Berjalan');
@@ -1497,6 +1507,9 @@
       html += '          </td>';
       html += '          <td class="home-col-main-issue">';
       html += '            <div class="main-issue-title">' + escapeHtml(mainIssueText) + '</div>';
+      html += '          </td>';
+      html += '          <td class="home-col-issue-details">';
+      html += '            <div class="issue-details-text">' + escapeHtml(issueDetailsText) + '</div>';
       html += '          </td>';
       html += '          <td style="text-align: center;">';
       if (canUpdate) {
@@ -2368,6 +2381,7 @@
           nama: 'PT Solusi Finansial (Corporate)',
           nomorLayanan: '081288992211',
           kategori: 'Bundling MU',
+          issueDetails: 'Pelanggan sudah aktivasi paket bundling namun masih dikenakan MU, baik aktivasi dari channel digipos atau HVC.',
           detail: 'Pelanggan sudah aktivasi paket bundling namun masih dikenakan MU, baik aktivasi dari channel digipos atau HVC.\n\nNeed Support:\n• Perbaikan sistem untuk pelanggan dengan paket bundling tidak dikenakan charge MU',
           progress: 'Remove MU berdasarkan KMI2230926841 dan pengajuan adjustment',
           pic: 'Tim Mobile',
@@ -2385,6 +2399,7 @@
           nama: 'Siti Rahma',
           nomorLayanan: '082155443322',
           kategori: 'SMOOA Auto Renew',
+          issueDetails: 'Kuota SMOOA tidak diperpanjang otomatis dan kendala add/remove member via DSC.',
           detail: 'Kuota SMOOA tidak diperpanjang otomatis dan kendala add/remove SMOOATotal Volume tiket keluhan SMOOA dari tanggal 1 – 13 Oktober 2026, total volume keluhan tercatat 335 tiket. Tiket open didominasi keluhan Kuota Otomatis Tidak Diperpanjang dengan total keluhan 76 tiket dan 19 tiket masih open di pool IT. Keluhan yang lain adalah Tidak bisa menambahkan/menghapus member sebanyak 29 tiket.\n\nNeed Support:\n• Optimalisasi proses fixing secara masalah seluruh MSISDN yang terimpact kuota tidak diperpanjang otomatis.\n• Perbaikan tools DSC agar dapat add/remove member via DSC',
           progress: 'Eskalasi ke IT',
           pic: 'Tim Mobile',
@@ -2402,6 +2417,7 @@
           nama: '-',
           nomorLayanan: '081377889900',
           kategori: 'Selena Log',
+          issueDetails: 'Log aktivasi paket/ transfer pulsa prepaid tidak dapat dilakukan saat pengecekan notifikasi sistem.',
           detail: 'Log aktivasi paket/ transfer pulsa prepaid tidak dapat dilakukan saat pengecekan notifikasi sistem.\n\nNeed Support:\n• Approval pengajuan keyword selena app_nois',
           progress: 'Escalate to IT untuk mendapatkan log aktivasi/transfer pulsa',
           pic: 'Tim Mobile',
@@ -2419,6 +2435,7 @@
           nama: 'Ahmad Fauzi',
           nomorLayanan: '081122334455',
           kategori: 'RoaMAX',
+          issueDetails: 'Pelanggan melakukan aktivasi Paket RoaMAX namun menerima notifikasi gagal, lalu aktivasi ulang sehingga terjadi double aktivasi.',
           detail: 'Pelanggan melakukan aktivasi Paket RoaMAX namun menerima notifikasi Maaf request Anda tidak bisa kami proses, kemudian melakukan aktivasi ulang dan menyebabkan double aktivasi. Sample: https://prnt.sc/OnC_JQ7q8lp3\n\nNeed Support:\n• Auto refund/adjustment jika terjadi double aktivasi paket yang sama dalam range 60 menit',
           progress: 'Remove paket dan pengajuan adjustment mengacu source KM1216012510',
           pic: 'Tim Mobile',
@@ -2437,6 +2454,7 @@
           nama: 'Pelanggan IndiHome',
           nomorLayanan: '122556677889',
           kategori: 'Perhitungan Paket PDD',
+          issueDetails: 'Perhitungan paket PDD bulan Juli 2026 memerlukan rekonsiliasi.',
           detail: 'Perhitungan paket PDD bulan Juli 2026 memerlukan rekonsiliasi.',
           pic: 'Tim Billing',
           terakhirUpdate: '2026-07-23T17:00:00Z',
@@ -2453,6 +2471,7 @@
           nama: 'Pelanggan IndiHome Smart',
           nomorLayanan: '122998877665',
           kategori: 'Biaya IndiHome Smart',
+          issueDetails: 'Penyesuaian tagihan biaya IndiHome Smart periode Agustus 2026.',
           detail: 'Penyesuaian tagihan biaya IndiHome Smart periode Agustus 2026.',
           pic: 'Tim Billing',
           terakhirUpdate: '2026-08-20T20:30:00Z',

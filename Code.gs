@@ -456,7 +456,8 @@ function getSheetRecords(ss, sheetName, serviceType) {
   if (caseIdx < 0 && headers.length > 2) caseIdx = 2; // Kolom C fallback
   else if (caseIdx < 0 && headers.length > 1) caseIdx = 1;
 
-  var detailIdx = findHeaderIndex(headers, ['issue details', 'detail_kendala', 'detail kendala', 'detail', 'keterangan', 'deskripsi', 'catatan']);
+  var detailIdx = findHeaderIndex(headers, ['issue details (description)', 'issue details', 'issue detail', 'detail_kendala', 'detail kendala', 'detail', 'keterangan', 'deskripsi', 'catatan']);
+  if (detailIdx < 0 && headers.length > 3) detailIdx = 3; // Kolom D fallback
   var progressIdx = findHeaderIndex(headers, ['progress & quick win', 'progress', 'quick win', 'temporary solution', 'solusi']);
   var needSupportIdx = findHeaderIndex(headers, ['need support', 'need_support', 'support', 'bantuan', 'dukungan']);
 
@@ -630,7 +631,8 @@ function getSheetRecords(ss, sheetName, serviceType) {
       nama: rawName,
       nomorLayanan: rawNum,
       kategori: catIdx >= 0 && row[catIdx] ? String(row[catIdx]).trim() : 'General',
-      detail: fullDetail,
+      issueDetails: rawDetail || fullDetail,
+      detail: fullDetail || rawDetail,
       progress: rawProgress,
       needSupport: rawNeed,
       pic: picIdx >= 0 && row[picIdx] ? String(row[picIdx]).trim() : rawReq,
