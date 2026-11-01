@@ -3634,15 +3634,33 @@
       try {
         state.authUser = JSON.parse(savedUser);
       } catch (e) {
-        state.authUser = { name: savedUser, role: 'Administrator' };
+        state.authUser = { name: 'Administrator Utama', username: savedUser, role: 'Administrator' };
       }
+
+      // Sinkronkan selalu dengan database akun pengguna terbaru untuk memastikan Role dan Nama Lengkap akurat
+      if (state.authUser) {
+        var accounts = getStoredUserAccounts();
+        var cleanLookup = (state.authUser.username || state.authUser.name || '').replace(/^@+/, '').trim().toLowerCase();
+        var matchedAcc = accounts.find(function(a) {
+          return (a.username || '').replace(/^@+/, '').trim().toLowerCase() === cleanLookup;
+        });
+        if (matchedAcc) {
+          state.authUser.name = matchedAcc.name || matchedAcc.username;
+          state.authUser.username = matchedAcc.username;
+          state.authUser.role = matchedAcc.role || 'Inputer';
+          try {
+            localStorage.setItem('koncho_auth_user', JSON.stringify(state.authUser));
+          } catch(err) {}
+        }
+      }
+
       showDashboardApp();
     } else {
       showLoginScreen();
     }
   }
 
-    // =========================================================================
+  // =========================================================================
   // SISTEM KELOLA PENGGUNA (USER MANAGEMENT) - KHUSUS ROLE ADMINISTRATOR
   // =========================================================================
   var DEFAULT_USER_ACCOUNTS = [
@@ -3675,6 +3693,10 @@
       if (raw) {
         var parsed = JSON.parse(raw);
         if (Array.isArray(parsed) && parsed.length > 0) {
+          // Bersihkan leading @ jika tersimpan
+          parsed.forEach(function(u) {
+            if (u.username) u.username = u.username.replace(/^@+/, '').trim();
+          });
           return parsed;
         }
       }
@@ -3816,8 +3838,9 @@
 
   // Edit User
   window.editUserAccount = function(username) {
+    var cleanU = (username || '').replace(/^@+/, '').trim().toLowerCase();
     var users = getStoredUserAccounts();
-    var found = users.find(function(u) { return u.username.toLowerCase() === username.toLowerCase(); });
+    var found = users.find(function(u) { return (u.username || '').replace(/^@+/, '').trim().toLowerCase() === cleanU; });
     if (!found) {
       showToast('Pengguna tidak ditemukan!', 'error');
       return;
@@ -3853,8 +3876,8 @@
   // Simpan Pengguna (Create / Update)
   function handleSaveUserAccount(e) {
     if (e && e.preventDefault) e.preventDefault();
-    var orig = (document.getElementById('userEditOriginalUsername') ? document.getElementById('userEditOriginalUsername').value : '').trim();
-    var username = (document.getElementById('inpUserUsername') ? document.getElementById('inpUserUsername').value : '').trim();
+    var orig = (document.getElementById('userEditOriginalUsername') ? document.getElementById('userEditOriginalUsername').value : '').trim().replace(/^@+/, '');
+    var username = (document.getElementById('inpUserUsername') ? document.getElementById('inpUserUsername').value : '').trim().replace(/^@+/, '');
     var name = (document.getElementById('inpUserFullName') ? document.getElementById('inpUserFullName').value : '').trim();
     var role = (document.getElementById('inpUserRole') ? document.getElementById('inpUserRole').value : 'Facilitator').trim();
     var password = (document.getElementById('inpUserPassword') ? document.getElementById('inpUserPassword').value : '').trim();
@@ -3876,7 +3899,7 @@
 
     if (orig) {
       // Mode Edit
-      var idx = users.findIndex(function(u) { return u.username.toLowerCase() === orig.toLowerCase(); });
+      var idx = users.findIndex(function(u) { return (u.username || '').replace(/^@+/, '').trim().toLowerCase() === orig.toLowerCase(); });
       if (idx !== -1) {
         users[idx].name = name;
         users[idx].role = role;
@@ -3885,7 +3908,7 @@
         showToast('Akun @' + orig + ' berhasil diperbarui!', 'success');
 
         // Jika mengedit akun yang sedang login, update sesi langsung
-        if (state.authUser && (state.authUser.username === orig || state.authUser.name === orig)) {
+        if (state.authUser && ((state.authUser.username || '').replace(/^@+/, '').toLowerCase() === orig.toLowerCase() || (state.authUser.name || '').toLowerCase() === orig.toLowerCase())) {
           state.authUser.name = name;
           state.authUser.role = role;
           try { localStorage.setItem('koncho_auth_user', JSON.stringify(state.authUser)); } catch(err){}
@@ -3894,7 +3917,7 @@
       }
     } else {
       // Mode Create Baru
-      var exists = users.some(function(u) { return u.username.toLowerCase() === username.toLowerCase(); });
+      var exists = users.some(function(u) { return (u.username || '').replace(/^@+/, '').trim().toLowerCase() === username.toLowerCase(); });
       if (exists) {
         showToast('Username @' + username + ' sudah digunakan! Gunakan username lain.', 'error');
         return;
@@ -3917,21 +3940,22 @@
 
   // Hapus Pengguna (Delete)
   window.deleteUserAccount = function(username) {
-    if (username.toLowerCase() === 'admin_koncho') {
+    var cleanU = (username || '').replace(/^@+/, '').trim().toLowerCase();
+    if (cleanU === 'admin_koncho') {
       showToast('Akun admin_koncho adalah Administrator Utama dan tidak boleh dihapus!', 'warning');
       return;
     }
-    var currentUsername = (state.authUser && (state.authUser.username || state.authUser.name)) ? (state.authUser.username || state.authUser.name) : '';
-    if (username.toLowerCase() === currentUsername.toLowerCase()) {
+    var currentUsername = (state.authUser && (state.authUser.username || state.authUser.name)) ? (state.authUser.username || state.authUser.name).replace(/^@+/, '').trim().toLowerCase() : '';
+    if (cleanU === currentUsername) {
       showToast('Anda tidak dapat menghapus akun yang sedang aktif digunakan!', 'warning');
       return;
     }
 
-    if (confirm('Apakah Anda yakin ingin menghapus akun @' + username + '? Pengguna ini tidak akan dapat login lagi.')) {
+    if (confirm('Apakah Anda yakin ingin menghapus akun @' + cleanU + '? Pengguna ini tidak akan dapat login lagi.')) {
       var users = getStoredUserAccounts();
-      var filtered = users.filter(function(u) { return u.username.toLowerCase() !== username.toLowerCase(); });
-      saveStoredUserAccounts(filtered);
-      showToast('Pengguna @' + username + ' berhasil dihapus.', 'info');
+      users = users.filter(function(u) { return (u.username || '').replace(/^@+/, '').trim().toLowerCase() !== cleanU; });
+      saveStoredUserAccounts(users);
+      showToast('Akun @' + cleanU + ' berhasil dihapus.', 'info');
       renderUserMgmtList();
     }
   };
@@ -3939,13 +3963,28 @@
   function applyRolePermissions() {
     var role = (state.authUser && state.authUser.role) ? state.authUser.role : 'Administrator';
     
-    // 1. Profil Header
+    // 1. Profil Header (Menampilkan Nama Lengkap Saja)
     var nameEl = document.getElementById('hdrUserName');
     var roleEl = document.getElementById('hdrUserRole');
     var avatarEl = document.getElementById('hdrUserAvatar');
 
     if (nameEl && state.authUser) {
-      nameEl.textContent = state.authUser.name || 'admin_koncho';
+      var displayName = state.authUser.name;
+      // Jika displayName masih berupa @username atau sama dengan username, sinkronkan nama lengkap dari database akun
+      if (!displayName || displayName.indexOf('@') === 0 || displayName === state.authUser.username) {
+        var accounts = getStoredUserAccounts();
+        var cleanU = (state.authUser.username || state.authUser.name || '').replace(/^@+/, '').trim().toLowerCase();
+        var matched = accounts.find(function(a) {
+          return (a.username || '').replace(/^@+/, '').trim().toLowerCase() === cleanU;
+        });
+        if (matched && matched.name) {
+          displayName = matched.name;
+          state.authUser.name = matched.name;
+          state.authUser.role = matched.role || role;
+          role = matched.role || role;
+        }
+      }
+      nameEl.textContent = displayName || 'Administrator Utama';
     }
     if (roleEl) {
       var badgeClass = 'role-admin';
@@ -4027,10 +4066,10 @@
     var passInp = document.getElementById('loginPassword');
     var btnSubmit = document.getElementById('btnLoginSubmit');
     
-    var username = (userInp && userInp.value ? userInp.value : '').trim();
+    var rawUsername = (userInp && userInp.value ? userInp.value : '').trim();
     var password = (passInp && passInp.value ? passInp.value : '').trim();
 
-    if (!username) {
+    if (!rawUsername) {
       showToast('Harap masukkan Nama Pengguna (Username)!', 'warning');
       if (userInp) userInp.focus();
       return;
@@ -4041,37 +4080,26 @@
       return;
     }
 
+    var cleanUsername = rawUsername.replace(/^@+/, '').trim().toLowerCase();
     var accounts = getStoredUserAccounts();
     var found = accounts.find(function(a) {
-      return a.username.toLowerCase() === username.toLowerCase();
+      return (a.username || '').replace(/^@+/, '').trim().toLowerCase() === cleanUsername;
     });
 
-    var role = 'Administrator';
-    var displayName = username;
-
-    if (found) {
-      if (found.password && found.password !== password) {
-        showToast('Kata sandi salah untuk pengguna: @' + username, 'error');
-        if (passInp) passInp.focus();
-        return;
-      }
-      role = found.role || 'Administrator';
-      displayName = found.name || found.username;
-    } else {
-      var uLower = username.toLowerCase();
-      if (uLower.indexOf('facilitator') >= 0) {
-        role = 'Facilitator';
-      } else if (uLower.indexOf('input') >= 0) {
-        role = 'Inputer';
-      } else {
-        role = 'Administrator';
-      }
-      if (username === 'admin_koncho' && password !== 'koncho123') {
-        showToast('Kata sandi salah! Password untuk admin_koncho adalah: koncho123', 'error');
-        if (passInp) passInp.focus();
-        return;
-      }
+    if (!found) {
+      showToast('Nama Pengguna (Username) "@' + cleanUsername + '" tidak terdaftar! Periksa kembali username Anda.', 'error');
+      if (userInp) userInp.focus();
+      return;
     }
+
+    if (found.password && found.password !== password) {
+      showToast('Kata sandi salah untuk pengguna: @' + found.username, 'error');
+      if (passInp) passInp.focus();
+      return;
+    }
+
+    var role = found.role || 'Inputer';
+    var fullName = found.name || found.username;
 
     if (btnSubmit) {
       btnSubmit.innerHTML = '<span>Memverifikasi Akses...</span>';
@@ -4080,8 +4108,8 @@
 
     setTimeout(function() {
       state.authUser = {
-        name: displayName,
-        username: username,
+        name: fullName,
+        username: found.username,
         role: role,
         loginTime: new Date().toISOString()
       };
@@ -4093,7 +4121,7 @@
         } catch (err) {}
       }
 
-      showToast('Selamat Datang di konCHO! Masuk sebagai ' + role + ' (' + displayName + ')', 'success');
+      showToast('Selamat Datang di konCHO! Masuk sebagai ' + role + ' (' + fullName + ')', 'success');
       showDashboardApp();
       renderCaseList();
 
