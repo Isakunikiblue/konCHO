@@ -827,12 +827,16 @@
   }
 
   .badge-srv {
-    font-size: 11px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 11.5px;
     font-weight: 700;
-    padding: 3px 9px;
-    border-radius: var(--radius-sm);
+    padding: 4px 10px;
+    border-radius: var(--radius-full);
     text-transform: uppercase;
     letter-spacing: 0.5px;
+    white-space: nowrap;
   }
   .badge-srv.mobile {
     background: var(--mobile-bg);
@@ -1787,7 +1791,14 @@
   }
   .user-cell-username {
     font-weight: 700;
-    color: #f8fafc;
+    color: var(--text-primary);
+    font-family: monospace;
+    font-size: 13px;
+    background: var(--bg-elevated);
+    padding: 3px 8px;
+    border-radius: var(--radius-sm);
+    border: 1px solid var(--border-color);
+    display: inline-block;
   }
   .user-tag-current {
     font-size: 9.5px;
@@ -2411,6 +2422,11 @@
     color: #a5b4fc;
     border: 1px solid rgba(99, 102, 241, 0.3);
   }
+  .tag-col-d {
+    background: rgba(168, 85, 247, 0.15);
+    color: #c084fc;
+    border: 1px solid rgba(168, 85, 247, 0.3);
+  }
   .tag-col-h {
     background: rgba(245, 158, 11, 0.15);
     color: #fbbf24;
@@ -2426,6 +2442,29 @@
     flex-direction: column;
     gap: 4px;
     margin: 6px 0 10px 0;
+  }
+  .case-col-d-box {
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-color);
+    border-left: 3px solid #c084fc;
+    border-radius: var(--radius-sm);
+    padding: 10px 14px;
+    margin-top: 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .col-d-header {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .col-d-text {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.5;
+    word-break: break-word;
+    white-space: pre-line;
   }
   .case-col-j-box {
     background: var(--bg-elevated);
@@ -3419,11 +3458,12 @@
           <table class="user-mgmt-table">
             <thead>
               <tr>
-                <th>Pengguna</th>
-                <th>Nama Lengkap</th>
-                <th>Peran (Role)</th>
-                <th>Kata Sandi</th>
-                <th style="text-align: right;">Aksi</th>
+                <th style="width: 65px; text-align: center;">Peran</th>
+                <th style="min-width: 150px;">Username</th>
+                <th style="min-width: 170px;">Nama Lengkap</th>
+                <th style="width: 140px;">Peran (Role)</th>
+                <th style="width: 130px;">Kata Sandi</th>
+                <th style="text-align: right; width: 140px;">Aksi</th>
               </tr>
             </thead>
             <tbody id="userMgmtTableBody">
@@ -3676,7 +3716,7 @@
     var currentUsername = (state.authUser && (state.authUser.username || state.authUser.name)) ? (state.authUser.username || state.authUser.name) : 'admin_koncho';
 
     if (users.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center; padding:24px; color:#94a3b8;">Belum ada pengguna terdaftar</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center; padding:24px; color:#94a3b8;">Belum ada pengguna terdaftar</td></tr>';
       return;
     }
 
@@ -3696,20 +3736,20 @@
       var isRootAdmin = u.username.toLowerCase() === 'admin_koncho';
 
       html += '<tr>';
+      html += '  <td style="text-align: center;">';
+      html += '    <div class="user-cell-avatar" style="margin: 0 auto;" title="' + escapeHtml(u.role) + '">' + roleIcon + '</div>';
+      html += '  </td>';
       html += '  <td>';
-      html += '    <div class="user-badge-cell">';
-      html += '      <div class="user-cell-avatar">' + roleIcon + '</div>';
-      html += '      <div>';
-      html += '        <span class="user-cell-username">@' + escapeHtml(u.username) + '</span>';
+      html += '    <div style="display:flex; align-items:center; gap:6px;">';
+      html += '      <span class="user-cell-username">@' + escapeHtml(u.username) + '</span>';
       if (isCurrent) {
-        html += '        <span class="user-tag-current">Akun Anda</span>';
+        html += '      <span class="user-tag-current">Akun Anda</span>';
       }
-      html += '      </div>';
       html += '    </div>';
       html += '  </td>';
       html += '  <td><strong>' + escapeHtml(u.name || '-') + '</strong></td>';
       html += '  <td><span class="badge-role ' + roleBadgeClass + '">' + roleIcon + ' ' + escapeHtml(u.role) + '</span></td>';
-      html += '  <td><code style="background:rgba(0,0,0,0.3); padding:3px 8px; border-radius:6px; font-size:12px; color:#f6c84c;">' + escapeHtml(u.password || '••••••••') + '</code></td>';
+      html += '  <td><code style="background:var(--bg-elevated); padding:3px 8px; border-radius:6px; font-size:12px; color:var(--text-primary); border:1px solid var(--border-color);">' + escapeHtml(u.password || '••••••••') + '</code></td>';
       html += '  <td style="text-align: right; white-space: nowrap;">';
       html += '    <button type="button" class="btn-table-action btn-table-edit" onclick="editUserAccount(\'' + escapeHtml(u.username) + '\')" title="Edit Akun">';
       html += '      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M11 4H4a2 2 0 0 0-2 2v14a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2v-7"/><path d="M18.5 2.5a2.121 2.121 0 0 1 3 3L12 15l-4 1 1-4 9.5-9.5z"/></svg>';
@@ -4758,6 +4798,15 @@
       html += '  <div class="case-row-title" style="font-size:16px; font-weight:800; color:var(--text-primary); margin-top:4px;">' + escapeHtml(item.totalCaseIsu || 'Isu Case CHO') + '</div>';
       html += '</div>';
 
+      // 2.5. Issue Details (Kolom D) - Deskripsi Detail Kasus Isu
+      var issueDetailsVal = item.issueDetails || item.detail || item.keterangan || '-';
+      html += '<div class="case-col-d-box">';
+      html += '  <div class="col-d-header">';
+      html += '    <span class="col-indicator-tag tag-col-d">Kolom D • Issue Details</span>';
+      html += '  </div>';
+      html += '  <div class="col-d-text">' + escapeHtml(issueDetailsVal) + '</div>';
+      html += '</div>';
+
       // 3. Status Update (Kolom J) - Catatan Tindak Lanjut Terkini
       var statusUpdateText = item.statusInformasi || item.statusUpdate || (statusKey === 'open' ? 'Belum Ada Update' : 'Update Sedang Berjalan');
       var updateContent = item.inProgressNote || item.closedNote || item.progress || item.detail || 'Belum ada catatan update pada kolom J.';
@@ -4917,7 +4966,7 @@
     html += '        <tr>';
     html += '          <th style="width: 50px; text-align: center;">No</th>';
     html += '          <th style="width: 135px; text-align: center;">Bulan</th>';
-    html += '          <th style="width: 120px; text-align: center;">Unit</th>';
+    html += '          <th style="width: 140px; min-width: 140px; text-align: center;">Unit</th>';
     html += '          <th style="min-width: 250px;">Main Issue (Kolom C)</th>';
     html += '          <th style="min-width: 270px;">Issue Details (Kolom D)</th>';
     html += '          <th style="width: 135px; text-align: center;">Status (Kolom H)</th>';
@@ -4953,7 +5002,7 @@
       html += '          <td style="text-align: center;">';
       html += '            <span class="badge-month-pill">📅 ' + escapeHtml(item.bulan || 'Oktober 2026') + '</span>';
       html += '          </td>';
-      html += '          <td style="text-align: center;">';
+      html += '          <td style="text-align: center; white-space: nowrap;">';
       html += '            <span class="badge-srv ' + srvClass + '">' + escapeHtml(srvLabel) + '</span>';
       html += '          </td>';
       html += '          <td class="home-col-main-issue">';
@@ -5081,8 +5130,8 @@
     dom.inProgressIssueText.textContent = ticket.totalCaseIsu || '-';
 
     dom.inProgressMessage.value = '';
-    dom.inProgressAuthor.value = state.defaultAuthor || localStorage.getItem('koncho_pic_name') || '';
-    dom.inProgressFollowUp.value = ticket.followUpTo && ticket.followUpTo !== '-' ? ticket.followUpTo : '';
+    dom.inProgressAuthor.value = '';
+    dom.inProgressFollowUp.value = '';
 
     dom.modalInProgress.classList.add('active');
     setTimeout(function() { dom.inProgressMessage.focus(); }, 100);
@@ -5090,6 +5139,9 @@
 
   function closeInProgressModal() {
     dom.modalInProgress.classList.remove('active');
+    dom.inProgressMessage.value = '';
+    dom.inProgressAuthor.value = '';
+    dom.inProgressFollowUp.value = '';
     state.currentActionTicket = null;
   }
 
@@ -5221,8 +5273,8 @@
     dom.closedIssueText.textContent = ticket.totalCaseIsu || '-';
 
     dom.closedMessage.value = '';
-    dom.closedByUser.value = state.defaultAuthor || localStorage.getItem('koncho_pic_name') || '';
-    dom.closedFollowUp.value = ticket.followUpTo && ticket.followUpTo !== '-' ? ticket.followUpTo : 'Selesai';
+    dom.closedByUser.value = '';
+    dom.closedFollowUp.value = '';
 
     dom.modalClosed.classList.add('active');
     setTimeout(function() { dom.closedMessage.focus(); }, 100);
@@ -5230,6 +5282,9 @@
 
   function closeClosedModal() {
     dom.modalClosed.classList.remove('active');
+    dom.closedMessage.value = '';
+    dom.closedByUser.value = '';
+    dom.closedFollowUp.value = '';
     state.currentActionTicket = null;
   }
 
@@ -5578,6 +5633,16 @@
     if (dom.inputBulanTahun && state.activeMonthFilter !== 'all') {
       dom.inputBulanTahun.value = state.activeMonthFilter;
     }
+    // Kosongkan form inputan agar data sebelumnya tidak terbaca
+    if (dom.inputCaseIssue) dom.inputCaseIssue.value = '';
+    if (dom.inputRequestor) dom.inputRequestor.value = '';
+    if (dom.inputProgress) dom.inputProgress.value = '';
+    if (dom.inputDetailKendala) dom.inputDetailKendala.value = '';
+    if (dom.inputNeedSupport) dom.inputNeedSupport.value = '';
+    if (dom.inputNomorLayanan) dom.inputNomorLayanan.value = '';
+    if (dom.inputNamaPelanggan) dom.inputNamaPelanggan.value = '';
+    if (dom.inputWilayah) dom.inputWilayah.value = '';
+
     dom.newDataModal.classList.add('active');
     setTimeout(function() {
       if (dom.inputCaseIssue) dom.inputCaseIssue.focus();
@@ -5586,6 +5651,14 @@
 
   function closeNewModal() {
     dom.newDataModal.classList.remove('active');
+    if (dom.inputCaseIssue) dom.inputCaseIssue.value = '';
+    if (dom.inputRequestor) dom.inputRequestor.value = '';
+    if (dom.inputProgress) dom.inputProgress.value = '';
+    if (dom.inputDetailKendala) dom.inputDetailKendala.value = '';
+    if (dom.inputNeedSupport) dom.inputNeedSupport.value = '';
+    if (dom.inputNomorLayanan) dom.inputNomorLayanan.value = '';
+    if (dom.inputNamaPelanggan) dom.inputNamaPelanggan.value = '';
+    if (dom.inputWilayah) dom.inputWilayah.value = '';
   }
 
   function setNewModalService(srv) {
