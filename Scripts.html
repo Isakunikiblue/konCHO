@@ -542,6 +542,10 @@
     if (sidebarSheetInfo) {
       sidebarSheetInfo.style.display = (role === 'Administrator') ? 'block' : 'none';
     }
+
+    // 5. Update Status & Tab Peran di Buku Panduan (User Guide)
+    updateGuideCurrentRoleBadge();
+    renderGuideRoleTabs();
   }
 
   function showDashboardApp() {
@@ -633,12 +637,211 @@
       showToast('Selamat Datang di konCHO! Masuk sebagai ' + role + ' (' + fullName + ')', 'success');
       showDashboardApp();
       renderCaseList();
+      resetIdleTimer();
 
       if (btnSubmit) {
         btnSubmit.innerHTML = '<span>Sign In</span> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
         btnSubmit.style.opacity = '1';
       }
     }, 350);
+  }
+
+  // =========================================================================
+  // SISTEM KEAMANAN: AUTO-LOGOUT SETELAH 15 MENIT TIDAK AKTIF (IDLE TIMEOUT)
+  // =========================================================================
+  var IDLE_TIMEOUT_MS = 15 * 60 * 1000; // 15 Menit = 900.000 ms
+  var lastUserActivity = Date.now();
+  var idleCheckTimer = null;
+
+  function resetIdleTimer() {
+    lastUserActivity = Date.now();
+  }
+
+  function initIdleAutoLogout() {
+    lastUserActivity = Date.now();
+    var events = ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll', 'click', 'wheel'];
+    events.forEach(function(evt) {
+      window.addEventListener(evt, resetIdleTimer, { passive: true });
+    });
+
+    if (idleCheckTimer) clearInterval(idleCheckTimer);
+    idleCheckTimer = setInterval(function() {
+      // Hanya berjalan jika user sedang dalam sesi aktif (logged in)
+      if (!state.authUser) return;
+
+      var idleTime = Date.now() - lastUserActivity;
+      if (idleTime >= IDLE_TIMEOUT_MS) {
+        performIdleAutoLogout();
+      }
+    }, 10000); // Evaluasi setiap 10 detik
+  }
+
+  function performIdleAutoLogout() {
+    // 1. Tutup seluruh modal jika ada yang sedang terbuka
+    var activeModals = document.querySelectorAll('.modal-backdrop.active');
+    activeModals.forEach(function(m) {
+      m.classList.remove('active');
+    });
+
+    // 2. Hapus sesi otentikasi
+    try {
+      localStorage.removeItem('koncho_auth_user');
+    } catch(e) {}
+    state.authUser = null;
+
+    // 3. Tampilkan layar login
+    showLoginScreen();
+
+    // 4. Berikan notifikasi toast informatif
+    showToast('Sesi Anda telah berakhir secara otomatis karena tidak ada aktivitas selama 15 menit. Silakan login kembali.', 'warning');
+  }
+
+  // =========================================================================
+  // BUKU PANDUAN PENGGUNA (USER GUIDE) SESUAI PERAN & ALL ROLE
+  // =========================================================================
+  var activeGuideTab = 'all';
+
+  function openUserGuideModal() {
+    var modal = document.getElementById('modalUserGuide');
+    if (!modal) return;
+
+    renderGuideRoleTabs();
+    updateGuideCurrentRoleBadge();
+    modal.classList.add('active');
+
+    // Reset scroll ke paling atas saat dibuka
+    var contentArea = document.getElementById('guideContentArea');
+    if (contentArea) contentArea.scrollTop = 0;
+  }
+
+  function closeUserGuideModal() {
+    var modal = document.getElementById('modalUserGuide');
+    if (modal) modal.classList.remove('active');
+  }
+
+  function updateGuideCurrentRoleBadge() {
+    var badge = document.getElementById('guideCurrentRoleBadge');
+    if (!badge) return;
+    var role = (state.authUser && state.authUser.role) ? state.authUser.role : 'Administrator';
+    if (role === 'Administrator') {
+      badge.innerHTML = '👑 Administrator (All Role Access)';
+      badge.style.background = 'rgba(246, 200, 76, 0.18)';
+      badge.style.color = '#f6c84c';
+    } else if (role === 'Facilitator') {
+      badge.innerHTML = '🛠️ Facilitator (Penanganan & Resolusi)';
+      badge.style.background = 'rgba(59, 130, 246, 0.18)';
+      badge.style.color = '#3b82f6';
+    } else {
+      badge.innerHTML = '📝 Inputer (Pelaporan Kasus Baru)';
+      badge.style.background = 'rgba(168, 85, 247, 0.18)';
+      badge.style.color = '#a855f7';
+    }
+  }
+
+  function renderGuideRoleTabs() {
+    var role = (state.authUser && state.authUser.role) ? state.authUser.role : 'Administrator';
+    var tabsContainer = document.getElementById('guideRoleTabs');
+    if (!tabsContainer) return;
+
+    tabsContainer.innerHTML = '';
+
+    var tabs = [];
+    if (role === 'Administrator') {
+      // Role admin mendapatkan user guide all role
+      tabs = [
+        { id: 'all', label: '👑 Semua Panduan (All Role)' },
+        { id: 'inputer', label: '📝 Panduan Inputer' },
+        { id: 'facilitator', label: '🛠️ Panduan Facilitator' },
+        { id: 'admin', label: '👑 Panduan Administrator' },
+        { id: 'flow', label: '🔄 Alur Siklus Kasus' }
+      ];
+    } else if (role === 'Facilitator') {
+      tabs = [
+        { id: 'facilitator', label: '🛠️ Panduan Facilitator' },
+        { id: 'inputer', label: '📝 Referensi Inputer' },
+        { id: 'flow', label: '🔄 Alur Siklus Kasus' }
+      ];
+    } else {
+      // Inputer
+      tabs = [
+        { id: 'inputer', label: '📝 Panduan Inputer' },
+        { id: 'flow', label: '🔄 Alur Siklus Kasus' }
+      ];
+    }
+
+    var isValid = tabs.some(function(t) { return t.id === activeGuideTab; });
+    if (!isValid) {
+      activeGuideTab = tabs[0].id;
+    }
+
+    tabs.forEach(function(t) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'guide-tab-btn' + (t.id === activeGuideTab ? ' active' : '');
+      btn.textContent = t.label;
+      btn.addEventListener('click', function() {
+        activeGuideTab = t.id;
+        renderGuideRoleTabs();
+        handleGuideTabSwitch(t.id);
+      });
+      tabsContainer.appendChild(btn);
+    });
+  }
+
+  function handleGuideTabSwitch(tabId) {
+    var targetSecId = 'guide-sec-matrix';
+    if (tabId === 'inputer') targetSecId = 'guide-sec-inputer';
+    else if (tabId === 'facilitator') targetSecId = 'guide-sec-progress';
+    else if (tabId === 'admin') targetSecId = 'guide-sec-admin';
+    else if (tabId === 'flow') targetSecId = 'guide-sec-progress';
+    else if (tabId === 'all') targetSecId = 'guide-sec-matrix';
+
+    scrollGuideToSection(targetSecId);
+  }
+
+  function scrollGuideToSection(secId) {
+    var sec = document.getElementById(secId);
+    var contentArea = document.getElementById('guideContentArea');
+    if (sec && contentArea) {
+      var topPos = sec.offsetTop - contentArea.offsetTop - 12;
+      contentArea.scrollTo({ top: topPos, behavior: 'smooth' });
+
+      // Perbarui status aktif di Daftar Isi (TOC)
+      var tocLinks = document.querySelectorAll('.guide-toc-link');
+      tocLinks.forEach(function(link) {
+        link.classList.toggle('active', link.getAttribute('data-target') === secId);
+      });
+    }
+  }
+
+  function initGuideTocEvents() {
+    var tocLinks = document.querySelectorAll('.guide-toc-link');
+    tocLinks.forEach(function(link) {
+      link.addEventListener('click', function() {
+        var targetId = link.getAttribute('data-target');
+        if (targetId) {
+          scrollGuideToSection(targetId);
+        }
+      });
+    });
+
+    var contentArea = document.getElementById('guideContentArea');
+    if (contentArea) {
+      contentArea.addEventListener('scroll', function() {
+        var sections = document.querySelectorAll('.guide-section');
+        var scrollPos = contentArea.scrollTop + 60;
+        sections.forEach(function(sec) {
+          var top = sec.offsetTop - contentArea.offsetTop;
+          var height = sec.offsetHeight;
+          if (scrollPos >= top && scrollPos < top + height) {
+            var id = sec.id;
+            tocLinks.forEach(function(l) {
+              l.classList.toggle('active', l.getAttribute('data-target') === id);
+            });
+          }
+        });
+      }, { passive: true });
+    }
   }
 
   function handleLogout() {
@@ -655,6 +858,7 @@
     applyTheme(state.theme);
     initAuth();
     bindEvents();
+    initIdleAutoLogout();
     loadApplicationData();
   }
 
@@ -868,8 +1072,23 @@
     if (dom.toggleFixed) dom.toggleFixed.addEventListener('click', function() { setNewModalService('FIXED'); });
     if (dom.btnSubmitNewReport) dom.btnSubmitNewReport.addEventListener('click', handleSubmitNewReport);
 
+    // 11. User Guide Modal Events
+    var btnUserGuideHdr = document.getElementById('btnUserGuide');
+    if (btnUserGuideHdr) btnUserGuideHdr.addEventListener('click', openUserGuideModal);
+
+    var sidebarBtnUserGuide = document.getElementById('sidebarBtnUserGuide');
+    if (sidebarBtnUserGuide) sidebarBtnUserGuide.addEventListener('click', openUserGuideModal);
+
+    var btnCloseUserGuideModal = document.getElementById('btnCloseUserGuideModal');
+    if (btnCloseUserGuideModal) btnCloseUserGuideModal.addEventListener('click', closeUserGuideModal);
+
+    var btnCloseUserGuideFoot = document.getElementById('btnCloseUserGuideFoot');
+    if (btnCloseUserGuideFoot) btnCloseUserGuideFoot.addEventListener('click', closeUserGuideModal);
+
+    initGuideTocEvents();
+
     // Tutup modal jika klik di luar box modal
-    [dom.modalInProgress, dom.modalClosed, dom.modalLog, dom.newDataModal, document.getElementById('modalManageUsers')].forEach(function(m) {
+    [dom.modalInProgress, dom.modalClosed, dom.modalLog, dom.newDataModal, document.getElementById('modalManageUsers'), document.getElementById('modalUserGuide')].forEach(function(m) {
       if (!m) return;
       m.addEventListener('click', function(e) {
         if (e.target === m) {

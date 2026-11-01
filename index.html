@@ -2667,6 +2667,462 @@
     border: 1px solid var(--border-color);
     white-space: nowrap;
   }
+
+  /* =========================================================================
+     USER GUIDE / PANDUAN PENGGUNA RESMI konCHO
+     ========================================================================= */
+  .btn-hdr-guide {
+    background: rgba(59, 130, 246, 0.12) !important;
+    border-color: rgba(59, 130, 246, 0.38) !important;
+    color: #3b82f6 !important;
+    font-weight: 700;
+  }
+  .btn-hdr-guide:hover {
+    background: rgba(59, 130, 246, 0.22) !important;
+    border-color: #3b82f6 !important;
+    color: #60a5fa !important;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(59, 130, 246, 0.25);
+  }
+
+  .sidebar-nav-btn.guide-btn {
+    border-color: rgba(59, 130, 246, 0.35);
+  }
+  .sidebar-nav-btn.guide-btn:hover {
+    border-color: #3b82f6;
+    background: rgba(59, 130, 246, 0.08);
+  }
+
+  .modal-dialog.modal-guide-dialog {
+    max-width: 1080px;
+    width: 95%;
+    height: 88vh;
+    max-height: 88vh;
+  }
+
+  .blue-kicker {
+    color: #3b82f6;
+  }
+
+  .guide-role-filter-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 12px 24px;
+    background: var(--bg-elevated);
+    border-bottom: 1px solid var(--border-color);
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+
+  .guide-filter-info {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 13px;
+  }
+  .guide-info-label {
+    color: var(--text-secondary);
+    font-weight: 600;
+  }
+
+  .guide-role-tabs {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+
+  .guide-tab-btn {
+    padding: 6px 14px;
+    border-radius: var(--radius-full);
+    font-size: 12px;
+    font-weight: 700;
+    cursor: pointer;
+    border: 1px solid var(--border-color);
+    background: var(--bg-card);
+    color: var(--text-secondary);
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .guide-tab-btn:hover {
+    border-color: var(--primary-color);
+    color: var(--text-primary);
+  }
+  .guide-tab-btn.active {
+    background: linear-gradient(135deg, var(--primary-color), #4f46e5);
+    color: #ffffff;
+    border-color: transparent;
+    box-shadow: 0 2px 8px rgba(99, 102, 241, 0.35);
+  }
+
+  .guide-modal-body {
+    display: flex;
+    padding: 0 !important;
+    overflow: hidden;
+    flex: 1;
+    min-height: 0;
+  }
+
+  /* Left TOC Sidebar */
+  .guide-toc-sidebar {
+    width: 290px;
+    min-width: 290px;
+    border-right: 1px solid var(--border-color);
+    background: var(--bg-card);
+    display: flex;
+    flex-direction: column;
+    overflow-y: auto;
+  }
+
+  .guide-toc-header {
+    padding: 14px 18px 10px;
+    font-size: 11px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid var(--border-color);
+  }
+
+  .guide-toc-nav {
+    padding: 10px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+
+  .guide-toc-link {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 12px;
+    border-radius: var(--radius-sm);
+    font-size: 12.5px;
+    font-weight: 600;
+    color: var(--text-secondary);
+    text-decoration: none;
+    transition: var(--transition);
+    cursor: pointer;
+    border: 1px solid transparent;
+    text-align: left;
+    background: transparent;
+    width: 100%;
+  }
+  .guide-toc-link:hover {
+    background: var(--bg-card-hover);
+    color: var(--text-primary);
+  }
+  .guide-toc-link.active {
+    background: rgba(99, 102, 241, 0.12);
+    color: var(--primary-color);
+    border-color: rgba(99, 102, 241, 0.3);
+    font-weight: 700;
+  }
+  .guide-toc-num {
+    font-size: 11px;
+    width: 22px;
+    height: 22px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    border-radius: 50%;
+    background: var(--bg-elevated);
+    border: 1px solid var(--border-color);
+    flex-shrink: 0;
+  }
+  .guide-toc-link.active .guide-toc-num {
+    background: var(--primary-color);
+    color: #fff;
+    border-color: var(--primary-color);
+  }
+
+  /* Right Content Area */
+  .guide-content-area {
+    flex: 1;
+    overflow-y: auto;
+    padding: 24px 28px;
+    scroll-behavior: smooth;
+    display: flex;
+    flex-direction: column;
+    gap: 32px;
+  }
+
+  .guide-section {
+    scroll-margin-top: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .guide-section-header {
+    border-bottom: 2px solid var(--border-color);
+    padding-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+  }
+  .guide-section-title {
+    font-size: 17px;
+    font-weight: 800;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    gap: 10px;
+  }
+  .guide-section-badge {
+    padding: 3px 10px;
+    border-radius: var(--radius-full);
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  .guide-section-desc {
+    font-size: 13.5px;
+    color: var(--text-secondary);
+    line-height: 1.6;
+  }
+
+  /* Visual Cards & Mockups inside Guide */
+  .guide-visual-card {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    overflow: hidden;
+    box-shadow: var(--shadow-sm);
+  }
+  .guide-visual-head {
+    padding: 10px 16px;
+    background: var(--bg-elevated);
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    font-size: 12px;
+    font-weight: 700;
+    color: var(--text-secondary);
+  }
+  .guide-visual-body {
+    padding: 18px;
+  }
+
+  /* Flowchart / Diagram */
+  .guide-flow-diagram {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    padding: 18px;
+    background: var(--bg-elevated);
+    border-radius: var(--radius-md);
+    border: 1px dashed var(--border-color);
+  }
+  .guide-flow-node {
+    padding: 12px 18px;
+    border-radius: var(--radius-md);
+    font-weight: 700;
+    font-size: 13px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-width: 140px;
+    text-align: center;
+    border: 1px solid transparent;
+    box-shadow: var(--shadow-sm);
+  }
+  .guide-flow-node.node-open {
+    background: rgba(246, 200, 76, 0.15);
+    color: #eab308;
+    border-color: rgba(246, 200, 76, 0.35);
+  }
+  .guide-flow-node.node-progress {
+    background: rgba(59, 130, 246, 0.15);
+    color: #3b82f6;
+    border-color: rgba(59, 130, 246, 0.35);
+  }
+  .guide-flow-node.node-closed {
+    background: rgba(16, 185, 129, 0.15);
+    color: #10b981;
+    border-color: rgba(16, 185, 129, 0.35);
+  }
+  .guide-flow-sub {
+    font-size: 11px;
+    font-weight: 500;
+    opacity: 0.85;
+  }
+  .guide-flow-arrow {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 700;
+  }
+
+  /* Matrix Table */
+  .guide-matrix-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 13px;
+  }
+  .guide-matrix-table th {
+    background: var(--bg-elevated);
+    padding: 10px 14px;
+    text-align: left;
+    border-bottom: 2px solid var(--border-color);
+    font-weight: 700;
+    color: var(--text-primary);
+  }
+  .guide-matrix-table td {
+    padding: 10px 14px;
+    border-bottom: 1px solid var(--border-color);
+    color: var(--text-secondary);
+  }
+  .guide-matrix-table tr:hover td {
+    background: var(--bg-card-hover);
+  }
+  .guide-check {
+    color: #10b981;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+  .guide-cross {
+    color: #ef4444;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+  }
+
+  /* Step by Step */
+  .guide-steps-list {
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  .guide-step-row {
+    display: flex;
+    gap: 14px;
+    align-items: flex-start;
+  }
+  .guide-step-badge {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    background: linear-gradient(135deg, var(--primary-color), #4f46e5);
+    color: #ffffff;
+    font-size: 13px;
+    font-weight: 800;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    flex-shrink: 0;
+    box-shadow: 0 2px 6px rgba(99, 102, 241, 0.3);
+  }
+  .guide-step-text {
+    flex: 1;
+    font-size: 13px;
+    line-height: 1.55;
+    color: var(--text-secondary);
+  }
+  .guide-step-text strong {
+    color: var(--text-primary);
+  }
+
+  /* Form Mockup Preview */
+  .guide-mockup-form {
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    background: var(--bg-elevated);
+    padding: 16px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .guide-field-row {
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+  }
+  .guide-field-label {
+    font-size: 11.5px;
+    font-weight: 700;
+    color: var(--text-primary);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .guide-col-pill {
+    font-size: 10px;
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    font-weight: 700;
+    background: rgba(99, 102, 241, 0.15);
+    color: var(--primary-color);
+  }
+  .guide-field-input {
+    padding: 8px 12px;
+    border-radius: var(--radius-sm);
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    font-size: 12px;
+    color: var(--text-muted);
+  }
+
+  /* Idle Alert Box */
+  .guide-idle-box {
+    padding: 16px 20px;
+    border-radius: var(--radius-md);
+    background: rgba(245, 158, 11, 0.1);
+    border: 1px solid rgba(245, 158, 11, 0.3);
+    display: flex;
+    gap: 16px;
+    align-items: center;
+  }
+  .guide-idle-icon {
+    font-size: 32px;
+    line-height: 1;
+    flex-shrink: 0;
+  }
+  .guide-idle-text {
+    font-size: 13px;
+    color: var(--text-secondary);
+    line-height: 1.55;
+  }
+  .guide-idle-text strong {
+    color: #f59e0b;
+  }
+
+  @media (max-width: 860px) {
+    .modal-dialog.modal-guide-dialog {
+      height: 94vh;
+      max-height: 94vh;
+      width: 98%;
+    }
+    .guide-modal-body {
+      flex-direction: column;
+    }
+    .guide-toc-sidebar {
+      width: 100%;
+      min-width: 100%;
+      max-height: 180px;
+      border-right: none;
+      border-bottom: 1px solid var(--border-color);
+    }
+    .guide-flow-diagram {
+      flex-direction: column;
+    }
+  }
 </style>
 
 
@@ -2828,6 +3284,12 @@
           <span>Kelola User</span>
         </button>
 
+        <!-- Tombol Panduan Pengguna (User Guide) -->
+        <button class="btn-hdr btn-hdr-guide" id="btnUserGuide" title="Buku Panduan Pengguna (User Guide)">
+          <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+          <span>User Guide</span>
+        </button>
+
         <button class="btn-hdr" id="btnRefresh" title="Muat Ulang Data dari Google Sheet">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
           <span>Refresh</span>
@@ -2863,6 +3325,14 @@
                 <span class="nav-text" style="font-weight: 700;">Home</span>
               </div>
               <span class="nav-badge" style="background: linear-gradient(135deg, #10b981, #059669); color: #fff; font-weight: 700;">Sheet List</span>
+            </button>
+
+            <button class="sidebar-nav-btn guide-btn" id="sidebarBtnUserGuide" title="Buku Panduan Pengguna (User Guide)">
+              <div class="nav-btn-left">
+                <span class="nav-icon">📖</span>
+                <span class="nav-text" style="font-weight: 700;">User Guide</span>
+              </div>
+              <span class="nav-badge" style="background: rgba(59, 130, 246, 0.18); color: #3b82f6; font-weight: 700;">Panduan</span>
             </button>
             
           </div>
@@ -3483,7 +3953,590 @@
     </div>
   </div>
 
-    <!-- Toast Notification Container -->
+    <!-- =========================================================================
+       MODAL PANDUAN PENGGUNA (USER GUIDE INTERAKTIF & SESUAI PERAN)
+       Daftar Isi Lengkap, Ilustrasi Alur Status, Panduan Inputer, Facilitator & Admin
+       ========================================================================= -->
+    <div class="modal-backdrop" id="modalUserGuide">
+      <div class="modal-dialog modal-guide-dialog">
+        <div class="modal-head">
+          <div class="modal-title-wrap">
+            <div class="modal-kicker blue-kicker">📖 PANDUAN PENGGUNA RESMI konCHO</div>
+            <h2 class="modal-title">Buku Panduan Pengguna (User Guide)</h2>
+          </div>
+          <button class="modal-close-btn" id="btnCloseUserGuideModal" title="Tutup">✕</button>
+        </div>
+
+        <!-- Role Filter Bar & Quick Switcher -->
+        <div class="guide-role-filter-bar">
+          <div class="guide-filter-info">
+            <span class="guide-info-label">Peran Aktif Anda:</span>
+            <span class="guide-current-role-badge" id="guideCurrentRoleBadge" style="padding: 4px 10px; border-radius: 9999px; font-size: 12px; font-weight: 700; background: rgba(99,102,241,0.15); color: var(--primary-color);">👑 Administrator</span>
+          </div>
+          <div class="guide-role-tabs" id="guideRoleTabs">
+            <!-- Tabs diisi secara dinamis berdasarkan role user -->
+          </div>
+        </div>
+
+        <!-- Layout 2 Kolom: Kiri Daftar Isi (TOC), Kanan Konten Panduan Visual -->
+        <div class="modal-body guide-modal-body">
+          
+          <!-- SISI KIRI: DAFTAR ISI (TABLE OF CONTENTS) -->
+          <aside class="guide-toc-sidebar">
+            <div class="guide-toc-header">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>
+              <span>Daftar Isi Panduan</span>
+            </div>
+            <nav class="guide-toc-nav" id="guideTocNav">
+              <button type="button" class="guide-toc-link active" data-target="guide-sec-matrix">
+                <span class="guide-toc-num">1</span>
+                <span>Matriks Hak Akses & Peran</span>
+              </button>
+              <button type="button" class="guide-toc-link" data-target="guide-sec-inputer">
+                <span class="guide-toc-num">2</span>
+                <span>Panduan Inputer: Input Kasus</span>
+              </button>
+              <button type="button" class="guide-toc-link" data-target="guide-sec-home">
+                <span class="guide-toc-num">3</span>
+                <span>Panduan Membaca Menu Home</span>
+              </button>
+              <button type="button" class="guide-toc-link" data-target="guide-sec-progress">
+                <span class="guide-toc-num">4</span>
+                <span>Facilitator: Proses In Progress</span>
+              </button>
+              <button type="button" class="guide-toc-link" data-target="guide-sec-closed">
+                <span class="guide-toc-num">5</span>
+                <span>Facilitator: Selesaikan Closed</span>
+              </button>
+              <button type="button" class="guide-toc-link" data-target="guide-sec-log">
+                <span class="guide-toc-num">6</span>
+                <span>Update Keterangan & Log</span>
+              </button>
+              <button type="button" class="guide-toc-link" data-target="guide-sec-admin">
+                <span class="guide-toc-num">7</span>
+                <span>Administrator: Kelola User</span>
+              </button>
+              <button type="button" class="guide-toc-link" data-target="guide-sec-security">
+                <span class="guide-toc-num">8</span>
+                <span>Auto-Logout 15 Menit Idle</span>
+              </button>
+            </nav>
+          </aside>
+
+          <!-- SISI KANAN: KONTEN DETAIL DENGAN GAMBAR & MOCKUP VISUAL -->
+          <main class="guide-content-area" id="guideContentArea">
+
+            <!-- BAGIAN 1: MATRIKS HAK AKSES PERAN (ALL ROLE) -->
+            <section class="guide-section" id="guide-sec-matrix">
+              <div class="guide-section-header">
+                <h3 class="guide-section-title">
+                  <span>📌 1. Matriks Hak Akses & Peran Pengguna</span>
+                </h3>
+                <span class="guide-section-badge" style="background: rgba(99,102,241,0.15); color: var(--primary-color);">All Role</span>
+              </div>
+              <p class="guide-section-desc">
+                Aplikasi konCHO memiliki 3 peran pengguna (Role) dengan batasan wewenang yang dirancang untuk menjaga integritas data dan keamanan operasional.
+              </p>
+
+              <!-- Kartu 3 Peran -->
+              <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px;">
+                <div class="guide-visual-card">
+                  <div class="guide-visual-head" style="border-left: 4px solid #a855f7;">
+                    <span>📝 PERAN INPUTER</span>
+                  </div>
+                  <div class="guide-visual-body" style="font-size: 12.5px; line-height: 1.5; color: var(--text-secondary);">
+                    Fokus utama: <strong>Melaporkan & Menginput Kasus Baru</strong> (Mobile & Fixed) ke Google Sheet. Memantau status tiket secara read-only. Tidak dapat mengubah status kasus atau mengelola user.
+                  </div>
+                </div>
+
+                <div class="guide-visual-card">
+                  <div class="guide-visual-head" style="border-left: 4px solid #3b82f6;">
+                    <span>🛠️ PERAN FACILITATOR</span>
+                  </div>
+                  <div class="guide-visual-body" style="font-size: 12.5px; line-height: 1.5; color: var(--text-secondary);">
+                    Fokus utama: <strong>Menindaklanjuti & Menyelesaikan Kasus</strong>. Berwenang mengubah status (Open ➔ In Progress ➔ Closed), mencatat PIC pelaksana, dan memperbarui riwayat log komunikasi.
+                  </div>
+                </div>
+
+                <div class="guide-visual-card">
+                  <div class="guide-visual-head" style="border-left: 4px solid #f6c84c;">
+                    <span>👑 PERAN ADMINISTRATOR</span>
+                  </div>
+                  <div class="guide-visual-body" style="font-size: 12.5px; line-height: 1.5; color: var(--text-secondary);">
+                    Fokus utama: <strong>Pengawasan Penuh & Tata Kelola Pengguna</strong>. Memiliki seluruh hak akses Inputer + Facilitator, ditambah akses <em>Kelola Pengguna (User Management)</em> dan tautan spreadsheet.
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tabel Matriks Wewenang -->
+              <div class="guide-visual-card">
+                <div class="guide-visual-head">
+                  <span>📊 TABEL PERBANDINGAN HAK AKSES SISTEM</span>
+                </div>
+                <div style="overflow-x: auto;">
+                  <table class="guide-matrix-table">
+                    <thead>
+                      <tr>
+                        <th>Fitur / Wewenang Aksi</th>
+                        <th style="text-align: center;">📝 Inputer</th>
+                        <th style="text-align: center;">🛠️ Facilitator</th>
+                        <th style="text-align: center;">👑 Administrator</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr>
+                        <td><strong>Input Kasus Baru (+ Input Case Baru)</strong></td>
+                        <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
+                        <td style="text-align: center;"><span class="guide-cross">❌ Tidak</span></td>
+                        <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Lihat Daftar Kasus di Menu Home & Detil Case</strong></td>
+                        <td style="text-align: center;"><span class="guide-check">✅ Ya (Read-only)</span></td>
+                        <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
+                        <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Ubah Status ke In Progress (+ Form PIC & Catatan)</strong></td>
+                        <td style="text-align: center;"><span class="guide-cross">❌ Tidak</span></td>
+                        <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
+                        <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Ubah Status ke Closed (+ Form Solusi Permanen)</strong></td>
+                        <td style="text-align: center;"><span class="guide-cross">❌ Tidak</span></td>
+                        <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
+                        <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Update Keterangan Berkala & Catatan Progres</strong></td>
+                        <td style="text-align: center;"><span class="guide-cross">❌ Tidak</span></td>
+                        <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
+                        <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Buka Riwayat Log Komunikasi & Detail Lengkap</strong></td>
+                        <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
+                        <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
+                        <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Menu Kelola User (Buat Akun, Ubah Role, Password)</strong></td>
+                        <td style="text-align: center;"><span class="guide-cross">❌ Tidak</span></td>
+                        <td style="text-align: center;"><span class="guide-cross">❌ Tidak</span></td>
+                        <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Tautan Metadata & Akses Langsung Google Sheet</strong></td>
+                        <td style="text-align: center;"><span class="guide-cross">❌ Tidak (Dihide)</span></td>
+                        <td style="text-align: center;"><span class="guide-cross">❌ Tidak (Dihide)</span></td>
+                        <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </section>
+
+            <!-- BAGIAN 2: PANDUAN ROLE INPUTER (CARA INPUT KASUS BARU) -->
+            <section class="guide-section" id="guide-sec-inputer">
+              <div class="guide-section-header">
+                <h3 class="guide-section-title">
+                  <span>📝 2. Panduan Role Inputer: Cara Input Kasus Baru</span>
+                </h3>
+                <span class="guide-section-badge" style="background: rgba(168,85,247,0.15); color: #a855f7;">Inputer & Admin</span>
+              </div>
+              <p class="guide-section-desc">
+                Role Inputer bertugas memasukkan setiap keluhan atau isu baru ke dalam sistem. Data yang disimpan akan langsung terkirim ke Google Sheets (Sheet <code>Mobile</code> atau Sheet <code>Fixed</code>) dan muncul otomatis di dashboard konCHO.
+              </p>
+
+              <!-- Langkah demi langkah -->
+              <div class="guide-steps-list">
+                <div class="guide-step-row">
+                  <div class="guide-step-badge">1</div>
+                  <div class="guide-step-text">
+                    Klik tombol <strong>+ Input Case Baru</strong> di pojok kanan atas header aplikasi.
+                  </div>
+                </div>
+                <div class="guide-step-row">
+                  <div class="guide-step-badge">2</div>
+                  <div class="guide-step-text">
+                    Pilih <strong>Unit Layanan</strong>: Klik tombol <strong>CHO Mobile</strong> (layanan seluler/paket) atau <strong>CHO Fixed</strong> (IndiHome/Internet/PSTN). Form akan menyesuaikan label dan sheet tujuan secara otomatis.
+                  </div>
+                </div>
+                <div class="guide-step-row">
+                  <div class="guide-step-badge">3</div>
+                  <div class="guide-step-text">
+                    Isi field data sesuai pemetaan kolom Google Sheet:
+                    <ul style="margin: 6px 0 0 18px; padding: 0;">
+                      <li><strong>Periode Bulan:</strong> Pilih bulan terjadinya kasus (misal: <em>Oktober 2026</em>, <em>Juli 2026</em>).</li>
+                      <li><strong>Case Isu yang Masuk (Kolom B):</strong> Judul ringkas kendala atau tiket awal.</li>
+                      <li><strong>Main Issue (Kolom C):</strong> Pokok permasalahan utama (akan menjadi tajuk di menu Home).</li>
+                      <li><strong>Issue Details / Description (Kolom D):</strong> Kronologi lengkap permasalahan, dampak ke pelanggan, nomor sampel jika ada.</li>
+                      <li><strong>Requestor / Pemohon (Kolom G):</strong> Pihak pelapor (contoh: <em>Call Center 147</em>, <em>Sales D2D</em>, <em>B2B Care</em>).</li>
+                      <li><strong>Follow Up To (Kolom I):</strong> Tim teknis pelaksana (contoh: <em>Tim RO</em>, <em>Tim Splicing Lapangan</em>).</li>
+                      <li><strong>Status Awal (Kolom H):</strong> Secara default bernilai <strong>Open</strong>.</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="guide-step-row">
+                  <div class="guide-step-badge">4</div>
+                  <div class="guide-step-text">
+                    Klik tombol <strong>Simpan ke Database</strong>. Sistem akan mengirim data ke Google Apps Script dan memunculkan notifikasi sukses.
+                  </div>
+                </div>
+              </div>
+
+              <!-- GAMBAR MOCKUP: FORM INPUT KASUS BARU -->
+              <div class="guide-visual-card">
+                <div class="guide-visual-head">
+                  <span>📸 ILUSTRASI FORM INPUT KASUS BARU (PEMETAAN KOLOM B, C, D, G, H, I)</span>
+                  <span style="font-size: 11px; color: #10b981;">● Visual Preview</span>
+                </div>
+                <div class="guide-visual-body">
+                  <div class="guide-mockup-form">
+                    <div style="display: flex; gap: 8px; justify-content: center; margin-bottom: 6px;">
+                      <span style="padding: 6px 16px; border-radius: 6px; background: rgba(168,85,247,0.2); color: #a855f7; font-weight: 700; font-size: 12px; border: 1px solid #a855f7;">📱 CHO Mobile</span>
+                      <span style="padding: 6px 16px; border-radius: 6px; background: var(--bg-card); color: var(--text-muted); font-size: 12px; border: 1px solid var(--border-color);">🌐 CHO Fixed</span>
+                    </div>
+
+                    <div class="guide-field-row">
+                      <div class="guide-field-label">
+                        <span>Case Isu yang Masuk</span>
+                        <span class="guide-col-pill">KOLOM B</span>
+                      </div>
+                      <div class="guide-field-input">Kendala charge MU pada paket bundling...</div>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                      <div class="guide-field-row">
+                        <div class="guide-field-label">
+                          <span>Main Issue</span>
+                          <span class="guide-col-pill">KOLOM C</span>
+                        </div>
+                        <div class="guide-field-input">Kendala charge MU bundling</div>
+                      </div>
+                      <div class="guide-field-row">
+                        <div class="guide-field-label">
+                          <span>Requestor</span>
+                          <span class="guide-col-pill">KOLOM G</span>
+                        </div>
+                        <div class="guide-field-input">Call Center 147</div>
+                      </div>
+                    </div>
+
+                    <div class="guide-field-row">
+                      <div class="guide-field-label">
+                        <span>Issue Details (Description)</span>
+                        <span class="guide-col-pill">KOLOM D</span>
+                      </div>
+                      <div class="guide-field-input" style="height: 48px;">Pelanggan sudah aktivasi paket bundling namun masih dikenakan MU baik aktivasi dari channel digipos atau HVC...</div>
+                    </div>
+
+                    <div style="display: flex; justify-content: flex-end; margin-top: 4px;">
+                      <span style="padding: 6px 18px; border-radius: 6px; background: linear-gradient(135deg, var(--primary-color), #4f46e5); color: #fff; font-weight: 700; font-size: 12px;">💾 Simpan ke Database</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- BAGIAN 3: PANDUAN MEMBACA MENU HOME (SHEET LIST C, D, H, J) -->
+            <section class="guide-section" id="guide-sec-home">
+              <div class="guide-section-header">
+                <h3 class="guide-section-title">
+                  <span>🏠 3. Panduan Membaca Menu Home (Sheet List C, D, H, J)</span>
+                </h3>
+                <span class="guide-section-badge" style="background: rgba(16,185,129,0.15); color: #10b981;">Sheet List</span>
+              </div>
+              <p class="guide-section-desc">
+                Menu <strong>Home</strong> menyajikan rekap data yang ringkas dan terfokus pada kolom-kolom utama seperti pada Google Sheets Mobile dan Fixed, dilengkapi dengan pembeda warna unit layanan.
+              </p>
+
+              <!-- GAMBAR MOCKUP: TABEL HOME -->
+              <div class="guide-visual-card">
+                <div class="guide-visual-head">
+                  <span>📸 ILUSTRASI TAMPILAN TABEL HOME DENGAN KOLOM C, D, H, J</span>
+                  <span style="font-size: 11px; color: #3b82f6;">● Real Layout</span>
+                </div>
+                <div class="guide-visual-body" style="padding: 0; overflow-x: auto;">
+                  <table style="width: 100%; border-collapse: collapse; font-size: 12px;">
+                    <thead style="background: var(--bg-elevated); border-bottom: 2px solid var(--border-color);">
+                      <tr>
+                        <th style="padding: 8px 10px; width: 40px; text-align: center;">NO</th>
+                        <th style="padding: 8px 10px; width: 110px;">BULAN</th>
+                        <th style="padding: 8px 10px; width: 110px; text-align: center;">UNIT</th>
+                        <th style="padding: 8px 10px; min-width: 180px;">MAIN ISSUE (KOLOM C)</th>
+                        <th style="padding: 8px 10px; min-width: 220px;">ISSUE DETAILS (KOLOM D)</th>
+                        <th style="padding: 8px 10px; width: 110px; text-align: center;">STATUS (KOLOM H)</th>
+                        <th style="padding: 8px 10px; width: 130px;">STATUS UPDATE (KOLOM J)</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      <tr style="border-bottom: 1px solid var(--border-color);">
+                        <td style="padding: 10px; text-align: center;">1</td>
+                        <td style="padding: 10px;"><span class="badge-month-pill">📅 Oktober 2026</span></td>
+                        <td style="padding: 10px; text-align: center;"><span style="padding: 3px 8px; border-radius: 9999px; font-size: 11px; font-weight: 700; background: rgba(168,85,247,0.18); color: #a855f7;">CHO MOBILE</span></td>
+                        <td style="padding: 10px; font-weight: 700;">Kendala charge MU paket bundling</td>
+                        <td style="padding: 10px; color: var(--text-secondary); font-size: 11.5px;">Pelanggan sudah aktivasi paket bundling namun tetap terpotong MU...</td>
+                        <td style="padding: 10px; text-align: center;"><span style="padding: 3px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700; background: rgba(59,130,246,0.15); color: #3b82f6;">In Progress</span></td>
+                        <td style="padding: 10px; font-size: 11.5px; color: var(--text-muted);">Ada Update Baru</td>
+                      </tr>
+                      <tr>
+                        <td style="padding: 10px; text-align: center;">2</td>
+                        <td style="padding: 10px;"><span class="badge-month-pill">📅 Juli 2026</span></td>
+                        <td style="padding: 10px; text-align: center;"><span style="padding: 3px 8px; border-radius: 9999px; font-size: 11px; font-weight: 700; background: rgba(59,130,246,0.18); color: #3b82f6;">CHO FIXED</span></td>
+                        <td style="padding: 10px; font-weight: 700;">Perhitungan Paket PDD (Juli 2026)</td>
+                        <td style="padding: 10px; color: var(--text-secondary); font-size: 11.5px;">Pelanggan menanyakan tagihan di bulan terakhir masa PDD...</td>
+                        <td style="padding: 10px; text-align: center;"><span style="padding: 3px 10px; border-radius: 9999px; font-size: 11px; font-weight: 700; background: rgba(246,200,76,0.18); color: #eab308;">Open</span></td>
+                        <td style="padding: 10px; font-size: 11.5px; color: var(--text-muted);">Belum Ada Update</td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </div>
+            </section>
+
+            <!-- BAGIAN 4: PANDUAN FACILITATOR (PROSES KASUS KE IN PROGRESS) -->
+            <section class="guide-section" id="guide-sec-progress">
+              <div class="guide-section-header">
+                <h3 class="guide-section-title">
+                  <span>🛠️ 4. Panduan Facilitator: Proses Kasus ke In Progress</span>
+                </h3>
+                <span class="guide-section-badge" style="background: rgba(59,130,246,0.15); color: #3b82f6;">Facilitator & Admin</span>
+              </div>
+              <p class="guide-section-desc">
+                Ketika kasus baru (status <em>Open</em>) mulai ditangani oleh tim teknis/terkait, Facilitator wajib memindahkan statusnya menjadi <strong>In Progress</strong> agar terpantau aktif.
+              </p>
+
+              <!-- DIAGRAM ALUR STATUS -->
+              <div class="guide-visual-card">
+                <div class="guide-visual-head">
+                  <span>🔄 DIAGRAM SIKLUS STATUS KASUS konCHO</span>
+                </div>
+                <div class="guide-visual-body">
+                  <div class="guide-flow-diagram">
+                    <div class="guide-flow-node node-open">
+                      <span>🟡 STATUS: OPEN</span>
+                      <span class="guide-flow-sub">Tiket Baru dari Inputer</span>
+                    </div>
+
+                    <div class="guide-flow-arrow">
+                      <span>Tombol Aksi</span>
+                      <span style="color: #3b82f6; font-size: 14px;">➔ ▶️ Proses ➔</span>
+                      <span>Isi Form PIC</span>
+                    </div>
+
+                    <div class="guide-flow-node node-progress">
+                      <span>🔵 IN PROGRESS</span>
+                      <span class="guide-flow-sub">Sedang Ditangani / Koordinasi</span>
+                    </div>
+
+                    <div class="guide-flow-arrow">
+                      <span>Tombol Aksi</span>
+                      <span style="color: #10b981; font-size: 14px;">➔ ✅ Selesaikan ➔</span>
+                      <span>Isi Form Solusi</span>
+                    </div>
+
+                    <div class="guide-flow-node node-closed">
+                      <span>🟢 STATUS: CLOSED</span>
+                      <span class="guide-flow-sub">Selesai & Tersolusi</span>
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Langkah Pengisian -->
+              <div class="guide-steps-list">
+                <div class="guide-step-row">
+                  <div class="guide-step-badge">1</div>
+                  <div class="guide-step-text">
+                    Temukan baris kasus berstatus <strong>Open</strong>, lalu klik tombol biru <strong>Proses (In Progress)</strong>.
+                  </div>
+                </div>
+                <div class="guide-step-row">
+                  <div class="guide-step-badge">2</div>
+                  <div class="guide-step-text">
+                    Pada formulir popup yang muncul, isikan:
+                    <ul style="margin: 4px 0 0 16px;">
+                      <li><strong>Keterangan / Catatan Tindak Lanjut:</strong> Langkah analisa, koordinasi tim, atau mitigasi sementara yang sedang berjalan.</li>
+                      <li><strong>PIC / Petugas Pelaksana:</strong> Nama personil yang bertanggung jawab menangani tiket.</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="guide-step-row">
+                  <div class="guide-step-badge">3</div>
+                  <div class="guide-step-text">
+                    Klik <strong>Simpan & Ubah ke In Progress</strong>. Status kasus langsung berubah dan tercatat secara real-time pada riwayat log.
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- BAGIAN 5: PANDUAN FACILITATOR (SELESAIKAN KASUS KE CLOSED) -->
+            <section class="guide-section" id="guide-sec-closed">
+              <div class="guide-section-header">
+                <h3 class="guide-section-title">
+                  <span>✅ 5. Panduan Facilitator: Selesaikan Kasus ke Closed</span>
+                </h3>
+                <span class="guide-section-badge" style="background: rgba(16,185,129,0.15); color: #10b981;">Facilitator & Admin</span>
+              </div>
+              <p class="guide-section-desc">
+                Setelah kendala berhasil diperbaiki dan terverifikasi normal, Facilitator mengubah status tiket menjadi <strong>Closed</strong>.
+              </p>
+
+              <div class="guide-steps-list">
+                <div class="guide-step-row">
+                  <div class="guide-step-badge">1</div>
+                  <div class="guide-step-text">
+                    Klik tombol hijau <strong>Selesaikan (Closed)</strong> pada kartu atau baris kasus terkait.
+                  </div>
+                </div>
+                <div class="guide-step-row">
+                  <div class="guide-step-badge">2</div>
+                  <div class="guide-step-text">
+                    Pada form modal yang muncul, isikan:
+                    <ul style="margin: 4px 0 0 16px;">
+                      <li><strong>Keterangan Penyelesaian (Solusi Permanen / Hasil Akhir):</strong> Rincian perbaikan teknis, adjustment, atau konfirmasi hasil pengetesan.</li>
+                      <li><strong>Diselesaikan Oleh (Closed By / PIC):</strong> Nama petugas yang mengesahkan penyelesaian kasus.</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="guide-step-row">
+                  <div class="guide-step-badge">3</div>
+                  <div class="guide-step-text">
+                    Klik <strong>Simpan & Selesaikan</strong>. Tiket menjadi Closed, indikator KPI Closed bertambah, dan tercatat permanen di riwayat log.
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- BAGIAN 6: UPDATE KETERANGAN & RIWAYAT LOG -->
+            <section class="guide-section" id="guide-sec-log">
+              <div class="guide-section-header">
+                <h3 class="guide-section-title">
+                  <span>💬 6. Update Keterangan Berkala & Riwayat Log Komunikasi</span>
+                </h3>
+                <span class="guide-section-badge" style="background: rgba(59,130,246,0.15); color: #3b82f6;">All Role</span>
+              </div>
+              <p class="guide-section-desc">
+                Gunakan tombol <strong>+ Update Keterangan</strong> untuk menambahkan catatan progres harian atau eskalasi tanpa mengubah status tiket. Seluruh jejak komunikasi dapat dilihat kapan saja melalui tombol <strong>Riwayat Log</strong>.
+              </p>
+            </section>
+
+            <!-- BAGIAN 7: PANDUAN ADMINISTRATOR (KELOLA USER & HAK AKSES) -->
+            <section class="guide-section" id="guide-sec-admin">
+              <div class="guide-section-header">
+                <h3 class="guide-section-title">
+                  <span>👑 7. Panduan Administrator: Kelola Pengguna & Hak Akses</span>
+                </h3>
+                <span class="guide-section-badge" style="background: rgba(246,200,76,0.18); color: #f6c84c;">Khusus Admin</span>
+              </div>
+              <p class="guide-section-desc">
+                Menu <strong>Kelola User</strong> hanya dapat diakses oleh pengguna dengan role <strong>Administrator</strong>. Menu ini berfungsi untuk mendaftarkan akun baru, mengubah hak akses (Role), mereset kata sandi, atau menonaktifkan pengguna.
+              </p>
+
+              <div class="guide-steps-list">
+                <div class="guide-step-row">
+                  <div class="guide-step-badge">1</div>
+                  <div class="guide-step-text">
+                    Buka menu <strong>Kelola User</strong> melalui tombol di header atas atau menu di sidebar kiri.
+                  </div>
+                </div>
+                <div class="guide-step-row">
+                  <div class="guide-step-badge">2</div>
+                  <div class="guide-step-text">
+                    Klik tombol <strong>+ Tambah Pengguna Baru</strong>, lalu lengkapi isian:
+                    <ul style="margin: 4px 0 0 16px;">
+                      <li><strong>Username:</strong> Nama pengguna untuk login (contoh: <code>budi_cho</code> atau <code>0123</code>, tanpa spasi). Awalan <code>@</code> dibersihkan otomatis.</li>
+                      <li><strong>Nama Lengkap:</strong> Nama lengkap identitas resmi (contoh: <em>Budi Santoso</em>). Nama ini yang akan tampil di header profil dan riwayat log.</li>
+                      <li><strong>Peran (Role):</strong> Pilih <em>Administrator</em>, <em>Facilitator</em>, atau <em>Inputer</em>.</li>
+                      <li><strong>Kata Sandi:</strong> Password yang digunakan user untuk login.</li>
+                    </ul>
+                  </div>
+                </div>
+                <div class="guide-step-row">
+                  <div class="guide-step-badge">3</div>
+                  <div class="guide-step-text">
+                    Klik <strong>Simpan Pengguna</strong>. Akun baru langsung aktif seketika dan dapat digunakan untuk masuk ke konCHO.
+                  </div>
+                </div>
+              </div>
+
+              <!-- GAMBAR MOCKUP KELOLA USER -->
+              <div class="guide-visual-card">
+                <div class="guide-visual-head">
+                  <span>📸 ILUSTRASI FORM PEMBUATAN AKUN PENGGUNA BARU</span>
+                </div>
+                <div class="guide-visual-body">
+                  <div class="guide-mockup-form">
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                      <div class="guide-field-row">
+                        <div class="guide-field-label"><span>Username</span></div>
+                        <div class="guide-field-input">@reza_cho</div>
+                      </div>
+                      <div class="guide-field-row">
+                        <div class="guide-field-label"><span>Nama Lengkap</span></div>
+                        <div class="guide-field-input">Reza Pratama</div>
+                      </div>
+                    </div>
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+                      <div class="guide-field-row">
+                        <div class="guide-field-label"><span>Peran (Role)</span></div>
+                        <div class="guide-field-input">📝 Inputer (Hanya Input Kasus Baru)</div>
+                      </div>
+                      <div class="guide-field-row">
+                        <div class="guide-field-label"><span>Kata Sandi</span></div>
+                        <div class="guide-field-input">••••••••</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </section>
+
+            <!-- BAGIAN 8: FITUR KEAMANAN AUTO-LOGOUT 15 MENIT IDLE -->
+            <section class="guide-section" id="guide-sec-security">
+              <div class="guide-section-header">
+                <h3 class="guide-section-title">
+                  <span>⏱️ 8. Fitur Keamanan: Auto-Logout Otomatis 15 Menit Idle</span>
+                </h3>
+                <span class="guide-section-badge" style="background: rgba(245,158,11,0.15); color: #f59e0b;">Keamanan Sistem</span>
+              </div>
+              <p class="guide-section-desc">
+                Untuk mencegah akses tanpa izin jika perangkat ditinggalkan tanpa pengawasan, konCHO dilengkapi dengan mekanisme <strong>Deteksi Inaktivitas (Idle Auto-Logout)</strong> berstandar keamanan data enterprise.
+              </p>
+
+              <!-- KOTAK PERINGATAN FITUR IDLE -->
+              <div class="guide-idle-box">
+                <div class="guide-idle-icon">⏱️</div>
+                <div class="guide-idle-text">
+                  <strong>Bagaimana Auto-Logout 15 Menit Bekerja?</strong><br>
+                  Sistem terus memantau aktivitas Anda secara lokal di browser (pergerakan mouse, ketukan keyboard, klik, scroll, dan sentuhan layar). Jika tidak ada interaksi apapun selama <strong>15 menit (900 detik)</strong> berturut-turut, sesi Anda akan otomatis diakhiri dan dikembalikan ke layar login secara aman.
+                </div>
+              </div>
+
+              <div class="guide-steps-list" style="margin-top: 10px;">
+                <div class="guide-step-row">
+                  <div class="guide-step-badge">💡</div>
+                  <div class="guide-step-text">
+                    <strong>Cara Mereset Timer:</strong> Cukup gerakkan kursor mouse, lakukan klik, atau gulir layar aplikasi. Timer 15 menit akan langsung diperbarui ke 0 kembali secara otomatis tanpa mengganggu pekerjaan Anda.
+                  </div>
+                </div>
+              </div>
+            </section>
+
+          </main>
+        </div>
+
+        <div class="modal-foot" style="justify-content: space-between;">
+          <span style="font-size: 12px; color: #64748b; display: flex; align-items: center; gap: 6px;">
+            <span style="color: #f59e0b;">⏱️</span> Sesi konCHO otomatis logout jika idle 15 menit tanpa aktivitas.
+          </span>
+          <button type="button" class="btn btn-secondary" id="btnCloseUserGuideFoot">Tutup Panduan</button>
+        </div>
+      </div>
+    </div>
     <div class="toast-container" id="toastContainer"></div>
 
   </div> <!-- End #appView -->
@@ -4033,6 +5086,10 @@
     if (sidebarSheetInfo) {
       sidebarSheetInfo.style.display = (role === 'Administrator') ? 'block' : 'none';
     }
+
+    // 5. Update Status & Tab Peran di Buku Panduan (User Guide)
+    updateGuideCurrentRoleBadge();
+    renderGuideRoleTabs();
   }
 
   function showDashboardApp() {
@@ -4124,12 +5181,211 @@
       showToast('Selamat Datang di konCHO! Masuk sebagai ' + role + ' (' + fullName + ')', 'success');
       showDashboardApp();
       renderCaseList();
+      resetIdleTimer();
 
       if (btnSubmit) {
         btnSubmit.innerHTML = '<span>Sign In</span> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
         btnSubmit.style.opacity = '1';
       }
     }, 350);
+  }
+
+  // =========================================================================
+  // SISTEM KEAMANAN: AUTO-LOGOUT SETELAH 15 MENIT TIDAK AKTIF (IDLE TIMEOUT)
+  // =========================================================================
+  var IDLE_TIMEOUT_MS = 15 * 60 * 1000; // 15 Menit = 900.000 ms
+  var lastUserActivity = Date.now();
+  var idleCheckTimer = null;
+
+  function resetIdleTimer() {
+    lastUserActivity = Date.now();
+  }
+
+  function initIdleAutoLogout() {
+    lastUserActivity = Date.now();
+    var events = ['mousemove', 'mousedown', 'keydown', 'touchstart', 'scroll', 'click', 'wheel'];
+    events.forEach(function(evt) {
+      window.addEventListener(evt, resetIdleTimer, { passive: true });
+    });
+
+    if (idleCheckTimer) clearInterval(idleCheckTimer);
+    idleCheckTimer = setInterval(function() {
+      // Hanya berjalan jika user sedang dalam sesi aktif (logged in)
+      if (!state.authUser) return;
+
+      var idleTime = Date.now() - lastUserActivity;
+      if (idleTime >= IDLE_TIMEOUT_MS) {
+        performIdleAutoLogout();
+      }
+    }, 10000); // Evaluasi setiap 10 detik
+  }
+
+  function performIdleAutoLogout() {
+    // 1. Tutup seluruh modal jika ada yang sedang terbuka
+    var activeModals = document.querySelectorAll('.modal-backdrop.active');
+    activeModals.forEach(function(m) {
+      m.classList.remove('active');
+    });
+
+    // 2. Hapus sesi otentikasi
+    try {
+      localStorage.removeItem('koncho_auth_user');
+    } catch(e) {}
+    state.authUser = null;
+
+    // 3. Tampilkan layar login
+    showLoginScreen();
+
+    // 4. Berikan notifikasi toast informatif
+    showToast('Sesi Anda telah berakhir secara otomatis karena tidak ada aktivitas selama 15 menit. Silakan login kembali.', 'warning');
+  }
+
+  // =========================================================================
+  // BUKU PANDUAN PENGGUNA (USER GUIDE) SESUAI PERAN & ALL ROLE
+  // =========================================================================
+  var activeGuideTab = 'all';
+
+  function openUserGuideModal() {
+    var modal = document.getElementById('modalUserGuide');
+    if (!modal) return;
+
+    renderGuideRoleTabs();
+    updateGuideCurrentRoleBadge();
+    modal.classList.add('active');
+
+    // Reset scroll ke paling atas saat dibuka
+    var contentArea = document.getElementById('guideContentArea');
+    if (contentArea) contentArea.scrollTop = 0;
+  }
+
+  function closeUserGuideModal() {
+    var modal = document.getElementById('modalUserGuide');
+    if (modal) modal.classList.remove('active');
+  }
+
+  function updateGuideCurrentRoleBadge() {
+    var badge = document.getElementById('guideCurrentRoleBadge');
+    if (!badge) return;
+    var role = (state.authUser && state.authUser.role) ? state.authUser.role : 'Administrator';
+    if (role === 'Administrator') {
+      badge.innerHTML = '👑 Administrator (All Role Access)';
+      badge.style.background = 'rgba(246, 200, 76, 0.18)';
+      badge.style.color = '#f6c84c';
+    } else if (role === 'Facilitator') {
+      badge.innerHTML = '🛠️ Facilitator (Penanganan & Resolusi)';
+      badge.style.background = 'rgba(59, 130, 246, 0.18)';
+      badge.style.color = '#3b82f6';
+    } else {
+      badge.innerHTML = '📝 Inputer (Pelaporan Kasus Baru)';
+      badge.style.background = 'rgba(168, 85, 247, 0.18)';
+      badge.style.color = '#a855f7';
+    }
+  }
+
+  function renderGuideRoleTabs() {
+    var role = (state.authUser && state.authUser.role) ? state.authUser.role : 'Administrator';
+    var tabsContainer = document.getElementById('guideRoleTabs');
+    if (!tabsContainer) return;
+
+    tabsContainer.innerHTML = '';
+
+    var tabs = [];
+    if (role === 'Administrator') {
+      // Role admin mendapatkan user guide all role
+      tabs = [
+        { id: 'all', label: '👑 Semua Panduan (All Role)' },
+        { id: 'inputer', label: '📝 Panduan Inputer' },
+        { id: 'facilitator', label: '🛠️ Panduan Facilitator' },
+        { id: 'admin', label: '👑 Panduan Administrator' },
+        { id: 'flow', label: '🔄 Alur Siklus Kasus' }
+      ];
+    } else if (role === 'Facilitator') {
+      tabs = [
+        { id: 'facilitator', label: '🛠️ Panduan Facilitator' },
+        { id: 'inputer', label: '📝 Referensi Inputer' },
+        { id: 'flow', label: '🔄 Alur Siklus Kasus' }
+      ];
+    } else {
+      // Inputer
+      tabs = [
+        { id: 'inputer', label: '📝 Panduan Inputer' },
+        { id: 'flow', label: '🔄 Alur Siklus Kasus' }
+      ];
+    }
+
+    var isValid = tabs.some(function(t) { return t.id === activeGuideTab; });
+    if (!isValid) {
+      activeGuideTab = tabs[0].id;
+    }
+
+    tabs.forEach(function(t) {
+      var btn = document.createElement('button');
+      btn.type = 'button';
+      btn.className = 'guide-tab-btn' + (t.id === activeGuideTab ? ' active' : '');
+      btn.textContent = t.label;
+      btn.addEventListener('click', function() {
+        activeGuideTab = t.id;
+        renderGuideRoleTabs();
+        handleGuideTabSwitch(t.id);
+      });
+      tabsContainer.appendChild(btn);
+    });
+  }
+
+  function handleGuideTabSwitch(tabId) {
+    var targetSecId = 'guide-sec-matrix';
+    if (tabId === 'inputer') targetSecId = 'guide-sec-inputer';
+    else if (tabId === 'facilitator') targetSecId = 'guide-sec-progress';
+    else if (tabId === 'admin') targetSecId = 'guide-sec-admin';
+    else if (tabId === 'flow') targetSecId = 'guide-sec-progress';
+    else if (tabId === 'all') targetSecId = 'guide-sec-matrix';
+
+    scrollGuideToSection(targetSecId);
+  }
+
+  function scrollGuideToSection(secId) {
+    var sec = document.getElementById(secId);
+    var contentArea = document.getElementById('guideContentArea');
+    if (sec && contentArea) {
+      var topPos = sec.offsetTop - contentArea.offsetTop - 12;
+      contentArea.scrollTo({ top: topPos, behavior: 'smooth' });
+
+      // Perbarui status aktif di Daftar Isi (TOC)
+      var tocLinks = document.querySelectorAll('.guide-toc-link');
+      tocLinks.forEach(function(link) {
+        link.classList.toggle('active', link.getAttribute('data-target') === secId);
+      });
+    }
+  }
+
+  function initGuideTocEvents() {
+    var tocLinks = document.querySelectorAll('.guide-toc-link');
+    tocLinks.forEach(function(link) {
+      link.addEventListener('click', function() {
+        var targetId = link.getAttribute('data-target');
+        if (targetId) {
+          scrollGuideToSection(targetId);
+        }
+      });
+    });
+
+    var contentArea = document.getElementById('guideContentArea');
+    if (contentArea) {
+      contentArea.addEventListener('scroll', function() {
+        var sections = document.querySelectorAll('.guide-section');
+        var scrollPos = contentArea.scrollTop + 60;
+        sections.forEach(function(sec) {
+          var top = sec.offsetTop - contentArea.offsetTop;
+          var height = sec.offsetHeight;
+          if (scrollPos >= top && scrollPos < top + height) {
+            var id = sec.id;
+            tocLinks.forEach(function(l) {
+              l.classList.toggle('active', l.getAttribute('data-target') === id);
+            });
+          }
+        });
+      }, { passive: true });
+    }
   }
 
   function handleLogout() {
@@ -4146,6 +5402,7 @@
     applyTheme(state.theme);
     initAuth();
     bindEvents();
+    initIdleAutoLogout();
     loadApplicationData();
   }
 
@@ -4359,8 +5616,23 @@
     if (dom.toggleFixed) dom.toggleFixed.addEventListener('click', function() { setNewModalService('FIXED'); });
     if (dom.btnSubmitNewReport) dom.btnSubmitNewReport.addEventListener('click', handleSubmitNewReport);
 
+    // 11. User Guide Modal Events
+    var btnUserGuideHdr = document.getElementById('btnUserGuide');
+    if (btnUserGuideHdr) btnUserGuideHdr.addEventListener('click', openUserGuideModal);
+
+    var sidebarBtnUserGuide = document.getElementById('sidebarBtnUserGuide');
+    if (sidebarBtnUserGuide) sidebarBtnUserGuide.addEventListener('click', openUserGuideModal);
+
+    var btnCloseUserGuideModal = document.getElementById('btnCloseUserGuideModal');
+    if (btnCloseUserGuideModal) btnCloseUserGuideModal.addEventListener('click', closeUserGuideModal);
+
+    var btnCloseUserGuideFoot = document.getElementById('btnCloseUserGuideFoot');
+    if (btnCloseUserGuideFoot) btnCloseUserGuideFoot.addEventListener('click', closeUserGuideModal);
+
+    initGuideTocEvents();
+
     // Tutup modal jika klik di luar box modal
-    [dom.modalInProgress, dom.modalClosed, dom.modalLog, dom.newDataModal, document.getElementById('modalManageUsers')].forEach(function(m) {
+    [dom.modalInProgress, dom.modalClosed, dom.modalLog, dom.newDataModal, document.getElementById('modalManageUsers'), document.getElementById('modalUserGuide')].forEach(function(m) {
       if (!m) return;
       m.addEventListener('click', function(e) {
         if (e.target === m) {
