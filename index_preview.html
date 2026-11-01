@@ -2704,6 +2704,43 @@
     color: #3b82f6;
   }
 
+  .btn-download-guide-head {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 6px 14px;
+    font-size: 12px;
+    font-weight: 700;
+    border-radius: var(--radius-sm);
+    background: rgba(16, 185, 129, 0.12);
+    border: 1px solid rgba(16, 185, 129, 0.35);
+    color: #10b981;
+    cursor: pointer;
+    transition: var(--transition);
+  }
+  .btn-download-guide-head:hover {
+    background: #10b981;
+    color: #ffffff;
+    box-shadow: 0 3px 10px rgba(16, 185, 129, 0.3);
+    transform: translateY(-1px);
+  }
+
+  .btn.btn-download-guide {
+    background: linear-gradient(135deg, #10b981, #059669);
+    color: #ffffff;
+    border: none;
+    font-weight: 700;
+    display: inline-flex;
+    align-items: center;
+    gap: 7px;
+    box-shadow: 0 2px 8px rgba(16, 185, 129, 0.35);
+  }
+  .btn.btn-download-guide:hover {
+    filter: brightness(1.1);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 14px rgba(16, 185, 129, 0.45);
+  }
+
   .guide-role-filter-bar {
     display: flex;
     justify-content: space-between;
@@ -3964,7 +4001,13 @@
             <div class="modal-kicker blue-kicker">📖 PANDUAN PENGGUNA RESMI konCHO</div>
             <h2 class="modal-title">Buku Panduan Pengguna (User Guide)</h2>
           </div>
-          <button class="modal-close-btn" id="btnCloseUserGuideModal" title="Tutup">✕</button>
+          <div style="display: flex; align-items: center; gap: 10px;">
+            <button type="button" class="btn-download-guide-head" id="btnDownloadUserGuideHead" title="Unduh Buku Panduan Lengkap (Khusus Administrator)" style="display: none;">
+              <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span>Download PDF</span>
+            </button>
+            <button class="modal-close-btn" id="btnCloseUserGuideModal" title="Tutup">✕</button>
+          </div>
         </div>
 
         <!-- Role Filter Bar & Quick Switcher -->
@@ -4533,7 +4576,13 @@
           <span style="font-size: 12px; color: #64748b; display: flex; align-items: center; gap: 6px;">
             <span style="color: #f59e0b;">⏱️</span> Sesi konCHO otomatis logout jika idle 15 menit tanpa aktivitas.
           </span>
-          <button type="button" class="btn btn-secondary" id="btnCloseUserGuideFoot">Tutup Panduan</button>
+          <div style="display: flex; align-items: center; gap: 8px;">
+            <button type="button" class="btn btn-download-guide" id="btnDownloadUserGuide" title="Unduh Buku Panduan Lengkap (Khusus Administrator)" style="display: none;">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="7 10 12 15 17 10"/><line x1="12" y1="15" x2="12" y2="3"/></svg>
+              <span>Download Panduan (PDF)</span>
+            </button>
+            <button type="button" class="btn btn-secondary" id="btnCloseUserGuideFoot">Tutup Panduan</button>
+          </div>
         </div>
       </div>
     </div>
@@ -5090,6 +5139,17 @@
     // 5. Update Status & Tab Peran di Buku Panduan (User Guide)
     updateGuideCurrentRoleBadge();
     renderGuideRoleTabs();
+
+    // 6. Kontrol Tombol Download User Guide (KHUSUS ADMINISTRATOR)
+    var btnDownloadFoot = document.getElementById('btnDownloadUserGuide');
+    var btnDownloadHead = document.getElementById('btnDownloadUserGuideHead');
+    var isAdministrator = (role === 'Administrator');
+    if (btnDownloadFoot) {
+      btnDownloadFoot.style.display = isAdministrator ? 'inline-flex' : 'none';
+    }
+    if (btnDownloadHead) {
+      btnDownloadHead.style.display = isAdministrator ? 'inline-flex' : 'none';
+    }
   }
 
   function showDashboardApp() {
@@ -5249,6 +5309,13 @@
     var modal = document.getElementById('modalUserGuide');
     if (!modal) return;
 
+    var role = (state.authUser && state.authUser.role) ? state.authUser.role : 'Administrator';
+    var isAdministrator = (role === 'Administrator');
+    var btnDownloadFoot = document.getElementById('btnDownloadUserGuide');
+    var btnDownloadHead = document.getElementById('btnDownloadUserGuideHead');
+    if (btnDownloadFoot) btnDownloadFoot.style.display = isAdministrator ? 'inline-flex' : 'none';
+    if (btnDownloadHead) btnDownloadHead.style.display = isAdministrator ? 'inline-flex' : 'none';
+
     renderGuideRoleTabs();
     updateGuideCurrentRoleBadge();
     modal.classList.add('active');
@@ -5261,6 +5328,252 @@
   function closeUserGuideModal() {
     var modal = document.getElementById('modalUserGuide');
     if (modal) modal.classList.remove('active');
+  }
+
+  // Unduh Buku Panduan (User Guide) - KHUSUS ROLE ADMINISTRATOR
+  function handleDownloadUserGuide() {
+    var role = (state.authUser && state.authUser.role) ? state.authUser.role : '';
+    if (role !== 'Administrator') {
+      showToast('Akses Ditolak: Hanya Administrator yang berhak mengunduh Buku Panduan Resmi!', 'error');
+      return;
+    }
+
+    var contentArea = document.getElementById('guideContentArea');
+    if (!contentArea) {
+      showToast('Konten panduan tidak ditemukan.', 'error');
+      return;
+    }
+
+    var adminName = (state.authUser && state.authUser.name) ? state.authUser.name : 'Administrator Utama';
+    var nowFormatted = new Date().toLocaleDateString('id-ID', {
+      weekday: 'long', year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit'
+    }) + ' WIB';
+
+    // Buat template dokumen HTML siap cetak / simpan PDF
+    var printContent = '<!DOCTYPE html>\n' +
+'<html lang="id">\n' +
+'<head>\n' +
+'  <meta charset="UTF-8">\n' +
+'  <title>Buku Panduan Pengguna (User Guide) - konCHO</title>\n' +
+'  <style>\n' +
+'    @page {\n' +
+'      size: A4;\n' +
+'      margin: 15mm 15mm 20mm 15mm;\n' +
+'    }\n' +
+'    * {\n' +
+'      box-sizing: border-box;\n' +
+'      -webkit-print-color-adjust: exact !important;\n' +
+'      print-color-adjust: exact !important;\n' +
+'    }\n' +
+'    body {\n' +
+'      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;\n' +
+'      line-height: 1.5;\n' +
+'      color: #1e293b;\n' +
+'      background: #ffffff;\n' +
+'      padding: 24px;\n' +
+'      margin: 0;\n' +
+'    }\n' +
+'    .doc-header {\n' +
+'      border-bottom: 3px solid #4f46e5;\n' +
+'      padding-bottom: 16px;\n' +
+'      margin-bottom: 24px;\n' +
+'      display: flex;\n' +
+'      justify-content: space-between;\n' +
+'      align-items: flex-start;\n' +
+'    }\n' +
+'    .doc-title {\n' +
+'      font-size: 22px;\n' +
+'      font-weight: 800;\n' +
+'      color: #0f172a;\n' +
+'      margin: 0 0 6px 0;\n' +
+'    }\n' +
+'    .doc-sub {\n' +
+'      font-size: 13px;\n' +
+'      color: #64748b;\n' +
+'      margin: 0;\n' +
+'    }\n' +
+'    .doc-meta {\n' +
+'      text-align: right;\n' +
+'      font-size: 11.5px;\n' +
+'      color: #475569;\n' +
+'      line-height: 1.6;\n' +
+'    }\n' +
+'    .doc-badge {\n' +
+'      display: inline-block;\n' +
+'      padding: 4px 10px;\n' +
+'      border-radius: 9999px;\n' +
+'      font-size: 11px;\n' +
+'      font-weight: 700;\n' +
+'      background: rgba(79, 70, 229, 0.1);\n' +
+'      color: #4f46e5;\n' +
+'      border: 1px solid rgba(79, 70, 229, 0.25);\n' +
+'      margin-bottom: 6px;\n' +
+'    }\n' +
+'    .guide-section {\n' +
+'      margin-bottom: 28px;\n' +
+'      page-break-inside: avoid;\n' +
+'    }\n' +
+'    .guide-section-header {\n' +
+'      border-bottom: 2px solid #e2e8f0;\n' +
+'      padding-bottom: 8px;\n' +
+'      margin-bottom: 12px;\n' +
+'      display: flex;\n' +
+'      justify-content: space-between;\n' +
+'      align-items: center;\n' +
+'    }\n' +
+'    .guide-section-title {\n' +
+'      font-size: 16px;\n' +
+'      font-weight: 800;\n' +
+'      color: #0f172a;\n' +
+'      margin: 0;\n' +
+'    }\n' +
+'    .guide-section-desc {\n' +
+'      font-size: 12.5px;\n' +
+'      color: #334155;\n' +
+'      margin-bottom: 12px;\n' +
+'    }\n' +
+'    .guide-visual-card {\n' +
+'      border: 1px solid #cbd5e1;\n' +
+'      border-radius: 8px;\n' +
+'      overflow: hidden;\n' +
+'      margin-top: 10px;\n' +
+'      margin-bottom: 14px;\n' +
+'      background: #f8fafc;\n' +
+'    }\n' +
+'    .guide-visual-head {\n' +
+'      background: #e2e8f0;\n' +
+'      padding: 8px 14px;\n' +
+'      font-weight: 700;\n' +
+'      font-size: 11.5px;\n' +
+'      color: #334155;\n' +
+'      border-bottom: 1px solid #cbd5e1;\n' +
+'    }\n' +
+'    .guide-visual-body {\n' +
+'      padding: 14px;\n' +
+'    }\n' +
+'    .guide-matrix-table {\n' +
+'      width: 100%;\n' +
+'      border-collapse: collapse;\n' +
+'      font-size: 11.5px;\n' +
+'    }\n' +
+'    .guide-matrix-table th, .guide-matrix-table td {\n' +
+'      border: 1px solid #cbd5e1;\n' +
+'      padding: 8px 10px;\n' +
+'      text-align: left;\n' +
+'    }\n' +
+'    .guide-matrix-table th {\n' +
+'      background: #e2e8f0;\n' +
+'      font-weight: 700;\n' +
+'    }\n' +
+'    .guide-flow-diagram {\n' +
+'      display: flex;\n' +
+'      align-items: center;\n' +
+'      justify-content: center;\n' +
+'      gap: 12px;\n' +
+'      padding: 14px;\n' +
+'      background: #f1f5f9;\n' +
+'      border-radius: 6px;\n' +
+'      border: 1px dashed #cbd5e1;\n' +
+'    }\n' +
+'    .guide-flow-node {\n' +
+'      padding: 10px 14px;\n' +
+'      border-radius: 6px;\n' +
+'      font-size: 11.5px;\n' +
+'      font-weight: 700;\n' +
+'      text-align: center;\n' +
+'    }\n' +
+'    .guide-flow-node.node-open { background: #fef3c7; color: #b45309; border: 1px solid #fde68a; }\n' +
+'    .guide-flow-node.node-progress { background: #dbeafe; color: #1d4ed8; border: 1px solid #bfdbfe; }\n' +
+'    .guide-flow-node.node-closed { background: #d1fae5; color: #047857; border: 1px solid #a7f3d0; }\n' +
+'    .guide-step-row {\n' +
+'      display: flex;\n' +
+'      gap: 10px;\n' +
+'      margin-bottom: 8px;\n' +
+'      font-size: 12px;\n' +
+'    }\n' +
+'    .guide-step-badge {\n' +
+'      width: 22px;\n' +
+'      height: 22px;\n' +
+'      border-radius: 50%;\n' +
+'      background: #4f46e5;\n' +
+'      color: #fff;\n' +
+'      font-size: 11px;\n' +
+'      font-weight: 700;\n' +
+'      display: flex;\n' +
+'      align-items: center;\n' +
+'      justify-content: center;\n' +
+'      flex-shrink: 0;\n' +
+'    }\n' +
+'    .guide-step-text {\n' +
+'      flex: 1;\n' +
+'    }\n' +
+'    .guide-idle-box {\n' +
+'      background: #fef3c7;\n' +
+'      border: 1px solid #fde68a;\n' +
+'      border-radius: 6px;\n' +
+'      padding: 12px 16px;\n' +
+'      font-size: 12px;\n' +
+'      color: #92400e;\n' +
+'    }\n' +
+'    .doc-footer {\n' +
+'      border-top: 1px solid #cbd5e1;\n' +
+'      padding-top: 12px;\n' +
+'      margin-top: 30px;\n' +
+'      font-size: 11px;\n' +
+'      color: #64748b;\n' +
+'      display: flex;\n' +
+'      justify-content: space-between;\n' +
+'    }\n' +
+'  </style>\n' +
+'</head>\n' +
+'<body>\n' +
+'  <div class="doc-header">\n' +
+'    <div>\n' +
+'      <span class="doc-badge">DOKUMEN RESMI INTERNAL konCHO</span>\n' +
+'      <h1 class="doc-title">Buku Panduan Pengguna (User Guide)</h1>\n' +
+'      <p class="doc-sub">Complaint Handling Officer (CHO Mobile & CHO Fixed) • Panduan Operasional Lengkap Seluruh Peran (All Role)</p>\n' +
+'    </div>\n' +
+'    <div class="doc-meta">\n' +
+'      <div><strong>Status Dokumen:</strong> Terverifikasi (Administrator)</div>\n' +
+'      <div><strong>Diunduh Oleh:</strong> ' + escapeHtml(adminName) + '</div>\n' +
+'      <div><strong>Tanggal Unduh:</strong> ' + escapeHtml(nowFormatted) + '</div>\n' +
+'      <div><strong>Sistem:</strong> konCHO v2.0</div>\n' +
+'    </div>\n' +
+'  </div>\n\n' +
+  contentArea.innerHTML + '\n\n' +
+'  <div class="doc-footer">\n' +
+'    <span>© konCHO Complaint Handling Officer • PT Telkom Indonesia</span>\n' +
+'    <span>Dokumen Resmi Administrasi • Khusus Digunakan untuk Internal</span>\n' +
+'  </div>\n' +
+'</body>\n' +
+'</html>';
+
+    // 1. Download file HTML offline
+    var blob = new Blob([printContent], { type: 'text/html;charset=utf-8' });
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement('a');
+    a.href = url;
+    a.download = 'Buku_Panduan_User_Guide_konCHO_Official.html';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    setTimeout(function() { URL.revokeObjectURL(url); }, 2000);
+
+    // 2. Buka jendela cetak / Simpan PDF
+    var printWin = window.open('', '_blank');
+    if (printWin) {
+      printWin.document.open();
+      printWin.document.write(printContent);
+      printWin.document.close();
+      printWin.focus();
+      setTimeout(function() {
+        try {
+          printWin.print();
+        } catch(e) {}
+      }, 500);
+    }
+
+    showToast('Buku Panduan berhasil disiapkan! Silakan simpan dokumen sebagai PDF.', 'success');
   }
 
   function updateGuideCurrentRoleBadge() {
@@ -5628,6 +5941,12 @@
 
     var btnCloseUserGuideFoot = document.getElementById('btnCloseUserGuideFoot');
     if (btnCloseUserGuideFoot) btnCloseUserGuideFoot.addEventListener('click', closeUserGuideModal);
+
+    var btnDownloadGuide = document.getElementById('btnDownloadUserGuide');
+    if (btnDownloadGuide) btnDownloadGuide.addEventListener('click', handleDownloadUserGuide);
+
+    var btnDownloadGuideHead = document.getElementById('btnDownloadUserGuideHead');
+    if (btnDownloadGuideHead) btnDownloadGuideHead.addEventListener('click', handleDownloadUserGuide);
 
     initGuideTocEvents();
 
