@@ -796,6 +796,23 @@
       else avatarEl.textContent = '📝';
     }
 
+    // 1b. Sinkronkan juga pada kartu profil mobile drawer (jika ada)
+    var drawerNameEl = document.getElementById('drawerUserName');
+    var drawerRoleEl = document.getElementById('drawerUserRole');
+    var drawerAvatarEl = document.getElementById('drawerUserAvatar');
+    if (drawerNameEl && state.authUser) {
+      drawerNameEl.textContent = (nameEl ? nameEl.textContent : state.authUser.name) || 'Administrator Utama';
+    }
+    if (drawerRoleEl) {
+      drawerRoleEl.innerHTML = '<span class="badge-role ' + badgeClass + '">' + badgeIcon + ' ' + escapeHtml(role) + '</span>';
+    }
+    if (drawerAvatarEl) {
+      if (role === 'Administrator') drawerAvatarEl.textContent = '👑';
+      else if (role === 'Facilitator') drawerAvatarEl.textContent = '🛠️';
+      else if (role === 'Viewer') drawerAvatarEl.textContent = '👁️';
+      else drawerAvatarEl.textContent = '📝';
+    }
+
     // 2. Kontrol Tombol Input Kasus Baru:
     // Administrator & Inputer bisa input data baru.
     // Facilitator & Viewer TIDAK input data (Viewer purely read-only).
@@ -1410,6 +1427,34 @@
   }
 
   /**
+   * Helper Pengendali Mobile Sidebar Drawer (HP Android & iPhone)
+   */
+  function openMobileSidebar() {
+    var sidebar = document.getElementById('sidebarLeft') || document.querySelector('.sidebar-left');
+    var backdrop = document.getElementById('sidebarBackdrop');
+    if (sidebar) sidebar.classList.add('mobile-open');
+    if (backdrop) backdrop.classList.add('active');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeMobileSidebar() {
+    var sidebar = document.getElementById('sidebarLeft') || document.querySelector('.sidebar-left');
+    var backdrop = document.getElementById('sidebarBackdrop');
+    if (sidebar) sidebar.classList.remove('mobile-open');
+    if (backdrop) backdrop.classList.remove('active');
+    document.body.style.overflow = '';
+  }
+
+  function toggleMobileSidebar() {
+    var sidebar = document.getElementById('sidebarLeft') || document.querySelector('.sidebar-left');
+    if (sidebar && sidebar.classList.contains('mobile-open')) {
+      closeMobileSidebar();
+    } else {
+      openMobileSidebar();
+    }
+  }
+
+  /**
    * Inisialisasi Aplikasi
    */
   function init() {
@@ -1479,7 +1524,10 @@
     if (btnManageHeader) btnManageHeader.addEventListener('click', openManageUsersModal);
 
     var sidebarBtnManage = document.getElementById('sidebarBtnManageUsers');
-    if (sidebarBtnManage) sidebarBtnManage.addEventListener('click', openManageUsersModal);
+    if (sidebarBtnManage) sidebarBtnManage.addEventListener('click', function() {
+      if (window.innerWidth <= 860) closeMobileSidebar();
+      openManageUsersModal();
+    });
 
     var btnCloseManage = document.getElementById('btnCloseManageUsersModal');
     if (btnCloseManage) btnCloseManage.addEventListener('click', closeManageUsersModal);
@@ -1505,6 +1553,42 @@
     var btnLogout = document.getElementById('btnLogout');
     if (btnLogout) btnLogout.addEventListener('click', handleLogout);
 
+    // 0a. Pengendali Mobile Drawer Menu (HP Android & iPhone)
+    var btnToggleSidebar = document.getElementById('btnToggleMobileSidebar');
+    if (btnToggleSidebar) btnToggleSidebar.addEventListener('click', toggleMobileSidebar);
+
+    var btnCloseSidebar = document.getElementById('btnCloseMobileSidebar');
+    if (btnCloseSidebar) btnCloseSidebar.addEventListener('click', closeMobileSidebar);
+
+    var sidebarBackdrop = document.getElementById('sidebarBackdrop');
+    if (sidebarBackdrop) sidebarBackdrop.addEventListener('click', closeMobileSidebar);
+
+    var btnDrawerRefresh = document.getElementById('btnDrawerRefresh');
+    if (btnDrawerRefresh) {
+      btnDrawerRefresh.addEventListener('click', function() {
+        closeMobileSidebar();
+        loadApplicationData(true);
+      });
+    }
+
+    var btnDrawerLogout = document.getElementById('btnDrawerLogout');
+    if (btnDrawerLogout) {
+      btnDrawerLogout.addEventListener('click', function() {
+        closeMobileSidebar();
+        handleLogout();
+      });
+    }
+
+    var userProfileBadge = document.getElementById('userProfileBadge');
+    if (userProfileBadge) {
+      userProfileBadge.addEventListener('click', function(e) {
+        if (e.target && (e.target.id === 'btnLogout' || (e.target.closest && e.target.closest('#btnLogout')))) return;
+        if (window.innerWidth <= 860) {
+          openMobileSidebar();
+        }
+      });
+    }
+
     // 0. Navigasi Menu: Home (Sheet List) vs Detail Case
     if (dom.navHome) {
       dom.navHome.addEventListener('click', function() {
@@ -1519,6 +1603,7 @@
         updateScopeLabel();
         updateKpiCounters();
         setViewMode('home');
+        if (window.innerWidth <= 860) closeMobileSidebar();
       });
     }
     if (dom.btnViewHome) {
@@ -1556,6 +1641,7 @@
         updateScopeLabel();
         updateKpiCounters();
         renderCaseList();
+        if (window.innerWidth <= 860) closeMobileSidebar();
       });
     });
 
@@ -1566,6 +1652,7 @@
         updateScopeLabel();
         updateKpiCounters();
         renderCaseList();
+        if (window.innerWidth <= 860) closeMobileSidebar();
       });
     }
 
@@ -1587,6 +1674,7 @@
           updateKpiCounters();
         }
         renderCaseList();
+        if (window.innerWidth <= 860) closeMobileSidebar();
       });
     });
 
@@ -1638,7 +1726,10 @@
     if (btnUserGuideHdr) btnUserGuideHdr.addEventListener('click', openUserGuideModal);
 
     var sidebarBtnUserGuide = document.getElementById('sidebarBtnUserGuide');
-    if (sidebarBtnUserGuide) sidebarBtnUserGuide.addEventListener('click', openUserGuideModal);
+    if (sidebarBtnUserGuide) sidebarBtnUserGuide.addEventListener('click', function() {
+      if (window.innerWidth <= 860) closeMobileSidebar();
+      openUserGuideModal();
+    });
 
     var btnCloseUserGuideModal = document.getElementById('btnCloseUserGuideModal');
     if (btnCloseUserGuideModal) btnCloseUserGuideModal.addEventListener('click', closeUserGuideModal);
@@ -2305,6 +2396,7 @@
 
     var html = '<div class="home-sheet-container">';
     html += '<div class="home-sheet-card">';
+    html += '  <div class="mobile-table-scroll-hint"><span class="hint-icon">👉</span><span>Geser tabel ke samping untuk melihat rincian &amp; status</span></div>';
     html += '  <div class="home-table-responsive">';
     html += '    <table class="home-sheet-table">';
     html += '      <thead>';
