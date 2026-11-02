@@ -1153,6 +1153,10 @@
   .modal-dialog.modal-lg {
     max-width: 760px;
   }
+  #modalManageUsers .modal-dialog {
+    max-width: 880px;
+    width: 95%;
+  }
 
   @keyframes fadeIn {
     from { opacity: 0; }
@@ -2639,7 +2643,7 @@
     border-bottom: 1px solid var(--border-color);
     font-size: 13.5px;
     color: var(--text-primary);
-    vertical-align: middle;
+    vertical-align: top; /* Rapi sejajar atas ketika ada kolom teks yang digeser tinggi */
   }
   .home-sheet-table tbody tr:last-child td {
     border-bottom: none;
@@ -2655,23 +2659,62 @@
     color: var(--text-secondary);
     line-height: 1.5;
     background: var(--bg-elevated);
-    padding: 8px 12px;
+    padding: 9px 13px;
     border-radius: var(--radius-sm);
     border: 1px solid var(--border-color);
     word-break: break-word;
-    max-height: 120px;
+    min-height: 48px;
+    max-height: 800px;
     overflow-y: auto;
+    resize: vertical; /* Pengguna dapat menarik/menggeser kotak ke bawah */
     white-space: pre-line;
+    position: relative;
+    box-sizing: border-box;
+    transition: border-color 0.15s ease;
+  }
+  .home-col-issue-details .issue-details-text:focus,
+  .home-col-issue-details .issue-details-text:hover {
+    border-color: rgba(99, 102, 241, 0.45);
   }
   .home-col-status-update .status-update-text {
     font-size: 13px;
     color: var(--text-secondary);
     line-height: 1.5;
     background: var(--bg-elevated);
-    padding: 8px 12px;
+    padding: 9px 13px;
     border-radius: var(--radius-sm);
     border: 1px solid var(--border-color);
     word-break: break-word;
+    min-height: 48px;
+    max-height: 800px;
+    overflow-y: auto;
+    resize: vertical; /* Pengguna dapat menarik/menggeser kotak ke bawah */
+    white-space: pre-line;
+    box-sizing: border-box;
+  }
+  .issue-details-expand-wrap {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 4px;
+  }
+  .btn-expand-cell {
+    background: transparent;
+    border: 1px dashed var(--border-color);
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    transition: all 0.15s ease;
+  }
+  .btn-expand-cell:hover {
+    background: var(--bg-elevated);
+    color: var(--primary-color);
+    border-color: var(--primary-color);
   }
   .sidebar-nav-btn.home-btn {
     border-color: rgba(99, 102, 241, 0.35);
@@ -3441,19 +3484,35 @@
           <div class="sidebar-month-wrapper">
             <span class="month-icon">📅</span>
             <select id="monthFilterSelect" class="sidebar-month-select" aria-label="Filter Periode Bulan">
-              <option value="all" selected>Semua Periode (Januari - Desember)</option>
-              <option value="Januari">Januari 2026</option>
-              <option value="Februari">Februari 2026</option>
-              <option value="Maret">Maret 2026</option>
-              <option value="April">April 2026</option>
-              <option value="Mei">Mei 2026</option>
-              <option value="Juni">Juni 2026</option>
-              <option value="Juli">Juli 2026</option>
-              <option value="Agustus">Agustus 2026</option>
-              <option value="September">September 2026</option>
-              <option value="Oktober">Oktober 2026</option>
-              <option value="November">November 2026</option>
-              <option value="Desember">Desember 2026</option>
+              <option value="all" selected>Semua Periode (Semua Bulan &amp; Tahun)</option>
+              <optgroup label="Tahun 2026">
+                <option value="Januari 2026">Januari 2026</option>
+                <option value="Februari 2026">Februari 2026</option>
+                <option value="Maret 2026">Maret 2026</option>
+                <option value="April 2026">April 2026</option>
+                <option value="Mei 2026">Mei 2026</option>
+                <option value="Juni 2026">Juni 2026</option>
+                <option value="Juli 2026">Juli 2026</option>
+                <option value="Agustus 2026">Agustus 2026</option>
+                <option value="September 2026">September 2026</option>
+                <option value="Oktober 2026">Oktober 2026</option>
+                <option value="November 2026">November 2026</option>
+                <option value="Desember 2026">Desember 2026</option>
+              </optgroup>
+              <optgroup label="Tahun 2027">
+                <option value="Januari 2027">Januari 2027</option>
+                <option value="Februari 2027">Februari 2027</option>
+                <option value="Maret 2027">Maret 2027</option>
+                <option value="April 2027">April 2027</option>
+                <option value="Mei 2027">Mei 2027</option>
+                <option value="Juni 2027">Juni 2027</option>
+                <option value="Juli 2027">Juli 2027</option>
+                <option value="Agustus 2027">Agustus 2027</option>
+                <option value="September 2027">September 2027</option>
+                <option value="Oktober 2027">Oktober 2027</option>
+                <option value="November 2027">November 2027</option>
+                <option value="Desember 2027">Desember 2027</option>
+              </optgroup>
             </select>
           </div>
         </div>
@@ -3795,18 +3854,34 @@
                 Bulan - Tahun <span class="req-star">*</span>
               </label>
               <select id="inputBulanTahun" class="form-control">
-                <option value="Januari 2026">Januari 2026</option>
-                <option value="Februari 2026">Februari 2026</option>
-                <option value="Maret 2026">Maret 2026</option>
-                <option value="April 2026">April 2026</option>
-                <option value="Mei 2026">Mei 2026</option>
-                <option value="Juni 2026">Juni 2026</option>
-                <option value="Juli 2026">Juli 2026</option>
-                <option value="Agustus 2026">Agustus 2026</option>
-                <option value="September 2026">September 2026</option>
-                <option value="Oktober 2026" selected>Oktober 2026</option>
-                <option value="November 2026">November 2026</option>
-                <option value="Desember 2026">Desember 2026</option>
+                <optgroup label="Tahun 2026">
+                  <option value="Januari 2026">Januari 2026</option>
+                  <option value="Februari 2026">Februari 2026</option>
+                  <option value="Maret 2026">Maret 2026</option>
+                  <option value="April 2026">April 2026</option>
+                  <option value="Mei 2026">Mei 2026</option>
+                  <option value="Juni 2026">Juni 2026</option>
+                  <option value="Juli 2026">Juli 2026</option>
+                  <option value="Agustus 2026">Agustus 2026</option>
+                  <option value="September 2026">September 2026</option>
+                  <option value="Oktober 2026" selected>Oktober 2026</option>
+                  <option value="November 2026">November 2026</option>
+                  <option value="Desember 2026">Desember 2026</option>
+                </optgroup>
+                <optgroup label="Tahun 2027">
+                  <option value="Januari 2027">Januari 2027</option>
+                  <option value="Februari 2027">Februari 2027</option>
+                  <option value="Maret 2027">Maret 2027</option>
+                  <option value="April 2027">April 2027</option>
+                  <option value="Mei 2027">Mei 2027</option>
+                  <option value="Juni 2027">Juni 2027</option>
+                  <option value="Juli 2027">Juli 2027</option>
+                  <option value="Agustus 2027">Agustus 2027</option>
+                  <option value="September 2027">September 2027</option>
+                  <option value="Oktober 2027">Oktober 2027</option>
+                  <option value="November 2027">November 2027</option>
+                  <option value="Desember 2027">Desember 2027</option>
+                </optgroup>
               </select>
             </div>
 
@@ -4866,18 +4941,39 @@
       role: 'Inputer',
       password: 'koncho123',
       createdAt: '2026-10-25'
-    },
-    {
-      username: 'viewer_koncho',
-      name: 'User Tamu (Viewer)',
-      role: 'Viewer',
-      password: 'koncho123',
-      createdAt: '2026-11-02'
     }
   ];
 
+  // Auto-clean akun demo viewer_koncho agar tidak pernah muncul lagi
+  (function ensureViewerDemoRemoved() {
+    try {
+      var d = JSON.parse(localStorage.getItem('koncho_deleted_users') || '[]');
+      if (!Array.isArray(d)) d = [];
+      if (d.indexOf('viewer_koncho') === -1) {
+        d.push('viewer_koncho');
+        localStorage.setItem('koncho_deleted_users', JSON.stringify(d));
+      }
+      var raw = localStorage.getItem('koncho_user_accounts');
+      if (raw) {
+        var list = JSON.parse(raw);
+        if (Array.isArray(list)) {
+          var filtered = list.filter(function(u) {
+            return (u.username || '').replace(/^@+/, '').trim().toLowerCase() !== 'viewer_koncho';
+          });
+          localStorage.setItem('koncho_user_accounts', JSON.stringify(filtered));
+        }
+      }
+    } catch(e) {}
+  })();
+
   function getStoredUserAccounts() {
     var accounts = [];
+    var deleted = [];
+    try {
+      deleted = JSON.parse(localStorage.getItem('koncho_deleted_users') || '[]');
+      if (!Array.isArray(deleted)) deleted = [];
+    } catch(e) { deleted = []; }
+
     try {
       var raw = localStorage.getItem('koncho_user_accounts');
       if (raw) {
@@ -4888,10 +4984,20 @@
       }
     } catch (e) {}
 
+    // Bersihkan akun yang pernah dihapus
+    if (deleted.length > 0) {
+      accounts = accounts.filter(function(a) {
+        var u = (a.username || '').replace(/^@+/, '').trim().toLowerCase();
+        return deleted.indexOf(u) === -1;
+      });
+    }
+
     // Merge akun default yang belum tercatat agar tidak hilang
     DEFAULT_USER_ACCOUNTS.forEach(function(def) {
+      var defU = def.username.toLowerCase();
+      if (deleted.indexOf(defU) !== -1) return;
       var exists = accounts.some(function(a) {
-        return (a.username || '').replace(/^@+/, '').trim().toLowerCase() === def.username.toLowerCase();
+        return (a.username || '').replace(/^@+/, '').trim().toLowerCase() === defU;
       });
       if (!exists) {
         accounts.push(def);
@@ -5235,6 +5341,14 @@
     }
 
     if (confirm('Apakah Anda yakin ingin menghapus akun @' + cleanU + '? Pengguna ini tidak akan dapat login lagi.')) {
+      // Catat ke daftar pengguna yang dihapus agar tidak pernah dibangkitkan lagi
+      try {
+        var deleted = JSON.parse(localStorage.getItem('koncho_deleted_users') || '[]');
+        if (!Array.isArray(deleted)) deleted = [];
+        if (deleted.indexOf(cleanU) === -1) deleted.push(cleanU);
+        localStorage.setItem('koncho_deleted_users', JSON.stringify(deleted));
+      } catch (e) {}
+
       var users = getStoredUserAccounts();
       users = users.filter(function(u) { return (u.username || '').replace(/^@+/, '').trim().toLowerCase() !== cleanU; });
       saveStoredUserAccounts(users);
@@ -6429,33 +6543,36 @@
   }
 
   /**
-   * Mengisi Opsi Dropdown Bulan secara dinamis
+   * Mengisi Opsi Dropdown Bulan secara dinamis (Tahun 2026 & Tahun 2027)
    */
   function populateMonthDropdown() {
     if (!dom.monthFilterSelect) return;
 
-    var monthList = [
-      { val: 'all', text: 'Semua Periode (Januari - Desember)' },
-      { val: 'Januari', text: 'Januari 2026' },
-      { val: 'Februari', text: 'Februari 2026' },
-      { val: 'Maret', text: 'Maret 2026' },
-      { val: 'April', text: 'April 2026' },
-      { val: 'Mei', text: 'Mei 2026' },
-      { val: 'Juni', text: 'Juni 2026' },
-      { val: 'Juli', text: 'Juli 2026' },
-      { val: 'Agustus', text: 'Agustus 2026' },
-      { val: 'September', text: 'September 2026' },
-      { val: 'Oktober', text: 'Oktober 2026' },
-      { val: 'November', text: 'November 2026' },
-      { val: 'Desember', text: 'Desember 2026' }
+    var monthNames = [
+      'Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni',
+      'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'
     ];
 
     var cur = state.activeMonthFilter || 'all';
-    var html = '';
-    monthList.forEach(function(m) {
-      var isSel = (cur === m.val || cur.toLowerCase() === m.val.toLowerCase());
-      html += '<option value="' + m.val + '"' + (isSel ? ' selected' : '') + '>' + m.text + '</option>';
+    var html = '<option value="all">Semua Periode (Semua Bulan & Tahun)</option>';
+
+    // Periode Tahun 2026
+    html += '<optgroup label="Tahun 2026">';
+    monthNames.forEach(function(m) {
+      var val = m + ' 2026';
+      var isSel = (cur.toLowerCase() === val.toLowerCase() || cur.toLowerCase() === m.toLowerCase());
+      html += '<option value="' + val + '"' + (isSel ? ' selected' : '') + '>' + val + '</option>';
     });
+    html += '</optgroup>';
+
+    // Periode Tahun 2027
+    html += '<optgroup label="Tahun 2027">';
+    monthNames.forEach(function(m) {
+      var val = m + ' 2027';
+      var isSel = (cur.toLowerCase() === val.toLowerCase());
+      html += '<option value="' + val + '"' + (isSel ? ' selected' : '') + '>' + val + '</option>';
+    });
+    html += '</optgroup>';
 
     dom.monthFilterSelect.innerHTML = html;
   }
@@ -6492,7 +6609,7 @@
   }
 
   /**
-   * Helper: Filter Pemeriksaan Bulan
+   * Helper: Filter Pemeriksaan Bulan & Tahun (Mendukung 2026 & 2027)
    */
   function itemMatchesMonth(item, selectedMonth) {
     if (!selectedMonth || selectedMonth === 'all') return true;
@@ -6502,25 +6619,34 @@
     var det = String(item.detail || '').toLowerCase();
     var isu = String(item.totalCaseIsu || '').toLowerCase();
 
+    // Cek filter spesifik tahun (2026 vs 2027)
+    var filterHas2027 = sel.indexOf('2027') >= 0 || sel.indexOf('-27') >= 0;
+    var filterHas2026 = sel.indexOf('2026') >= 0 || sel.indexOf('-26') >= 0;
+
+    var itemIs2027 = b.indexOf('2027') >= 0 || tgl.indexOf('2027') >= 0 || b.indexOf('-27') >= 0 || tgl.indexOf('-27') >= 0;
+
+    if (filterHas2027 && !itemIs2027) return false;
+    if (filterHas2026 && itemIs2027) return false;
+
     // Kamus Lengkap Alias dan Singkatan Bulan (Januari s/d Desember)
     var MONTH_ALIASES = {
-      'januari': ['januari', 'january', 'jan', 'jan-26', '01-26', '/01/', '-01-'],
-      'februari': ['februari', 'february', 'feb', 'feb-26', '02-26', '/02/', '-02-'],
-      'maret': ['maret', 'march', 'mar', 'mar-26', '03-26', '/03/', '-03-'],
-      'april': ['april', 'apr', 'apr-26', '04-26', '/04/', '-04-'],
-      'mei': ['mei', 'may', 'mei-26', 'may-26', '05-26', '/05/', '-05-'],
-      'juni': ['juni', 'june', 'jun', 'jun-26', '06-26', '/06/', '-06-'],
-      'juli': ['juli', 'july', 'jul', 'jul-26', '07-26', '/07/', '-07-'],
-      'agustus': ['agustus', 'august', 'agu', 'agt', 'aug', 'agu-26', 'agt-26', 'aug-26', '08-26', '/08/', '-08-'],
-      'september': ['september', 'sep', 'sept', 'sep-26', '09-26', '/09/', '-09-'],
-      'oktober': ['oktober', 'october', 'okt', 'oct', 'okt-26', 'oct-26', '10-26', '/10/', '-10-'],
-      'november': ['november', 'nov', 'nov-26', '11-26', '/11/', '-11-'],
-      'desember': ['desember', 'december', 'des', 'dec', 'des-26', 'dec-26', '12-26', '/12/', '-12-']
+      'januari': ['januari', 'january', 'jan', '01/', '/01/', '-01-'],
+      'februari': ['februari', 'february', 'feb', '02/', '/02/', '-02-'],
+      'maret': ['maret', 'march', 'mar', '03/', '/03/', '-03-'],
+      'april': ['april', 'apr', '04/', '/04/', '-04-'],
+      'mei': ['mei', 'may', '05/', '/05/', '-05-'],
+      'juni': ['juni', 'june', 'jun', '06/', '/06/', '-06-'],
+      'juli': ['juli', 'july', 'jul', '07/', '/07/', '-07-'],
+      'agustus': ['agustus', 'august', 'agu', 'agt', 'aug', '08/', '/08/', '-08-'],
+      'september': ['september', 'sep', 'sept', '09/', '/09/', '-09-'],
+      'oktober': ['oktober', 'october', 'okt', 'oct', '10/', '/10/', '-10-'],
+      'november': ['november', 'nov', '11/', '/11/', '-11-'],
+      'desember': ['desember', 'december', 'des', 'dec', '12/', '/12/', '-12-']
     };
 
     var targetKey = '';
     for (var k in MONTH_ALIASES) {
-      if (sel.indexOf(k) >= 0 || MONTH_ALIASES[k].indexOf(sel) >= 0) {
+      if (sel.indexOf(k) >= 0) {
         targetKey = k;
         break;
       }
@@ -6943,6 +7069,12 @@
       // Status Update (Kolom J)
       var statusUpdateText = item.statusInformasi || item.statusUpdate || item.inProgressNote || item.closedNote || item.progress || (statusKey === 'open' ? 'Belum Ada Update' : 'Update Sedang Berjalan');
 
+      var detailBoxId = 'issueDetailBox_' + item.serviceType + '_' + item.id;
+      var isLongDetail = (issueDetailsText && (issueDetailsText.length > 110 || issueDetailsText.indexOf('\n') >= 0));
+
+      var updateBoxId = 'statusUpdateBox_' + item.serviceType + '_' + item.id;
+      var isLongUpdate = (statusUpdateText && (statusUpdateText.length > 110 || statusUpdateText.indexOf('\n') >= 0));
+
       html += '        <tr class="home-sheet-row" data-id="' + escapeHtml(item.id) + '" data-service="' + item.serviceType + '">';
       html += '          <td style="text-align: center; font-weight: 700; color: var(--text-muted);">' + (idx + 1) + '</td>';
       html += '          <td style="text-align: center;">';
@@ -6955,7 +7087,14 @@
       html += '            <div class="main-issue-title">' + escapeHtml(mainIssueText) + '</div>';
       html += '          </td>';
       html += '          <td class="home-col-issue-details">';
-      html += '            <div class="issue-details-text">' + escapeHtml(issueDetailsText) + '</div>';
+      html += '            <div class="issue-details-text" id="' + detailBoxId + '" title="Tarik/geser sudut kanan bawah ke bawah untuk memperbesar kotak">' + escapeHtml(issueDetailsText) + '</div>';
+      if (isLongDetail) {
+        html += '            <div class="issue-details-expand-wrap">';
+        html += '              <button type="button" class="btn-expand-cell" onclick="toggleCellExpand(\'' + detailBoxId + '\', this)" title="Klik untuk membuka/menutup seluruh isi tulisan">';
+        html += '                <span>↕️ Buka Semua / Geser</span>';
+        html += '              </button>';
+        html += '            </div>';
+      }
       html += '          </td>';
       html += '          <td style="text-align: center;">';
       if (canUpdate) {
@@ -6971,7 +7110,14 @@
       }
       html += '          </td>';
       html += '          <td class="home-col-status-update">';
-      html += '            <div class="status-update-text">' + escapeHtml(statusUpdateText) + '</div>';
+      html += '            <div class="status-update-text" id="' + updateBoxId + '" title="Tarik/geser sudut kanan bawah ke bawah untuk memperbesar kotak">' + escapeHtml(statusUpdateText) + '</div>';
+      if (isLongUpdate) {
+        html += '            <div class="issue-details-expand-wrap">';
+        html += '              <button type="button" class="btn-expand-cell" onclick="toggleCellExpand(\'' + updateBoxId + '\', this)" title="Klik untuk membuka/menutup seluruh isi tulisan">';
+        html += '                <span>↕️ Buka Semua / Geser</span>';
+        html += '              </button>';
+        html += '            </div>';
+      }
       html += '          </td>';
       html += '        </tr>';
     });
@@ -6984,6 +7130,23 @@
 
     return html;
   }
+
+  /**
+   * Helper: Buka atau Ciutkan Kotak Teks Panjang di Home Sheet
+   */
+  window.toggleCellExpand = function(elId, btn) {
+    var el = document.getElementById(elId);
+    if (!el) return;
+    if (el.getAttribute('data-expanded') === 'true') {
+      el.style.maxHeight = '120px';
+      el.removeAttribute('data-expanded');
+      if (btn) btn.innerHTML = '<span>↕️ Buka Semua / Geser</span>';
+    } else {
+      el.style.maxHeight = 'none';
+      el.setAttribute('data-expanded', 'true');
+      if (btn) btn.innerHTML = '<span>▲ Ciutkan Kotak</span>';
+    }
+  };
 
   /**
    * Pasang Event Handler pada tombol di setiap baris kasus

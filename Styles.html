@@ -1142,6 +1142,10 @@
   .modal-dialog.modal-lg {
     max-width: 760px;
   }
+  #modalManageUsers .modal-dialog {
+    max-width: 880px;
+    width: 95%;
+  }
 
   @keyframes fadeIn {
     from { opacity: 0; }
@@ -2628,7 +2632,7 @@
     border-bottom: 1px solid var(--border-color);
     font-size: 13.5px;
     color: var(--text-primary);
-    vertical-align: middle;
+    vertical-align: top; /* Rapi sejajar atas ketika ada kolom teks yang digeser tinggi */
   }
   .home-sheet-table tbody tr:last-child td {
     border-bottom: none;
@@ -2644,23 +2648,62 @@
     color: var(--text-secondary);
     line-height: 1.5;
     background: var(--bg-elevated);
-    padding: 8px 12px;
+    padding: 9px 13px;
     border-radius: var(--radius-sm);
     border: 1px solid var(--border-color);
     word-break: break-word;
-    max-height: 120px;
+    min-height: 48px;
+    max-height: 800px;
     overflow-y: auto;
+    resize: vertical; /* Pengguna dapat menarik/menggeser kotak ke bawah */
     white-space: pre-line;
+    position: relative;
+    box-sizing: border-box;
+    transition: border-color 0.15s ease;
+  }
+  .home-col-issue-details .issue-details-text:focus,
+  .home-col-issue-details .issue-details-text:hover {
+    border-color: rgba(99, 102, 241, 0.45);
   }
   .home-col-status-update .status-update-text {
     font-size: 13px;
     color: var(--text-secondary);
     line-height: 1.5;
     background: var(--bg-elevated);
-    padding: 8px 12px;
+    padding: 9px 13px;
     border-radius: var(--radius-sm);
     border: 1px solid var(--border-color);
     word-break: break-word;
+    min-height: 48px;
+    max-height: 800px;
+    overflow-y: auto;
+    resize: vertical; /* Pengguna dapat menarik/menggeser kotak ke bawah */
+    white-space: pre-line;
+    box-sizing: border-box;
+  }
+  .issue-details-expand-wrap {
+    display: flex;
+    justify-content: flex-end;
+    margin-top: 4px;
+  }
+  .btn-expand-cell {
+    background: transparent;
+    border: 1px dashed var(--border-color);
+    color: var(--text-muted);
+    font-size: 11px;
+    font-weight: 600;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 2px 7px;
+    border-radius: 4px;
+    transition: all 0.15s ease;
+  }
+  .btn-expand-cell:hover {
+    background: var(--bg-elevated);
+    color: var(--primary-color);
+    border-color: var(--primary-color);
   }
   .sidebar-nav-btn.home-btn {
     border-color: rgba(99, 102, 241, 0.35);
