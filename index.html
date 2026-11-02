@@ -1639,6 +1639,11 @@
     color: #6ee7b7;
     border: 1px solid rgba(16, 185, 129, 0.4);
   }
+  .role-viewer {
+    background: rgba(14, 165, 233, 0.18);
+    color: #38bdf8;
+    border: 1px solid rgba(14, 165, 233, 0.38);
+  }
   .badge-role-readonly {
     display: inline-flex;
     align-items: center;
@@ -3957,6 +3962,7 @@
                   <option value="Administrator">👑 Administrator (Akses Penuh + Kelola User)</option>
                   <option value="Facilitator">🛠️ Facilitator (Update Status s/d Closed)</option>
                   <option value="Inputer">📝 Inputer (Hanya Input Kasus Baru)</option>
+                  <option value="Viewer">👁️ Viewer (Hanya Melihat Data / Read-Only)</option>
                 </select>
                 <small class="form-hint" id="roleDescHint">Administrator memiliki akses penuh ke seluruh sistem.</small>
               </div>
@@ -4099,10 +4105,10 @@
                 <span class="guide-section-badge" style="background: rgba(99,102,241,0.15); color: var(--primary-color);">All Role</span>
               </div>
               <p class="guide-section-desc">
-                Aplikasi konCHO memiliki 3 peran pengguna (Role) dengan batasan wewenang yang dirancang untuk menjaga integritas data dan keamanan operasional.
+                Aplikasi konCHO memiliki 4 peran pengguna (Role) dengan batasan wewenang yang dirancang untuk menjaga integritas data dan keamanan operasional.
               </p>
 
-              <!-- Kartu 3 Peran -->
+              <!-- Kartu 4 Peran -->
               <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px;">
                 <div class="guide-visual-card">
                   <div class="guide-visual-head" style="border-left: 4px solid #a855f7;">
@@ -4123,11 +4129,20 @@
                 </div>
 
                 <div class="guide-visual-card">
+                  <div class="guide-visual-head" style="border-left: 4px solid #38bdf8;">
+                    <span>👁️ PERAN VIEWER</span>
+                  </div>
+                  <div class="guide-visual-body" style="font-size: 12.5px; line-height: 1.5; color: var(--text-secondary);">
+                    Fokus utama: <strong>Monitoring & Memantau Kasus (Read-Only)</strong>. Berwenang melihat ringkasan KPI, membaca daftar kasus Home & Detil Case, dan melihat riwayat log. <em>Tidak dapat menginput kasus baru maupun mengedit apapun.</em>
+                  </div>
+                </div>
+
+                <div class="guide-visual-card">
                   <div class="guide-visual-head" style="border-left: 4px solid #f6c84c;">
                     <span>👑 PERAN ADMINISTRATOR</span>
                   </div>
                   <div class="guide-visual-body" style="font-size: 12.5px; line-height: 1.5; color: var(--text-secondary);">
-                    Fokus utama: <strong>Pengawasan Penuh & Tata Kelola Pengguna</strong>. Memiliki seluruh hak akses Inputer + Facilitator, ditambah akses <em>Kelola Pengguna (User Management)</em> dan tautan spreadsheet.
+                    Fokus utama: <strong>Pengawasan Penuh & Tata Kelola Pengguna</strong>. Memiliki seluruh hak akses Inputer + Facilitator, ditambah akses <em>Kelola Pengguna (User Management)</em>, download panduan, dan tautan database.
                   </div>
                 </div>
               </div>
@@ -4144,6 +4159,7 @@
                         <th>Fitur / Wewenang Aksi</th>
                         <th style="text-align: center;">📝 Inputer</th>
                         <th style="text-align: center;">🛠️ Facilitator</th>
+                        <th style="text-align: center;">👁️ Viewer</th>
                         <th style="text-align: center;">👑 Administrator</th>
                       </tr>
                     </thead>
@@ -4152,46 +4168,68 @@
                         <td><strong>Input Kasus Baru (+ Input Case Baru)</strong></td>
                         <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
                         <td style="text-align: center;"><span class="guide-cross">❌ Tidak</span></td>
+                        <td style="text-align: center;"><span class="guide-cross">❌ Tidak</span></td>
                         <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
                       </tr>
                       <tr>
                         <td><strong>Lihat Daftar Kasus di Menu Home & Detil Case</strong></td>
                         <td style="text-align: center;"><span class="guide-check">✅ Ya (Read-only)</span></td>
                         <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
+                        <td style="text-align: center;"><span class="guide-check">✅ Ya (Read-only)</span></td>
                         <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
                       </tr>
                       <tr>
                         <td><strong>Ubah Status ke In Progress (+ Form PIC & Catatan)</strong></td>
                         <td style="text-align: center;"><span class="guide-cross">❌ Tidak</span></td>
                         <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
+                        <td style="text-align: center;"><span class="guide-cross">❌ Tidak</span></td>
                         <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
                       </tr>
                       <tr>
                         <td><strong>Ubah Status ke Closed (+ Form Solusi Permanen)</strong></td>
                         <td style="text-align: center;"><span class="guide-cross">❌ Tidak</span></td>
                         <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
+                        <td style="text-align: center;"><span class="guide-cross">❌ Tidak</span></td>
                         <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
                       </tr>
                       <tr>
                         <td><strong>Update Keterangan Berkala & Catatan Progres</strong></td>
                         <td style="text-align: center;"><span class="guide-cross">❌ Tidak</span></td>
                         <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
+                        <td style="text-align: center;"><span class="guide-cross">❌ Tidak</span></td>
                         <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
                       </tr>
                       <tr>
                         <td><strong>Buka Riwayat Log Komunikasi & Detail Lengkap</strong></td>
                         <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
                         <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
+                        <td style="text-align: center;"><span class="guide-check">✅ Ya (Read-only)</span></td>
+                        <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Tambah Catatan Log Komunikasi Baru</strong></td>
+                        <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
+                        <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
+                        <td style="text-align: center;"><span class="guide-cross">❌ Tidak</span></td>
                         <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
                       </tr>
                       <tr>
                         <td><strong>Menu Kelola User (Buat Akun, Ubah Role, Password)</strong></td>
                         <td style="text-align: center;"><span class="guide-cross">❌ Tidak</span></td>
                         <td style="text-align: center;"><span class="guide-cross">❌ Tidak</span></td>
+                        <td style="text-align: center;"><span class="guide-cross">❌ Tidak</span></td>
                         <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
                       </tr>
                       <tr>
                         <td><strong>Tautan Metadata & Akses Langsung Google Sheet</strong></td>
+                        <td style="text-align: center;"><span class="guide-cross">❌ Tidak (Dihide)</span></td>
+                        <td style="text-align: center;"><span class="guide-cross">❌ Tidak (Dihide)</span></td>
+                        <td style="text-align: center;"><span class="guide-cross">❌ Tidak (Dihide)</span></td>
+                        <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Download Dokumen Resmi User Guide (Buku Panduan)</strong></td>
+                        <td style="text-align: center;"><span class="guide-cross">❌ Tidak (Dihide)</span></td>
                         <td style="text-align: center;"><span class="guide-cross">❌ Tidak (Dihide)</span></td>
                         <td style="text-align: center;"><span class="guide-cross">❌ Tidak (Dihide)</span></td>
                         <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
@@ -4828,6 +4866,13 @@
       role: 'Inputer',
       password: 'koncho123',
       createdAt: '2026-10-25'
+    },
+    {
+      username: 'viewer_koncho',
+      name: 'User Tamu (Viewer)',
+      role: 'Viewer',
+      password: 'koncho123',
+      createdAt: '2026-11-02'
     }
   ];
 
@@ -4868,8 +4913,13 @@
     } catch (e) {}
   }
 
-  // Buka Modal Kelola User
+  // Buka Modal Kelola User (Khusus Administrator)
   function openManageUsersModal() {
+    var role = (state.authUser && state.authUser.role) ? state.authUser.role : 'Administrator';
+    if (role !== 'Administrator') {
+      showToast('Akses ditolak: Hanya Administrator yang berwenang mengakses menu Kelola Pengguna.', 'error');
+      return;
+    }
     renderUserMgmtList();
     hideUserForm();
     var modal = document.getElementById('modalManageUsers');
@@ -4910,6 +4960,9 @@
       } else if (u.role === 'Inputer') {
         roleIcon = '📝';
         roleBadgeClass = 'role-inputer';
+      } else if (u.role === 'Viewer') {
+        roleIcon = '👁️';
+        roleBadgeClass = 'role-viewer';
       }
 
       var isRootAdmin = u.username.toLowerCase() === 'admin_koncho';
@@ -4951,6 +5004,22 @@
     tbody.innerHTML = html;
   }
 
+  function updateRoleDescHint() {
+    var roleInp = document.getElementById('inpUserRole');
+    var roleDescHint = document.getElementById('roleDescHint');
+    if (!roleInp || !roleDescHint) return;
+    var val = roleInp.value;
+    if (val === 'Administrator') {
+      roleDescHint.textContent = 'Administrator memiliki akses penuh ke seluruh sistem dan menu kelola user.';
+    } else if (val === 'Facilitator') {
+      roleDescHint.textContent = 'Facilitator berwenang mengubah status kasus (In Progress, Closed, Reopen) dan menambah catatan log.';
+    } else if (val === 'Inputer') {
+      roleDescHint.textContent = 'Inputer berwenang menginput kasus baru ke Google Sheets.';
+    } else if (val === 'Viewer') {
+      roleDescHint.textContent = 'Viewer hanya dapat memantau dan membaca seluruh data kasus tanpa hak input maupun edit (Read-Only).';
+    }
+  }
+
   // Tampilkan / Sembunyikan Form Tambah User
   function showAddUserForm() {
     var card = document.getElementById('userFormCard');
@@ -4973,6 +5042,7 @@
     }
     if (nameInp) nameInp.value = '';
     if (roleInp) roleInp.value = 'Facilitator';
+    updateRoleDescHint();
     if (passInp) {
       passInp.value = ''; // Jangan default koncho123, diisi manual oleh user
       passInp.placeholder = 'Masukkan kata sandi...';
@@ -5030,6 +5100,7 @@
     }
     if (nameInp) nameInp.value = found.name || '';
     if (roleInp) roleInp.value = found.role || 'Facilitator';
+    updateRoleDescHint();
     if (passInp) {
       passInp.value = found.password || ''; // Tampilkan kata sandi saat ini & dapat diedit manual
       passInp.placeholder = 'Masukkan kata sandi baru...';
@@ -5325,21 +5396,25 @@
       } else if (role === 'Inputer') {
         badgeClass = 'role-inputer';
         badgeIcon = '📝';
+      } else if (role === 'Viewer') {
+        badgeClass = 'role-viewer';
+        badgeIcon = '👁️';
       }
       roleEl.innerHTML = '<span class="badge-role ' + badgeClass + '">' + badgeIcon + ' ' + escapeHtml(role) + '</span>';
     }
     if (avatarEl) {
       if (role === 'Administrator') avatarEl.textContent = '👑';
       else if (role === 'Facilitator') avatarEl.textContent = '🛠️';
+      else if (role === 'Viewer') avatarEl.textContent = '👁️';
       else avatarEl.textContent = '📝';
     }
 
     // 2. Kontrol Tombol Input Kasus Baru:
     // Administrator & Inputer bisa input data baru.
-    // Facilitator TIDAK input data (khusus fasilitasi update s/d closed).
+    // Facilitator & Viewer TIDAK input data (Viewer purely read-only).
     var btnNew = document.getElementById('btnOpenNewModal');
     if (btnNew) {
-      if (role === 'Facilitator') {
+      if (role === 'Facilitator' || role === 'Viewer') {
         btnNew.style.display = 'none';
       } else {
         btnNew.style.display = 'inline-flex';
@@ -5816,6 +5891,10 @@
       badge.innerHTML = '🛠️ Facilitator (Penanganan & Resolusi)';
       badge.style.background = 'rgba(59, 130, 246, 0.18)';
       badge.style.color = '#3b82f6';
+    } else if (role === 'Viewer') {
+      badge.innerHTML = '👁️ Viewer (Monitoring & Read-Only)';
+      badge.style.background = 'rgba(14, 165, 233, 0.18)';
+      badge.style.color = '#38bdf8';
     } else {
       badge.innerHTML = '📝 Inputer (Pelaporan Kasus Baru)';
       badge.style.background = 'rgba(168, 85, 247, 0.18)';
@@ -5844,6 +5923,12 @@
       tabs = [
         { id: 'facilitator', label: '🛠️ Panduan Facilitator' },
         { id: 'inputer', label: '📝 Referensi Inputer' },
+        { id: 'flow', label: '🔄 Alur Siklus Kasus' }
+      ];
+    } else if (role === 'Viewer') {
+      tabs = [
+        { id: 'all', label: '👁️ Panduan Viewer (Read-Only)' },
+        { id: 'home', label: '🏠 Panduan Membaca Home' },
         { id: 'flow', label: '🔄 Alur Siklus Kasus' }
       ];
     } else {
@@ -5878,6 +5963,7 @@
     if (tabId === 'inputer') targetSecId = 'guide-sec-inputer';
     else if (tabId === 'facilitator') targetSecId = 'guide-sec-progress';
     else if (tabId === 'admin') targetSecId = 'guide-sec-admin';
+    else if (tabId === 'home') targetSecId = 'guide-sec-home';
     else if (tabId === 'flow') targetSecId = 'guide-sec-progress';
     else if (tabId === 'all') targetSecId = 'guide-sec-matrix';
 
@@ -6025,6 +6111,9 @@
 
     var btnSaveUser = document.getElementById('btnSaveUser');
     if (btnSaveUser) btnSaveUser.addEventListener('click', handleSaveUserAccount);
+
+    var roleInpSelect = document.getElementById('inpUserRole');
+    if (roleInpSelect) roleInpSelect.addEventListener('change', updateRoleDescHint);
 
     var btnLogout = document.getElementById('btnLogout');
     if (btnLogout) btnLogout.addEventListener('click', handleLogout);
@@ -6725,6 +6814,11 @@
         html += '<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>';
         html += '<span>Mode Inputer (Hanya Baca • Akses Edit Dibatasi)</span>';
         html += '</span>';
+      } else if (currentRole === 'Viewer') {
+        // Role Viewer: HANYA BISA MELIHAT DATA, TIDAK BISA INPUT ATAU EDIT!
+        html += '<span class="badge-role-readonly" title="Role Viewer hanya berwenang memantau seluruh data tanpa hak input maupun edit.">';
+        html += '👁️ <span>Mode Viewer (Read-Only • Hanya Melihat)</span>';
+        html += '</span>';
       } else {
         // Role Administrator & Facilitator: BISA UPDATE STATUS SAMPAI CLOSED!
         if (statusKey === 'open') {
@@ -6808,7 +6902,7 @@
     }
 
     var currentRole = (state.authUser && state.authUser.role) ? state.authUser.role : 'Administrator';
-    var canUpdate = currentRole !== 'Inputer';
+    var canUpdate = currentRole !== 'Inputer' && currentRole !== 'Viewer';
 
     var html = '<div class="home-sheet-container">';
     html += '<div class="home-sheet-card">';
@@ -6965,8 +7059,8 @@
    * =========================================================================
    */
   function openInProgressModal(ticketId, isUpdateOnly) {
-    if (state.authUser && state.authUser.role === 'Inputer') {
-      showToast('Akses ditolak: Role Inputer hanya berwenang menambah kasus baru, tidak dapat mengubah status.', 'error');
+    if (state.authUser && (state.authUser.role === 'Inputer' || state.authUser.role === 'Viewer')) {
+      showToast('Akses ditolak: Peran ' + state.authUser.role + ' tidak berwenang mengubah status kasus.', 'error');
       return;
     }
     var ticket = state.records.find(function(r) { return r.id === ticketId; });
@@ -7108,8 +7202,8 @@
    * =========================================================================
    */
   function openClosedModal(ticketId) {
-    if (state.authUser && state.authUser.role === 'Inputer') {
-      showToast('Akses ditolak: Role Inputer tidak berwenang menyelesaikan/menutup status kasus.', 'error');
+    if (state.authUser && (state.authUser.role === 'Inputer' || state.authUser.role === 'Viewer')) {
+      showToast('Akses ditolak: Peran ' + state.authUser.role + ' tidak berwenang menyelesaikan/menutup status kasus.', 'error');
       return;
     }
     var ticket = state.records.find(function(r) { return r.id === ticketId; });
@@ -7249,8 +7343,8 @@
    * Reopen / Kembalikan Status
    */
   function handleQuickReopen(ticketId, targetStatus) {
-    if (state.authUser && state.authUser.role === 'Inputer') {
-      showToast('Akses ditolak: Role Inputer tidak dapat membuka kembali atau mengubah status kasus.', 'error');
+    if (state.authUser && (state.authUser.role === 'Inputer' || state.authUser.role === 'Viewer')) {
+      showToast('Akses ditolak: Peran ' + state.authUser.role + ' tidak dapat membuka kembali atau mengubah status kasus.', 'error');
       return;
     }
     var ticket = state.records.find(function(r) { return r.id === ticketId; });
@@ -7320,6 +7414,13 @@
     dom.logQuickAuthor.value = state.defaultAuthor || localStorage.getItem('koncho_pic_name') || '';
     dom.logQuickMessage.value = '';
 
+    // Kontrol form Tambah Catatan Cepat (Viewer: Sembunyikan, Murni Read-Only)
+    var role = (state.authUser && state.authUser.role) ? state.authUser.role : 'Administrator';
+    var quickAddBox = dom.modalLog.querySelector('.log-quick-add');
+    if (quickAddBox) {
+      quickAddBox.style.display = (role === 'Viewer') ? 'none' : 'block';
+    }
+
     renderTimelineLogs(ticket);
 
     dom.modalLog.classList.add('active');
@@ -7367,6 +7468,10 @@
   }
 
   function handleSaveQuickLog() {
+    if (state.authUser && state.authUser.role === 'Viewer') {
+      showToast('Akses ditolak: Peran Viewer hanya memiliki hak baca (Read-Only), tidak dapat menambahkan catatan log.', 'error');
+      return;
+    }
     var ticket = state.currentActionTicket;
     if (!ticket) return;
 
@@ -7473,8 +7578,8 @@
    * =========================================================================
    */
   function openNewModal() {
-    if (state.authUser && state.authUser.role === 'Facilitator') {
-      showToast('Akses ditolak: Role Facilitator bertugas memfasilitasi status kasus hingga closed.', 'error');
+    if (state.authUser && (state.authUser.role === 'Facilitator' || state.authUser.role === 'Viewer')) {
+      showToast('Akses ditolak: Peran ' + state.authUser.role + ' tidak berwenang menginput data kasus baru.', 'error');
       return;
     }
     if (state.activeServiceScope === 'FIXED') {
@@ -7533,8 +7638,8 @@
   }
 
   function handleSubmitNewReport() {
-    if (state.authUser && state.authUser.role === 'Facilitator') {
-      showToast('Akses ditolak: Role Facilitator tidak memiliki hak untuk menginput data kasus baru.', 'error');
+    if (state.authUser && (state.authUser.role === 'Facilitator' || state.authUser.role === 'Viewer')) {
+      showToast('Akses ditolak: Peran ' + state.authUser.role + ' tidak memiliki hak untuk menginput data kasus baru.', 'error');
       closeNewModal();
       return;
     }
