@@ -1712,11 +1712,32 @@
     margin: 0 0 4px 0;
     font-size: 15px;
     font-weight: 800;
-    color: #f8fafc;
+    color: var(--text-primary);
   }
   .user-form-sub {
     font-size: 12px;
     color: var(--text-muted);
+  }
+  .user-form-card .form-control {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+  }
+  .user-form-card .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px var(--primary-light);
+  }
+  .user-form-card .input-with-icon .form-control {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-primary) !important;
+    height: 42px !important;
+    border-radius: var(--radius-md) !important;
+    font-size: 13.5px !important;
+  }
+  .user-form-card .input-with-icon .form-control:focus {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 2px var(--primary-light) !important;
   }
   .user-form-actions {
     display: flex;

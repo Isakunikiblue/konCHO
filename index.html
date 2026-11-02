@@ -1723,11 +1723,32 @@
     margin: 0 0 4px 0;
     font-size: 15px;
     font-weight: 800;
-    color: #f8fafc;
+    color: var(--text-primary);
   }
   .user-form-sub {
     font-size: 12px;
     color: var(--text-muted);
+  }
+  .user-form-card .form-control {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    color: var(--text-primary);
+  }
+  .user-form-card .form-control:focus {
+    border-color: var(--primary-color);
+    box-shadow: 0 0 0 2px var(--primary-light);
+  }
+  .user-form-card .input-with-icon .form-control {
+    background: var(--bg-card) !important;
+    border: 1px solid var(--border-color) !important;
+    color: var(--text-primary) !important;
+    height: 42px !important;
+    border-radius: var(--radius-md) !important;
+    font-size: 13.5px !important;
+  }
+  .user-form-card .input-with-icon .form-control:focus {
+    border-color: var(--primary-color) !important;
+    box-shadow: 0 0 0 2px var(--primary-light) !important;
   }
   .user-form-actions {
     display: flex;
@@ -3944,9 +3965,9 @@
                 <label class="form-label" for="inpUserPassword">Kata Sandi (Password) <span class="required-star">*</span></label>
                 <div class="input-with-icon">
                   <svg class="input-icon" viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="11" width="18" height="11" rx="2" ry="2"/><path d="M7 11V7a5 5 0 0 1 10 0v4"/></svg>
-                  <input type="text" id="inpUserPassword" class="form-control" placeholder="Kata sandi..." required value="koncho123">
+                  <input type="text" id="inpUserPassword" class="form-control" placeholder="Masukkan kata sandi akun..." required autocomplete="new-password">
                 </div>
-                <small class="form-hint">Password untuk masuk ke akun ini.</small>
+                <small class="form-hint">Password untuk masuk ke akun ini (diisi manual).</small>
               </div>
             </div>
 
@@ -3983,7 +4004,7 @@
 
       <div class="modal-foot" style="justify-content: space-between;">
         <span style="font-size: 11.5px; color: #64748b;">
-          💡 Perubahan pengguna disimpan ke database browser dan langsung berlaku saat login.
+          📊 Database Terhubung: Akun pengguna otomatis tersimpan di Google Spreadsheet (Sheet "Users") &amp; tersinkronisasi saat login.
         </span>
         <button class="btn btn-secondary" id="btnDoneManageUsers">Selesai</button>
       </div>
@@ -4774,37 +4795,71 @@
       createdAt: '2026-10-01'
     },
     {
-      username: 'facilitator_cho',
-      name: 'Dimas (CHO Facilitator)',
-      role: 'Facilitator',
+      username: '23255592',
+      name: 'Moch Fajar Sahuri',
+      role: 'Administrator',
       password: 'koncho123',
-      createdAt: '2026-10-05'
+      createdAt: '2026-10-15'
     },
     {
-      username: 'inputer_cho',
-      name: 'Siti (CHO Inputer)',
+      username: '96137',
+      name: 'Reza Trianto',
+      role: 'Facilitator',
+      password: 'koncho@26',
+      createdAt: '2026-10-18'
+    },
+    {
+      username: '19233208',
+      name: 'EVA AROMA FITRIAWAN',
+      role: 'Administrator',
+      password: 'koncho123',
+      createdAt: '2026-10-20'
+    },
+    {
+      username: '23255029',
+      name: 'Putri Wahyu Febriani',
       role: 'Inputer',
       password: 'koncho123',
-      createdAt: '2026-10-10'
+      createdAt: '2026-10-22'
+    },
+    {
+      username: '23255561',
+      name: 'MARTA DEWI RAKHMANITA',
+      role: 'Inputer',
+      password: 'koncho123',
+      createdAt: '2026-10-25'
     }
   ];
 
   function getStoredUserAccounts() {
+    var accounts = [];
     try {
       var raw = localStorage.getItem('koncho_user_accounts');
       if (raw) {
         var parsed = JSON.parse(raw);
         if (Array.isArray(parsed) && parsed.length > 0) {
-          // Bersihkan leading @ jika tersimpan
-          parsed.forEach(function(u) {
-            if (u.username) u.username = u.username.replace(/^@+/, '').trim();
-          });
-          return parsed;
+          accounts = parsed;
         }
       }
     } catch (e) {}
-    saveStoredUserAccounts(DEFAULT_USER_ACCOUNTS);
-    return DEFAULT_USER_ACCOUNTS;
+
+    // Merge akun default yang belum tercatat agar tidak hilang
+    DEFAULT_USER_ACCOUNTS.forEach(function(def) {
+      var exists = accounts.some(function(a) {
+        return (a.username || '').replace(/^@+/, '').trim().toLowerCase() === def.username.toLowerCase();
+      });
+      if (!exists) {
+        accounts.push(def);
+      }
+    });
+
+    // Bersihkan leading @ jika ada
+    accounts.forEach(function(u) {
+      if (u.username) u.username = u.username.replace(/^@+/, '').trim();
+    });
+
+    saveStoredUserAccounts(accounts);
+    return accounts;
   }
 
   function saveStoredUserAccounts(list) {
@@ -4909,12 +4964,19 @@
     var lblToggle = document.getElementById('lblToggleAddUser');
 
     if (title) title.textContent = 'Tambah Pengguna Baru';
-    if (sub) sub.textContent = 'Isi form di bawah untuk membuat kredensial akun baru';
+    if (sub) sub.textContent = 'Isi form di bawah untuk membuat kredensial akun baru (tersimpan ke Google Sheet)';
     if (orig) orig.value = '';
-    if (uInp) { uInp.value = ''; uInp.readOnly = false; }
+    if (uInp) { 
+      uInp.value = ''; 
+      uInp.readOnly = false;
+      uInp.placeholder = 'contoh: budi_cho';
+    }
     if (nameInp) nameInp.value = '';
     if (roleInp) roleInp.value = 'Facilitator';
-    if (passInp) passInp.value = 'koncho123';
+    if (passInp) {
+      passInp.value = ''; // Jangan default koncho123, diisi manual oleh user
+      passInp.placeholder = 'Masukkan kata sandi...';
+    }
     if (lblToggle) lblToggle.textContent = 'Tutup Form';
     if (card) {
       card.style.display = 'block';
@@ -4938,7 +5000,7 @@
     }
   }
 
-  // Edit User
+  // Edit User (Role Administrator dapat edit Username & Kata Sandi)
   window.editUserAccount = function(username) {
     var cleanU = (username || '').replace(/^@+/, '').trim().toLowerCase();
     var users = getStoredUserAccounts();
@@ -4959,23 +5021,27 @@
     var lblToggle = document.getElementById('lblToggleAddUser');
 
     if (title) title.textContent = 'Edit Pengguna: @' + found.username;
-    if (sub) sub.textContent = 'Perbarui nama lengkap, peran (role), atau kata sandi';
+    if (sub) sub.textContent = 'Perbarui Nama Pengguna (Username), Nama Lengkap, Peran, atau Kata Sandi';
     if (orig) orig.value = found.username;
     if (uInp) {
       uInp.value = found.username;
-      uInp.readOnly = true;
+      uInp.readOnly = false; // BISA DIEDIT OLEH ADMIN
+      uInp.placeholder = 'Nama pengguna...';
     }
     if (nameInp) nameInp.value = found.name || '';
     if (roleInp) roleInp.value = found.role || 'Facilitator';
-    if (passInp) passInp.value = found.password || '';
+    if (passInp) {
+      passInp.value = found.password || ''; // Tampilkan kata sandi saat ini & dapat diedit manual
+      passInp.placeholder = 'Masukkan kata sandi baru...';
+    }
     if (lblToggle) lblToggle.textContent = 'Tutup Form Edit';
     if (card) {
       card.style.display = 'block';
-      if (nameInp) nameInp.focus();
+      if (uInp) uInp.focus();
     }
   };
 
-  // Simpan Pengguna (Create / Update)
+  // Simpan Pengguna (Create / Update) & Sinkronkan ke Google Sheet
   function handleSaveUserAccount(e) {
     if (e && e.preventDefault) e.preventDefault();
     var orig = (document.getElementById('userEditOriginalUsername') ? document.getElementById('userEditOriginalUsername').value : '').trim().replace(/^@+/, '');
@@ -4986,14 +5052,20 @@
 
     if (!username) {
       showToast('Harap masukkan Nama Pengguna (Username)!', 'warning');
+      var uEl = document.getElementById('inpUserUsername');
+      if (uEl) uEl.focus();
       return;
     }
     if (!name) {
       showToast('Harap masukkan Nama Lengkap!', 'warning');
+      var nEl = document.getElementById('inpUserFullName');
+      if (nEl) nEl.focus();
       return;
     }
     if (!password) {
-      showToast('Harap tentukan Kata Sandi (Password)!', 'warning');
+      showToast('Harap isi Kata Sandi (Password)! Jangan dikosongkan.', 'warning');
+      var pEl = document.getElementById('inpUserPassword');
+      if (pEl) pEl.focus();
       return;
     }
 
@@ -5003,14 +5075,42 @@
       // Mode Edit
       var idx = users.findIndex(function(u) { return (u.username || '').replace(/^@+/, '').trim().toLowerCase() === orig.toLowerCase(); });
       if (idx !== -1) {
+        // Cek jika username diubah, jangan sampai bentrok dengan akun lain
+        if (username.toLowerCase() !== orig.toLowerCase()) {
+          var conflict = users.some(function(u, i) {
+            return i !== idx && (u.username || '').replace(/^@+/, '').trim().toLowerCase() === username.toLowerCase();
+          });
+          if (conflict) {
+            showToast('Username @' + username + ' sudah digunakan akun lain! Harap pilih username berbeda.', 'error');
+            return;
+          }
+        }
+
+        users[idx].username = username;
         users[idx].name = name;
         users[idx].role = role;
         users[idx].password = password;
+        users[idx].updatedAt = new Date().toISOString();
         saveStoredUserAccounts(users);
-        showToast('Akun @' + orig + ' berhasil diperbarui!', 'success');
+
+        // Sinkronisasi pembaruan ke Google Spreadsheet
+        syncUserToGoogleSheet({
+          origUsername: orig,
+          username: username,
+          name: name,
+          role: role,
+          password: password
+        });
+
+        showToast('Akun @' + username + ' berhasil diperbarui dan tersimpan ke Google Sheet!', 'success');
 
         // Jika mengedit akun yang sedang login, update sesi langsung
-        if (state.authUser && ((state.authUser.username || '').replace(/^@+/, '').toLowerCase() === orig.toLowerCase() || (state.authUser.name || '').toLowerCase() === orig.toLowerCase())) {
+        if (state.authUser && (
+          (state.authUser.username || '').replace(/^@+/, '').toLowerCase() === orig.toLowerCase() ||
+          (state.authUser.username || '').replace(/^@+/, '').toLowerCase() === username.toLowerCase() ||
+          (state.authUser.name || '').toLowerCase() === orig.toLowerCase()
+        )) {
+          state.authUser.username = username;
           state.authUser.name = name;
           state.authUser.role = role;
           try { localStorage.setItem('koncho_auth_user', JSON.stringify(state.authUser)); } catch(err){}
@@ -5025,22 +5125,32 @@
         return;
       }
 
-      users.push({
+      var newUser = {
         username: username,
         name: name,
         role: role,
         password: password,
         createdAt: new Date().toISOString().split('T')[0]
-      });
+      };
+      users.push(newUser);
       saveStoredUserAccounts(users);
-      showToast('Pengguna baru @' + username + ' (' + role + ') berhasil ditambahkan!', 'success');
+
+      // Sinkronisasi akun baru ke Google Spreadsheet
+      syncUserToGoogleSheet({
+        username: username,
+        name: name,
+        role: role,
+        password: password
+      });
+
+      showToast('Pengguna baru @' + username + ' (' + role + ') berhasil ditambahkan dan tersimpan ke Google Sheet!', 'success');
     }
 
     hideUserForm();
     renderUserMgmtList();
   }
 
-  // Hapus Pengguna (Delete)
+  // Hapus Pengguna (Delete) & Sinkronkan ke Google Sheet
   window.deleteUserAccount = function(username) {
     var cleanU = (username || '').replace(/^@+/, '').trim().toLowerCase();
     if (cleanU === 'admin_koncho') {
@@ -5057,10 +5167,128 @@
       var users = getStoredUserAccounts();
       users = users.filter(function(u) { return (u.username || '').replace(/^@+/, '').trim().toLowerCase() !== cleanU; });
       saveStoredUserAccounts(users);
-      showToast('Akun @' + cleanU + ' berhasil dihapus.', 'info');
+      
+      // Hapus dari Google Spreadsheet
+      deleteUserFromGoogleSheet(cleanU);
+
+      showToast('Akun @' + cleanU + ' berhasil dihapus dari sistem dan Google Sheet.', 'info');
       renderUserMgmtList();
     }
   };
+
+  // Sinkronisasi Akun Pengguna ke Google Spreadsheet (Sheet Users)
+  function syncUserToGoogleSheet(userPayload) {
+    // 1. GAS Native Environment
+    if (typeof google !== 'undefined' && google.script && google.script.run) {
+      google.script.run
+        .withSuccessHandler(function(res) {
+          console.log('Google Sheets user sync response:', res);
+        })
+        .withFailureHandler(function(err) {
+          console.warn('Google Sheets user sync failed:', err);
+        })
+        .saveUserAccount(userPayload);
+    }
+
+    // 2. Vercel / External Web App POST
+    if (state.gasApiUrl) {
+      try {
+        fetch(state.gasApiUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'saveUserAccount', data: userPayload })
+        });
+      } catch (err) {
+        console.warn('Fetch saveUserAccount error:', err);
+      }
+    }
+  }
+
+  // Hapus Akun Pengguna dari Google Spreadsheet
+  function deleteUserFromGoogleSheet(username) {
+    // 1. GAS Native Environment
+    if (typeof google !== 'undefined' && google.script && google.script.run) {
+      google.script.run
+        .withSuccessHandler(function(res) {
+          console.log('Google Sheets user delete response:', res);
+        })
+        .withFailureHandler(function(err) {
+          console.warn('Google Sheets user delete failed:', err);
+        })
+        .deleteUserAccount(username);
+    }
+
+    // 2. Vercel / External Web App POST
+    if (state.gasApiUrl) {
+      try {
+        fetch(state.gasApiUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'deleteUserAccount', data: { username: username } })
+        });
+      } catch (err) {
+        console.warn('Fetch deleteUserAccount error:', err);
+      }
+    }
+  }
+
+  // Sinkronisasi data pengguna dari Google Sheet ke localStorage
+  function syncStoredUsersFromSheet(remoteUsers) {
+    if (!remoteUsers || !Array.isArray(remoteUsers) || remoteUsers.length === 0) return;
+    var localUsers = getStoredUserAccounts();
+    var hasChanges = false;
+
+    remoteUsers.forEach(function(rem) {
+      if (!rem || !rem.username) return;
+      var cleanRemU = rem.username.replace(/^@+/, '').trim().toLowerCase();
+      var idx = localUsers.findIndex(function(loc) {
+        return (loc.username || '').replace(/^@+/, '').trim().toLowerCase() === cleanRemU;
+      });
+
+      if (idx !== -1) {
+        if (
+          localUsers[idx].name !== rem.name ||
+          localUsers[idx].role !== rem.role ||
+          (rem.password && localUsers[idx].password !== rem.password)
+        ) {
+          localUsers[idx].name = rem.name || localUsers[idx].name;
+          localUsers[idx].role = rem.role || localUsers[idx].role;
+          if (rem.password) localUsers[idx].password = rem.password;
+          hasChanges = true;
+        }
+      } else {
+        localUsers.push({
+          username: rem.username.replace(/^@+/, '').trim(),
+          name: rem.name || rem.username,
+          role: rem.role || 'Inputer',
+          password: rem.password || '',
+          createdAt: new Date().toISOString().split('T')[0]
+        });
+        hasChanges = true;
+      }
+    });
+
+    if (hasChanges) {
+      saveStoredUserAccounts(localUsers);
+      renderUserMgmtList();
+
+      if (state.authUser) {
+        var cleanMyU = (state.authUser.username || state.authUser.name || '').replace(/^@+/, '').trim().toLowerCase();
+        var myAcc = localUsers.find(function(a) {
+          return (a.username || '').replace(/^@+/, '').trim().toLowerCase() === cleanMyU;
+        });
+        if (myAcc) {
+          state.authUser.name = myAcc.name;
+          state.authUser.role = myAcc.role;
+          state.authUser.username = myAcc.username;
+          try { localStorage.setItem('koncho_auth_user', JSON.stringify(state.authUser)); } catch(e){}
+          applyRolePermissions();
+        }
+      }
+    }
+  }
 
   function applyRolePermissions() {
     var role = (state.authUser && state.authUser.role) ? state.authUser.role : 'Administrator';
@@ -6081,6 +6309,11 @@
     updateScopeLabel();
     updateKpiCounters();
     renderCaseList();
+
+    // Sinkronisasi data pengguna dari Google Sheet (Sheet Users)
+    if (data.users && Array.isArray(data.users) && data.users.length > 0) {
+      syncStoredUsersFromSheet(data.users);
+    }
   }
 
   /**

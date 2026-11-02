@@ -12,6 +12,7 @@ var CONFIG = {
   SHEET_MOBILE: 'Mobile',
   SHEET_FIXED: 'Fixed',
   SHEET_LOG: 'Log_Komunikasi',
+  SHEET_USERS: 'Users',
   // Sesuai struktur kolom formulir dan sheet user:
   // Kolom A: ID_Tiket / No
   // Kolom B: Bulan - Tahun
@@ -53,6 +54,9 @@ var CONFIG = {
   DEFAULT_HEADERS_LOG: [
     'Log_ID', 'ID_Tiket', 'Tipe_Layanan', 'Pengirim', 'Pesan_Update', 
     'Status_Terkait', 'Follow_Up_To', 'Waktu_Update'
+  ],
+  DEFAULT_HEADERS_USERS: [
+    'Username', 'Nama Lengkap', 'Role', 'Password', 'Terakhir Diperbarui'
   ]
 };
 
@@ -66,6 +70,9 @@ function doGet(e) {
     var responseData = {};
     if (action === 'getInitialData') {
       responseData = getInitialData();
+    } else if (action === 'getUsers') {
+      var ss = getSpreadsheet();
+      responseData = { success: true, users: getUserRecords(ss) };
     } else {
       responseData = { success: false, message: 'Action tidak dikenal' };
     }
@@ -101,6 +108,10 @@ function doPost(e) {
       result = submitNewData(data);
     } else if (action === 'postCommunicationUpdate') {
       result = postCommunicationUpdate(data);
+    } else if (action === 'saveUserAccount') {
+      result = saveUserAccount(data);
+    } else if (action === 'deleteUserAccount') {
+      result = deleteUserAccount(data.username || data);
     } else {
       result = { success: false, error: 'Aksi POST tidak valid' };
     }
@@ -243,6 +254,7 @@ function initializeDatabase() {
   var mobileSheet = ensureSheet(ss, CONFIG.SHEET_MOBILE, CONFIG.DEFAULT_HEADERS_MOBILE);
   var fixedSheet = ensureSheet(ss, CONFIG.SHEET_FIXED, CONFIG.DEFAULT_HEADERS_FIXED);
   var logSheet = ensureSheet(ss, CONFIG.SHEET_LOG, CONFIG.DEFAULT_HEADERS_LOG);
+  var usersSheet = ensureUsersSheet(ss);
   
   // Pastikan kolom tracking aman
   try {
@@ -296,6 +308,7 @@ function getInitialData() {
     var mobileData = getSheetRecords(ss, CONFIG.SHEET_MOBILE, 'MOBILE');
     var fixedData = getSheetRecords(ss, CONFIG.SHEET_FIXED, 'FIXED');
     var logData = getLogRecords(ss);
+    var usersData = getUserRecords(ss);
     
     return {
       success: true,
@@ -311,6 +324,7 @@ function getInitialData() {
         all: ss.getSheets().map(function(s) { return s.getName(); })
       },
       logs: logData,
+      users: usersData,
       timestamp: new Date().toISOString()
     };
   } catch (err) {
@@ -1013,4 +1027,197 @@ function formatDate(val) {
     return Utilities.formatDate(val, Session.getScriptTimeZone() || 'Asia/Jakarta', 'yyyy-MM-dd HH:mm:ss');
   }
   return String(val);
+}
+
+/**
+ * =========================================================================
+ * MANAJEMEN AKUN PENGGUNA (USERS) DI GOOGLE SPREADSHEET
+ * =========================================================================
+ */
+
+/**
+ * Memastikan sheet 'Users' tersedia dan terstruktur di Google Spreadsheet
+ */
+function ensureUsersSheet(ss) {
+  if (!ss) ss = getSpreadsheet();
+  var sheet = findBestSheet(ss, CONFIG.SHEET_USERS);
+  if (!sheet) {
+    sheet = ss.insertSheet(CONFIG.SHEET_USERS);
+  }
+
+  // Jika sheet masih baru atau kosong, pasang header & seed pengguna awal
+  if (sheet.getLastRow() === 0) {
+    sheet.appendRow(CONFIG.DEFAULT_HEADERS_USERS);
+    var headerRange = sheet.getRange(1, 1, 1, CONFIG.DEFAULT_HEADERS_USERS.length);
+    headerRange.setFontWeight('bold');
+    headerRange.setBackground('#f1f5f9');
+    
+    // Seed pengguna awal ke Google Sheets
+    var defaultUsers = [
+      ['admin_koncho', 'Administrator Utama', 'Administrator', 'koncho123', '2026-10-01 08:00:00'],
+      ['23255592', 'Moch Fajar Sahuri', 'Administrator', 'koncho123', '2026-10-15 09:00:00'],
+      ['96137', 'Reza Trianto', 'Facilitator', 'koncho@26', '2026-10-18 10:00:00'],
+      ['19233208', 'EVA AROMA FITRIAWAN', 'Administrator', 'koncho123', '2026-10-20 11:00:00'],
+      ['23255029', 'Putri Wahyu Febriani', 'Inputer', 'koncho123', '2026-10-22 13:00:00'],
+      ['23255561', 'MARTA DEWI RAKHMANITA', 'Inputer', 'koncho123', '2026-10-25 14:00:00']
+    ];
+    for (var i = 0; i < defaultUsers.length; i++) {
+      sheet.appendRow(defaultUsers[i]);
+    }
+  } else {
+    var existingHeaders = sheet.getRange(1, 1, 1, Math.max(sheet.getLastColumn(), 1)).getValues()[0];
+    if (existingHeaders.length === 0 || !existingHeaders[0]) {
+      sheet.getRange(1, 1, 1, CONFIG.DEFAULT_HEADERS_USERS.length).setValues([CONFIG.DEFAULT_HEADERS_USERS]);
+    }
+  }
+
+  return sheet;
+}
+
+/**
+ * Membaca daftar akun pengguna dari sheet Users di Google Spreadsheet
+ */
+function getUserRecords(ss) {
+  try {
+    if (!ss) ss = getSpreadsheet();
+    var sheet = ensureUsersSheet(ss);
+    var lastRow = sheet.getLastRow();
+    var lastCol = sheet.getLastColumn();
+    if (lastRow <= 1 || lastCol < 4) {
+      return [];
+    }
+
+    var values = sheet.getRange(1, 1, lastRow, lastCol).getValues();
+    var headers = values[0].map(function(h) { return String(h || '').trim(); });
+
+    var uIdx = findHeaderIndex(headers, ['Username', 'User', 'Nama Pengguna']);
+    var nameIdx = findHeaderIndex(headers, ['Nama Lengkap', 'Nama', 'Identitas', 'FullName']);
+    var roleIdx = findHeaderIndex(headers, ['Role', 'Peran', 'Peran Akun']);
+    var passIdx = findHeaderIndex(headers, ['Password', 'Kata Sandi', 'Sandi']);
+    var timeIdx = findHeaderIndex(headers, ['Terakhir Diperbarui', 'Terakhir Update', 'Waktu Update']);
+
+    if (uIdx === -1) uIdx = 0;
+    if (nameIdx === -1) nameIdx = 1;
+    if (roleIdx === -1) roleIdx = 2;
+    if (passIdx === -1) passIdx = 3;
+    if (timeIdx === -1) timeIdx = 4;
+
+    var users = [];
+    for (var r = 1; r < values.length; r++) {
+      var row = values[r];
+      var rawUser = String(row[uIdx] || '').trim();
+      if (!rawUser) continue;
+      var cleanUser = rawUser.replace(/^@+/, '').trim();
+      var rawName = String(row[nameIdx] || '').trim();
+      var rawRole = String(row[roleIdx] || '').trim();
+      var rawPass = String(row[passIdx] || '').trim();
+      var rawTime = row[timeIdx] ? formatDate(row[timeIdx]) : '';
+
+      users.push({
+        username: cleanUser,
+        name: rawName || cleanUser,
+        role: rawRole || 'Inputer',
+        password: rawPass,
+        updatedAt: rawTime
+      });
+    }
+
+    return users;
+  } catch (err) {
+    Logger.log('getUserRecords error: ' + err.message);
+    return [];
+  }
+}
+
+/**
+ * Menyimpan / memperbarui akun pengguna ke sheet Users di Google Spreadsheet
+ */
+function saveUserAccount(userPayload) {
+  try {
+    var ss = getSpreadsheet();
+    var sheet = ensureUsersSheet(ss);
+
+    var origUsername = String(userPayload.origUsername || userPayload.orig || '').replace(/^@+/, '').trim();
+    var newUsername = String(userPayload.username || '').replace(/^@+/, '').trim();
+    var fullName = String(userPayload.name || userPayload.fullName || '').trim();
+    var role = String(userPayload.role || 'Inputer').trim();
+    var password = String(userPayload.password || '').trim();
+    var nowStr = Utilities.formatDate(new Date(), Session.getScriptTimeZone() || 'Asia/Jakarta', 'yyyy-MM-dd HH:mm:ss');
+
+    if (!newUsername) {
+      return { success: false, error: 'Username tidak boleh kosong' };
+    }
+
+    var lastRow = sheet.getLastRow();
+    var targetRow = -1;
+
+    if (lastRow > 1) {
+      var uValues = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+      for (var i = 0; i < uValues.length; i++) {
+        var rowU = String(uValues[i][0] || '').replace(/^@+/, '').trim().toLowerCase();
+        if (origUsername && rowU === origUsername.toLowerCase()) {
+          targetRow = i + 2;
+          break;
+        } else if (!origUsername && rowU === newUsername.toLowerCase()) {
+          targetRow = i + 2;
+          break;
+        }
+      }
+    }
+
+    if (targetRow > 1) {
+      // Update baris pengguna
+      sheet.getRange(targetRow, 1).setValue(newUsername);
+      sheet.getRange(targetRow, 2).setValue(fullName);
+      sheet.getRange(targetRow, 3).setValue(role);
+      sheet.getRange(targetRow, 4).setValue(password);
+      sheet.getRange(targetRow, 5).setValue(nowStr);
+    } else {
+      // Tambah baris baru
+      sheet.appendRow([newUsername, fullName, role, password, nowStr]);
+    }
+
+    return {
+      success: true,
+      message: 'Akun @' + newUsername + ' berhasil disimpan di Google Sheets',
+      user: {
+        username: newUsername,
+        name: fullName,
+        role: role,
+        password: password,
+        updatedAt: nowStr
+      }
+    };
+  } catch (err) {
+    Logger.log('saveUserAccount error: ' + err.message);
+    return { success: false, error: err.message };
+  }
+}
+
+/**
+ * Menghapus akun pengguna dari sheet Users di Google Spreadsheet
+ */
+function deleteUserAccount(username) {
+  try {
+    var ss = getSpreadsheet();
+    var sheet = ensureUsersSheet(ss);
+    var cleanU = String(username || '').replace(/^@+/, '').trim().toLowerCase();
+
+    var lastRow = sheet.getLastRow();
+    if (lastRow <= 1) return { success: true };
+
+    var uValues = sheet.getRange(2, 1, lastRow - 1, 1).getValues();
+    for (var i = 0; i < uValues.length; i++) {
+      var rowU = String(uValues[i][0] || '').replace(/^@+/, '').trim().toLowerCase();
+      if (rowU === cleanU) {
+        sheet.deleteRow(i + 2);
+        return { success: true, message: 'Akun @' + cleanU + ' berhasil dihapus dari Google Sheets' };
+      }
+    }
+
+    return { success: true, message: 'Akun tidak ditemukan di Google Sheets' };
+  } catch (err) {
+    Logger.log('deleteUserAccount error: ' + err.message);
+    return { success: false, error: err.message };
+  }
 }
