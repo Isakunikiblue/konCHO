@@ -3628,6 +3628,13 @@
     white-space: nowrap;
   }
 
+  .btn-ppt-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    margin-top: 2px;
+  }
+
   .btn-ppt-reupload {
     background: transparent;
     border: none;
@@ -3642,6 +3649,25 @@
   .btn-ppt-reupload:hover {
     color: #ea580c;
     background: rgba(234, 88, 12, 0.1);
+  }
+
+  .btn-ppt-delete {
+    background: transparent;
+    border: none;
+    color: var(--danger-color, #ef4444);
+    font-size: 10.5px;
+    font-weight: 600;
+    cursor: pointer;
+    padding: 2px 6px;
+    border-radius: 4px;
+    transition: var(--transition);
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+  }
+  .btn-ppt-delete:hover {
+    color: #b91c1c;
+    background: rgba(239, 68, 68, 0.12);
   }
 
   .ppt-empty-badge {
@@ -5051,9 +5077,12 @@
           <!-- Existing PPT Link if already uploaded -->
           <div id="existingPptContainer" style="display:none; margin-top:12px;">
             <div style="font-size:11.5px; font-weight:700; color:var(--text-muted); margin-bottom:4px;">File PPT Saat Ini di Google Drive:</div>
-            <div class="existing-ppt-card">
-              <span style="font-size:16px;">📎</span>
-              <a href="#" target="_blank" rel="noopener noreferrer" id="existingPptLink" class="existing-ppt-link">Lihat File di Google Drive</a>
+            <div class="existing-ppt-card" style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
+              <div style="display:flex; align-items:center; gap:6px; overflow:hidden;">
+                <span style="font-size:16px;">📎</span>
+                <a href="#" target="_blank" rel="noopener noreferrer" id="existingPptLink" class="existing-ppt-link">Lihat File di Google Drive</a>
+              </div>
+              <button type="button" id="btnModalDeletePpt" class="btn-ppt-delete" style="display:none;" title="Hapus File PPT ini">🗑️ Hapus PPT</button>
             </div>
           </div>
 
@@ -5622,11 +5651,39 @@
                         <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
                       </tr>
                       <tr>
+                        <td><strong>Upload & Ganti Materi PPT (Google Drive)</strong></td>
+                        <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
+                        <td style="text-align: center;"><span class="guide-cross">❌ Tidak</span></td>
+                        <td style="text-align: center;"><span class="guide-cross">❌ Tidak</span></td>
+                        <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Hapus Materi PPT yang Sudah Diupload</strong></td>
+                        <td style="text-align: center;"><span class="guide-cross">❌ Tidak</span></td>
+                        <td style="text-align: center;"><span class="guide-cross">❌ Tidak</span></td>
+                        <td style="text-align: center;"><span class="guide-cross">❌ Tidak</span></td>
+                        <td style="text-align: center;"><span class="guide-check">✅ Ya (Eksklusif)</span></td>
+                      </tr>
+                      <tr>
                         <td><strong>Download Dokumen Resmi User Guide (Buku Panduan)</strong></td>
                         <td style="text-align: center;"><span class="guide-cross">❌ Tidak (Dihide)</span></td>
                         <td style="text-align: center;"><span class="guide-cross">❌ Tidak (Dihide)</span></td>
                         <td style="text-align: center;"><span class="guide-cross">❌ Tidak (Dihide)</span></td>
                         <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Upload & Ganti Materi PPT (Google Drive)</strong></td>
+                        <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
+                        <td style="text-align: center;"><span class="guide-cross">❌ Tidak</span></td>
+                        <td style="text-align: center;"><span class="guide-cross">❌ Tidak</span></td>
+                        <td style="text-align: center;"><span class="guide-check">✅ Ya</span></td>
+                      </tr>
+                      <tr>
+                        <td><strong>Hapus Materi PPT yang Sudah Diupload</strong></td>
+                        <td style="text-align: center;"><span class="guide-cross">❌ Tidak</span></td>
+                        <td style="text-align: center;"><span class="guide-cross">❌ Tidak</span></td>
+                        <td style="text-align: center;"><span class="guide-cross">❌ Tidak</span></td>
+                        <td style="text-align: center;"><span class="guide-check">✅ Ya (Eksklusif)</span></td>
                       </tr>
                     </tbody>
                   </table>
@@ -6188,6 +6245,7 @@
     btnRemovePptFile: document.getElementById('btnRemovePptFile'),
     existingPptContainer: document.getElementById('existingPptContainer'),
     existingPptLink: document.getElementById('existingPptLink'),
+    btnModalDeletePpt: document.getElementById('btnModalDeletePpt'),
     uploadPptProgress: document.getElementById('uploadPptProgress'),
     uploadPptStatusText: document.getElementById('uploadPptStatusText'),
     uploadPptPercent: document.getElementById('uploadPptPercent'),
@@ -7883,6 +7941,13 @@
     if (dom.btnSubmitUploadPpt) {
       dom.btnSubmitUploadPpt.addEventListener('click', handleUploadPptSubmit);
     }
+    if (dom.btnModalDeletePpt) {
+      dom.btnModalDeletePpt.addEventListener('click', function() {
+        if (state.uploadPptTarget && state.uploadPptTarget.ticketId) {
+          handleDeletePpt(state.uploadPptTarget.ticketId, state.uploadPptTarget.serviceType);
+        }
+      });
+    }
 
     // Tutup modal jika klik di luar box modal
     [dom.modalInProgress, dom.modalClosed, dom.modalLog, dom.newDataModal, dom.modalUploadPpt, document.getElementById('modalManageUsers'), document.getElementById('modalUserGuide')].forEach(function(m) {
@@ -8363,6 +8428,7 @@
       // 2. Main Issue (Kolom C) - Judul Utama Isu Kasus
       var currentRole = (state.authUser && state.authUser.role) ? state.authUser.role : 'Administrator';
       var canUploadPpt = currentRole === 'Administrator' || currentRole === 'Inputer';
+      var isAdmin = currentRole === 'Administrator';
       var pptInfo = getCasePptAttachment(item.serviceType, item.id);
 
       html += '<div class="case-col-c-box">';
@@ -8379,6 +8445,9 @@
         html += '      </a>';
         if (canUploadPpt) {
           html += '      <button type="button" class="btn-ppt-reupload" onclick="openUploadPptModal(\'' + escapeHtml(item.id) + '\', \'' + item.serviceType + '\')" title="Ganti / Upload Ulang File PPT">✏️ Ganti</button>';
+        }
+        if (isAdmin) {
+          html += '      <button type="button" class="btn-ppt-delete" onclick="handleDeletePpt(\'' + escapeHtml(item.id) + '\', \'' + item.serviceType + '\')" title="Hapus File PPT">🗑️ Hapus</button>';
         }
         html += '    </div>';
       } else if (canUploadPpt) {
@@ -8618,6 +8687,7 @@
       html += '          </td>';
 
       var canUploadPpt = currentRole === 'Administrator' || currentRole === 'Inputer';
+      var isAdmin = currentRole === 'Administrator';
       var pptInfo = getCasePptAttachment(item.serviceType, item.id);
 
       html += '          <td class="home-col-ppt">';
@@ -8628,8 +8698,15 @@
         html += '                <span class="ppt-text">' + escapeHtml(pptInfo.fileName || 'Lihat PPT') + '</span>';
         html += '                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>';
         html += '              </a>';
-        if (canUploadPpt) {
-          html += '              <button type="button" class="btn-ppt-reupload" onclick="openUploadPptModal(\'' + escapeHtml(item.id) + '\', \'' + item.serviceType + '\')" title="Ganti / Upload Ulang File PPT">✏️ Ganti</button>';
+        if (canUploadPpt || isAdmin) {
+          html += '              <div class="btn-ppt-actions">';
+          if (canUploadPpt) {
+            html += '                <button type="button" class="btn-ppt-reupload" onclick="openUploadPptModal(\'' + escapeHtml(item.id) + '\', \'' + item.serviceType + '\')" title="Ganti / Upload Ulang File PPT">✏️ Ganti</button>';
+          }
+          if (isAdmin) {
+            html += '                <button type="button" class="btn-ppt-delete" onclick="handleDeletePpt(\'' + escapeHtml(item.id) + '\', \'' + item.serviceType + '\')" title="Hapus File PPT">🗑️ Hapus</button>';
+          }
+          html += '              </div>';
         }
         html += '            </div>';
       } else {
@@ -9140,8 +9217,12 @@
         dom.existingPptLink.href = existingPpt.fileUrl;
         dom.existingPptLink.textContent = existingPpt.fileName ? ('Buka: ' + existingPpt.fileName) : 'Buka File di Google Drive';
       }
+      if (dom.btnModalDeletePpt) {
+        dom.btnModalDeletePpt.style.display = (currentRole === 'Administrator') ? 'inline-flex' : 'none';
+      }
     } else {
       if (dom.existingPptContainer) dom.existingPptContainer.style.display = 'none';
+      if (dom.btnModalDeletePpt) dom.btnModalDeletePpt.style.display = 'none';
     }
 
     // Reset Dropzone & Inputs
@@ -9327,6 +9408,79 @@
   // Ekspor fungsi agar dapat dipanggil dari onclick atribut HTML
   window.openUploadPptModal = openUploadPptModal;
   window.closeUploadPptModal = closeUploadPptModal;
+  window.handleDeletePpt = handleDeletePpt;
+
+  /**
+   * Hapus File PPT (Khusus Administrator)
+   */
+  function handleDeletePpt(ticketId, serviceType) {
+    var currentRole = (state.authUser && state.authUser.role) ? state.authUser.role : 'Administrator';
+    if (currentRole !== 'Administrator') {
+      showToast('Akses ditolak: Hanya Administrator yang berwenang menghapus materi PPT.', 'error');
+      return;
+    }
+
+    var confirmed = window.confirm('Apakah Anda yakin ingin menghapus materi PPT untuk Case #' + ticketId + ' (' + serviceType + ')?');
+    if (!confirmed) return;
+
+    var currentUserName = getCurrentLoggedInUserName();
+    var key = serviceType + '_' + ticketId;
+
+    // 1. Hapus dari state & localStorage
+    if (!state.pptAttachments) state.pptAttachments = getStoredPptAttachments();
+    if (state.pptAttachments[key]) {
+      delete state.pptAttachments[key];
+      saveStoredPptAttachments(state.pptAttachments);
+    }
+
+    // 2. Kosongkan di memory record
+    var allItems = (serviceType === 'MOBILE' ? state.mobileRecords : state.fixedRecords) || [];
+    var targetRec = allItems.find(function(r) { return String(r.id) === String(ticketId); });
+    if (targetRec) {
+      targetRec.filePpt = '';
+    }
+
+    closeUploadPptModal();
+    showToast('Materi PPT berhasil dihapus!', 'success');
+    renderCaseList();
+
+    // 3. Sinkronisasi penghapusan ke Google Apps Script / Sheet & Trash Drive
+    var payload = {
+      action: 'deletePptFile',
+      ticketId: ticketId,
+      serviceType: serviceType,
+      deletedBy: currentUserName
+    };
+
+    if (state.isGasEnvironment) {
+      google.script.run
+        .withSuccessHandler(function(res) {
+          console.log('Delete PPT Apps Script success:', res);
+        })
+        .withFailureHandler(function(err) {
+          console.warn('Delete PPT Apps Script notice:', err);
+        })
+        .deletePptFile(payload);
+    } else if (state.gasApiUrl) {
+      try {
+        fetch(state.gasApiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload),
+          redirect: 'follow'
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(res) {
+          console.log('Delete PPT server response:', res);
+        })
+        .catch(function(err) {
+          console.warn('Delete PPT fetch notice:', err);
+        });
+      } catch (e) {
+        console.warn('Delete PPT remote error:', e);
+      }
+    }
+  }
 
   /**
    * Reopen / Kembalikan Status

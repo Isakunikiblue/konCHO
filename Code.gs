@@ -115,6 +115,8 @@ function doPost(e) {
       result = postCommunicationUpdate(data);
     } else if (action === 'uploadPptFile') {
       result = uploadPptFile(data);
+    } else if (action === 'deletePptFile') {
+      result = deletePptFile(data);
     } else if (action === 'saveUserAccount') {
       result = saveUserAccount(data);
     } else if (action === 'deleteUserAccount') {
@@ -1346,6 +1348,92 @@ function uploadPptFile(data) {
     };
   } catch (err) {
     Logger.log('uploadPptFile error: ' + err.stack);
+    return {
+      success: false,
+      error: err.message
+    };
+  }
+}
+
+/**
+ * Hapus File PPT dari Sheet dan Trash file di Google Drive (Khusus Role Administrator)
+ */
+function deletePptFile(data) {
+  try {
+    if (!data || !data.ticketId || !data.serviceType) {
+      return { success: false, error: 'Data tiket tidak lengkap' };
+    }
+
+    var ss = getSpreadsheet();
+    var targetSheetName = (data.serviceType === 'FIXED') ? CONFIG.SHEET_FIXED : CONFIG.SHEET_MOBILE;
+    var sheet = findBestSheet(ss, targetSheetName);
+    var oldFileUrl = '';
+
+    if (sheet) {
+      var lastRow = sheet.getLastRow();
+      var lastCol = sheet.getLastColumn();
+      if (lastRow > 0 && lastCol > 0) {
+        var allValues = sheet.getRange(1, 1, lastRow, lastCol).getValues();
+        var headers = allValues[0] || [];
+        var pptColIdx = findHeaderIndex(headers, ['file ppt', 'file_ppt', 'link_ppt', 'materi ppt', 'materi_ppt', 'lampiran ppt']);
+        
+        if (pptColIdx >= 0) {
+          for (var r = 1; r < allValues.length; r++) {
+            if (String(allValues[r][0]).trim() === String(data.ticketId).trim()) {
+              oldFileUrl = String(allValues[r][pptColIdx] || '');
+              sheet.getRange(r + 1, pptColIdx + 1).setValue('');
+              break;
+            }
+          }
+        }
+      }
+    }
+
+    // Jika file ada di Google Drive dan URL memiliki ID file, coba masukkan ke sampah (trash)
+    if (oldFileUrl) {
+      try {
+        var matchId = oldFileUrl.match(/\/d\/([a-zA-Z0-9_-]+)/) || oldFileUrl.match(/id=([a-zA-Z0-9_-]+)/);
+        if (matchId && matchId[1]) {
+          var driveFile = DriveApp.getFileById(matchId[1]);
+          if (driveFile) {
+            driveFile.setTrashed(true);
+            Logger.log('File Drive ditrash: ' + matchId[1]);
+          }
+        }
+      } catch (driveErr) {
+        Logger.log('DriveApp trash notice: ' + driveErr.message);
+      }
+    }
+
+    // Catat ke Log_Komunikasi
+    try {
+      var logSheet = ensureSheet(ss, CONFIG.SHEET_LOG, CONFIG.DEFAULT_HEADERS_LOG);
+      var now = new Date();
+      var dateStr = Utilities.formatDate(now, Session.getScriptTimeZone() || 'Asia/Jakarta', 'yyyyMMdd');
+      var formattedDate = Utilities.formatDate(now, Session.getScriptTimeZone() || 'Asia/Jakarta', 'yyyy-MM-dd HH:mm:ss');
+      var logId = 'LOG-' + dateStr + '-' + Math.floor(1000 + Math.random() * 9000);
+      var adminUser = data.deletedBy || 'Administrator';
+
+      logSheet.appendRow([
+        logId,
+        data.ticketId,
+        data.serviceType,
+        adminUser,
+        'Hapus Materi PPT untuk tiket ' + data.ticketId + ' (' + (oldFileUrl || 'Lampiran PPT') + ')',
+        'Hapus PPT',
+        'Materi Presentasi',
+        formattedDate
+      ]);
+    } catch (logErr) {
+      Logger.log('Log komunikasi PPT notice: ' + logErr.message);
+    }
+
+    return {
+      success: true,
+      message: 'Materi PPT untuk Case #' + data.ticketId + ' berhasil dihapus.'
+    };
+  } catch (err) {
+    Logger.log('deletePptFile error: ' + err.stack);
     return {
       success: false,
       error: err.message

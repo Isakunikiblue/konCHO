@@ -142,6 +142,7 @@
     btnRemovePptFile: document.getElementById('btnRemovePptFile'),
     existingPptContainer: document.getElementById('existingPptContainer'),
     existingPptLink: document.getElementById('existingPptLink'),
+    btnModalDeletePpt: document.getElementById('btnModalDeletePpt'),
     uploadPptProgress: document.getElementById('uploadPptProgress'),
     uploadPptStatusText: document.getElementById('uploadPptStatusText'),
     uploadPptPercent: document.getElementById('uploadPptPercent'),
@@ -1837,6 +1838,13 @@
     if (dom.btnSubmitUploadPpt) {
       dom.btnSubmitUploadPpt.addEventListener('click', handleUploadPptSubmit);
     }
+    if (dom.btnModalDeletePpt) {
+      dom.btnModalDeletePpt.addEventListener('click', function() {
+        if (state.uploadPptTarget && state.uploadPptTarget.ticketId) {
+          handleDeletePpt(state.uploadPptTarget.ticketId, state.uploadPptTarget.serviceType);
+        }
+      });
+    }
 
     // Tutup modal jika klik di luar box modal
     [dom.modalInProgress, dom.modalClosed, dom.modalLog, dom.newDataModal, dom.modalUploadPpt, document.getElementById('modalManageUsers'), document.getElementById('modalUserGuide')].forEach(function(m) {
@@ -2317,6 +2325,7 @@
       // 2. Main Issue (Kolom C) - Judul Utama Isu Kasus
       var currentRole = (state.authUser && state.authUser.role) ? state.authUser.role : 'Administrator';
       var canUploadPpt = currentRole === 'Administrator' || currentRole === 'Inputer';
+      var isAdmin = currentRole === 'Administrator';
       var pptInfo = getCasePptAttachment(item.serviceType, item.id);
 
       html += '<div class="case-col-c-box">';
@@ -2333,6 +2342,9 @@
         html += '      </a>';
         if (canUploadPpt) {
           html += '      <button type="button" class="btn-ppt-reupload" onclick="openUploadPptModal(\'' + escapeHtml(item.id) + '\', \'' + item.serviceType + '\')" title="Ganti / Upload Ulang File PPT">✏️ Ganti</button>';
+        }
+        if (isAdmin) {
+          html += '      <button type="button" class="btn-ppt-delete" onclick="handleDeletePpt(\'' + escapeHtml(item.id) + '\', \'' + item.serviceType + '\')" title="Hapus File PPT">🗑️ Hapus</button>';
         }
         html += '    </div>';
       } else if (canUploadPpt) {
@@ -2572,6 +2584,7 @@
       html += '          </td>';
 
       var canUploadPpt = currentRole === 'Administrator' || currentRole === 'Inputer';
+      var isAdmin = currentRole === 'Administrator';
       var pptInfo = getCasePptAttachment(item.serviceType, item.id);
 
       html += '          <td class="home-col-ppt">';
@@ -2582,8 +2595,15 @@
         html += '                <span class="ppt-text">' + escapeHtml(pptInfo.fileName || 'Lihat PPT') + '</span>';
         html += '                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>';
         html += '              </a>';
-        if (canUploadPpt) {
-          html += '              <button type="button" class="btn-ppt-reupload" onclick="openUploadPptModal(\'' + escapeHtml(item.id) + '\', \'' + item.serviceType + '\')" title="Ganti / Upload Ulang File PPT">✏️ Ganti</button>';
+        if (canUploadPpt || isAdmin) {
+          html += '              <div class="btn-ppt-actions">';
+          if (canUploadPpt) {
+            html += '                <button type="button" class="btn-ppt-reupload" onclick="openUploadPptModal(\'' + escapeHtml(item.id) + '\', \'' + item.serviceType + '\')" title="Ganti / Upload Ulang File PPT">✏️ Ganti</button>';
+          }
+          if (isAdmin) {
+            html += '                <button type="button" class="btn-ppt-delete" onclick="handleDeletePpt(\'' + escapeHtml(item.id) + '\', \'' + item.serviceType + '\')" title="Hapus File PPT">🗑️ Hapus</button>';
+          }
+          html += '              </div>';
         }
         html += '            </div>';
       } else {
@@ -3094,8 +3114,12 @@
         dom.existingPptLink.href = existingPpt.fileUrl;
         dom.existingPptLink.textContent = existingPpt.fileName ? ('Buka: ' + existingPpt.fileName) : 'Buka File di Google Drive';
       }
+      if (dom.btnModalDeletePpt) {
+        dom.btnModalDeletePpt.style.display = (currentRole === 'Administrator') ? 'inline-flex' : 'none';
+      }
     } else {
       if (dom.existingPptContainer) dom.existingPptContainer.style.display = 'none';
+      if (dom.btnModalDeletePpt) dom.btnModalDeletePpt.style.display = 'none';
     }
 
     // Reset Dropzone & Inputs
@@ -3281,6 +3305,79 @@
   // Ekspor fungsi agar dapat dipanggil dari onclick atribut HTML
   window.openUploadPptModal = openUploadPptModal;
   window.closeUploadPptModal = closeUploadPptModal;
+  window.handleDeletePpt = handleDeletePpt;
+
+  /**
+   * Hapus File PPT (Khusus Administrator)
+   */
+  function handleDeletePpt(ticketId, serviceType) {
+    var currentRole = (state.authUser && state.authUser.role) ? state.authUser.role : 'Administrator';
+    if (currentRole !== 'Administrator') {
+      showToast('Akses ditolak: Hanya Administrator yang berwenang menghapus materi PPT.', 'error');
+      return;
+    }
+
+    var confirmed = window.confirm('Apakah Anda yakin ingin menghapus materi PPT untuk Case #' + ticketId + ' (' + serviceType + ')?');
+    if (!confirmed) return;
+
+    var currentUserName = getCurrentLoggedInUserName();
+    var key = serviceType + '_' + ticketId;
+
+    // 1. Hapus dari state & localStorage
+    if (!state.pptAttachments) state.pptAttachments = getStoredPptAttachments();
+    if (state.pptAttachments[key]) {
+      delete state.pptAttachments[key];
+      saveStoredPptAttachments(state.pptAttachments);
+    }
+
+    // 2. Kosongkan di memory record
+    var allItems = (serviceType === 'MOBILE' ? state.mobileRecords : state.fixedRecords) || [];
+    var targetRec = allItems.find(function(r) { return String(r.id) === String(ticketId); });
+    if (targetRec) {
+      targetRec.filePpt = '';
+    }
+
+    closeUploadPptModal();
+    showToast('Materi PPT berhasil dihapus!', 'success');
+    renderCaseList();
+
+    // 3. Sinkronisasi penghapusan ke Google Apps Script / Sheet & Trash Drive
+    var payload = {
+      action: 'deletePptFile',
+      ticketId: ticketId,
+      serviceType: serviceType,
+      deletedBy: currentUserName
+    };
+
+    if (state.isGasEnvironment) {
+      google.script.run
+        .withSuccessHandler(function(res) {
+          console.log('Delete PPT Apps Script success:', res);
+        })
+        .withFailureHandler(function(err) {
+          console.warn('Delete PPT Apps Script notice:', err);
+        })
+        .deletePptFile(payload);
+    } else if (state.gasApiUrl) {
+      try {
+        fetch(state.gasApiUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify(payload),
+          redirect: 'follow'
+        })
+        .then(function(res) { return res.json(); })
+        .then(function(res) {
+          console.log('Delete PPT server response:', res);
+        })
+        .catch(function(err) {
+          console.warn('Delete PPT fetch notice:', err);
+        });
+      } catch (e) {
+        console.warn('Delete PPT remote error:', e);
+      }
+    }
+  }
 
   /**
    * Reopen / Kembalikan Status
