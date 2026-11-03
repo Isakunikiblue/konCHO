@@ -9231,31 +9231,43 @@
       if (state.isGasEnvironment) {
         google.script.run
           .withSuccessHandler(function(res) {
-            onUploadPptSuccess(res, file, target, currentUserName);
+            if (res && res.success) {
+              onUploadPptSuccess(res, file, target, currentUserName);
+            } else {
+              var errMsg = (res && res.error) ? res.error : 'Gagal mengunggah file ke Google Drive';
+              onUploadPptError(errMsg, file, target);
+            }
           })
           .withFailureHandler(function(err) {
-            onUploadPptFallback(file, target, currentUserName, err.message);
+            onUploadPptError(err.message || 'Gagal memproses upload ke Google Apps Script', file, target);
           })
           .uploadPptFile(payload);
       } else {
         // Lingkungan Vercel / Web Eksternal
         if (state.gasApiUrl) {
-          try {
-            fetch(state.gasApiUrl, {
-              method: 'POST',
-              mode: 'no-cors',
-              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-              body: JSON.stringify(payload)
-            }).then(function() {
-              onUploadPptSuccess({ success: true, fileUrl: GOOGLE_DRIVE_FOLDER_URL }, file, target, currentUserName);
-            }).catch(function(err) {
-              onUploadPptFallback(file, target, currentUserName, err.message);
-            });
-          } catch(err) {
-            onUploadPptFallback(file, target, currentUserName, err.message);
-          }
+          fetch(state.gasApiUrl, {
+            method: 'POST',
+            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+            body: JSON.stringify(payload),
+            redirect: 'follow'
+          })
+          .then(function(response) {
+            return response.json();
+          })
+          .then(function(res) {
+            if (res && res.success) {
+              onUploadPptSuccess(res, file, target, currentUserName);
+            } else {
+              var errMsg = (res && res.error) ? res.error : 'Gagal mengunggah file ke Google Drive';
+              onUploadPptError(errMsg, file, target);
+            }
+          })
+          .catch(function(err) {
+            console.error('Upload PPT error:', err);
+            onUploadPptError('Koneksi upload gagal: ' + err.message, file, target);
+          });
         } else {
-          onUploadPptSuccess({ success: true, fileUrl: GOOGLE_DRIVE_FOLDER_URL }, file, target, currentUserName);
+          onUploadPptError('URL Google Apps Script belum terkonfigurasi.', file, target);
         }
       }
     };
@@ -9263,7 +9275,7 @@
       showToast('Gagal membaca file dari perangkat.', 'error');
       if (dom.btnSubmitUploadPpt) {
         dom.btnSubmitUploadPpt.disabled = false;
-        dom.btnSubmitUploadPpt.innerHTML = '<span>Upload ke Google Drive</span>';
+        dom.btnSubmitUploadPpt.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span>Upload ke Google Drive</span>';
       }
     };
     reader.readAsDataURL(file);
@@ -9272,7 +9284,7 @@
   function onUploadPptSuccess(res, file, target, currentUserName) {
     if (dom.uploadPptBar) dom.uploadPptBar.style.width = '100%';
     if (dom.uploadPptPercent) dom.uploadPptPercent.textContent = '100%';
-    if (dom.uploadPptStatusText) dom.uploadPptStatusText.textContent = 'Selesai diunggah!';
+    if (dom.uploadPptStatusText) dom.uploadPptStatusText.textContent = 'Selesai diunggah ke Google Drive!';
 
     var fileUrl = (res && res.fileUrl) ? res.fileUrl : GOOGLE_DRIVE_FOLDER_URL;
     var key = target.serviceType + '_' + target.ticketId;
@@ -9297,26 +9309,19 @@
     }, 450);
   }
 
-  function onUploadPptFallback(file, target, currentUserName, errMsg) {
-    console.warn('Upload PPT fallback:', errMsg);
-    var fileUrl = GOOGLE_DRIVE_FOLDER_URL;
-    var key = target.serviceType + '_' + target.ticketId;
-    if (!state.pptAttachments) state.pptAttachments = getStoredPptAttachments();
-    state.pptAttachments[key] = {
-      fileUrl: fileUrl,
-      fileName: file.name,
-      uploadedBy: currentUserName,
-      timestamp: new Date().toISOString()
-    };
-    saveStoredPptAttachments(state.pptAttachments);
-
-    if (target.record) {
-      target.record.filePpt = fileUrl;
+  function onUploadPptError(errMsg, file, target) {
+    console.warn('Upload PPT Error:', errMsg);
+    if (dom.btnSubmitUploadPpt) {
+      dom.btnSubmitUploadPpt.disabled = false;
+      dom.btnSubmitUploadPpt.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span>Upload ke Google Drive</span>';
     }
+    if (dom.uploadPptProgress) dom.uploadPptProgress.style.display = 'none';
 
-    closeUploadPptModal();
-    showToast('File "' + file.name + '" tersimpan dan terhubung ke folder Google Drive!', 'success');
-    renderCaseList();
+    var displayMsg = errMsg;
+    if (errMsg.indexOf('DriveApp') >= 0 || errMsg.indexOf('izin') >= 0 || errMsg.indexOf('permission') >= 0) {
+      displayMsg = 'Izin Google Drive (DriveApp) belum disetujui di Apps Script. Buka editor Apps Script, jalankan fungsi testDriveAuthorization() dan klik Izinkan (Allow), lalu terapkan Versi Baru (Deploy New Version).';
+    }
+    showToast('Gagal upload: ' + displayMsg, 'error');
   }
 
   // Ekspor fungsi agar dapat dipanggil dari onclick atribut HTML

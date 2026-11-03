@@ -294,6 +294,10 @@ function ensureTrackingColumns(sheet) {
     var cleanL = String(h).toLowerCase().replace(/[^a-z]/g, '');
     return cleanL === 'terakhirupdate' || cleanL === 'lastupdate'; 
   });
+  var needsFilePpt = !headers.some(function(h) { 
+    var cleanP = String(h).toLowerCase().replace(/[^a-z]/g, '');
+    return cleanP === 'fileppt' || cleanP === 'materippt' || cleanP === 'linkppt'; 
+  });
   
   if (needsStatusInfo) {
     sheet.getRange(1, lastCol + 1).setValue('Status_Informasi').setFontWeight('bold').setBackground('#E2E8F0');
@@ -301,6 +305,10 @@ function ensureTrackingColumns(sheet) {
   }
   if (needsLastUpdate) {
     sheet.getRange(1, lastCol + 1).setValue('Terakhir_Update').setFontWeight('bold').setBackground('#E2E8F0');
+    lastCol++;
+  }
+  if (needsFilePpt) {
+    sheet.getRange(1, lastCol + 1).setValue('File PPT').setFontWeight('bold').setBackground('#E2E8F0');
   }
 }
 
@@ -1342,5 +1350,34 @@ function uploadPptFile(data) {
       success: false,
       error: err.message
     };
+  }
+}
+
+/**
+ * Jalankan fungsi ini SATU KALI di Google Apps Script editor (pilih fungsi ini lalu klik tombol 'Run' / 'Jalankan')
+ * untuk mengesahkan perizinan Google Drive (DriveApp) dan menguji koneksi folder tujuan.
+ */
+function testDriveAuthorization() {
+  var folderId = CONFIG.DRIVE_FOLDER_ID || '1KHMMjAovxmRpyd0JTAehyoSgH2sWItMV';
+  try {
+    var folder = DriveApp.getFolderById(folderId);
+    var folderName = folder.getName();
+    Logger.log('✅ SUKSES: Izin Google Drive aktif! Folder ditemukan: "' + folderName + '" (ID: ' + folder.getId() + ')');
+    
+    // Uji buat file teks kecil untuk verifikasi hak tulis
+    var testFile = folder.createFile('_tes_koneksi_koncho.txt', 'Tes koneksi Google Drive konCHO berhasil pada ' + new Date().toISOString(), MimeType.PLAIN_TEXT);
+    Logger.log('✅ SUKSES: Berhasil membuat file tes di folder: ' + testFile.getUrl());
+    testFile.setTrashed(true);
+    Logger.log('✅ File tes otomatis dibersihkan dari folder.');
+    
+    return {
+      success: true,
+      folderName: folderName,
+      folderId: folder.getId(),
+      message: 'Izin Google Drive berhasil diaktifkan dan folder ' + folderName + ' siap digunakan!'
+    };
+  } catch (err) {
+    Logger.log('❌ GAGAL: ' + err.message);
+    throw err;
   }
 }
