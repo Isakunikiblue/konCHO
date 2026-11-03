@@ -13,6 +13,8 @@ var CONFIG = {
   SHEET_FIXED: 'Fixed',
   SHEET_LOG: 'Log_Komunikasi',
   SHEET_USERS: 'Users',
+  DRIVE_FOLDER_ID: '1KHMMjAovxmRpyd0JTAehyoSgH2sWItMV',
+  DRIVE_FOLDER_URL: 'https://drive.google.com/drive/folders/1KHMMjAovxmRpyd0JTAehyoSgH2sWItMV?hl=ID',
   // Sesuai struktur kolom formulir dan sheet user:
   // Kolom A: ID_Tiket / No
   // Kolom B: Bulan - Tahun
@@ -25,6 +27,7 @@ var CONFIG = {
   // Kolom I: Follow up to
   // Kolom J: Status Update
   // Kolom K: Terakhir_Update
+  // Kolom Tambahan: File PPT (Google Drive Link)
   DEFAULT_HEADERS_MOBILE: [
     'ID_Tiket', 
     'Bulan - Tahun',
@@ -36,7 +39,8 @@ var CONFIG = {
     'Status', 
     'Follow up to', 
     'Status Update', 
-    'Terakhir_Update'
+    'Terakhir_Update',
+    'File PPT'
   ],
   DEFAULT_HEADERS_FIXED: [
     'ID_Tiket', 
@@ -49,7 +53,8 @@ var CONFIG = {
     'Status', 
     'Follow up to', 
     'Status Update', 
-    'Terakhir_Update'
+    'Terakhir_Update',
+    'File PPT'
   ],
   DEFAULT_HEADERS_LOG: [
     'Log_ID', 'ID_Tiket', 'Tipe_Layanan', 'Pengirim', 'Pesan_Update', 
@@ -108,6 +113,8 @@ function doPost(e) {
       result = submitNewData(data);
     } else if (action === 'postCommunicationUpdate') {
       result = postCommunicationUpdate(data);
+    } else if (action === 'uploadPptFile') {
+      result = uploadPptFile(data);
     } else if (action === 'saveUserAccount') {
       result = saveUserAccount(data);
     } else if (action === 'deleteUserAccount') {
@@ -494,6 +501,7 @@ function getSheetRecords(ss, sheetName, serviceType) {
   var catIdx = findHeaderIndex(headers, ['kategori_keluhan', 'kategori_kendala', 'kategori']);
   var picIdx = findHeaderIndex(headers, ['pic_handling', 'pic', 'petugas']);
   var lastUpdateIdx = findHeaderIndex(headers, ['terakhir_update', 'last_update', 'update_terakhir']);
+  var pptIdx = findHeaderIndex(headers, ['file ppt', 'file_ppt', 'link_ppt', 'materi ppt', 'materi_ppt', 'lampiran ppt', 'ppt', 'materi']);
   var statusInfoIdx = findHeaderIndex(headers, ['status update', 'status_update', 'status informasi', 'status_informasi', 'update_status', 'ada_update', 'status_info', 'update info', 'keterangan update']);
   if (statusInfoIdx < 0 && headers.length > 9) statusInfoIdx = 9; // Kolom J fallback (index 9)
 
@@ -651,6 +659,7 @@ function getSheetRecords(ss, sheetName, serviceType) {
       needSupport: rawNeed,
       pic: picIdx >= 0 && row[picIdx] ? String(row[picIdx]).trim() : rawReq,
       terakhirUpdate: lastUpdateIdx >= 0 && row[lastUpdateIdx] ? formatDate(row[lastUpdateIdx]) : '',
+      filePpt: pptIdx >= 0 && row[pptIdx] ? String(row[pptIdx]).trim() : '',
       statusInformasi: statusInfoIdx >= 0 && row[statusInfoIdx] ? String(row[statusInfoIdx]).trim() : 'Belum Ada Update',
       statusUpdate: statusInfoIdx >= 0 && row[statusInfoIdx] ? String(row[statusInfoIdx]).trim() : 'Belum Ada Update',
       rawRowData: {}
@@ -781,6 +790,8 @@ function submitNewData(payload) {
         val = payload.kategori || '';
       } else if (headerNorm.indexOf('pic') >= 0) {
         val = payload.pic || payload.requestor || 'CHO Team';
+      } else if (headerNorm.indexOf('fileppt') >= 0 || headerNorm.indexOf('materippt') >= 0 || headerNorm.indexOf('linkppt') >= 0) {
+        val = payload.filePpt || '';
       } else if (payload.customFields && payload.customFields[headers[c]] !== undefined) {
         val = payload.customFields[headers[c]];
       }
@@ -1219,5 +1230,117 @@ function deleteUserAccount(username) {
   } catch (err) {
     Logger.log('deleteUserAccount error: ' + err.message);
     return { success: false, error: err.message };
+  }
+}
+
+/**
+ * Upload File PPT ke Google Drive Folder Khusus konCHO dan Update Link ke Sheet
+ * Folder ID: 1KHMMjAovxmRpyd0JTAehyoSgH2sWItMV
+ * Folder Link: https://drive.google.com/drive/folders/1KHMMjAovxmRpyd0JTAehyoSgH2sWItMV?hl=ID
+ */
+function uploadPptFile(data) {
+  try {
+    if (!data || !data.fileBase64) {
+      return { success: false, error: 'Data file base64 tidak ditemukan' };
+    }
+
+    var folderId = CONFIG.DRIVE_FOLDER_ID || '1KHMMjAovxmRpyd0JTAehyoSgH2sWItMV';
+    var folder;
+    try {
+      folder = DriveApp.getFolderById(folderId);
+    } catch (fErr) {
+      Logger.log('Drive folder access warning: ' + fErr.message);
+      folder = DriveApp.getRootFolder();
+    }
+
+    var ticketId = data.ticketId || ('CASE-' + Date.now());
+    var rawFileName = data.fileName || ('Materi_PPT_' + ticketId + '.pptx');
+    var safeFileName = rawFileName.replace(/[<>:"/\\|?*]+/g, '_');
+
+    var decoded = Utilities.base64Decode(data.fileBase64);
+    var mimeType = data.mimeType || 'application/vnd.openxmlformats-officedocument.presentationml.presentation';
+    var blob = Utilities.newBlob(decoded, mimeType, safeFileName);
+    var driveFile = folder.createFile(blob);
+
+    try {
+      driveFile.setSharing(DriveApp.Access.ANYONE_WITH_LINK, DriveApp.Permission.VIEW);
+    } catch (permErr) {
+      Logger.log('Set sharing notice: ' + permErr.message);
+    }
+
+    var fileUrl = driveFile.getUrl();
+    var fileId = driveFile.getId();
+
+    // Jika terkait tiket tertentu, perbarui kolom 'File PPT' di sheet induk
+    if (data.ticketId && data.serviceType) {
+      var ss = getSpreadsheet();
+      var targetSheetName = (data.serviceType === 'FIXED') ? CONFIG.SHEET_FIXED : CONFIG.SHEET_MOBILE;
+      var sheet = findBestSheet(ss, targetSheetName);
+
+      if (sheet) {
+        var lastRow = sheet.getLastRow();
+        var lastCol = sheet.getLastColumn();
+        if (lastRow > 0 && lastCol > 0) {
+          var allValues = sheet.getRange(1, 1, lastRow, lastCol).getValues();
+          var headers = allValues[0] || [];
+          var pptColIdx = findHeaderIndex(headers, ['file ppt', 'file_ppt', 'link_ppt', 'materi ppt', 'materi_ppt', 'lampiran ppt']);
+          
+          if (pptColIdx < 0) {
+            pptColIdx = lastCol;
+            sheet.getRange(1, pptColIdx + 1).setValue('File PPT').setFontWeight('bold').setBackground('#E2E8F0');
+          }
+
+          var targetRowIdx = -1;
+          for (var r = 1; r < allValues.length; r++) {
+            if (String(allValues[r][0]).trim() === String(data.ticketId).trim()) {
+              targetRowIdx = r + 1;
+              break;
+            }
+          }
+
+          if (targetRowIdx > 1) {
+            sheet.getRange(targetRowIdx, pptColIdx + 1).setValue(fileUrl);
+          }
+        }
+      }
+
+      // Rekam di Log_Komunikasi
+      try {
+        var logSheet = ensureSheet(ss, CONFIG.SHEET_LOG, CONFIG.DEFAULT_HEADERS_LOG);
+        var now = new Date();
+        var dateStr = Utilities.formatDate(now, Session.getScriptTimeZone() || 'Asia/Jakarta', 'yyyyMMdd');
+        var formattedDate = Utilities.formatDate(now, Session.getScriptTimeZone() || 'Asia/Jakarta', 'yyyy-MM-dd HH:mm:ss');
+        var logId = 'LOG-' + dateStr + '-' + Math.floor(1000 + Math.random() * 9000);
+        var uploader = data.uploadedBy || 'User konCHO';
+
+        logSheet.appendRow([
+          logId,
+          data.ticketId,
+          data.serviceType,
+          uploader,
+          'Upload Materi PPT (' + safeFileName + ') ke Google Drive: ' + fileUrl,
+          'Update PPT',
+          'Materi Presentasi',
+          formattedDate
+        ]);
+      } catch (logErr) {
+        Logger.log('Log komunikasi PPT notice: ' + logErr.message);
+      }
+    }
+
+    return {
+      success: true,
+      fileUrl: fileUrl,
+      fileId: fileId,
+      fileName: safeFileName,
+      folderUrl: CONFIG.DRIVE_FOLDER_URL,
+      message: 'Materi PPT berhasil diupload ke Google Drive konCHO!'
+    };
+  } catch (err) {
+    Logger.log('uploadPptFile error: ' + err.stack);
+    return {
+      success: false,
+      error: err.message
+    };
   }
 }

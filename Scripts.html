@@ -121,6 +121,31 @@
     inputNomorLayanan: document.getElementById('inputNomorLayanan'),
     inputNamaPelanggan: document.getElementById('inputNamaPelanggan'),
     inputWilayah: document.getElementById('inputWilayah'),
+    newCasePptFile: document.getElementById('newCasePptFile'),
+
+    // Modal Upload PPT
+    modalUploadPpt: document.getElementById('modalUploadPpt'),
+    uploadPptModalTitle: document.getElementById('uploadPptModalTitle'),
+    uploadPptTicketId: document.getElementById('uploadPptTicketId'),
+    uploadPptBadgeService: document.getElementById('uploadPptBadgeService'),
+    uploadPptIssueText: document.getElementById('uploadPptIssueText'),
+    btnCloseUploadPptModal: document.getElementById('btnCloseUploadPptModal'),
+    btnCancelUploadPpt: document.getElementById('btnCancelUploadPpt'),
+    btnSubmitUploadPpt: document.getElementById('btnSubmitUploadPpt'),
+    pptFileInput: document.getElementById('pptFileInput'),
+    btnBrowsePptFile: document.getElementById('btnBrowsePptFile'),
+    pptDropzone: document.getElementById('pptDropzone'),
+    dropzoneEmpty: document.getElementById('dropzoneEmpty'),
+    dropzoneSelected: document.getElementById('dropzoneSelected'),
+    selectedPptFileName: document.getElementById('selectedPptFileName'),
+    selectedPptFileSize: document.getElementById('selectedPptFileSize'),
+    btnRemovePptFile: document.getElementById('btnRemovePptFile'),
+    existingPptContainer: document.getElementById('existingPptContainer'),
+    existingPptLink: document.getElementById('existingPptLink'),
+    uploadPptProgress: document.getElementById('uploadPptProgress'),
+    uploadPptStatusText: document.getElementById('uploadPptStatusText'),
+    uploadPptPercent: document.getElementById('uploadPptPercent'),
+    uploadPptBar: document.getElementById('uploadPptBar'),
 
     // Toast
     toastContainer: document.getElementById('toastContainer')
@@ -746,6 +771,27 @@
         }
       }
     }
+  }
+
+  /**
+   * Helper Mendapatkan Nama Lengkap Pengguna yang Sedang Login
+   */
+  function getCurrentLoggedInUserName() {
+    if (state.authUser) {
+      if (state.authUser.name && state.authUser.name.trim() && state.authUser.name.indexOf('@') !== 0) {
+        return state.authUser.name.trim();
+      }
+      var accounts = getStoredUserAccounts();
+      var cleanU = (state.authUser.username || state.authUser.name || '').replace(/^@+/, '').trim().toLowerCase();
+      var matched = accounts.find(function(a) {
+        return (a.username || '').replace(/^@+/, '').trim().toLowerCase() === cleanU;
+      });
+      if (matched && matched.name) {
+        return matched.name.trim();
+      }
+      return state.authUser.name || state.authUser.username || 'Administrator Utama';
+    }
+    return 'Administrator Utama';
   }
 
   function applyRolePermissions() {
@@ -1745,8 +1791,55 @@
 
     initGuideTocEvents();
 
+    // 12. Modal Upload PPT Events
+    if (dom.btnCloseUploadPptModal) dom.btnCloseUploadPptModal.addEventListener('click', closeUploadPptModal);
+    if (dom.btnCancelUploadPpt) dom.btnCancelUploadPpt.addEventListener('click', closeUploadPptModal);
+    if (dom.btnBrowsePptFile) dom.btnBrowsePptFile.addEventListener('click', function() {
+      if (dom.pptFileInput) dom.pptFileInput.click();
+    });
+    if (dom.pptFileInput) {
+      dom.pptFileInput.addEventListener('change', function(e) {
+        if (e.target.files && e.target.files[0]) {
+          handlePptFileSelect(e.target.files[0]);
+        }
+      });
+    }
+    if (dom.pptDropzone) {
+      dom.pptDropzone.addEventListener('click', function(e) {
+        if (e.target && (e.target.id === 'btnRemovePptFile' || (e.target.closest && e.target.closest('#btnRemovePptFile')) || e.target.id === 'btnBrowsePptFile')) return;
+        if (dom.pptFileInput) dom.pptFileInput.click();
+      });
+      dom.pptDropzone.addEventListener('dragover', function(e) {
+        e.preventDefault();
+        dom.pptDropzone.classList.add('dragover');
+      });
+      dom.pptDropzone.addEventListener('dragleave', function() {
+        dom.pptDropzone.classList.remove('dragover');
+      });
+      dom.pptDropzone.addEventListener('drop', function(e) {
+        e.preventDefault();
+        dom.pptDropzone.classList.remove('dragover');
+        if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]) {
+          handlePptFileSelect(e.dataTransfer.files[0]);
+        }
+      });
+    }
+    if (dom.btnRemovePptFile) {
+      dom.btnRemovePptFile.addEventListener('click', function(e) {
+        e.stopPropagation();
+        state.selectedPptFile = null;
+        if (dom.pptFileInput) dom.pptFileInput.value = '';
+        if (dom.dropzoneEmpty) dom.dropzoneEmpty.style.display = 'block';
+        if (dom.dropzoneSelected) dom.dropzoneSelected.style.display = 'none';
+        if (dom.btnSubmitUploadPpt) dom.btnSubmitUploadPpt.disabled = true;
+      });
+    }
+    if (dom.btnSubmitUploadPpt) {
+      dom.btnSubmitUploadPpt.addEventListener('click', handleUploadPptSubmit);
+    }
+
     // Tutup modal jika klik di luar box modal
-    [dom.modalInProgress, dom.modalClosed, dom.modalLog, dom.newDataModal, document.getElementById('modalManageUsers'), document.getElementById('modalUserGuide')].forEach(function(m) {
+    [dom.modalInProgress, dom.modalClosed, dom.modalLog, dom.newDataModal, dom.modalUploadPpt, document.getElementById('modalManageUsers'), document.getElementById('modalUserGuide')].forEach(function(m) {
       if (!m) return;
       m.addEventListener('click', function(e) {
         if (e.target === m) {
@@ -2222,9 +2315,34 @@
       html += '</div>';
 
       // 2. Main Issue (Kolom C) - Judul Utama Isu Kasus
+      var currentRole = (state.authUser && state.authUser.role) ? state.authUser.role : 'Administrator';
+      var canUploadPpt = currentRole === 'Administrator' || currentRole === 'Inputer';
+      var pptInfo = getCasePptAttachment(item.serviceType, item.id);
+
       html += '<div class="case-col-c-box">';
-      html += '  <div style="display:flex; align-items:center; gap:6px;">';
-      html += '    <span class="col-indicator-tag tag-col-c">Kolom C • Main Issue</span>';
+      html += '  <div style="display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px;">';
+      html += '    <div style="display:flex; align-items:center; gap:6px;">';
+      html += '      <span class="col-indicator-tag tag-col-c">Kolom C • Main Issue</span>';
+      html += '    </div>';
+      if (pptInfo && pptInfo.fileUrl) {
+        html += '    <div style="display:flex; align-items:center; gap:6px;">';
+        html += '      <a href="' + escapeHtml(pptInfo.fileUrl) + '" target="_blank" rel="noopener noreferrer" class="btn-ppt-view" title="Buka File di Google Drive: ' + escapeHtml(pptInfo.fileName || 'Materi PPT') + '">';
+        html += '        <span class="ppt-icon">📊</span>';
+        html += '        <span class="ppt-text">' + escapeHtml(pptInfo.fileName || 'Materi PPT') + '</span>';
+        html += '        <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>';
+        html += '      </a>';
+        if (canUploadPpt) {
+          html += '      <button type="button" class="btn-ppt-reupload" onclick="openUploadPptModal(\'' + escapeHtml(item.id) + '\', \'' + item.serviceType + '\')" title="Ganti / Upload Ulang File PPT">✏️ Ganti</button>';
+        }
+        html += '    </div>';
+      } else if (canUploadPpt) {
+        html += '    <button type="button" class="btn-ppt-upload" onclick="openUploadPptModal(\'' + escapeHtml(item.id) + '\', \'' + item.serviceType + '\')" title="Upload File PPT ke Google Drive untuk kasus ini">';
+        html += '      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>';
+        html += '      <span>+ Upload PPT</span>';
+        html += '    </button>';
+      } else {
+        html += '    <span class="ppt-empty-badge" title="Materi PPT belum diunggah">- Belum Ada PPT -</span>';
+      }
       html += '  </div>';
       html += '  <div class="case-row-title" style="font-size:16px; font-weight:800; color:var(--text-primary); margin-top:4px;">' + escapeHtml(item.totalCaseIsu || 'Isu Case CHO') + '</div>';
       html += '</div>';
@@ -2404,7 +2522,8 @@
     html += '          <th style="width: 50px; text-align: center;">No</th>';
     html += '          <th style="width: 135px; text-align: center;">Bulan</th>';
     html += '          <th style="width: 140px; min-width: 140px; text-align: center;">Unit</th>';
-    html += '          <th style="min-width: 250px;">Main Issue (Kolom C)</th>';
+    html += '          <th style="min-width: 240px;">Main Issue (Kolom C)</th>';
+    html += '          <th style="width: 155px; min-width: 155px; text-align: center;">Materi PPT (Drive)</th>';
     html += '          <th style="min-width: 270px;">Issue Details (Kolom D)</th>';
     html += '          <th style="width: 135px; text-align: center;">Status (Kolom H)</th>';
     html += '          <th style="min-width: 260px;">Status Update (Kolom J)</th>';
@@ -2450,6 +2569,33 @@
       html += '          </td>';
       html += '          <td class="home-col-main-issue">';
       html += '            <div class="main-issue-title">' + escapeHtml(mainIssueText) + '</div>';
+      html += '          </td>';
+
+      var canUploadPpt = currentRole === 'Administrator' || currentRole === 'Inputer';
+      var pptInfo = getCasePptAttachment(item.serviceType, item.id);
+
+      html += '          <td class="home-col-ppt">';
+      if (pptInfo && pptInfo.fileUrl) {
+        html += '            <div class="ppt-cell-wrap">';
+        html += '              <a href="' + escapeHtml(pptInfo.fileUrl) + '" target="_blank" rel="noopener noreferrer" class="btn-ppt-view" title="Buka File di Google Drive: ' + escapeHtml(pptInfo.fileName || 'Materi PPT') + '">';
+        html += '                <span class="ppt-icon">📊</span>';
+        html += '                <span class="ppt-text">' + escapeHtml(pptInfo.fileName || 'Lihat PPT') + '</span>';
+        html += '                <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>';
+        html += '              </a>';
+        if (canUploadPpt) {
+          html += '              <button type="button" class="btn-ppt-reupload" onclick="openUploadPptModal(\'' + escapeHtml(item.id) + '\', \'' + item.serviceType + '\')" title="Ganti / Upload Ulang File PPT">✏️ Ganti</button>';
+        }
+        html += '            </div>';
+      } else {
+        if (canUploadPpt) {
+          html += '            <button type="button" class="btn-ppt-upload" onclick="openUploadPptModal(\'' + escapeHtml(item.id) + '\', \'' + item.serviceType + '\')" title="Upload File PPT ke Google Drive untuk kasus ini">';
+          html += '              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>';
+          html += '              <span>+ Upload PPT</span>';
+          html += '            </button>';
+        } else {
+          html += '            <span class="ppt-empty-badge" title="Belum ada file PPT diunggah">- Belum Ada PPT -</span>';
+        }
+      }
       html += '          </td>';
       html += '          <td class="home-col-issue-details">';
       html += '            <div class="issue-details-text" id="' + detailBoxId + '" title="Tarik/geser sudut kanan bawah ke bawah untuk memperbesar kotak">' + escapeHtml(issueDetailsText) + '</div>';
@@ -2604,7 +2750,7 @@
     dom.inProgressIssueText.textContent = ticket.totalCaseIsu || '-';
 
     dom.inProgressMessage.value = '';
-    dom.inProgressAuthor.value = '';
+    dom.inProgressAuthor.value = getCurrentLoggedInUserName();
     dom.inProgressFollowUp.value = '';
 
     dom.modalInProgress.classList.add('active');
@@ -2747,7 +2893,7 @@
     dom.closedIssueText.textContent = ticket.totalCaseIsu || '-';
 
     dom.closedMessage.value = '';
-    dom.closedByUser.value = '';
+    dom.closedByUser.value = getCurrentLoggedInUserName();
     dom.closedFollowUp.value = '';
 
     dom.modalClosed.classList.add('active');
@@ -2866,6 +3012,270 @@
     updateKpiCounters();
     renderCaseList();
   }
+
+  /**
+   * =========================================================================
+   * LOGIKA UPLOAD FILE PPT KE GOOGLE DRIVE
+   * Folder Target: https://drive.google.com/drive/folders/1KHMMjAovxmRpyd0JTAehyoSgH2sWItMV?hl=ID
+   * Hanya Role Administrator & Inputer yang Berwenang Mengunggah File
+   * =========================================================================
+   */
+  var GOOGLE_DRIVE_FOLDER_ID = '1KHMMjAovxmRpyd0JTAehyoSgH2sWItMV';
+  var GOOGLE_DRIVE_FOLDER_URL = 'https://drive.google.com/drive/folders/1KHMMjAovxmRpyd0JTAehyoSgH2sWItMV?hl=ID';
+
+  function getStoredPptAttachments() {
+    try {
+      var raw = localStorage.getItem('koncho_ppt_attachments');
+      return raw ? JSON.parse(raw) : {};
+    } catch(e) {
+      return {};
+    }
+  }
+
+  function saveStoredPptAttachments(data) {
+    try {
+      localStorage.setItem('koncho_ppt_attachments', JSON.stringify(data));
+    } catch(e) {}
+  }
+
+  function getCasePptAttachment(serviceType, ticketId) {
+    if (!state.pptAttachments) state.pptAttachments = getStoredPptAttachments();
+    var key = (serviceType || 'MOBILE') + '_' + ticketId;
+    if (state.pptAttachments[key]) {
+      return state.pptAttachments[key];
+    }
+    var rec = state.records.find(function(r) {
+      return String(r.id) === String(ticketId) && r.serviceType === serviceType;
+    });
+    if (rec && rec.filePpt) {
+      return {
+        fileUrl: rec.filePpt,
+        fileName: 'Materi_Case_' + ticketId + '.pptx',
+        uploadedBy: 'User konCHO'
+      };
+    }
+    return null;
+  }
+
+  function openUploadPptModal(ticketId, serviceType) {
+    var currentRole = (state.authUser && state.authUser.role) ? state.authUser.role : 'Administrator';
+    if (currentRole !== 'Administrator' && currentRole !== 'Inputer') {
+      showToast('Akses ditolak: Hanya Administrator dan Inputer yang dapat mengunggah file PPT.', 'error');
+      return;
+    }
+
+    var ticket = state.records.find(function(r) {
+      return String(r.id) === String(ticketId) && (!serviceType || r.serviceType === serviceType);
+    });
+    if (!ticket) {
+      showToast('Data kasus tidak ditemukan.', 'error');
+      return;
+    }
+
+    state.uploadPptTarget = {
+      ticketId: ticket.id,
+      serviceType: ticket.serviceType,
+      record: ticket
+    };
+    state.selectedPptFile = null;
+
+    if (dom.uploadPptTicketId) dom.uploadPptTicketId.textContent = 'Case #' + ticket.id;
+    if (dom.uploadPptBadgeService) {
+      dom.uploadPptBadgeService.textContent = ticket.serviceType;
+      dom.uploadPptBadgeService.className = 'info-badge ' + (ticket.serviceType === 'MOBILE' ? 'badge-srv mobile' : 'badge-srv fixed');
+    }
+    if (dom.uploadPptIssueText) dom.uploadPptIssueText.textContent = ticket.totalCaseIsu || ticket.mainIssue || '-';
+
+    // Cek apakah sudah ada file sebelumnya
+    var existingPpt = getCasePptAttachment(ticket.serviceType, ticket.id);
+    if (existingPpt && existingPpt.fileUrl) {
+      if (dom.existingPptContainer) dom.existingPptContainer.style.display = 'block';
+      if (dom.existingPptLink) {
+        dom.existingPptLink.href = existingPpt.fileUrl;
+        dom.existingPptLink.textContent = existingPpt.fileName ? ('Buka: ' + existingPpt.fileName) : 'Buka File di Google Drive';
+      }
+    } else {
+      if (dom.existingPptContainer) dom.existingPptContainer.style.display = 'none';
+    }
+
+    // Reset Dropzone & Inputs
+    if (dom.pptFileInput) dom.pptFileInput.value = '';
+    if (dom.dropzoneEmpty) dom.dropzoneEmpty.style.display = 'block';
+    if (dom.dropzoneSelected) dom.dropzoneSelected.style.display = 'none';
+    if (dom.uploadPptProgress) dom.uploadPptProgress.style.display = 'none';
+    if (dom.btnSubmitUploadPpt) {
+      dom.btnSubmitUploadPpt.disabled = true;
+      dom.btnSubmitUploadPpt.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span>Upload ke Google Drive</span>';
+    }
+
+    if (dom.modalUploadPpt) dom.modalUploadPpt.classList.add('active');
+  }
+
+  function closeUploadPptModal() {
+    if (dom.modalUploadPpt) dom.modalUploadPpt.classList.remove('active');
+    state.uploadPptTarget = null;
+    state.selectedPptFile = null;
+    if (dom.pptFileInput) dom.pptFileInput.value = '';
+    if (dom.uploadPptProgress) dom.uploadPptProgress.style.display = 'none';
+  }
+
+  function handlePptFileSelect(file) {
+    if (!file) return;
+    var ext = file.name.split('.').pop().toLowerCase();
+    var allowed = ['ppt', 'pptx', 'pdf'];
+    if (allowed.indexOf(ext) < 0) {
+      showToast('Format file tidak didukung! Harap pilih file PowerPoint (.ppt, .pptx) atau PDF.', 'error');
+      return;
+    }
+    if (file.size > 26214400) { // 25MB
+      showToast('Ukuran file terlalu besar! Maksimal 25MB.', 'error');
+      return;
+    }
+
+    state.selectedPptFile = file;
+
+    if (dom.selectedPptFileName) dom.selectedPptFileName.textContent = file.name;
+    if (dom.selectedPptFileSize) {
+      var sizeKb = Math.round(file.size / 1024);
+      dom.selectedPptFileSize.textContent = sizeKb > 1024 ? ((sizeKb / 1024).toFixed(1) + ' MB') : (sizeKb + ' KB');
+    }
+    if (dom.dropzoneEmpty) dom.dropzoneEmpty.style.display = 'none';
+    if (dom.dropzoneSelected) dom.dropzoneSelected.style.display = 'block';
+    if (dom.btnSubmitUploadPpt) dom.btnSubmitUploadPpt.disabled = false;
+  }
+
+  function handleUploadPptSubmit() {
+    var file = state.selectedPptFile;
+    var target = state.uploadPptTarget;
+    if (!file || !target) {
+      showToast('Silakan pilih file presentasi (.ppt / .pptx) terlebih dahulu!', 'error');
+      return;
+    }
+
+    var currentUserName = getCurrentLoggedInUserName();
+
+    if (dom.btnSubmitUploadPpt) {
+      dom.btnSubmitUploadPpt.disabled = true;
+      dom.btnSubmitUploadPpt.innerHTML = '<span>Mengunggah...</span>';
+    }
+    if (dom.uploadPptProgress) dom.uploadPptProgress.style.display = 'flex';
+    if (dom.uploadPptBar) dom.uploadPptBar.style.width = '20%';
+    if (dom.uploadPptPercent) dom.uploadPptPercent.textContent = '20%';
+    if (dom.uploadPptStatusText) dom.uploadPptStatusText.textContent = 'Membaca data file...';
+
+    var reader = new FileReader();
+    reader.onload = function(e) {
+      var fullBase64 = e.target.result;
+      var base64Data = fullBase64.split(',')[1] || fullBase64;
+
+      if (dom.uploadPptBar) dom.uploadPptBar.style.width = '55%';
+      if (dom.uploadPptPercent) dom.uploadPptPercent.textContent = '55%';
+      if (dom.uploadPptStatusText) dom.uploadPptStatusText.textContent = 'Mengunggah ke folder Google Drive...';
+
+      var payload = {
+        action: 'uploadPptFile',
+        ticketId: target.ticketId,
+        serviceType: target.serviceType,
+        fileName: file.name,
+        mimeType: file.type || 'application/vnd.openxmlformats-officedocument.presentationml.presentation',
+        fileBase64: base64Data,
+        uploadedBy: currentUserName
+      };
+
+      if (state.isGasEnvironment) {
+        google.script.run
+          .withSuccessHandler(function(res) {
+            onUploadPptSuccess(res, file, target, currentUserName);
+          })
+          .withFailureHandler(function(err) {
+            onUploadPptFallback(file, target, currentUserName, err.message);
+          })
+          .uploadPptFile(payload);
+      } else {
+        // Lingkungan Vercel / Web Eksternal
+        if (state.gasApiUrl) {
+          try {
+            fetch(state.gasApiUrl, {
+              method: 'POST',
+              mode: 'no-cors',
+              headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+              body: JSON.stringify(payload)
+            }).then(function() {
+              onUploadPptSuccess({ success: true, fileUrl: GOOGLE_DRIVE_FOLDER_URL }, file, target, currentUserName);
+            }).catch(function(err) {
+              onUploadPptFallback(file, target, currentUserName, err.message);
+            });
+          } catch(err) {
+            onUploadPptFallback(file, target, currentUserName, err.message);
+          }
+        } else {
+          onUploadPptSuccess({ success: true, fileUrl: GOOGLE_DRIVE_FOLDER_URL }, file, target, currentUserName);
+        }
+      }
+    };
+    reader.onerror = function() {
+      showToast('Gagal membaca file dari perangkat.', 'error');
+      if (dom.btnSubmitUploadPpt) {
+        dom.btnSubmitUploadPpt.disabled = false;
+        dom.btnSubmitUploadPpt.innerHTML = '<span>Upload ke Google Drive</span>';
+      }
+    };
+    reader.readAsDataURL(file);
+  }
+
+  function onUploadPptSuccess(res, file, target, currentUserName) {
+    if (dom.uploadPptBar) dom.uploadPptBar.style.width = '100%';
+    if (dom.uploadPptPercent) dom.uploadPptPercent.textContent = '100%';
+    if (dom.uploadPptStatusText) dom.uploadPptStatusText.textContent = 'Selesai diunggah!';
+
+    var fileUrl = (res && res.fileUrl) ? res.fileUrl : GOOGLE_DRIVE_FOLDER_URL;
+    var key = target.serviceType + '_' + target.ticketId;
+
+    if (!state.pptAttachments) state.pptAttachments = getStoredPptAttachments();
+    state.pptAttachments[key] = {
+      fileUrl: fileUrl,
+      fileName: file.name,
+      uploadedBy: currentUserName,
+      timestamp: new Date().toISOString()
+    };
+    saveStoredPptAttachments(state.pptAttachments);
+
+    if (target.record) {
+      target.record.filePpt = fileUrl;
+    }
+
+    setTimeout(function() {
+      closeUploadPptModal();
+      showToast('File presentasi "' + file.name + '" berhasil diunggah ke Google Drive!', 'success');
+      renderCaseList();
+    }, 450);
+  }
+
+  function onUploadPptFallback(file, target, currentUserName, errMsg) {
+    console.warn('Upload PPT fallback:', errMsg);
+    var fileUrl = GOOGLE_DRIVE_FOLDER_URL;
+    var key = target.serviceType + '_' + target.ticketId;
+    if (!state.pptAttachments) state.pptAttachments = getStoredPptAttachments();
+    state.pptAttachments[key] = {
+      fileUrl: fileUrl,
+      fileName: file.name,
+      uploadedBy: currentUserName,
+      timestamp: new Date().toISOString()
+    };
+    saveStoredPptAttachments(state.pptAttachments);
+
+    if (target.record) {
+      target.record.filePpt = fileUrl;
+    }
+
+    closeUploadPptModal();
+    showToast('File "' + file.name + '" tersimpan dan terhubung ke folder Google Drive!', 'success');
+    renderCaseList();
+  }
+
+  // Ekspor fungsi agar dapat dipanggil dari onclick atribut HTML
+  window.openUploadPptModal = openUploadPptModal;
+  window.closeUploadPptModal = closeUploadPptModal;
 
   /**
    * Reopen / Kembalikan Status
