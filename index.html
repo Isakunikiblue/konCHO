@@ -4427,6 +4427,63 @@
       flex-direction: column;
     }
   }
+
+  /* =========================================================================
+     GOOGLE STITCH TEAMS CALENDAR & TASKS EXTENSIONS
+     ========================================================================= */
+  .calendar-table-border {
+    border-collapse: separate;
+    border-spacing: 0;
+  }
+
+  .calendar-day-cell {
+    transition: all 0.18s ease-in-out;
+  }
+  .calendar-day-cell:hover {
+    background-color: #f8faff;
+    z-index: 2;
+  }
+  .calendar-day-cell.is-selected {
+    background-color: #f0f5ff !important;
+    border-color: #3b82f6 !important;
+    box-shadow: inset 0 0 0 2px #2563eb;
+  }
+
+  /* Slide-over Drawer Animations */
+  #issue-drawer {
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+  #issue-drawer.drawer-open {
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+  #issue-drawer.drawer-closed {
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+
+  #drawer-panel {
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  #issue-drawer.drawer-open #drawer-panel {
+    transform: translateX(0) !important;
+  }
+  #issue-drawer.drawer-closed #drawer-panel {
+    transform: translateX(100%) !important;
+  }
+
+  #drawer-backdrop {
+    transition: opacity 0.3s ease;
+  }
+  #issue-drawer.drawer-open #drawer-backdrop {
+    opacity: 1 !important;
+  }
+  #issue-drawer.drawer-closed #drawer-backdrop {
+    opacity: 0 !important;
+  }
+
 </style>
 
 
@@ -4437,6 +4494,53 @@
 
 
 
+
+
+  <!-- Google Fonts: Inter & Manrope -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Manrope:wght@500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@20..48,100..700,0..1,-50..200" rel="stylesheet">
+
+  <!-- Tailwind CSS via CDN -->
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <script id="tailwind-config">
+    tailwind.config = {
+      darkMode: "class",
+      theme: {
+        extend: {
+          colors: {
+            "primary": "#061345",
+            "primary-container": "#1e295a",
+            "on-primary": "#ffffff",
+            "on-primary-container": "#8791c9",
+            "secondary": "#006a61",
+            "secondary-container": "#86f2e4",
+            "on-secondary": "#ffffff",
+            "on-secondary-container": "#006f66",
+            "surface": "#f8f9ff",
+            "surface-bright": "#f8f9ff",
+            "surface-container": "#e6eeff",
+            "surface-container-high": "#dce9ff",
+            "surface-container-highest": "#d5e3fc",
+            "surface-container-lowest": "#ffffff",
+            "on-surface": "#0d1c2e",
+            "on-surface-variant": "#45464f",
+            "error": "#ba1a1a",
+            "error-container": "#ffdad6",
+            "on-error": "#ffffff",
+            "on-error-container": "#93000a",
+            "outline": "#767680",
+            "outline-variant": "#c6c5d0"
+          },
+          fontFamily: {
+            headline: ["Manrope", "sans-serif"],
+            body: ["Inter", "sans-serif"]
+          }
+        }
+      }
+    };
+  </script>
 
 </head>
 <body data-theme="dark">
@@ -4666,6 +4770,42 @@
           </div>
         </div>
         
+        
+        <!-- GOOGLE STITCH 3 MAIN MENUS: ACTIVITY, CALENDAR, TASKS -->
+        <div class="sidebar-block" style="border-bottom: 2px solid rgba(255,255,255,0.12); padding-bottom: 12px; margin-bottom: 12px;">
+          <div class="sidebar-block-title" style="color: #89f5e7; font-weight: 800; letter-spacing: 0.5px;">
+            <span>MENU UTAMA</span>
+          </div>
+          <div class="sidebar-nav-list flex flex-col gap-1.5">
+            <!-- 1. Activity -->
+            <a id="nav-link-activity" class="sidebar-nav-btn flex items-center justify-between p-2.5 rounded-xl text-slate-300 hover:bg-white/10 hover:text-white transition-all group cursor-pointer" href="#" title="Activity Feed & Audit Trail">
+              <div class="flex items-center gap-2.5">
+                <span class="material-symbols-outlined text-[20px] text-blue-400">notifications</span>
+                <span class="font-bold text-xs">Activity</span>
+              </div>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-blue-500/20 text-blue-300">Feed</span>
+            </a>
+
+            <!-- 2. Calendar -->
+            <a id="nav-link-calendar" class="sidebar-nav-btn active flex items-center justify-between p-2.5 rounded-xl bg-white/20 text-white font-bold shadow-sm border border-white/10 transition-all group cursor-pointer" href="#" title="Teams Calendar View">
+              <div class="flex items-center gap-2.5">
+                <span class="material-symbols-outlined text-[20px] text-[#86f2e4]">calendar_month</span>
+                <span class="font-bold text-xs">Calendar</span>
+              </div>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-500/20 text-emerald-300">Teams</span>
+            </a>
+
+            <!-- 3. Tasks -->
+            <a id="nav-link-tasks" class="sidebar-nav-btn flex items-center justify-between p-2.5 rounded-xl text-slate-300 hover:bg-white/10 hover:text-white transition-all group cursor-pointer" href="#" title="Tasks & Kolom C, D, H, J">
+              <div class="flex items-center gap-2.5">
+                <span class="material-symbols-outlined text-[20px] text-teal-400">check_circle</span>
+                <span class="font-bold text-xs">Tasks</span>
+              </div>
+              <span class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-teal-500/20 text-teal-300">Isu</span>
+            </a>
+          </div>
+        </div>
+
         <!-- Section 0: Menu Navigasi Utama -->
         <div class="sidebar-block">
           <div class="sidebar-block-title">
@@ -4839,6 +4979,651 @@
 
       <!-- AREA UTAMA KANAN: SEARCH BAR & SATU CARD BESAR BERISI SELURUH KASUS -->
       <main class="content-main">
+
+      <!-- =====================================================================
+           VIEW 1: TEAMS CALENDAR DASHBOARD VIEW (#view-calendar)
+           ===================================================================== -->
+      <div id="view-calendar" class="transition-all duration-300 block mb-6">
+        <div class="max-w-[1680px] mx-auto flex flex-col xl:flex-row gap-5 items-start">
+          
+          <!-- LEFT / MAIN CALENDAR WORKSPACE -->
+          <div class="flex-1 flex flex-col gap-4 min-w-0 w-full">
+            
+            <!-- CALENDAR CONTROL BAR -->
+            <div class="bg-white rounded-xl p-3.5 sm:p-4 shadow-sm border border-slate-200/90 flex flex-col xl:flex-row xl:items-center justify-between gap-3.5">
+              <!-- Left: Month Jump & Prev/Next -->
+              <div class="flex flex-wrap items-center gap-2 sm:gap-3">
+                <div class="relative">
+                  <select id="select-month-jump" class="h-9 pl-3 pr-8 bg-slate-50 border border-slate-200 text-slate-900 text-xs font-bold rounded-lg focus:outline-none focus:ring-2 focus:ring-[#061345] cursor-pointer appearance-none">
+                    <option value="oktober-2026">Oktober 2026</option>
+                    <option value="november-2026">November 2026</option>
+                    <option value="desember-2026">Desember 2026</option>
+                    <option value="januari-2027">Januari 2027</option>
+                    <option value="februari-2027">Februari 2027</option>
+                    <option value="maret-2027">Maret 2027</option>
+                    <option value="agustus-2026">Agustus 2026</option>
+                    <option value="juli-2026">Juli 2026</option>
+                  </select>
+                  <span class="material-symbols-outlined absolute right-2 top-2 text-slate-400 text-[18px] pointer-events-none">expand_more</span>
+                </div>
+
+                <span id="calendar-cycle-badge" class="bg-blue-50 text-[#061345] border border-blue-200/80 text-[11px] font-semibold px-2.5 py-1 rounded-md">
+                  Cycle CHO • Okt 2026
+                </span>
+
+                <div class="flex items-center bg-slate-100 rounded-lg p-0.5 border border-slate-200">
+                  <button id="btn-prev-month" class="w-7 h-7 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-white rounded transition-colors" title="Bulan Sebelumnya" type="button">
+                    <span class="material-symbols-outlined text-[16px]">chevron_left</span>
+                  </button>
+                  <button id="btn-today" class="px-2.5 h-7 text-xs font-medium text-slate-700 hover:bg-white rounded transition-colors" type="button">
+                    Hari Ini
+                  </button>
+                  <button id="btn-next-month" class="w-7 h-7 flex items-center justify-center text-slate-600 hover:text-slate-900 hover:bg-white rounded transition-colors" title="Bulan Berikutnya" type="button">
+                    <span class="material-symbols-outlined text-[16px]">chevron_right</span>
+                  </button>
+                </div>
+              </div>
+
+              <!-- Right: Filters & Switchers -->
+              <div class="flex flex-wrap items-center gap-2 sm:gap-2.5">
+                <select id="filter-unit-select" class="h-8 pl-2.5 pr-7 bg-slate-50 border border-slate-200 text-slate-700 text-xs font-medium rounded-lg focus:outline-none focus:ring-1 focus:ring-[#061345] cursor-pointer appearance-none">
+                  <option value="all">Unit: Semua CHO</option>
+                  <option value="mobile">Unit: CHO Mobile</option>
+                  <option value="fixed">Unit: CHO Fixed</option>
+                </select>
+
+                <select id="filter-status-select" class="h-8 pl-2.5 pr-7 bg-slate-50 border border-slate-200 text-slate-700 text-xs font-medium rounded-lg focus:outline-none focus:ring-1 focus:ring-[#061345] cursor-pointer appearance-none">
+                  <option value="active">Status: Isu Aktif & Open</option>
+                  <option value="all">Status: Semua Status</option>
+                  <option value="closed">Status: Closed / Selesai</option>
+                </select>
+
+                <div class="inline-flex rounded-lg bg-slate-100 p-0.5 border border-slate-200">
+                  <button class="px-2.5 py-1 text-xs font-bold bg-white text-[#061345] rounded shadow-xs" type="button">Bulan</button>
+                  <button class="px-2.5 py-1 text-xs font-medium text-slate-600 hover:text-slate-900 rounded" type="button">Minggu</button>
+                  <button class="px-2.5 py-1 text-xs font-medium text-slate-600 hover:text-slate-900 rounded" type="button">Hari</button>
+                </div>
+              </div>
+            </div>
+
+            <!-- MAIN CALENDAR CONTAINER (7-COLUMNS WITH CRISP BORDERS) -->
+            <div class="bg-white rounded-xl shadow-sm border border-slate-200/90 overflow-hidden flex flex-col">
+              <!-- Day Names Header -->
+              <div class="grid grid-cols-7 bg-slate-50 border-b border-slate-200 text-center font-headline text-xs font-bold text-slate-600 py-2.5">
+                <div>SEN</div>
+                <div>SEL</div>
+                <div>RAB</div>
+                <div>KAM</div>
+                <div>JUM</div>
+                <div class="text-slate-400">SAB</div>
+                <div class="text-slate-400">MIN</div>
+              </div>
+
+              <!-- Calendar Day Cells Grid -->
+              <div id="calendar-grid-cells" class="grid grid-cols-7 divide-x divide-y divide-slate-100 calendar-table-border">
+                <!-- Dynamically populated by JS renderCalendarGrid() -->
+              </div>
+
+              <!-- Calendar Summary Footer -->
+              <div id="calendar-summary-footer" class="p-3 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between text-xs text-slate-600 gap-2">
+                <div class="flex items-center gap-4">
+                  <div class="flex items-center gap-1.5 font-medium">
+                    <span class="material-symbols-outlined text-[16px] text-blue-600">event</span>
+                    <span><strong id="summary-agenda-count" class="text-slate-800">18</strong> Agenda & Sesi CHO</span>
+                  </div>
+                  <div class="flex items-center gap-1.5 font-medium">
+                    <span class="material-symbols-outlined text-[16px] text-rose-500">warning</span>
+                    <span><strong id="summary-issue-count" class="text-slate-800">4</strong> Isu Urgent / Blocker</span>
+                  </div>
+                  <div class="flex items-center gap-1.5 font-medium">
+                    <span class="material-symbols-outlined text-[16px] text-emerald-600">check_circle</span>
+                    <span><strong id="summary-quickwin-count" class="text-slate-800">9</strong> Solusi Cepat Terverifikasi</span>
+                  </div>
+                </div>
+                <div class="flex items-center gap-1 text-[11px] text-slate-500">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                  <span>Sinkronisasi Google Sheet & Teams Aktif</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+
+          <!-- RIGHT MONITORING & AGENDA PANEL -->
+          <div id="right-detail-panel" class="w-full xl:w-[420px] 2xl:w-[460px] flex flex-col gap-4">
+            
+            <!-- Panel Header Card -->
+            <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200/90 flex flex-col gap-3">
+              <div class="flex items-start justify-between">
+                <div>
+                  <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Monitoring & Agenda Harian</span>
+                  <h2 class="font-headline text-lg sm:text-xl font-extrabold text-[#061345] tracking-tight mt-0.5" id="panel-selected-date">Kamis, 24 Oktober 2026</h2>
+                </div>
+                <span id="panel-agenda-badge" class="bg-blue-100 text-[#061345] text-xs font-bold px-2 py-0.5 rounded-full">
+                  3 Agenda
+                </span>
+              </div>
+
+              <div class="flex items-center gap-2 pt-1 border-t border-slate-100">
+                <button class="flex-1 h-8 bg-[#061345] hover:bg-[#1e295a] text-white text-xs font-bold rounded-lg transition-colors flex items-center justify-center gap-1.5 js-open-agenda-modal" type="button">
+                  <span class="material-symbols-outlined text-[16px]">add</span>
+                  <span>Tambah Agenda</span>
+                </button>
+                <button id="btn-share-agenda" class="h-8 px-3 bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold rounded-lg transition-colors flex items-center gap-1" type="button">
+                  <span class="material-symbols-outlined text-[16px]">share</span>
+                  <span>Bagikan</span>
+                </button>
+              </div>
+            </div>
+
+            <!-- DAFTAR AGENDA PERTEMUAN -->
+            <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200/90 flex flex-col gap-3">
+              <div class="flex items-center justify-between">
+                <h3 class="font-headline text-xs font-bold text-slate-900 uppercase tracking-wide flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-[16px] text-blue-600">calendar_today</span>
+                  <span>Daftar Agenda Pertemuan</span>
+                </h3>
+                <span class="text-[10px] text-slate-400 font-medium">Zona WIB</span>
+              </div>
+
+              <div id="agenda-cards-container" class="flex flex-col gap-2.5">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
+
+            <!-- DAFTAR ISU & KENDALA -->
+            <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200/90 flex flex-col gap-3">
+              <div class="flex items-center justify-between">
+                <h3 class="font-headline text-xs font-bold text-slate-900 uppercase tracking-wide flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-[16px] text-rose-500">warning</span>
+                  <span>Daftar Isu & Kendala</span>
+                </h3>
+                <button id="btn-report-issue" class="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-0.5" type="button">
+                  <span class="material-symbols-outlined text-[14px]">add</span>
+                  <span>Laporkan</span>
+                </button>
+              </div>
+
+              <div id="issue-cards-container" class="flex flex-col gap-2.5">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
+
+            <!-- QUICK WINS & SOLUSI CEPAT -->
+            <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200/90 flex flex-col gap-3">
+              <div class="flex items-center justify-between">
+                <h3 class="font-headline text-xs font-bold text-slate-900 uppercase tracking-wide flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-[16px] text-emerald-600">bolt</span>
+                  <span>Quick Wins & Solusi Cepat</span>
+                </h3>
+                <button id="btn-add-quickwin" class="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-0.5" type="button">
+                  <span class="material-symbols-outlined text-[14px]">add</span>
+                  <span>Tambah</span>
+                </button>
+              </div>
+
+              <div id="quickwins-container" class="flex flex-col gap-2">
+                <!-- Populated dynamically -->
+              </div>
+            </div>
+
+            <!-- DOKUMEN PRESENTASI & MATERI PPT -->
+            <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200/90 flex flex-col gap-3">
+              <div class="flex items-center justify-between">
+                <h3 class="font-headline text-xs font-bold text-slate-900 uppercase tracking-wide flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-[16px] text-indigo-600">description</span>
+                  <span>Dokumen Presentasi</span>
+                </h3>
+                <span class="text-[10px] font-medium text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">Tersinkronisasi</span>
+              </div>
+
+              <div id="presentation-deck-container" class="flex flex-col gap-2.5">
+                <div id="calendar-ppt-dropzone" class="border-2 border-dashed border-slate-200 hover:border-blue-400 rounded-xl p-4 text-center cursor-pointer transition-colors bg-slate-50/50" onclick="if(window.openUploadPptModal) openUploadPptModal('1', 'MOBILE')">
+                  <span class="material-symbols-outlined text-[28px] text-slate-400">cloud_upload</span>
+                  <p class="text-xs font-semibold text-slate-700 mt-1">Tarik & lepas file PPT / PDF ke sini</p>
+                  <p class="text-[11px] text-slate-400">atau <span class="text-blue-600 font-semibold underline">Pilih dari Komputer</span> (Maks. 50 MB)</p>
+                </div>
+
+                <div id="calendar-ppt-file-card" class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between gap-2">
+                  <div class="flex items-center gap-2.5 min-w-0">
+                    <div class="w-8 h-8 rounded-lg bg-red-100 text-red-600 flex items-center justify-center shrink-0">
+                      <span class="material-symbols-outlined text-[18px]">slideshow</span>
+                    </div>
+                    <div class="flex flex-col min-w-0">
+                      <span id="presentation-deck-name" class="text-xs font-bold text-slate-800 truncate">Materi_Konsolidasi_CHO_v2.4.pptx</span>
+                      <span id="presentation-deck-meta" class="text-[10px] text-slate-500">14.8 MB • Diupload AU</span>
+                    </div>
+                  </div>
+                  <div class="flex items-center gap-1 shrink-0">
+                    <a id="btn-download-deck" href="https://drive.google.com/drive/folders/1KHMMjAovxmRpyd0JTAehyoSgH2sWItMV?hl=ID" target="_blank" rel="noopener noreferrer" class="w-7 h-7 rounded bg-white hover:bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600" title="Unduh PPT">
+                      <span class="material-symbols-outlined text-[15px]">download</span>
+                    </a>
+                    <button id="btn-delete-deck" class="w-7 h-7 rounded bg-rose-50 hover:bg-rose-100 border border-rose-200 flex items-center justify-center text-rose-600" title="Hapus PPT (Role Admin)" onclick="if(window.handleDeletePpt) handleDeletePpt('1', 'MOBILE')">
+                      <span class="material-symbols-outlined text-[15px]">delete</span>
+                    </button>
+                  </div>
+                </div>
+
+                <a href="https://teams.microsoft.com" target="_blank" rel="noopener noreferrer" class="w-full h-8 bg-[#061345] hover:bg-[#1e295a] text-white text-xs font-bold rounded-lg flex items-center justify-center gap-1.5 transition-colors">
+                  <span class="material-symbols-outlined text-[16px]">co_present</span>
+                  <span>Buka di Teams</span>
+                </a>
+              </div>
+            </div>
+
+          </div>
+
+        </div>
+      </div>
+
+      <!-- =====================================================================
+           VIEW 2: TASKS MANAGEMENT & DATA TABLE (#view-tasks)
+           ===================================================================== -->
+      <div id="view-tasks" class="transition-all duration-300 hidden mb-6">
+        <div class="max-w-[1680px] mx-auto flex flex-col gap-6 w-full">
+          
+          <!-- Breadcrumbs & Integration Actions -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            <div class="flex flex-col gap-1">
+              <div class="flex items-center gap-2 text-xs font-semibold text-slate-500 flex-wrap">
+                <span>KONCHO</span>
+                <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+                <span class="text-slate-800 font-bold">Manajemen Tugas & List Isu CHO</span>
+                <span class="px-2 py-0.5 bg-blue-100 text-[#061345] rounded-md font-mono text-[10px] font-bold">Kolom C, D, H, J</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <h1 class="font-headline text-xl md:text-2xl font-extrabold text-[#061345] tracking-tight">Daftar Penanganan Isu</h1>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
+                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
+                  Google Sheet Sinkronisasi Aktif
+                </span>
+              </div>
+            </div>
+
+            <!-- Quick Buttons -->
+            <div class="flex items-center gap-2.5 flex-wrap">
+              <a id="btn-export-sheet" href="https://docs.google.com/spreadsheets/d/1bqispkT4gfY7GJ38ruVxqyuBk3ChdORDd2E5AiBYuDc/edit" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 shadow-xs transition-colors">
+                <span class="material-symbols-outlined text-[16px] text-emerald-600">table_chart</span>
+                <span>Buka Google Sheet</span>
+              </a>
+              <button id="btn-sync-now" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-blue-50 border border-blue-200 text-xs font-bold text-[#061345] hover:bg-blue-100 shadow-xs transition-colors" type="button">
+                <span class="material-symbols-outlined text-[16px]">sync</span>
+                <span id="sync-text">Sinkronkan Data</span>
+              </button>
+              <button class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#061345] hover:bg-[#1e295a] text-white text-xs font-bold shadow-sm transition-all js-switch-calendar-btn" type="button">
+                <span class="material-symbols-outlined text-[16px]">calendar_month</span>
+                <span>Lihat di Teams Calendar &rarr;</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Information Banner -->
+          <div class="bg-gradient-to-r from-blue-50 via-indigo-50/50 to-white border border-blue-200/80 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
+            <div class="flex items-center gap-3">
+              <div class="w-8 h-8 rounded-lg bg-[#061345] text-[#86f2e4] flex items-center justify-center shrink-0">
+                <span class="material-symbols-outlined text-[18px]">info</span>
+              </div>
+              <p class="text-xs text-slate-700 leading-relaxed">
+                Semua agenda penanganan & penyelesaian isu dilakukan terpusat melalui menu <strong>Calendar</strong>. Klik salah satu judul isu di bawah untuk membuka detailnya langsung di kalender.
+              </p>
+            </div>
+            <button class="shrink-0 px-3.5 py-1.5 bg-[#061345] text-white text-xs font-bold rounded-lg hover:bg-[#1e295a] transition-colors js-switch-calendar-btn" type="button">
+              Buka Calendar
+            </button>
+          </div>
+
+          <!-- KPI METRIC CARDS GRID -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <!-- Total Kasus -->
+            <div class="bg-white rounded-xl p-4 border border-slate-200/90 shadow-sm flex flex-col justify-between">
+              <div class="flex items-start justify-between">
+                <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">TOTAL TUGAS / KASUS</span>
+                <div class="w-8 h-8 rounded-lg bg-blue-50 text-[#061345] flex items-center justify-center">
+                  <span class="material-symbols-outlined text-[18px]">cases</span>
+                </div>
+              </div>
+              <div class="mt-3">
+                <div class="text-2xl font-headline font-extrabold text-[#061345]" id="kpi-total-val">6</div>
+                <div class="text-xs text-slate-500 font-medium mt-0.5">Kasus Terdaftar</div>
+              </div>
+              <div class="mt-3 pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-600">
+                <span>Konsolidasi CHO</span>
+                <span class="font-bold text-[#061345]" id="kpi-coverage-val">100% Tercakup</span>
+              </div>
+            </div>
+
+            <!-- Open (Kolom H) -->
+            <div class="bg-white rounded-xl p-4 border border-amber-200/90 shadow-sm flex flex-col justify-between bg-amber-50/20">
+              <div class="flex items-start justify-between">
+                <div class="flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-amber-500"></span>
+                  <span class="text-[11px] font-bold text-amber-900 uppercase tracking-wide">OPEN (KOLOM H)</span>
+                </div>
+                <div class="w-8 h-8 rounded-lg bg-amber-100 text-amber-700 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-[18px]">pending_actions</span>
+                </div>
+              </div>
+              <div class="mt-3">
+                <div class="text-2xl font-headline font-extrabold text-amber-700" id="kpi-open-val">5</div>
+                <div class="text-xs text-amber-800 font-medium mt-0.5">Perlu Tindak Lanjut</div>
+              </div>
+              <div class="mt-3 pt-3 border-t border-amber-200/60 flex items-center justify-between text-xs text-amber-900">
+                <span id="kpi-open-sub">3 Mobile • 2 Fixed</span>
+                <span class="font-bold" id="kpi-open-pct">83.3% Total</span>
+              </div>
+            </div>
+
+            <!-- In Progress (Kolom H) -->
+            <div class="bg-white rounded-xl p-4 border border-blue-200/90 shadow-sm flex flex-col justify-between bg-blue-50/20">
+              <div class="flex items-start justify-between">
+                <div class="flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-blue-500"></span>
+                  <span class="text-[11px] font-bold text-blue-900 uppercase tracking-wide">IN PROGRESS (KOLOM H)</span>
+                </div>
+                <div class="w-8 h-8 rounded-lg bg-blue-100 text-blue-700 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-[18px]">autorenew</span>
+                </div>
+              </div>
+              <div class="mt-3">
+                <div class="text-2xl font-headline font-extrabold text-blue-700" id="kpi-inprogress-val">1</div>
+                <div class="text-xs text-blue-800 font-medium mt-0.5">Sedang Dikerjakan</div>
+              </div>
+              <div class="mt-3 pt-3 border-t border-blue-200/60 flex items-center justify-between text-xs text-blue-900">
+                <span id="kpi-inprogress-sub">1 Mobile • 0 Fixed</span>
+                <span class="font-bold" id="kpi-inprogress-pct">16.7% Total</span>
+              </div>
+            </div>
+
+            <!-- Closed (Kolom H) -->
+            <div class="bg-white rounded-xl p-4 border border-emerald-200/90 shadow-sm flex flex-col justify-between bg-emerald-50/20">
+              <div class="flex items-start justify-between">
+                <div class="flex items-center gap-1.5">
+                  <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
+                  <span class="text-[11px] font-bold text-emerald-900 uppercase tracking-wide">CLOSED (KOLOM H)</span>
+                </div>
+                <div class="w-8 h-8 rounded-lg bg-emerald-100 text-emerald-700 flex items-center justify-center">
+                  <span class="material-symbols-outlined text-[18px]">check_circle</span>
+                </div>
+              </div>
+              <div class="mt-3">
+                <div class="text-2xl font-headline font-extrabold text-emerald-700" id="kpi-closed-val">0</div>
+                <div class="text-xs text-emerald-800 font-medium mt-0.5">Kasus Tuntas</div>
+              </div>
+              <div class="mt-3 pt-3 border-t border-emerald-200/60 flex items-center justify-between text-xs text-emerald-900">
+                <span id="kpi-closed-sub">0 Mobile • 0 Fixed</span>
+                <span class="font-bold" id="kpi-closed-pct">0% Target</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- FILTERS TOOLBAR -->
+          <div class="bg-white rounded-xl p-3.5 border border-slate-200/90 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3">
+            <!-- Left: Search & Unit Pills -->
+            <div class="flex flex-wrap items-center gap-3 flex-1">
+              <div class="relative w-full sm:w-64">
+                <span class="material-symbols-outlined absolute left-3 top-2.5 text-slate-400 text-[18px] pointer-events-none">search</span>
+                <input id="table-search-input" class="w-full h-9 pl-9 pr-3 bg-slate-50 border border-slate-200 text-xs rounded-lg text-slate-800 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-[#061345]" placeholder="Filter isu, nomor tiket, atau..." type="text">
+              </div>
+
+              <div class="inline-flex rounded-lg bg-slate-100 p-0.5 border border-slate-200">
+                <button class="unit-filter-btn px-3 py-1.5 text-xs font-bold rounded bg-white text-[#061345] shadow-xs transition-all" data-filter-unit="all" type="button">Semua Unit</button>
+                <button class="unit-filter-btn px-3 py-1.5 text-xs font-semibold rounded text-slate-600 hover:text-slate-900 transition-all" data-filter-unit="CHO MOBILE" type="button">CHO Mobile</button>
+                <button class="unit-filter-btn px-3 py-1.5 text-xs font-semibold rounded text-slate-600 hover:text-slate-900 transition-all" data-filter-unit="CHO FIXED" type="button">CHO Fixed</button>
+              </div>
+            </div>
+
+            <!-- Right: Status Dropdown, Period Dropdown & Reset -->
+            <div class="flex flex-wrap items-center gap-2.5">
+              <select id="select-status-filter" class="h-9 pl-3 pr-8 bg-slate-50 border border-slate-200 text-slate-700 text-xs font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-[#061345] cursor-pointer appearance-none">
+                <option value="all">Semua Status</option>
+                <option value="Open">Open</option>
+                <option value="InProgress">In Progress</option>
+                <option value="Closed">Closed</option>
+              </select>
+
+              <select id="select-period-filter" class="h-9 pl-3 pr-8 bg-slate-50 border border-slate-200 text-slate-700 text-xs font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-[#061345] cursor-pointer appearance-none">
+                <option value="all">Semua Periode</option>
+                <option value="Oktober 2026">Oktober 2026</option>
+                <option value="Agustus 2026">Agustus 2026</option>
+                <option value="Juli 2026">Juli 2026</option>
+                <option value="Tahun 2027">Tahun 2027</option>
+                <option value="Januari 2027">Januari 2027</option>
+                <option value="Desember 2027">Desember 2027</option>
+              </select>
+
+              <button id="btn-reset-filters" class="h-9 px-3 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold rounded-lg flex items-center gap-1 transition-colors" type="button" title="Reset Semua Filter">
+                <span class="material-symbols-outlined text-[16px]">restart_alt</span>
+                <span>Reset</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Mobile table scroll hint banner -->
+          <div class="mobile-table-scroll-hint md:hidden p-2 text-center text-xs text-slate-500 bg-blue-50 border border-blue-200 rounded-lg">
+            <span>&larr; Geser tabel ke kanan / kiri untuk melihat detail selengkapnya &rarr;</span>
+          </div>
+
+          <!-- DATA TABLE CARD CONTAINER -->
+          <div class="bg-white rounded-xl border border-slate-200/90 shadow-sm overflow-hidden flex flex-col">
+            <div class="p-4 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
+              <div class="flex items-center gap-2">
+                <span class="material-symbols-outlined text-[20px] text-slate-500">list_alt</span>
+                <h3 class="font-headline text-sm font-bold text-slate-800">Konsolidasi Daftar Isu Terbuka</h3>
+                <span id="case-counter-badge" class="bg-blue-100 text-[#061345] text-xs font-bold px-2.5 py-0.5 rounded-full">
+                  5 Ditampilkan
+                </span>
+              </div>
+              <div class="flex items-center gap-2 text-xs text-slate-500">
+                <span>Spreadsheet ID: <strong class="font-mono text-slate-700">1bqisqkt4qfY...</strong></span>
+                <span>&bull;</span>
+                <span>Terakhir diperbarui: <strong class="text-slate-700">Baru Saja</strong></span>
+              </div>
+            </div>
+
+            <!-- Responsive Table -->
+            <div class="overflow-x-auto w-full">
+              <table id="tasks-table" class="home-sheet-table w-full text-left border-collapse text-xs">
+                <thead>
+                  <tr class="bg-slate-50/80 border-b border-slate-200 font-headline font-bold text-slate-600 uppercase text-[11px] tracking-wider">
+                    <th class="py-3 px-4 w-12 text-center">NO</th>
+                    <th class="py-3 px-4 w-32">PERIODE</th>
+                    <th class="py-3 px-4 w-28">UNIT</th>
+                    <th class="py-3 px-4 min-w-[220px]">MAIN ISSUE (KOLOM C)<span class="block text-[10px] font-normal text-slate-400">&mdash; klik untuk buka calendar</span></th>
+                    <th class="py-3 px-4 min-w-[320px]">DETAIL KENDALA (KOLOM D)</th>
+                    <th class="py-3 px-4 w-36">MATERI PPT (DRIVE)</th>
+                    <th class="py-3 px-4 w-32">STATUS (KOLOM H)</th>
+                    <th class="py-3 px-4 w-36">STATUS UPDATE (KOLOM J)</th>
+                  </tr>
+                </thead>
+                <tbody id="task-table-body" class="divide-y divide-slate-100">
+                  <!-- Populated dynamically by renderTasksTable() -->
+                </tbody>
+              </table>
+            </div>
+
+            <!-- Pagination Footer -->
+            <div class="p-3.5 bg-slate-50 border-t border-slate-200 flex flex-wrap items-center justify-between text-xs text-slate-600 gap-3">
+              <div class="flex items-center gap-1.5">
+                <span id="pagination-info">Menampilkan 1 - 5 dari 5 Kasus</span>
+                <span>&bull;</span>
+                <span class="text-emerald-600 font-medium">Tersinkronisasi Otomatis</span>
+              </div>
+              <div class="flex items-center gap-1">
+                <button class="px-2.5 py-1 rounded border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 text-xs font-medium disabled:opacity-50" disabled type="button">Sebelumnya</button>
+                <button class="w-7 h-7 rounded bg-[#061345] text-white text-xs font-bold" type="button">1</button>
+                <button class="px-2.5 py-1 rounded border border-slate-200 bg-white hover:bg-slate-50 text-slate-600 text-xs font-medium disabled:opacity-50" disabled type="button">Berikutnya</button>
+              </div>
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- =====================================================================
+           VIEW 3: ACTIVITY FEED & AUDIT TRAIL (#view-activity)
+           ===================================================================== -->
+      <div id="view-activity" class="transition-all duration-300 hidden mb-6">
+        <div class="max-w-[1680px] mx-auto flex flex-col gap-6 w-full">
+          
+          <!-- Breadcrumbs & Integration Actions -->
+          <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+            <div class="flex flex-col gap-1">
+              <div class="flex items-center gap-2 text-xs font-semibold text-slate-500 flex-wrap">
+                <span>KONCHO</span>
+                <span class="material-symbols-outlined text-[14px]">chevron_right</span>
+                <span class="text-slate-800 font-bold">Aktivitas & Log Komunikasi</span>
+                <span class="px-2 py-0.5 bg-indigo-100 text-indigo-900 rounded-md font-mono text-[10px] font-bold">Log_Komunikasi</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <h1 class="font-headline text-xl md:text-2xl font-extrabold text-[#061345] tracking-tight">Audit Trail & Riwayat Komunikasi</h1>
+                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">
+                  <span class="w-1.5 h-1.5 rounded-full bg-blue-500 animate-pulse"></span>
+                  Live Feed
+                </span>
+              </div>
+            </div>
+
+            <!-- Quick Buttons -->
+            <div class="flex items-center gap-2.5 flex-wrap">
+              <button id="btn-refresh-activity" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 shadow-xs transition-colors" type="button" onclick="if(window.loadApplicationData) loadApplicationData()">
+                <span class="material-symbols-outlined text-[16px]">sync</span>
+                <span>Refresh Aktivitas</span>
+              </button>
+              <button class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#061345] hover:bg-[#1e295a] text-white text-xs font-bold shadow-sm transition-all js-switch-calendar-btn" type="button">
+                <span class="material-symbols-outlined text-[16px]">calendar_month</span>
+                <span>Buka di Calendar &rarr;</span>
+              </button>
+            </div>
+          </div>
+
+          <!-- Summary Metric Cards -->
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+            <div class="bg-white rounded-xl p-4 border border-slate-200/90 shadow-sm">
+              <div class="text-[11px] font-bold text-slate-500 uppercase">TOTAL LOG TERDISTRIBUSI</div>
+              <div id="stat-total-logs" class="text-2xl font-headline font-extrabold text-[#061345] mt-1">12</div>
+              <div class="text-xs text-slate-500 mt-0.5">Catatan koordinasi & eskalasi</div>
+            </div>
+            <div class="bg-white rounded-xl p-4 border border-slate-200/90 shadow-sm">
+              <div class="text-[11px] font-bold text-slate-500 uppercase">AKTIVITAS CHO MOBILE</div>
+              <div id="stat-mobile-logs" class="text-2xl font-headline font-extrabold text-blue-600 mt-1">8</div>
+              <div class="text-xs text-slate-500 mt-0.5">Isu bundling, SMOOA, Selena</div>
+            </div>
+            <div class="bg-white rounded-xl p-4 border border-slate-200/90 shadow-sm">
+              <div class="text-[11px] font-bold text-slate-500 uppercase">AKTIVITAS CHO FIXED</div>
+              <div id="stat-fixed-logs" class="text-2xl font-headline font-extrabold text-teal-600 mt-1">4</div>
+              <div class="text-xs text-slate-500 mt-0.5">Isu IndiHome, PDD billing</div>
+            </div>
+            <div class="bg-white rounded-xl p-4 border border-slate-200/90 shadow-sm">
+              <div class="text-[11px] font-bold text-slate-500 uppercase">UPDATE TERAKHIR</div>
+              <div class="text-2xl font-headline font-extrabold text-emerald-600 mt-1">Hari Ini</div>
+              <div class="text-xs text-slate-500 mt-0.5">Sinkronisasi Google Sheet</div>
+            </div>
+          </div>
+
+          <!-- Timeline Feed -->
+          <div class="bg-white rounded-xl border border-slate-200/90 shadow-sm p-4 md:p-6 flex flex-col gap-4">
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-100 pb-3">
+              <h3 class="font-headline text-sm font-bold text-slate-800">Aliran Log Komunikasi Terkini</h3>
+              <div class="flex items-center gap-2">
+                <input id="activity-search-input" type="text" placeholder="Cari log atau PIC..." class="h-8 pl-3 pr-3 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#061345] w-48">
+                <select id="activity-unit-filter" class="h-8 px-2 text-xs bg-slate-50 border border-slate-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#061345]">
+                  <option value="all">Semua Unit</option>
+                  <option value="MOBILE">CHO Mobile</option>
+                  <option value="FIXED">CHO Fixed</option>
+                </select>
+              </div>
+            </div>
+
+            <!-- Activity Feed Stream -->
+            <div id="activity-timeline-feed" class="flex flex-col gap-3">
+              <!-- Dynamically populated by renderActivityFeed() -->
+            </div>
+          </div>
+
+        </div>
+      </div>
+
+      <!-- SLIDE-OVER DRAWER -->
+      <div id="issue-drawer" class="fixed inset-0 z-50 overflow-hidden drawer-closed" aria-labelledby="slide-over-title" role="dialog" aria-modal="true">
+        <div id="drawer-backdrop" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity duration-300"></div>
+
+        <div class="fixed inset-y-0 right-0 max-w-full flex pl-10">
+          <div id="drawer-panel" class="w-screen max-w-xl bg-white shadow-2xl flex flex-col transform transition-transform duration-300">
+            
+            <div class="p-5 border-b border-slate-200 bg-slate-50 flex items-start justify-between">
+              <div class="flex flex-col gap-1 pr-4">
+                <div class="flex items-center gap-2">
+                  <span id="drawer-unit-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-[#061345]">CHO MOBILE</span>
+                  <span id="drawer-period-badge" class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-200 text-slate-700">Oktober 2026</span>
+                  <span id="drawer-status" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">Open</span>
+                </div>
+                <h2 id="drawer-issue-title" class="font-headline text-base font-bold text-slate-900 mt-1">Detail Tiket Isu</h2>
+              </div>
+              <button id="btn-close-drawer" class="w-8 h-8 rounded-lg bg-slate-200/80 hover:bg-slate-300 text-slate-600 flex items-center justify-center transition-colors" type="button">
+                <span class="material-symbols-outlined text-[18px]">close</span>
+              </button>
+            </div>
+
+            <div class="p-6 flex-1 overflow-y-auto flex flex-col gap-5 text-xs text-slate-700">
+              <div>
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Detail Kendala (Kolom D)</span>
+                <div id="drawer-issue-detail" class="mt-1 p-3.5 bg-slate-50 border border-slate-200 rounded-xl leading-relaxed whitespace-pre-line issue-details-text">
+                  Memuat detail kendala...
+                </div>
+              </div>
+
+              <div class="grid grid-cols-2 gap-3 p-3.5 bg-blue-50/50 border border-blue-100 rounded-xl">
+                <div>
+                  <span class="text-[10px] font-bold text-slate-500 uppercase">PIC / Petugas Pelaksana</span>
+                  <p id="drawer-pic" class="font-semibold text-slate-800 mt-0.5">-</p>
+                </div>
+                <div>
+                  <span class="text-[10px] font-bold text-slate-500 uppercase">Follow Up To (Kolom I)</span>
+                  <p id="drawer-follow-up" class="font-semibold text-slate-800 mt-0.5">-</p>
+                </div>
+              </div>
+
+              <div>
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Materi Presentasi PPT (Drive)</span>
+                <div id="drawer-ppt-container" class="mt-2 p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
+                  <div class="flex items-center gap-2">
+                    <span class="material-symbols-outlined text-[20px] text-red-500">slideshow</span>
+                    <span id="drawer-ppt-name" class="font-medium text-slate-800">Belum ada file PPT</span>
+                  </div>
+                </div>
+              </div>
+
+              <div>
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Catatan Solusi / Status Update (Kolom J)</span>
+                <textarea id="drawer-note-input" rows="3" class="mt-1 w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#061345]" placeholder="Tuliskan catatan tindak lanjut penanganan..."></textarea>
+                <div class="mt-2 flex justify-end">
+                  <button id="btn-drawer-save" class="px-4 py-2 bg-[#061345] hover:bg-[#1e295a] text-white font-bold rounded-lg transition-colors flex items-center gap-1.5" type="button">
+                    <span class="material-symbols-outlined text-[15px]">save</span>
+                    <span>Simpan Catatan</span>
+                  </button>
+                </div>
+              </div>
+
+              <div>
+                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Riwayat Komunikasi & Audit Trail</span>
+                <div id="drawer-timeline-container" class="mt-2 flex flex-col gap-2 max-h-48 overflow-y-auto">
+                </div>
+              </div>
+            </div>
+
+            <div class="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+              <button id="btn-drawer-copy-text" class="px-3 py-1.5 bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 font-semibold rounded-lg flex items-center gap-1" type="button">
+                <span class="material-symbols-outlined text-[15px]">content_copy</span>
+                <span>Salin Ringkasan</span>
+              </button>
+              <button id="btn-drawer-close-foot" class="px-4 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-lg transition-colors" type="button">
+                Tutup
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
         
         <!-- Top Search & Active Filter Banner -->
         <div class="content-header-bar">
@@ -5323,7 +6108,59 @@
       </div>
     </div>
 
-    <!-- =========================================================================
+    
+  <!-- Modal: Tambah Agenda Penanganan CHO -->
+  <div id="modal-tambah-agenda" class="modal-backdrop">
+    <div class="modal-dialog" style="max-width: 520px;">
+      <div class="modal-head">
+        <div class="modal-title-wrap">
+          <div class="modal-kicker">📅 AGENDA TEAMS</div>
+          <h2 class="modal-title">Tambah Agenda Penanganan CHO</h2>
+        </div>
+        <button class="modal-close-btn js-close-agenda-modal" type="button">✕</button>
+      </div>
+
+      <form id="form-tambah-agenda" style="padding: 20px;" class="space-y-3">
+        <div>
+          <label class="block font-semibold text-xs mb-1">Judul Agenda / Rapat *</label>
+          <input id="modal-agenda-title-input" type="text" required placeholder="Contoh: Review Koordinasi Tiket SMOOA Pool IT" class="form-input w-full">
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-xs mb-1">Tanggal Agenda *</label>
+            <input id="modal-agenda-date-input" type="date" required class="form-input w-full">
+          </div>
+          <div>
+            <label class="block font-semibold text-xs mb-1">Waktu (WIB) *</label>
+            <input id="modal-agenda-time-input" type="text" placeholder="09:00 - 10:30 WIB" class="form-input w-full">
+          </div>
+        </div>
+
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="block font-semibold text-xs mb-1">Unit Layanan *</label>
+            <select id="modal-agenda-unit-input" class="form-select w-full">
+              <option value="mobile">CHO Mobile</option>
+              <option value="fixed">CHO Fixed</option>
+              <option value="all">Semua Unit (Konsolidasi)</option>
+            </select>
+          </div>
+          <div>
+            <label class="block font-semibold text-xs mb-1">Ruangan / Teams Link</label>
+            <input id="modal-agenda-room-input" type="text" placeholder="Sync Room CHO / War Room" class="form-input w-full">
+          </div>
+        </div>
+
+        <div class="flex justify-end gap-2 pt-3 border-t border-slate-100">
+          <button type="button" class="btn btn-secondary js-close-agenda-modal">Batal</button>
+          <button type="submit" class="btn btn-primary">Simpan Agenda</button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+<!-- =========================================================================
        MODAL KELOLA PENGGUNA (USER MANAGEMENT - KHUSUS ROLE ADMINISTRATOR)
        Fitur: Tambah User Baru, Edit User, Hapus User, Pengaturan Hak Akses
        ========================================================================= -->
@@ -10116,6 +10953,808 @@
       ]
     };
   }
+
+  
+  /* =========================================================================
+     GOOGLE STITCH TEAMS CALENDAR, TASKS & ACTIVITY CONTROLLERS
+     ========================================================================= */
+
+  // Calendar default dataset
+  const DEFAULT_CALENDAR_DATA = {
+    'oktober-2026': {
+      title: "Oktober 2026",
+      badge: "Cycle CHO • Okt 2026",
+      startDayIndex: 3, // 1 Okt 2026 = Kamis (0: Sen, 1: Sel, 2: Rab, 3: Kam, 4: Jum, 5: Sab, 6: Min)
+      totalDays: 31,
+      prevMonthSpill: [28, 29, 30],
+      nextMonthSpill: [1],
+      summary: { agendas: 18, issues: 4, quickwins: 9 },
+      items: {
+        1: [{ type: 'meeting', unit: 'mobile', text: 'Sync Billing Digipos' }],
+        3: [{ type: 'meeting', unit: 'mobile', text: 'SMOOA Fix Pool IT' }],
+        6: [{ type: 'meeting', unit: 'fixed', text: 'Eskalasi RoaMAX' }],
+        8: [{ type: 'meeting', unit: 'mobile', text: 'Log Selena Akses' }],
+        10: [{ type: 'meeting', unit: 'fixed', text: 'Audit Paket PDD' }],
+        13: [{ type: 'issue', unit: 'fixed', text: 'Status ONT Fixed' }],
+        15: [{ type: 'issue', unit: 'mobile', text: 'Charge MU Bundling' }, { type: 'meeting', unit: 'billing', text: 'Evaluasi Digipos' }],
+        17: [{ type: 'meeting', unit: 'mobile', text: 'Update Spreadsheet' }],
+        20: [{ type: 'issue', unit: 'mobile', text: 'Validasi HVC Digipos' }],
+        22: [{ type: 'meeting', unit: 'fixed', text: 'Eskalasi Kolom J' }],
+        24: [
+          { type: 'issue', unit: 'mobile', text: 'Charge MU Bundling', urgent: true, ticketId: '1' },
+          { type: 'meeting', unit: 'mobile', text: 'Review Isu Kendala Charge MU' },
+          { type: 'meeting', unit: 'fixed', text: 'Investigasi SMOOA & Selena' }
+        ],
+        27: [{ type: 'meeting', unit: 'fixed', text: 'Double RoaMAX Fix' }],
+        29: [{ type: 'issue', unit: 'fixed', text: 'Perhitungan PDD', ticketId: '5' }],
+        31: [{ type: 'quickwin', unit: 'all', text: 'Rekap Bulanan CHO' }]
+      },
+      details: {
+        24: {
+          dateStr: "Kamis, 24 Oktober 2026",
+          agendaCount: 3,
+          agendas: [
+            {
+              time: "09:00 - 10:30 WIB",
+              unit: "CHO Mobile",
+              unitClass: "bg-blue-50 text-blue-700 border-blue-200",
+              title: "Review Isu Kendala Charge MU & Paket Bundling",
+              host: "Tim Billing IT / CHO Mobile",
+              roomText: "Sync Room CHO",
+              isWarRoom: false
+            },
+            {
+              time: "13:30 - 14:30 WIB",
+              unit: "CHO Fixed",
+              unitClass: "bg-teal-50 text-teal-700 border-teal-200",
+              title: "Investigasi SMOOA Kuota & Akses Notifikasi Selena",
+              host: "Administrator Utama",
+              roomText: "War Room Operasional",
+              isWarRoom: true
+            }
+          ],
+          issues: [
+            {
+              badge: "URGENT / BLOCKER",
+              badgeClass: "bg-rose-100 text-rose-700 border-rose-200",
+              unit: "CHO Mobile",
+              ticket: "#CHO-890",
+              title: "Kendala charge MU pada paket bundling: Pelanggan sudah aktivasi bundling namun masih terpotong pulsa/MU dari digipos.",
+              pic: "Billing IT / Rian S.",
+              actionText: "Mitigasi Aktif",
+              actionClass: "bg-rose-50 text-rose-700 border-rose-200",
+              ticketId: '1',
+              serviceType: 'MOBILE'
+            },
+            {
+              badge: "DALAM INVESTIGASI",
+              badgeClass: "bg-amber-100 text-amber-800 border-amber-200",
+              unit: "CHO Mobile",
+              ticket: "#SMO-335",
+              title: "SMOOA – Tidak auto-renew & penambahan nomor member gagal pada klaster regional tertentu.",
+              pic: "Tim SMOOA / Maya D.",
+              actionText: "Verifikasi Log",
+              actionClass: "bg-amber-50 text-amber-800 border-amber-200",
+              ticketId: '2',
+              serviceType: 'MOBILE'
+            },
+            {
+              badge: "OPEN / REVIEW",
+              badgeClass: "bg-blue-100 text-blue-800 border-blue-200",
+              unit: "CHO Fixed",
+              ticket: "#FIX-112",
+              title: "Double Aktivasi Paket RoaMAX & Perhitungan Paket PDD: Sinkronisasi biling ONT Fixed.",
+              pic: "CHO Fixed Lead",
+              actionText: "Eskalasi Kolom J",
+              actionClass: "bg-blue-50 text-blue-800 border-blue-200",
+              ticketId: '4',
+              serviceType: 'MOBILE'
+            }
+          ],
+          quickwins: [
+            {
+              title: "Verifikasi charging bypass via digipos sandbox (CHO Mobile)",
+              status: "Selesai",
+              statusClass: "bg-emerald-100 text-emerald-800",
+              pic: "Oleh Tim Billing",
+              done: true
+            },
+            {
+              title: "Eskalasi tiket SMOOA ke pool IT & update status Kolom J",
+              status: "80%",
+              statusClass: "bg-blue-100 text-blue-800",
+              pic: "Estimasi 15 mnt",
+              done: false
+            },
+            {
+              title: "Sinkronisasi Master Spreadsheet Google Sheet (ID: 1bqisqkt4qfY...)",
+              status: "Antrean",
+              statusClass: "bg-slate-100 text-slate-700",
+              pic: "Auto-Sync 1 Jam",
+              done: false
+            }
+          ]
+        }
+      }
+    }
+  };
+
+  state.activeView = 'calendar';
+  state.selectedDate = 24;
+  state.selectedMonth = 'oktober-2026';
+  state.tasksFilterUnit = 'all';
+  state.tasksFilterStatus = 'all';
+  state.tasksFilterPeriod = 'all';
+
+  function activateView(viewName, targetTicketId, targetDate) {
+    const vActivity = document.getElementById('view-activity');
+    const vCalendar = document.getElementById('view-calendar');
+    const vTasks = document.getElementById('view-tasks');
+
+    const navActivity = document.getElementById('nav-link-activity');
+    const navCalendar = document.getElementById('nav-link-calendar');
+    const navTasks = document.getElementById('nav-link-tasks');
+
+    const activeClass = 'flex flex-col items-center justify-center w-full py-2 rounded-xl bg-white/20 text-white font-bold shadow-sm border border-white/10 transition-all group cursor-pointer';
+    const inactiveClass = 'flex flex-col items-center justify-center w-full py-2 rounded-xl text-slate-300 hover:bg-white/10 hover:text-white transition-all group cursor-pointer';
+
+    if (vActivity) vActivity.classList.add('hidden');
+    if (vCalendar) vCalendar.classList.add('hidden');
+    if (vTasks) vTasks.classList.add('hidden');
+
+    if (navActivity) navActivity.className = inactiveClass;
+    if (navCalendar) navCalendar.className = inactiveClass;
+    if (navTasks) navTasks.className = inactiveClass;
+
+    state.activeView = viewName;
+
+    if (viewName === 'calendar') {
+      if (vCalendar) vCalendar.classList.remove('hidden');
+      if (navCalendar) navCalendar.className = activeClass;
+      if (targetDate) {
+        state.selectedDate = parseInt(targetDate, 10);
+      }
+      renderCalendarGrid();
+      renderCalendarRightPanel(state.selectedDate);
+
+      if (targetTicketId) {
+        showToast('Membuka Detail Isu ' + targetTicketId + ' pada Calendar', 'info');
+        setTimeout(() => {
+          const panel = document.getElementById('issue-cards-container');
+          if (panel) {
+            panel.classList.add('ring-2', 'ring-blue-500', 'p-1', 'rounded-xl');
+            setTimeout(() => panel.classList.remove('ring-2', 'ring-blue-500', 'p-1'), 2000);
+          }
+        }, 300);
+      }
+    } else if (viewName === 'tasks') {
+      if (vTasks) vTasks.classList.remove('hidden');
+      if (navTasks) navTasks.className = activeClass;
+      renderTasksTable();
+      updateTasksKpis();
+    } else if (viewName === 'activity') {
+      if (vActivity) vActivity.classList.remove('hidden');
+      if (navActivity) navActivity.className = activeClass;
+      renderActivityFeed();
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function renderCalendarGrid() {
+    const container = document.getElementById('calendar-grid-cells');
+    if (!container) return;
+
+    const calData = DEFAULT_CALENDAR_DATA[state.selectedMonth] || DEFAULT_CALENDAR_DATA['oktober-2026'];
+    const startDay = calData.startDayIndex;
+    const totalDays = calData.totalDays;
+    const prevSpill = calData.prevMonthSpill || [];
+    const nextSpill = calData.nextMonthSpill || [];
+
+    let html = '';
+
+    prevSpill.forEach(d => {
+      html += '<div class="calendar-day-cell min-h-[96px] sm:min-h-[110px] p-2 bg-slate-50/60 opacity-40 flex flex-col justify-between"><span class="text-xs font-semibold text-slate-400">' + d + '</span><span class="text-[10px] text-slate-300">Bulan lalu</span></div>';
+    });
+
+    for (let day = 1; day <= totalDays; day++) {
+      const isSelected = day === state.selectedDate;
+      const isWeekend = ((startDay + day - 1) % 7 === 5) || ((startDay + day - 1) % 7 === 6);
+
+      let dayItems = (calData.items && calData.items[day]) ? [...calData.items[day]] : [];
+      if (state.tasksFilterUnit && state.tasksFilterUnit !== 'all') {
+        dayItems = dayItems.filter(it => it.unit === 'all' || it.unit === state.tasksFilterUnit);
+      }
+      const itemCount = dayItems.length;
+
+      html += '<div class="calendar-day-cell min-h-[96px] sm:min-h-[110px] p-2 sm:p-2.5 flex flex-col justify-between cursor-pointer border-t border-slate-100 ' + (isSelected ? 'is-selected' : isWeekend ? 'bg-slate-50/40' : 'bg-white') + '" onclick="handleCalendarDateClick(' + day + ')">';
+      html += '  <div class="flex items-center justify-between">';
+      html += '    <span class="text-xs font-extrabold ' + (isSelected ? 'text-blue-700 font-headline' : 'text-slate-800') + '">' + day + '</span>';
+      if (isSelected) {
+        html += '    <span class="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-blue-600 text-white">Dipilih</span>';
+      } else if (itemCount > 0) {
+        html += '    <span class="px-1.5 py-0.2 rounded-md text-[9px] font-bold bg-slate-100 text-slate-600">' + itemCount + ' item</span>';
+      }
+      html += '  </div>';
+
+      html += '  <div class="flex flex-col gap-1 mt-1 overflow-hidden">';
+      dayItems.slice(0, 2).forEach(item => {
+        if (item.urgent) {
+          html += '<span class="truncate px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200/80">&bull; ' + escapeHtml(item.text) + '</span>';
+        } else if (item.type === 'meeting') {
+          html += '<span class="truncate px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-700 border border-blue-200/70">&bull; ' + escapeHtml(item.text) + '</span>';
+        } else if (item.type === 'quickwin') {
+          html += '<span class="truncate px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">&bull; ' + escapeHtml(item.text) + '</span>';
+        } else {
+          html += '<span class="truncate px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-700 border border-slate-200">&bull; ' + escapeHtml(item.text) + '</span>';
+        }
+      });
+      if (itemCount > 2) {
+        html += '<span class="text-[9px] text-slate-400 font-semibold pl-1">+' + (itemCount - 2) + ' lainnya</span>';
+      }
+      html += '  </div>';
+
+      html += '  <div class="text-[9px] text-slate-300 self-end">' + (isWeekend ? 'Akhir pekan' : '') + '</div>';
+      html += '</div>';
+    }
+
+    nextSpill.forEach(d => {
+      html += '<div class="calendar-day-cell min-h-[96px] sm:min-h-[110px] p-2 bg-slate-50/60 opacity-40 flex flex-col justify-between"><span class="text-xs font-semibold text-slate-400">' + d + '</span><span class="text-[10px] text-slate-300">Bulan depan</span></div>';
+    });
+
+    container.innerHTML = html;
+  }
+
+  function handleCalendarDateClick(day) {
+    state.selectedDate = day;
+    renderCalendarGrid();
+    renderCalendarRightPanel(day);
+  }
+
+  function renderCalendarRightPanel(day) {
+    const calData = DEFAULT_CALENDAR_DATA[state.selectedMonth] || DEFAULT_CALENDAR_DATA['oktober-2026'];
+    const dayDetail = (calData.details && calData.details[day]) ? calData.details[day] : {
+      dateStr: "Tanggal " + day + " " + (calData.title || "Oktober 2026"),
+      agendaCount: 1,
+      agendas: [
+        {
+          time: "10:00 - 11:30 WIB",
+          unit: "CHO Mobile",
+          unitClass: "bg-blue-50 text-blue-700 border-blue-200",
+          title: "Sesi Koordinasi & Review Isu Harian CHO",
+          host: "PIC CHO / Administrator",
+          roomText: "Sync Room CHO",
+          isWarRoom: false
+        }
+      ],
+      issues: [
+        {
+          badge: "OPEN / REVIEW",
+          badgeClass: "bg-blue-100 text-blue-800 border-blue-200",
+          unit: "CHO Mobile",
+          ticket: "#CHO-" + day,
+          title: "Pemantauan berkala tiket kendala operasional CHO.",
+          pic: "Tim CHO Mobile",
+          actionText: "Verifikasi Log",
+          actionClass: "bg-blue-50 text-blue-800 border-blue-200",
+          ticketId: '1',
+          serviceType: 'MOBILE'
+        }
+      ],
+      quickwins: [
+        {
+          title: "Verifikasi status sinkronisasi Master Spreadsheet",
+          status: "Selesai",
+          statusClass: "bg-emerald-100 text-emerald-800",
+          pic: "Oleh Sistem",
+          done: true
+        }
+      ]
+    };
+
+    const titleEl = document.getElementById('panel-selected-date');
+    const badgeEl = document.getElementById('panel-agenda-badge');
+    if (titleEl) titleEl.textContent = dayDetail.dateStr;
+    if (badgeEl) badgeEl.textContent = (dayDetail.agendas ? dayDetail.agendas.length : 1) + ' Agenda';
+
+    const agendaContainer = document.getElementById('agenda-cards-container');
+    if (agendaContainer) {
+      if (dayDetail.agendas && dayDetail.agendas.length > 0) {
+        agendaContainer.innerHTML = dayDetail.agendas.map(ag => 
+          '<div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex flex-col gap-1.5 hover:border-blue-300 transition-colors">' +
+          '  <div class="flex items-center justify-between">' +
+          '    <span class="text-[11px] font-bold text-slate-500">' + ag.time + '</span>' +
+          '    <span class="px-2 py-0.5 rounded text-[10px] font-bold ' + ag.unitClass + '">' + ag.unit + '</span>' +
+          '  </div>' +
+          '  <h4 class="text-xs font-bold text-slate-900 leading-snug">' + escapeHtml(ag.title) + '</h4>' +
+          '  <div class="flex items-center justify-between pt-1 border-t border-slate-200/60 text-[11px]">' +
+          '    <span class="text-slate-500 flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">person</span><span>' + escapeHtml(ag.host) + '</span></span>' +
+          '    <span class="font-semibold text-blue-600 flex items-center gap-0.5"><span class="material-symbols-outlined text-[13px]">' + (ag.isWarRoom ? 'campaign' : 'video_camera_front') + '</span><span>' + ag.roomText + '</span></span>' +
+          '  </div>' +
+          '</div>'
+        ).join('');
+      } else {
+        agendaContainer.innerHTML = '<p class="text-xs text-slate-400 py-2 text-center">Tidak ada agenda pertemuan pada tanggal ini.</p>';
+      }
+    }
+
+    const issueContainer = document.getElementById('issue-cards-container');
+    if (issueContainer) {
+      if (dayDetail.issues && dayDetail.issues.length > 0) {
+        issueContainer.innerHTML = dayDetail.issues.map(iss => 
+          '<div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex flex-col gap-2 hover:border-slate-300 transition-colors">' +
+          '  <div class="flex items-center justify-between">' +
+          '    <span class="px-2 py-0.5 rounded text-[9px] font-extrabold ' + iss.badgeClass + '">' + iss.badge + '</span>' +
+          '    <div class="flex items-center gap-1.5"><span class="text-[10px] font-semibold text-slate-500">' + iss.unit + '</span><span class="text-[10px] font-mono font-bold text-slate-700">' + iss.ticket + '</span></div>' +
+          '  </div>' +
+          '  <p class="text-xs font-semibold text-slate-800 leading-relaxed">' + escapeHtml(iss.title) + '</p>' +
+          '  <div class="flex items-center justify-between pt-1.5 border-t border-slate-200/60">' +
+          '    <span class="text-[11px] text-slate-500">PIC: ' + escapeHtml(iss.pic) + '</span>' +
+          '    <button class="px-2.5 py-1 rounded text-[10px] font-bold border ' + iss.actionClass + ' hover:opacity-90 transition-opacity" onclick="openDrawer(\'' + (iss.ticketId || 1) + '\', \'' + (iss.serviceType || 'MOBILE') + '\')">' + iss.actionText + '</button>' +
+          '  </div>' +
+          '</div>'
+        ).join('');
+      } else {
+        issueContainer.innerHTML = '<p class="text-xs text-slate-400 py-2 text-center">Tidak ada kendala aktif pada tanggal ini.</p>';
+      }
+    }
+
+    const quickContainer = document.getElementById('quickwins-container');
+    if (quickContainer) {
+      if (dayDetail.quickwins && dayDetail.quickwins.length > 0) {
+        quickContainer.innerHTML = dayDetail.quickwins.map(qw => 
+          '<div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between gap-2">' +
+          '  <div class="flex items-center gap-2 min-w-0"><input type="checkbox" ' + (qw.done ? 'checked' : '') + ' class="rounded border-slate-300 text-blue-600 focus:ring-0"><span class="text-xs text-slate-700 truncate ' + (qw.done ? 'line-through text-slate-400' : '') + '">' + escapeHtml(qw.title) + '</span></div>' +
+          '  <span class="px-2 py-0.5 rounded text-[10px] font-bold shrink-0 ' + qw.statusClass + '">' + qw.status + '</span>' +
+          '</div>'
+        ).join('');
+      } else {
+        quickContainer.innerHTML = '<p class="text-xs text-slate-400 py-2 text-center">Belum ada catatan quick win.</p>';
+      }
+    }
+  }
+
+  function renderTasksTable() {
+    const tbody = document.getElementById('task-table-body');
+    if (!tbody) return;
+
+    const records = state.records || [];
+    let visible = [...records];
+
+    if (state.tasksFilterUnit && state.tasksFilterUnit !== 'all') {
+      visible = visible.filter(r => r.serviceType === state.tasksFilterUnit);
+    }
+    if (state.tasksFilterStatus && state.tasksFilterStatus !== 'all') {
+      visible = visible.filter(r => (r.status || '').toLowerCase().replace(/\s+/g, '') === state.tasksFilterStatus.toLowerCase().replace(/\s+/g, ''));
+    }
+    if (state.tasksFilterPeriod && state.tasksFilterPeriod !== 'all') {
+      visible = visible.filter(r => (r.bulan || '').includes(state.tasksFilterPeriod));
+    }
+    if (state.searchQuery) {
+      const q = state.searchQuery.toLowerCase();
+      visible = visible.filter(r => 
+        (r.totalCaseIsu || '').toLowerCase().includes(q) ||
+        (r.issueDetails || '').toLowerCase().includes(q) ||
+        (r.detail || '').toLowerCase().includes(q) ||
+        (r.requestor || '').toLowerCase().includes(q) ||
+        (r.pic || '').toLowerCase().includes(q)
+      );
+    }
+
+    const badge = document.getElementById('case-counter-badge');
+    if (badge) badge.textContent = visible.length + ' Ditampilkan';
+    const info = document.getElementById('pagination-info');
+    if (info) info.textContent = 'Menampilkan 1 - ' + visible.length + ' dari ' + visible.length + ' Kasus';
+
+    if (visible.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-slate-400">Tidak ada kasus yang sesuai dengan filter.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = visible.map((item, idx) => {
+      const sType = item.serviceType || 'MOBILE';
+      const unitBadge = sType === 'MOBILE' 
+        ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-[#061345]">CHO MOBILE</span>'
+        : '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-teal-100 text-teal-800">CHO FIXED</span>';
+
+      const rawStatus = (item.status || 'Open').toLowerCase().replace(/\s+/g, '');
+      let statusPill = '';
+      if (rawStatus === 'inprogress') {
+        statusPill = '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800 cursor-pointer hover:bg-blue-200" onclick="openInProgressModal(\'' + item.id + '\', true)"><span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>In Progress</span>';
+      } else if (rawStatus === 'closed') {
+        statusPill = '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 cursor-pointer"><span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>Closed</span>';
+      } else {
+        statusPill = '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 cursor-pointer hover:bg-amber-200" onclick="openInProgressModal(\'' + item.id + '\')"><span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>Open</span>';
+      }
+
+      const ppt = getCasePptAttachment(sType, item.id);
+      let pptCell = '';
+      if (ppt && ppt.url) {
+        pptCell = '<div class="flex flex-col gap-1">' +
+          '<a href="' + ppt.url + '" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-2 py-1 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 rounded text-[11px] font-semibold truncate max-w-[130px]" title="' + escapeHtml(ppt.name || 'Lihat PPT') + '">' +
+          '  <span class="material-symbols-outlined text-[14px]">slideshow</span><span class="truncate">' + escapeHtml(ppt.name || 'Lihat PPT') + '</span>' +
+          '</a>' +
+          (state.authUser && state.authUser.role === 'Administrator' ? '<button type="button" class="text-[10px] text-rose-600 hover:underline text-left" onclick="handleDeletePpt(\'' + item.id + '\', \'' + sType + '\')">Hapus PPT</button>' : '') +
+          '</div>';
+      } else {
+        if (state.authUser && (state.authUser.role === 'Administrator' || state.authUser.role === 'Inputer')) {
+          pptCell = '<button type="button" class="px-2 py-1 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded text-slate-700 font-semibold text-[11px] flex items-center gap-1" onclick="openUploadPptModal(\'' + item.id + '\', \'' + sType + '\')"><span class="material-symbols-outlined text-[13px]">upload</span><span>+ Upload PPT</span></button>';
+        } else {
+          pptCell = '<span class="text-slate-400 text-[11px]">Tersedia di Calendar</span>';
+        }
+      }
+
+      const mainIssueText = item.totalCaseIsu || item.caseTitle || '-';
+      const detailText = item.issueDetails || item.detail || '-';
+      const noteText = item.progress || item.keterangan || 'Belum Ada Update';
+
+      return '<tr class="hover:bg-slate-50/80 transition-colors">' +
+        '<td class="py-3 px-4 text-center font-bold text-slate-500">' + (idx + 1) + '</td>' +
+        '<td class="py-3 px-4 font-semibold text-slate-700">' + escapeHtml(item.bulan || 'Oktober 2026') + '</td>' +
+        '<td class="py-3 px-4">' + unitBadge + '</td>' +
+        '<td class="py-3 px-4">' +
+        '  <div class="flex flex-col gap-1">' +
+        '    <a href="#" class="font-bold text-slate-900 hover:text-blue-600 transition-colors leading-snug" onclick="openDrawer(\'' + item.id + '\', \'' + sType + '\'); return false;">' + escapeHtml(mainIssueText) + '</a>' +
+        '    <div class="flex items-center gap-2 mt-0.5">' +
+        '      <button type="button" class="text-[11px] font-semibold text-blue-600 hover:underline flex items-center gap-0.5" onclick="activateView(\'calendar\', \'' + item.id + '\', 24)">' +
+        '        <span>Buka Calendar</span><span class="material-symbols-outlined text-[13px]">arrow_forward</span>' +
+        '      </button>' +
+        '      <span class="text-slate-300">&bull;</span><span class="text-[10px] text-slate-400 font-mono">#CHO-' + item.id + '</span>' +
+        '    </div>' +
+        '  </div>' +
+        '</td>' +
+        '<td class="py-3 px-4"><div class="issue-details-text text-slate-600">' + escapeHtml(detailText) + '</div></td>' +
+        '<td class="py-3 px-4">' + pptCell + '</td>' +
+        '<td class="py-3 px-4">' + statusPill + '</td>' +
+        '<td class="py-3 px-4"><div class="flex items-center justify-between gap-1"><span class="text-slate-500 truncate max-w-[120px]">' + escapeHtml(noteText) + '</span><button type="button" class="w-6 h-6 rounded hover:bg-slate-200 flex items-center justify-center text-slate-500" title="Buka Detail" onclick="openDrawer(\'' + item.id + '\', \'' + sType + '\')"><span class="material-symbols-outlined text-[15px]">open_in_new</span></button></div></td>' +
+        '</tr>';
+    }).join('');
+  }
+
+  function updateTasksKpis() {
+    const records = state.records || [];
+    const total = records.length;
+    let open = 0, openMob = 0, openFix = 0;
+    let inprog = 0, inprogMob = 0, inprogFix = 0;
+    let closed = 0, closedMob = 0, closedFix = 0;
+
+    records.forEach(r => {
+      const st = (r.status || 'Open').toLowerCase().replace(/\s+/g, '');
+      const isMob = r.serviceType === 'MOBILE';
+      if (st === 'inprogress') {
+        inprog++;
+        if (isMob) inprogMob++; else inprogFix++;
+      } else if (st === 'closed') {
+        closed++;
+        if (isMob) closedMob++; else closedFix++;
+      } else {
+        open++;
+        if (isMob) openMob++; else openFix++;
+      }
+    });
+
+    const elTotal = document.getElementById('kpi-total-val');
+    const elOpen = document.getElementById('kpi-open-val');
+    const elInprog = document.getElementById('kpi-inprogress-val');
+    const elClosed = document.getElementById('kpi-closed-val');
+
+    if (elTotal) elTotal.textContent = total;
+    if (elOpen) elOpen.textContent = open;
+    if (elInprog) elInprog.textContent = inprog;
+    if (elClosed) elClosed.textContent = closed;
+
+    const subOpen = document.getElementById('kpi-open-sub');
+    const pctOpen = document.getElementById('kpi-open-pct');
+    if (subOpen) subOpen.textContent = openMob + ' Mobile • ' + openFix + ' Fixed';
+    if (pctOpen && total > 0) pctOpen.textContent = ((open / total) * 100).toFixed(1) + '% Total';
+
+    const subInprog = document.getElementById('kpi-inprogress-sub');
+    const pctInprog = document.getElementById('kpi-inprogress-pct');
+    if (subInprog) subInprog.textContent = inprogMob + ' Mobile • ' + inprogFix + ' Fixed';
+    if (pctInprog && total > 0) pctInprog.textContent = ((inprog / total) * 100).toFixed(1) + '% Total';
+
+    const subClosed = document.getElementById('kpi-closed-sub');
+    const pctClosed = document.getElementById('kpi-closed-pct');
+    if (subClosed) subClosed.textContent = closedMob + ' Mobile • ' + closedFix + ' Fixed';
+    if (pctClosed && total > 0) pctClosed.textContent = ((closed / total) * 100).toFixed(1) + '% Target';
+  }
+
+  function renderActivityFeed() {
+    const container = document.getElementById('activity-timeline-feed');
+    if (!container) return;
+
+    const logs = state.logs || [];
+    if (logs.length === 0) {
+      container.innerHTML = '<p class="text-xs text-slate-400 py-6 text-center">Belum ada riwayat aktivitas yang tercatat di sheet Log_Komunikasi.</p>';
+      return;
+    }
+
+    container.innerHTML = logs.map(l => {
+      const author = l.author || l.pic || 'Pengguna konCHO';
+      const time = l.timestamp || l.tanggal || 'Baru Saja';
+      const action = l.action || 'Catatan Koordinasi';
+      const message = l.message || l.keterangan || l.catatan || '-';
+      const service = l.serviceType || 'CHO Mobile';
+
+      return '<div class="p-3.5 bg-slate-50/70 border border-slate-200/90 rounded-xl flex items-start gap-3 hover:border-slate-300 transition-colors">' +
+        '<div class="w-8 h-8 rounded-full bg-[#061345] text-white flex items-center justify-center font-bold text-xs shrink-0">' + (author[0] ? author[0].toUpperCase() : 'A') + '</div>' +
+        '<div class="flex-1 flex flex-col gap-1 min-w-0">' +
+        '  <div class="flex items-center justify-between flex-wrap gap-1">' +
+        '    <div class="flex items-center gap-2">' +
+        '      <span class="font-bold text-slate-800 text-xs">' + escapeHtml(author) + '</span>' +
+        '      <span class="px-2 py-0.2 rounded text-[10px] font-bold bg-blue-100 text-[#061345]">' + service + '</span>' +
+        '      <span class="px-2 py-0.2 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">' + action + '</span>' +
+        '    </div>' +
+        '    <span class="text-[11px] text-slate-400 font-mono">' + escapeHtml(time) + '</span>' +
+        '  </div>' +
+        '  <p class="text-xs text-slate-700 mt-1 leading-relaxed whitespace-pre-line">' + escapeHtml(message) + '</p>' +
+        '  <div class="flex items-center gap-3 mt-1.5 pt-1.5 border-t border-slate-200/60 text-[11px] text-slate-500">' +
+        '    <span>Follow Up: <strong>' + escapeHtml(l.followUp || '-') + '</strong></span>' +
+        '    <span>&bull;</span>' +
+        '    <button type="button" class="text-blue-600 font-semibold hover:underline" onclick="activateView(\'tasks\')">Lihat di Tasks &rarr;</button>' +
+        '  </div>' +
+        '</div>' +
+        '</div>';
+    }).join('');
+  }
+
+  function openDrawer(ticketId, serviceType) {
+    const drawer = document.getElementById('issue-drawer');
+    if (!drawer) return;
+
+    const records = state.records || [];
+    const ticket = records.find(r => String(r.id) === String(ticketId) && (!serviceType || r.serviceType === serviceType)) || records[0];
+    if (!ticket) return;
+
+    state.activeDrawerTicket = ticket;
+
+    const titleEl = document.getElementById('drawer-issue-title');
+    const unitBadge = document.getElementById('drawer-unit-badge');
+    const periodBadge = document.getElementById('drawer-period-badge');
+    const statusBadge = document.getElementById('drawer-status');
+    const detailEl = document.getElementById('drawer-issue-detail');
+    const picEl = document.getElementById('drawer-pic');
+    const fuEl = document.getElementById('drawer-follow-up');
+    const noteInput = document.getElementById('drawer-note-input');
+    const pptName = document.getElementById('drawer-ppt-name');
+
+    if (titleEl) titleEl.textContent = ticket.totalCaseIsu || ticket.caseTitle || 'Isu CHO';
+    if (unitBadge) unitBadge.textContent = ticket.serviceType === 'MOBILE' ? 'CHO MOBILE' : 'CHO FIXED';
+    if (periodBadge) periodBadge.textContent = ticket.bulan || 'Oktober 2026';
+    if (statusBadge) statusBadge.textContent = ticket.status || 'Open';
+    if (detailEl) detailEl.textContent = ticket.issueDetails || ticket.detail || 'Tidak ada keterangan kendala.';
+    if (picEl) picEl.textContent = ticket.pic || '-';
+    if (fuEl) fuEl.textContent = ticket.followUpTo || '-';
+    if (noteInput) noteInput.value = ticket.progress && ticket.progress !== 'Belum Ada Update' ? ticket.progress : '';
+
+    const ppt = getCasePptAttachment(ticket.serviceType, ticket.id);
+    if (pptName) pptName.textContent = ppt && ppt.name ? ppt.name : 'Belum ada file PPT';
+
+    const timelineEl = document.getElementById('drawer-timeline-container');
+    if (timelineEl) {
+      const ticketLogs = (state.logs || []).filter(l => String(l.ticketId) === String(ticket.id));
+      if (ticketLogs.length > 0) {
+        timelineEl.innerHTML = ticketLogs.map(tl => 
+          '<div class="p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px]">' +
+          '  <div class="flex items-center justify-between text-slate-500 font-semibold mb-0.5"><span>' + escapeHtml(tl.author || 'PIC') + '</span><span>' + escapeHtml(tl.timestamp || '') + '</span></div>' +
+          '  <p class="text-slate-800">' + escapeHtml(tl.message || tl.keterangan || '-') + '</p>' +
+          '</div>'
+        ).join('');
+      } else {
+        timelineEl.innerHTML = '<p class="text-slate-400 py-1 text-center">Belum ada riwayat koordinasi untuk tiket ini.</p>';
+      }
+    }
+
+    drawer.classList.remove('drawer-closed');
+    drawer.classList.add('drawer-open');
+  }
+
+  function closeDrawer() {
+    const drawer = document.getElementById('issue-drawer');
+    if (drawer) {
+      drawer.classList.remove('drawer-open');
+      drawer.classList.add('drawer-closed');
+    }
+  }
+
+  // Hook into processLoadedData to update new Google Stitch views
+  const oldProcessLoadedData = processLoadedData;
+  processLoadedData = function(data) {
+    oldProcessLoadedData(data);
+    renderCalendarGrid();
+    renderCalendarRightPanel(state.selectedDate || 24);
+    renderTasksTable();
+    updateTasksKpis();
+    renderActivityFeed();
+  };
+
+  // Bind Google Stitch UI listeners
+  function bindStitchEvents() {
+    const navAct = document.getElementById('nav-link-activity');
+    const navCal = document.getElementById('nav-link-calendar');
+    const navTsk = document.getElementById('nav-link-tasks');
+
+    if (navAct) navAct.addEventListener('click', (e) => { e.preventDefault(); activateView('activity'); closeMobileSidebar(); });
+    if (navCal) navCal.addEventListener('click', (e) => { e.preventDefault(); activateView('calendar'); closeMobileSidebar(); });
+    if (navTsk) navTsk.addEventListener('click', (e) => { e.preventDefault(); activateView('tasks'); closeMobileSidebar(); });
+
+    const btnSideHelp = document.getElementById('btnSidebarHelp');
+    if (btnSideHelp) btnSideHelp.addEventListener('click', openUserGuideModal);
+
+    const btnSideSettings = document.getElementById('btnSidebarSettings');
+    if (btnSideSettings) btnSideSettings.addEventListener('click', openManageUsersModal);
+
+    const btnSideLogout = document.getElementById('btnSidebarLogout');
+    if (btnSideLogout) btnSideLogout.addEventListener('click', handleLogout);
+
+    const btnCloseDrawer = document.getElementById('btn-close-drawer');
+    const btnCloseDrawerFoot = document.getElementById('btn-drawer-close-foot');
+    const drawerBackdrop = document.getElementById('drawer-backdrop');
+    if (btnCloseDrawer) btnCloseDrawer.addEventListener('click', closeDrawer);
+    if (btnCloseDrawerFoot) btnCloseDrawerFoot.addEventListener('click', closeDrawer);
+    if (drawerBackdrop) drawerBackdrop.addEventListener('click', closeDrawer);
+
+    const monthSelect = document.getElementById('select-month-jump');
+    if (monthSelect) {
+      monthSelect.addEventListener('change', (e) => {
+        state.selectedMonth = e.target.value;
+        renderCalendarGrid();
+        renderCalendarRightPanel(state.selectedDate);
+      });
+    }
+
+    const calUnitFilter = document.getElementById('filter-unit-select');
+    if (calUnitFilter) {
+      calUnitFilter.addEventListener('change', (e) => {
+        state.tasksFilterUnit = e.target.value;
+        renderCalendarGrid();
+      });
+    }
+
+    const taskSearch = document.getElementById('table-search-input');
+    if (taskSearch) {
+      taskSearch.addEventListener('input', (e) => {
+        state.searchQuery = e.target.value;
+        renderTasksTable();
+      });
+    }
+
+    const globalSearch = document.getElementById('global-search-input');
+    if (globalSearch) {
+      globalSearch.addEventListener('input', (e) => {
+        state.searchQuery = e.target.value;
+        if (state.activeView !== 'tasks') {
+          activateView('tasks');
+        }
+        renderTasksTable();
+      });
+    }
+
+    const unitBtns = document.querySelectorAll('.unit-filter-btn');
+    unitBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        unitBtns.forEach(b => {
+          b.classList.remove('bg-white', 'text-[#061345]', 'shadow-xs');
+          b.classList.add('text-slate-600');
+        });
+        btn.classList.add('bg-white', 'text-[#061345]', 'shadow-xs');
+        btn.classList.remove('text-slate-600');
+        state.tasksFilterUnit = btn.getAttribute('data-filter-unit');
+        renderTasksTable();
+      });
+    });
+
+    const statusFilter = document.getElementById('select-status-filter');
+    if (statusFilter) {
+      statusFilter.addEventListener('change', (e) => {
+        state.tasksFilterStatus = e.target.value;
+        renderTasksTable();
+      });
+    }
+
+    const periodFilter = document.getElementById('select-period-filter');
+    if (periodFilter) {
+      periodFilter.addEventListener('change', (e) => {
+        state.tasksFilterPeriod = e.target.value;
+        renderTasksTable();
+      });
+    }
+
+    const btnResetFilters = document.getElementById('btn-reset-filters');
+    if (btnResetFilters) {
+      btnResetFilters.addEventListener('click', () => {
+        state.tasksFilterUnit = 'all';
+        state.tasksFilterStatus = 'all';
+        state.tasksFilterPeriod = 'all';
+        state.searchQuery = '';
+        if (taskSearch) taskSearch.value = '';
+        if (statusFilter) statusFilter.value = 'all';
+        if (periodFilter) periodFilter.value = 'all';
+        unitBtns.forEach((b, i) => {
+          if (i === 0) {
+            b.classList.add('bg-white', 'text-[#061345]', 'shadow-xs');
+            b.classList.remove('text-slate-600');
+          } else {
+            b.classList.remove('bg-white', 'text-[#061345]', 'shadow-xs');
+            b.classList.add('text-slate-600');
+          }
+        });
+        renderTasksTable();
+        showToast('Filter telah direset ke tampilan default.', 'info');
+      });
+    }
+
+    document.querySelectorAll('.js-switch-calendar-btn').forEach(btn => {
+      btn.addEventListener('click', () => activateView('calendar'));
+    });
+
+    document.querySelectorAll('.js-open-agenda-modal').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const m = document.getElementById('modal-tambah-agenda');
+        if (m) m.classList.add('active');
+      });
+    });
+
+    document.querySelectorAll('.js-close-agenda-modal').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const m = document.getElementById('modal-tambah-agenda');
+        if (m) m.classList.remove('active');
+      });
+    });
+
+    const formAgenda = document.getElementById('form-tambah-agenda');
+    if (formAgenda) {
+      formAgenda.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const t = document.getElementById('modal-agenda-title-input').value.trim();
+        const d = document.getElementById('modal-agenda-date-input').value;
+        const w = document.getElementById('modal-agenda-time-input').value.trim();
+        const u = document.getElementById('modal-agenda-unit-input').value;
+        const r = document.getElementById('modal-agenda-room-input').value.trim();
+
+        showToast('Agenda baru berhasil ditambahkan!', 'success');
+        const m = document.getElementById('modal-tambah-agenda');
+        if (m) m.classList.remove('active');
+      });
+    }
+
+    const btnDrawerSave = document.getElementById('btn-drawer-save');
+    if (btnDrawerSave) {
+      btnDrawerSave.addEventListener('click', () => {
+        const note = document.getElementById('drawer-note-input').value.trim();
+        if (state.activeDrawerTicket) {
+          state.activeDrawerTicket.progress = note;
+          showToast('Catatan berhasil diperbarui!', 'success');
+          renderTasksTable();
+        }
+      });
+    }
+
+    const btnDrawerCopy = document.getElementById('btn-drawer-copy-text');
+    if (btnDrawerCopy) {
+      btnDrawerCopy.addEventListener('click', () => {
+        if (!state.activeDrawerTicket) return;
+        const summary = 'Tiket: ' + (state.activeDrawerTicket.totalCaseIsu || '') + '\n' +
+          'Unit: ' + state.activeDrawerTicket.serviceType + '\n' +
+          'Status: ' + state.activeDrawerTicket.status + '\n' +
+          'Detail: ' + (state.activeDrawerTicket.issueDetails || state.activeDrawerTicket.detail || '');
+        navigator.clipboard.writeText(summary).then(() => showToast('Ringkasan berhasil disalin!', 'success'));
+      });
+    }
+  }
+
+  // Call bindStitchEvents on init
+  const oldBindEvents = bindEvents;
+  bindEvents = function() {
+    oldBindEvents();
+    bindStitchEvents();
+  };
+
+  // Expose global helpers
+  window.activateView = activateView;
+  window.openDrawer = openDrawer;
+  window.closeDrawer = closeDrawer;
+  window.handleCalendarDateClick = handleCalendarDateClick;
 
   // Bootstrap saat DOM siap
   document.addEventListener('DOMContentLoaded', init);

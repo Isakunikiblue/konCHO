@@ -4014,6 +4014,808 @@
     };
   }
 
+  
+  /* =========================================================================
+     GOOGLE STITCH TEAMS CALENDAR, TASKS & ACTIVITY CONTROLLERS
+     ========================================================================= */
+
+  // Calendar default dataset
+  const DEFAULT_CALENDAR_DATA = {
+    'oktober-2026': {
+      title: "Oktober 2026",
+      badge: "Cycle CHO • Okt 2026",
+      startDayIndex: 3, // 1 Okt 2026 = Kamis (0: Sen, 1: Sel, 2: Rab, 3: Kam, 4: Jum, 5: Sab, 6: Min)
+      totalDays: 31,
+      prevMonthSpill: [28, 29, 30],
+      nextMonthSpill: [1],
+      summary: { agendas: 18, issues: 4, quickwins: 9 },
+      items: {
+        1: [{ type: 'meeting', unit: 'mobile', text: 'Sync Billing Digipos' }],
+        3: [{ type: 'meeting', unit: 'mobile', text: 'SMOOA Fix Pool IT' }],
+        6: [{ type: 'meeting', unit: 'fixed', text: 'Eskalasi RoaMAX' }],
+        8: [{ type: 'meeting', unit: 'mobile', text: 'Log Selena Akses' }],
+        10: [{ type: 'meeting', unit: 'fixed', text: 'Audit Paket PDD' }],
+        13: [{ type: 'issue', unit: 'fixed', text: 'Status ONT Fixed' }],
+        15: [{ type: 'issue', unit: 'mobile', text: 'Charge MU Bundling' }, { type: 'meeting', unit: 'billing', text: 'Evaluasi Digipos' }],
+        17: [{ type: 'meeting', unit: 'mobile', text: 'Update Spreadsheet' }],
+        20: [{ type: 'issue', unit: 'mobile', text: 'Validasi HVC Digipos' }],
+        22: [{ type: 'meeting', unit: 'fixed', text: 'Eskalasi Kolom J' }],
+        24: [
+          { type: 'issue', unit: 'mobile', text: 'Charge MU Bundling', urgent: true, ticketId: '1' },
+          { type: 'meeting', unit: 'mobile', text: 'Review Isu Kendala Charge MU' },
+          { type: 'meeting', unit: 'fixed', text: 'Investigasi SMOOA & Selena' }
+        ],
+        27: [{ type: 'meeting', unit: 'fixed', text: 'Double RoaMAX Fix' }],
+        29: [{ type: 'issue', unit: 'fixed', text: 'Perhitungan PDD', ticketId: '5' }],
+        31: [{ type: 'quickwin', unit: 'all', text: 'Rekap Bulanan CHO' }]
+      },
+      details: {
+        24: {
+          dateStr: "Kamis, 24 Oktober 2026",
+          agendaCount: 3,
+          agendas: [
+            {
+              time: "09:00 - 10:30 WIB",
+              unit: "CHO Mobile",
+              unitClass: "bg-blue-50 text-blue-700 border-blue-200",
+              title: "Review Isu Kendala Charge MU & Paket Bundling",
+              host: "Tim Billing IT / CHO Mobile",
+              roomText: "Sync Room CHO",
+              isWarRoom: false
+            },
+            {
+              time: "13:30 - 14:30 WIB",
+              unit: "CHO Fixed",
+              unitClass: "bg-teal-50 text-teal-700 border-teal-200",
+              title: "Investigasi SMOOA Kuota & Akses Notifikasi Selena",
+              host: "Administrator Utama",
+              roomText: "War Room Operasional",
+              isWarRoom: true
+            }
+          ],
+          issues: [
+            {
+              badge: "URGENT / BLOCKER",
+              badgeClass: "bg-rose-100 text-rose-700 border-rose-200",
+              unit: "CHO Mobile",
+              ticket: "#CHO-890",
+              title: "Kendala charge MU pada paket bundling: Pelanggan sudah aktivasi bundling namun masih terpotong pulsa/MU dari digipos.",
+              pic: "Billing IT / Rian S.",
+              actionText: "Mitigasi Aktif",
+              actionClass: "bg-rose-50 text-rose-700 border-rose-200",
+              ticketId: '1',
+              serviceType: 'MOBILE'
+            },
+            {
+              badge: "DALAM INVESTIGASI",
+              badgeClass: "bg-amber-100 text-amber-800 border-amber-200",
+              unit: "CHO Mobile",
+              ticket: "#SMO-335",
+              title: "SMOOA – Tidak auto-renew & penambahan nomor member gagal pada klaster regional tertentu.",
+              pic: "Tim SMOOA / Maya D.",
+              actionText: "Verifikasi Log",
+              actionClass: "bg-amber-50 text-amber-800 border-amber-200",
+              ticketId: '2',
+              serviceType: 'MOBILE'
+            },
+            {
+              badge: "OPEN / REVIEW",
+              badgeClass: "bg-blue-100 text-blue-800 border-blue-200",
+              unit: "CHO Fixed",
+              ticket: "#FIX-112",
+              title: "Double Aktivasi Paket RoaMAX & Perhitungan Paket PDD: Sinkronisasi biling ONT Fixed.",
+              pic: "CHO Fixed Lead",
+              actionText: "Eskalasi Kolom J",
+              actionClass: "bg-blue-50 text-blue-800 border-blue-200",
+              ticketId: '4',
+              serviceType: 'MOBILE'
+            }
+          ],
+          quickwins: [
+            {
+              title: "Verifikasi charging bypass via digipos sandbox (CHO Mobile)",
+              status: "Selesai",
+              statusClass: "bg-emerald-100 text-emerald-800",
+              pic: "Oleh Tim Billing",
+              done: true
+            },
+            {
+              title: "Eskalasi tiket SMOOA ke pool IT & update status Kolom J",
+              status: "80%",
+              statusClass: "bg-blue-100 text-blue-800",
+              pic: "Estimasi 15 mnt",
+              done: false
+            },
+            {
+              title: "Sinkronisasi Master Spreadsheet Google Sheet (ID: 1bqisqkt4qfY...)",
+              status: "Antrean",
+              statusClass: "bg-slate-100 text-slate-700",
+              pic: "Auto-Sync 1 Jam",
+              done: false
+            }
+          ]
+        }
+      }
+    }
+  };
+
+  state.activeView = 'calendar';
+  state.selectedDate = 24;
+  state.selectedMonth = 'oktober-2026';
+  state.tasksFilterUnit = 'all';
+  state.tasksFilterStatus = 'all';
+  state.tasksFilterPeriod = 'all';
+
+  function activateView(viewName, targetTicketId, targetDate) {
+    const vActivity = document.getElementById('view-activity');
+    const vCalendar = document.getElementById('view-calendar');
+    const vTasks = document.getElementById('view-tasks');
+
+    const navActivity = document.getElementById('nav-link-activity');
+    const navCalendar = document.getElementById('nav-link-calendar');
+    const navTasks = document.getElementById('nav-link-tasks');
+
+    const activeClass = 'flex flex-col items-center justify-center w-full py-2 rounded-xl bg-white/20 text-white font-bold shadow-sm border border-white/10 transition-all group cursor-pointer';
+    const inactiveClass = 'flex flex-col items-center justify-center w-full py-2 rounded-xl text-slate-300 hover:bg-white/10 hover:text-white transition-all group cursor-pointer';
+
+    if (vActivity) vActivity.classList.add('hidden');
+    if (vCalendar) vCalendar.classList.add('hidden');
+    if (vTasks) vTasks.classList.add('hidden');
+
+    if (navActivity) navActivity.className = inactiveClass;
+    if (navCalendar) navCalendar.className = inactiveClass;
+    if (navTasks) navTasks.className = inactiveClass;
+
+    state.activeView = viewName;
+
+    if (viewName === 'calendar') {
+      if (vCalendar) vCalendar.classList.remove('hidden');
+      if (navCalendar) navCalendar.className = activeClass;
+      if (targetDate) {
+        state.selectedDate = parseInt(targetDate, 10);
+      }
+      renderCalendarGrid();
+      renderCalendarRightPanel(state.selectedDate);
+
+      if (targetTicketId) {
+        showToast('Membuka Detail Isu ' + targetTicketId + ' pada Calendar', 'info');
+        setTimeout(() => {
+          const panel = document.getElementById('issue-cards-container');
+          if (panel) {
+            panel.classList.add('ring-2', 'ring-blue-500', 'p-1', 'rounded-xl');
+            setTimeout(() => panel.classList.remove('ring-2', 'ring-blue-500', 'p-1'), 2000);
+          }
+        }, 300);
+      }
+    } else if (viewName === 'tasks') {
+      if (vTasks) vTasks.classList.remove('hidden');
+      if (navTasks) navTasks.className = activeClass;
+      renderTasksTable();
+      updateTasksKpis();
+    } else if (viewName === 'activity') {
+      if (vActivity) vActivity.classList.remove('hidden');
+      if (navActivity) navActivity.className = activeClass;
+      renderActivityFeed();
+    }
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+
+  function renderCalendarGrid() {
+    const container = document.getElementById('calendar-grid-cells');
+    if (!container) return;
+
+    const calData = DEFAULT_CALENDAR_DATA[state.selectedMonth] || DEFAULT_CALENDAR_DATA['oktober-2026'];
+    const startDay = calData.startDayIndex;
+    const totalDays = calData.totalDays;
+    const prevSpill = calData.prevMonthSpill || [];
+    const nextSpill = calData.nextMonthSpill || [];
+
+    let html = '';
+
+    prevSpill.forEach(d => {
+      html += '<div class="calendar-day-cell min-h-[96px] sm:min-h-[110px] p-2 bg-slate-50/60 opacity-40 flex flex-col justify-between"><span class="text-xs font-semibold text-slate-400">' + d + '</span><span class="text-[10px] text-slate-300">Bulan lalu</span></div>';
+    });
+
+    for (let day = 1; day <= totalDays; day++) {
+      const isSelected = day === state.selectedDate;
+      const isWeekend = ((startDay + day - 1) % 7 === 5) || ((startDay + day - 1) % 7 === 6);
+
+      let dayItems = (calData.items && calData.items[day]) ? [...calData.items[day]] : [];
+      if (state.tasksFilterUnit && state.tasksFilterUnit !== 'all') {
+        dayItems = dayItems.filter(it => it.unit === 'all' || it.unit === state.tasksFilterUnit);
+      }
+      const itemCount = dayItems.length;
+
+      html += '<div class="calendar-day-cell min-h-[96px] sm:min-h-[110px] p-2 sm:p-2.5 flex flex-col justify-between cursor-pointer border-t border-slate-100 ' + (isSelected ? 'is-selected' : isWeekend ? 'bg-slate-50/40' : 'bg-white') + '" onclick="handleCalendarDateClick(' + day + ')">';
+      html += '  <div class="flex items-center justify-between">';
+      html += '    <span class="text-xs font-extrabold ' + (isSelected ? 'text-blue-700 font-headline' : 'text-slate-800') + '">' + day + '</span>';
+      if (isSelected) {
+        html += '    <span class="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-blue-600 text-white">Dipilih</span>';
+      } else if (itemCount > 0) {
+        html += '    <span class="px-1.5 py-0.2 rounded-md text-[9px] font-bold bg-slate-100 text-slate-600">' + itemCount + ' item</span>';
+      }
+      html += '  </div>';
+
+      html += '  <div class="flex flex-col gap-1 mt-1 overflow-hidden">';
+      dayItems.slice(0, 2).forEach(item => {
+        if (item.urgent) {
+          html += '<span class="truncate px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200/80">&bull; ' + escapeHtml(item.text) + '</span>';
+        } else if (item.type === 'meeting') {
+          html += '<span class="truncate px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-700 border border-blue-200/70">&bull; ' + escapeHtml(item.text) + '</span>';
+        } else if (item.type === 'quickwin') {
+          html += '<span class="truncate px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">&bull; ' + escapeHtml(item.text) + '</span>';
+        } else {
+          html += '<span class="truncate px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-700 border border-slate-200">&bull; ' + escapeHtml(item.text) + '</span>';
+        }
+      });
+      if (itemCount > 2) {
+        html += '<span class="text-[9px] text-slate-400 font-semibold pl-1">+' + (itemCount - 2) + ' lainnya</span>';
+      }
+      html += '  </div>';
+
+      html += '  <div class="text-[9px] text-slate-300 self-end">' + (isWeekend ? 'Akhir pekan' : '') + '</div>';
+      html += '</div>';
+    }
+
+    nextSpill.forEach(d => {
+      html += '<div class="calendar-day-cell min-h-[96px] sm:min-h-[110px] p-2 bg-slate-50/60 opacity-40 flex flex-col justify-between"><span class="text-xs font-semibold text-slate-400">' + d + '</span><span class="text-[10px] text-slate-300">Bulan depan</span></div>';
+    });
+
+    container.innerHTML = html;
+  }
+
+  function handleCalendarDateClick(day) {
+    state.selectedDate = day;
+    renderCalendarGrid();
+    renderCalendarRightPanel(day);
+  }
+
+  function renderCalendarRightPanel(day) {
+    const calData = DEFAULT_CALENDAR_DATA[state.selectedMonth] || DEFAULT_CALENDAR_DATA['oktober-2026'];
+    const dayDetail = (calData.details && calData.details[day]) ? calData.details[day] : {
+      dateStr: "Tanggal " + day + " " + (calData.title || "Oktober 2026"),
+      agendaCount: 1,
+      agendas: [
+        {
+          time: "10:00 - 11:30 WIB",
+          unit: "CHO Mobile",
+          unitClass: "bg-blue-50 text-blue-700 border-blue-200",
+          title: "Sesi Koordinasi & Review Isu Harian CHO",
+          host: "PIC CHO / Administrator",
+          roomText: "Sync Room CHO",
+          isWarRoom: false
+        }
+      ],
+      issues: [
+        {
+          badge: "OPEN / REVIEW",
+          badgeClass: "bg-blue-100 text-blue-800 border-blue-200",
+          unit: "CHO Mobile",
+          ticket: "#CHO-" + day,
+          title: "Pemantauan berkala tiket kendala operasional CHO.",
+          pic: "Tim CHO Mobile",
+          actionText: "Verifikasi Log",
+          actionClass: "bg-blue-50 text-blue-800 border-blue-200",
+          ticketId: '1',
+          serviceType: 'MOBILE'
+        }
+      ],
+      quickwins: [
+        {
+          title: "Verifikasi status sinkronisasi Master Spreadsheet",
+          status: "Selesai",
+          statusClass: "bg-emerald-100 text-emerald-800",
+          pic: "Oleh Sistem",
+          done: true
+        }
+      ]
+    };
+
+    const titleEl = document.getElementById('panel-selected-date');
+    const badgeEl = document.getElementById('panel-agenda-badge');
+    if (titleEl) titleEl.textContent = dayDetail.dateStr;
+    if (badgeEl) badgeEl.textContent = (dayDetail.agendas ? dayDetail.agendas.length : 1) + ' Agenda';
+
+    const agendaContainer = document.getElementById('agenda-cards-container');
+    if (agendaContainer) {
+      if (dayDetail.agendas && dayDetail.agendas.length > 0) {
+        agendaContainer.innerHTML = dayDetail.agendas.map(ag => 
+          '<div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex flex-col gap-1.5 hover:border-blue-300 transition-colors">' +
+          '  <div class="flex items-center justify-between">' +
+          '    <span class="text-[11px] font-bold text-slate-500">' + ag.time + '</span>' +
+          '    <span class="px-2 py-0.5 rounded text-[10px] font-bold ' + ag.unitClass + '">' + ag.unit + '</span>' +
+          '  </div>' +
+          '  <h4 class="text-xs font-bold text-slate-900 leading-snug">' + escapeHtml(ag.title) + '</h4>' +
+          '  <div class="flex items-center justify-between pt-1 border-t border-slate-200/60 text-[11px]">' +
+          '    <span class="text-slate-500 flex items-center gap-1"><span class="material-symbols-outlined text-[14px]">person</span><span>' + escapeHtml(ag.host) + '</span></span>' +
+          '    <span class="font-semibold text-blue-600 flex items-center gap-0.5"><span class="material-symbols-outlined text-[13px]">' + (ag.isWarRoom ? 'campaign' : 'video_camera_front') + '</span><span>' + ag.roomText + '</span></span>' +
+          '  </div>' +
+          '</div>'
+        ).join('');
+      } else {
+        agendaContainer.innerHTML = '<p class="text-xs text-slate-400 py-2 text-center">Tidak ada agenda pertemuan pada tanggal ini.</p>';
+      }
+    }
+
+    const issueContainer = document.getElementById('issue-cards-container');
+    if (issueContainer) {
+      if (dayDetail.issues && dayDetail.issues.length > 0) {
+        issueContainer.innerHTML = dayDetail.issues.map(iss => 
+          '<div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex flex-col gap-2 hover:border-slate-300 transition-colors">' +
+          '  <div class="flex items-center justify-between">' +
+          '    <span class="px-2 py-0.5 rounded text-[9px] font-extrabold ' + iss.badgeClass + '">' + iss.badge + '</span>' +
+          '    <div class="flex items-center gap-1.5"><span class="text-[10px] font-semibold text-slate-500">' + iss.unit + '</span><span class="text-[10px] font-mono font-bold text-slate-700">' + iss.ticket + '</span></div>' +
+          '  </div>' +
+          '  <p class="text-xs font-semibold text-slate-800 leading-relaxed">' + escapeHtml(iss.title) + '</p>' +
+          '  <div class="flex items-center justify-between pt-1.5 border-t border-slate-200/60">' +
+          '    <span class="text-[11px] text-slate-500">PIC: ' + escapeHtml(iss.pic) + '</span>' +
+          '    <button class="px-2.5 py-1 rounded text-[10px] font-bold border ' + iss.actionClass + ' hover:opacity-90 transition-opacity" onclick="openDrawer(\'' + (iss.ticketId || 1) + '\', \'' + (iss.serviceType || 'MOBILE') + '\')">' + iss.actionText + '</button>' +
+          '  </div>' +
+          '</div>'
+        ).join('');
+      } else {
+        issueContainer.innerHTML = '<p class="text-xs text-slate-400 py-2 text-center">Tidak ada kendala aktif pada tanggal ini.</p>';
+      }
+    }
+
+    const quickContainer = document.getElementById('quickwins-container');
+    if (quickContainer) {
+      if (dayDetail.quickwins && dayDetail.quickwins.length > 0) {
+        quickContainer.innerHTML = dayDetail.quickwins.map(qw => 
+          '<div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between gap-2">' +
+          '  <div class="flex items-center gap-2 min-w-0"><input type="checkbox" ' + (qw.done ? 'checked' : '') + ' class="rounded border-slate-300 text-blue-600 focus:ring-0"><span class="text-xs text-slate-700 truncate ' + (qw.done ? 'line-through text-slate-400' : '') + '">' + escapeHtml(qw.title) + '</span></div>' +
+          '  <span class="px-2 py-0.5 rounded text-[10px] font-bold shrink-0 ' + qw.statusClass + '">' + qw.status + '</span>' +
+          '</div>'
+        ).join('');
+      } else {
+        quickContainer.innerHTML = '<p class="text-xs text-slate-400 py-2 text-center">Belum ada catatan quick win.</p>';
+      }
+    }
+  }
+
+  function renderTasksTable() {
+    const tbody = document.getElementById('task-table-body');
+    if (!tbody) return;
+
+    const records = state.records || [];
+    let visible = [...records];
+
+    if (state.tasksFilterUnit && state.tasksFilterUnit !== 'all') {
+      visible = visible.filter(r => r.serviceType === state.tasksFilterUnit);
+    }
+    if (state.tasksFilterStatus && state.tasksFilterStatus !== 'all') {
+      visible = visible.filter(r => (r.status || '').toLowerCase().replace(/\s+/g, '') === state.tasksFilterStatus.toLowerCase().replace(/\s+/g, ''));
+    }
+    if (state.tasksFilterPeriod && state.tasksFilterPeriod !== 'all') {
+      visible = visible.filter(r => (r.bulan || '').includes(state.tasksFilterPeriod));
+    }
+    if (state.searchQuery) {
+      const q = state.searchQuery.toLowerCase();
+      visible = visible.filter(r => 
+        (r.totalCaseIsu || '').toLowerCase().includes(q) ||
+        (r.issueDetails || '').toLowerCase().includes(q) ||
+        (r.detail || '').toLowerCase().includes(q) ||
+        (r.requestor || '').toLowerCase().includes(q) ||
+        (r.pic || '').toLowerCase().includes(q)
+      );
+    }
+
+    const badge = document.getElementById('case-counter-badge');
+    if (badge) badge.textContent = visible.length + ' Ditampilkan';
+    const info = document.getElementById('pagination-info');
+    if (info) info.textContent = 'Menampilkan 1 - ' + visible.length + ' dari ' + visible.length + ' Kasus';
+
+    if (visible.length === 0) {
+      tbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-slate-400">Tidak ada kasus yang sesuai dengan filter.</td></tr>';
+      return;
+    }
+
+    tbody.innerHTML = visible.map((item, idx) => {
+      const sType = item.serviceType || 'MOBILE';
+      const unitBadge = sType === 'MOBILE' 
+        ? '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-[#061345]">CHO MOBILE</span>'
+        : '<span class="px-2 py-0.5 rounded text-[10px] font-bold bg-teal-100 text-teal-800">CHO FIXED</span>';
+
+      const rawStatus = (item.status || 'Open').toLowerCase().replace(/\s+/g, '');
+      let statusPill = '';
+      if (rawStatus === 'inprogress') {
+        statusPill = '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800 cursor-pointer hover:bg-blue-200" onclick="openInProgressModal(\'' + item.id + '\', true)"><span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>In Progress</span>';
+      } else if (rawStatus === 'closed') {
+        statusPill = '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 cursor-pointer"><span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>Closed</span>';
+      } else {
+        statusPill = '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 cursor-pointer hover:bg-amber-200" onclick="openInProgressModal(\'' + item.id + '\')"><span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>Open</span>';
+      }
+
+      const ppt = getCasePptAttachment(sType, item.id);
+      let pptCell = '';
+      if (ppt && ppt.url) {
+        pptCell = '<div class="flex flex-col gap-1">' +
+          '<a href="' + ppt.url + '" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-2 py-1 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 rounded text-[11px] font-semibold truncate max-w-[130px]" title="' + escapeHtml(ppt.name || 'Lihat PPT') + '">' +
+          '  <span class="material-symbols-outlined text-[14px]">slideshow</span><span class="truncate">' + escapeHtml(ppt.name || 'Lihat PPT') + '</span>' +
+          '</a>' +
+          (state.authUser && state.authUser.role === 'Administrator' ? '<button type="button" class="text-[10px] text-rose-600 hover:underline text-left" onclick="handleDeletePpt(\'' + item.id + '\', \'' + sType + '\')">Hapus PPT</button>' : '') +
+          '</div>';
+      } else {
+        if (state.authUser && (state.authUser.role === 'Administrator' || state.authUser.role === 'Inputer')) {
+          pptCell = '<button type="button" class="px-2 py-1 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded text-slate-700 font-semibold text-[11px] flex items-center gap-1" onclick="openUploadPptModal(\'' + item.id + '\', \'' + sType + '\')"><span class="material-symbols-outlined text-[13px]">upload</span><span>+ Upload PPT</span></button>';
+        } else {
+          pptCell = '<span class="text-slate-400 text-[11px]">Tersedia di Calendar</span>';
+        }
+      }
+
+      const mainIssueText = item.totalCaseIsu || item.caseTitle || '-';
+      const detailText = item.issueDetails || item.detail || '-';
+      const noteText = item.progress || item.keterangan || 'Belum Ada Update';
+
+      return '<tr class="hover:bg-slate-50/80 transition-colors">' +
+        '<td class="py-3 px-4 text-center font-bold text-slate-500">' + (idx + 1) + '</td>' +
+        '<td class="py-3 px-4 font-semibold text-slate-700">' + escapeHtml(item.bulan || 'Oktober 2026') + '</td>' +
+        '<td class="py-3 px-4">' + unitBadge + '</td>' +
+        '<td class="py-3 px-4">' +
+        '  <div class="flex flex-col gap-1">' +
+        '    <a href="#" class="font-bold text-slate-900 hover:text-blue-600 transition-colors leading-snug" onclick="openDrawer(\'' + item.id + '\', \'' + sType + '\'); return false;">' + escapeHtml(mainIssueText) + '</a>' +
+        '    <div class="flex items-center gap-2 mt-0.5">' +
+        '      <button type="button" class="text-[11px] font-semibold text-blue-600 hover:underline flex items-center gap-0.5" onclick="activateView(\'calendar\', \'' + item.id + '\', 24)">' +
+        '        <span>Buka Calendar</span><span class="material-symbols-outlined text-[13px]">arrow_forward</span>' +
+        '      </button>' +
+        '      <span class="text-slate-300">&bull;</span><span class="text-[10px] text-slate-400 font-mono">#CHO-' + item.id + '</span>' +
+        '    </div>' +
+        '  </div>' +
+        '</td>' +
+        '<td class="py-3 px-4"><div class="issue-details-text text-slate-600">' + escapeHtml(detailText) + '</div></td>' +
+        '<td class="py-3 px-4">' + pptCell + '</td>' +
+        '<td class="py-3 px-4">' + statusPill + '</td>' +
+        '<td class="py-3 px-4"><div class="flex items-center justify-between gap-1"><span class="text-slate-500 truncate max-w-[120px]">' + escapeHtml(noteText) + '</span><button type="button" class="w-6 h-6 rounded hover:bg-slate-200 flex items-center justify-center text-slate-500" title="Buka Detail" onclick="openDrawer(\'' + item.id + '\', \'' + sType + '\')"><span class="material-symbols-outlined text-[15px]">open_in_new</span></button></div></td>' +
+        '</tr>';
+    }).join('');
+  }
+
+  function updateTasksKpis() {
+    const records = state.records || [];
+    const total = records.length;
+    let open = 0, openMob = 0, openFix = 0;
+    let inprog = 0, inprogMob = 0, inprogFix = 0;
+    let closed = 0, closedMob = 0, closedFix = 0;
+
+    records.forEach(r => {
+      const st = (r.status || 'Open').toLowerCase().replace(/\s+/g, '');
+      const isMob = r.serviceType === 'MOBILE';
+      if (st === 'inprogress') {
+        inprog++;
+        if (isMob) inprogMob++; else inprogFix++;
+      } else if (st === 'closed') {
+        closed++;
+        if (isMob) closedMob++; else closedFix++;
+      } else {
+        open++;
+        if (isMob) openMob++; else openFix++;
+      }
+    });
+
+    const elTotal = document.getElementById('kpi-total-val');
+    const elOpen = document.getElementById('kpi-open-val');
+    const elInprog = document.getElementById('kpi-inprogress-val');
+    const elClosed = document.getElementById('kpi-closed-val');
+
+    if (elTotal) elTotal.textContent = total;
+    if (elOpen) elOpen.textContent = open;
+    if (elInprog) elInprog.textContent = inprog;
+    if (elClosed) elClosed.textContent = closed;
+
+    const subOpen = document.getElementById('kpi-open-sub');
+    const pctOpen = document.getElementById('kpi-open-pct');
+    if (subOpen) subOpen.textContent = openMob + ' Mobile • ' + openFix + ' Fixed';
+    if (pctOpen && total > 0) pctOpen.textContent = ((open / total) * 100).toFixed(1) + '% Total';
+
+    const subInprog = document.getElementById('kpi-inprogress-sub');
+    const pctInprog = document.getElementById('kpi-inprogress-pct');
+    if (subInprog) subInprog.textContent = inprogMob + ' Mobile • ' + inprogFix + ' Fixed';
+    if (pctInprog && total > 0) pctInprog.textContent = ((inprog / total) * 100).toFixed(1) + '% Total';
+
+    const subClosed = document.getElementById('kpi-closed-sub');
+    const pctClosed = document.getElementById('kpi-closed-pct');
+    if (subClosed) subClosed.textContent = closedMob + ' Mobile • ' + closedFix + ' Fixed';
+    if (pctClosed && total > 0) pctClosed.textContent = ((closed / total) * 100).toFixed(1) + '% Target';
+  }
+
+  function renderActivityFeed() {
+    const container = document.getElementById('activity-timeline-feed');
+    if (!container) return;
+
+    const logs = state.logs || [];
+    if (logs.length === 0) {
+      container.innerHTML = '<p class="text-xs text-slate-400 py-6 text-center">Belum ada riwayat aktivitas yang tercatat di sheet Log_Komunikasi.</p>';
+      return;
+    }
+
+    container.innerHTML = logs.map(l => {
+      const author = l.author || l.pic || 'Pengguna konCHO';
+      const time = l.timestamp || l.tanggal || 'Baru Saja';
+      const action = l.action || 'Catatan Koordinasi';
+      const message = l.message || l.keterangan || l.catatan || '-';
+      const service = l.serviceType || 'CHO Mobile';
+
+      return '<div class="p-3.5 bg-slate-50/70 border border-slate-200/90 rounded-xl flex items-start gap-3 hover:border-slate-300 transition-colors">' +
+        '<div class="w-8 h-8 rounded-full bg-[#061345] text-white flex items-center justify-center font-bold text-xs shrink-0">' + (author[0] ? author[0].toUpperCase() : 'A') + '</div>' +
+        '<div class="flex-1 flex flex-col gap-1 min-w-0">' +
+        '  <div class="flex items-center justify-between flex-wrap gap-1">' +
+        '    <div class="flex items-center gap-2">' +
+        '      <span class="font-bold text-slate-800 text-xs">' + escapeHtml(author) + '</span>' +
+        '      <span class="px-2 py-0.2 rounded text-[10px] font-bold bg-blue-100 text-[#061345]">' + service + '</span>' +
+        '      <span class="px-2 py-0.2 rounded text-[10px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">' + action + '</span>' +
+        '    </div>' +
+        '    <span class="text-[11px] text-slate-400 font-mono">' + escapeHtml(time) + '</span>' +
+        '  </div>' +
+        '  <p class="text-xs text-slate-700 mt-1 leading-relaxed whitespace-pre-line">' + escapeHtml(message) + '</p>' +
+        '  <div class="flex items-center gap-3 mt-1.5 pt-1.5 border-t border-slate-200/60 text-[11px] text-slate-500">' +
+        '    <span>Follow Up: <strong>' + escapeHtml(l.followUp || '-') + '</strong></span>' +
+        '    <span>&bull;</span>' +
+        '    <button type="button" class="text-blue-600 font-semibold hover:underline" onclick="activateView(\'tasks\')">Lihat di Tasks &rarr;</button>' +
+        '  </div>' +
+        '</div>' +
+        '</div>';
+    }).join('');
+  }
+
+  function openDrawer(ticketId, serviceType) {
+    const drawer = document.getElementById('issue-drawer');
+    if (!drawer) return;
+
+    const records = state.records || [];
+    const ticket = records.find(r => String(r.id) === String(ticketId) && (!serviceType || r.serviceType === serviceType)) || records[0];
+    if (!ticket) return;
+
+    state.activeDrawerTicket = ticket;
+
+    const titleEl = document.getElementById('drawer-issue-title');
+    const unitBadge = document.getElementById('drawer-unit-badge');
+    const periodBadge = document.getElementById('drawer-period-badge');
+    const statusBadge = document.getElementById('drawer-status');
+    const detailEl = document.getElementById('drawer-issue-detail');
+    const picEl = document.getElementById('drawer-pic');
+    const fuEl = document.getElementById('drawer-follow-up');
+    const noteInput = document.getElementById('drawer-note-input');
+    const pptName = document.getElementById('drawer-ppt-name');
+
+    if (titleEl) titleEl.textContent = ticket.totalCaseIsu || ticket.caseTitle || 'Isu CHO';
+    if (unitBadge) unitBadge.textContent = ticket.serviceType === 'MOBILE' ? 'CHO MOBILE' : 'CHO FIXED';
+    if (periodBadge) periodBadge.textContent = ticket.bulan || 'Oktober 2026';
+    if (statusBadge) statusBadge.textContent = ticket.status || 'Open';
+    if (detailEl) detailEl.textContent = ticket.issueDetails || ticket.detail || 'Tidak ada keterangan kendala.';
+    if (picEl) picEl.textContent = ticket.pic || '-';
+    if (fuEl) fuEl.textContent = ticket.followUpTo || '-';
+    if (noteInput) noteInput.value = ticket.progress && ticket.progress !== 'Belum Ada Update' ? ticket.progress : '';
+
+    const ppt = getCasePptAttachment(ticket.serviceType, ticket.id);
+    if (pptName) pptName.textContent = ppt && ppt.name ? ppt.name : 'Belum ada file PPT';
+
+    const timelineEl = document.getElementById('drawer-timeline-container');
+    if (timelineEl) {
+      const ticketLogs = (state.logs || []).filter(l => String(l.ticketId) === String(ticket.id));
+      if (ticketLogs.length > 0) {
+        timelineEl.innerHTML = ticketLogs.map(tl => 
+          '<div class="p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px]">' +
+          '  <div class="flex items-center justify-between text-slate-500 font-semibold mb-0.5"><span>' + escapeHtml(tl.author || 'PIC') + '</span><span>' + escapeHtml(tl.timestamp || '') + '</span></div>' +
+          '  <p class="text-slate-800">' + escapeHtml(tl.message || tl.keterangan || '-') + '</p>' +
+          '</div>'
+        ).join('');
+      } else {
+        timelineEl.innerHTML = '<p class="text-slate-400 py-1 text-center">Belum ada riwayat koordinasi untuk tiket ini.</p>';
+      }
+    }
+
+    drawer.classList.remove('drawer-closed');
+    drawer.classList.add('drawer-open');
+  }
+
+  function closeDrawer() {
+    const drawer = document.getElementById('issue-drawer');
+    if (drawer) {
+      drawer.classList.remove('drawer-open');
+      drawer.classList.add('drawer-closed');
+    }
+  }
+
+  // Hook into processLoadedData to update new Google Stitch views
+  const oldProcessLoadedData = processLoadedData;
+  processLoadedData = function(data) {
+    oldProcessLoadedData(data);
+    renderCalendarGrid();
+    renderCalendarRightPanel(state.selectedDate || 24);
+    renderTasksTable();
+    updateTasksKpis();
+    renderActivityFeed();
+  };
+
+  // Bind Google Stitch UI listeners
+  function bindStitchEvents() {
+    const navAct = document.getElementById('nav-link-activity');
+    const navCal = document.getElementById('nav-link-calendar');
+    const navTsk = document.getElementById('nav-link-tasks');
+
+    if (navAct) navAct.addEventListener('click', (e) => { e.preventDefault(); activateView('activity'); closeMobileSidebar(); });
+    if (navCal) navCal.addEventListener('click', (e) => { e.preventDefault(); activateView('calendar'); closeMobileSidebar(); });
+    if (navTsk) navTsk.addEventListener('click', (e) => { e.preventDefault(); activateView('tasks'); closeMobileSidebar(); });
+
+    const btnSideHelp = document.getElementById('btnSidebarHelp');
+    if (btnSideHelp) btnSideHelp.addEventListener('click', openUserGuideModal);
+
+    const btnSideSettings = document.getElementById('btnSidebarSettings');
+    if (btnSideSettings) btnSideSettings.addEventListener('click', openManageUsersModal);
+
+    const btnSideLogout = document.getElementById('btnSidebarLogout');
+    if (btnSideLogout) btnSideLogout.addEventListener('click', handleLogout);
+
+    const btnCloseDrawer = document.getElementById('btn-close-drawer');
+    const btnCloseDrawerFoot = document.getElementById('btn-drawer-close-foot');
+    const drawerBackdrop = document.getElementById('drawer-backdrop');
+    if (btnCloseDrawer) btnCloseDrawer.addEventListener('click', closeDrawer);
+    if (btnCloseDrawerFoot) btnCloseDrawerFoot.addEventListener('click', closeDrawer);
+    if (drawerBackdrop) drawerBackdrop.addEventListener('click', closeDrawer);
+
+    const monthSelect = document.getElementById('select-month-jump');
+    if (monthSelect) {
+      monthSelect.addEventListener('change', (e) => {
+        state.selectedMonth = e.target.value;
+        renderCalendarGrid();
+        renderCalendarRightPanel(state.selectedDate);
+      });
+    }
+
+    const calUnitFilter = document.getElementById('filter-unit-select');
+    if (calUnitFilter) {
+      calUnitFilter.addEventListener('change', (e) => {
+        state.tasksFilterUnit = e.target.value;
+        renderCalendarGrid();
+      });
+    }
+
+    const taskSearch = document.getElementById('table-search-input');
+    if (taskSearch) {
+      taskSearch.addEventListener('input', (e) => {
+        state.searchQuery = e.target.value;
+        renderTasksTable();
+      });
+    }
+
+    const globalSearch = document.getElementById('global-search-input');
+    if (globalSearch) {
+      globalSearch.addEventListener('input', (e) => {
+        state.searchQuery = e.target.value;
+        if (state.activeView !== 'tasks') {
+          activateView('tasks');
+        }
+        renderTasksTable();
+      });
+    }
+
+    const unitBtns = document.querySelectorAll('.unit-filter-btn');
+    unitBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        unitBtns.forEach(b => {
+          b.classList.remove('bg-white', 'text-[#061345]', 'shadow-xs');
+          b.classList.add('text-slate-600');
+        });
+        btn.classList.add('bg-white', 'text-[#061345]', 'shadow-xs');
+        btn.classList.remove('text-slate-600');
+        state.tasksFilterUnit = btn.getAttribute('data-filter-unit');
+        renderTasksTable();
+      });
+    });
+
+    const statusFilter = document.getElementById('select-status-filter');
+    if (statusFilter) {
+      statusFilter.addEventListener('change', (e) => {
+        state.tasksFilterStatus = e.target.value;
+        renderTasksTable();
+      });
+    }
+
+    const periodFilter = document.getElementById('select-period-filter');
+    if (periodFilter) {
+      periodFilter.addEventListener('change', (e) => {
+        state.tasksFilterPeriod = e.target.value;
+        renderTasksTable();
+      });
+    }
+
+    const btnResetFilters = document.getElementById('btn-reset-filters');
+    if (btnResetFilters) {
+      btnResetFilters.addEventListener('click', () => {
+        state.tasksFilterUnit = 'all';
+        state.tasksFilterStatus = 'all';
+        state.tasksFilterPeriod = 'all';
+        state.searchQuery = '';
+        if (taskSearch) taskSearch.value = '';
+        if (statusFilter) statusFilter.value = 'all';
+        if (periodFilter) periodFilter.value = 'all';
+        unitBtns.forEach((b, i) => {
+          if (i === 0) {
+            b.classList.add('bg-white', 'text-[#061345]', 'shadow-xs');
+            b.classList.remove('text-slate-600');
+          } else {
+            b.classList.remove('bg-white', 'text-[#061345]', 'shadow-xs');
+            b.classList.add('text-slate-600');
+          }
+        });
+        renderTasksTable();
+        showToast('Filter telah direset ke tampilan default.', 'info');
+      });
+    }
+
+    document.querySelectorAll('.js-switch-calendar-btn').forEach(btn => {
+      btn.addEventListener('click', () => activateView('calendar'));
+    });
+
+    document.querySelectorAll('.js-open-agenda-modal').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const m = document.getElementById('modal-tambah-agenda');
+        if (m) m.classList.add('active');
+      });
+    });
+
+    document.querySelectorAll('.js-close-agenda-modal').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const m = document.getElementById('modal-tambah-agenda');
+        if (m) m.classList.remove('active');
+      });
+    });
+
+    const formAgenda = document.getElementById('form-tambah-agenda');
+    if (formAgenda) {
+      formAgenda.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const t = document.getElementById('modal-agenda-title-input').value.trim();
+        const d = document.getElementById('modal-agenda-date-input').value;
+        const w = document.getElementById('modal-agenda-time-input').value.trim();
+        const u = document.getElementById('modal-agenda-unit-input').value;
+        const r = document.getElementById('modal-agenda-room-input').value.trim();
+
+        showToast('Agenda baru berhasil ditambahkan!', 'success');
+        const m = document.getElementById('modal-tambah-agenda');
+        if (m) m.classList.remove('active');
+      });
+    }
+
+    const btnDrawerSave = document.getElementById('btn-drawer-save');
+    if (btnDrawerSave) {
+      btnDrawerSave.addEventListener('click', () => {
+        const note = document.getElementById('drawer-note-input').value.trim();
+        if (state.activeDrawerTicket) {
+          state.activeDrawerTicket.progress = note;
+          showToast('Catatan berhasil diperbarui!', 'success');
+          renderTasksTable();
+        }
+      });
+    }
+
+    const btnDrawerCopy = document.getElementById('btn-drawer-copy-text');
+    if (btnDrawerCopy) {
+      btnDrawerCopy.addEventListener('click', () => {
+        if (!state.activeDrawerTicket) return;
+        const summary = 'Tiket: ' + (state.activeDrawerTicket.totalCaseIsu || '') + '\n' +
+          'Unit: ' + state.activeDrawerTicket.serviceType + '\n' +
+          'Status: ' + state.activeDrawerTicket.status + '\n' +
+          'Detail: ' + (state.activeDrawerTicket.issueDetails || state.activeDrawerTicket.detail || '');
+        navigator.clipboard.writeText(summary).then(() => showToast('Ringkasan berhasil disalin!', 'success'));
+      });
+    }
+  }
+
+  // Call bindStitchEvents on init
+  const oldBindEvents = bindEvents;
+  bindEvents = function() {
+    oldBindEvents();
+    bindStitchEvents();
+  };
+
+  // Expose global helpers
+  window.activateView = activateView;
+  window.openDrawer = openDrawer;
+  window.closeDrawer = closeDrawer;
+  window.handleCalendarDateClick = handleCalendarDateClick;
+
   // Bootstrap saat DOM siap
   document.addEventListener('DOMContentLoaded', init);
 
