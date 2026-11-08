@@ -263,7 +263,7 @@
   }
 
   .btn-hdr.btn-primary {
-    background: linear-gradient(135deg, var(--primary-color), #4f46e5);
+    background: linear-gradient(135deg, #061345 0%, #1e295a 100%);
     color: #ffffff;
     border: none;
     box-shadow: 0 4px 12px rgba(99, 102, 241, 0.35);
@@ -2308,9 +2308,9 @@
      ADMINISTRATOR KELOLA USER (HEADER, SIDEBAR & MODAL)
      ========================================================================= */
   .btn-hdr-admin {
-    background: rgba(246, 200, 76, 0.12) !important;
-    border-color: rgba(246, 200, 76, 0.38) !important;
-    color: #f6c84c !important;
+    background: linear-gradient(135deg, #fffbeb 0%, #fef3c7 100%) !important;
+    border-color: #fde68a !important;
+    color: #92400e !important;
     font-weight: 700;
   }
 
@@ -3902,9 +3902,9 @@
      USER GUIDE / PANDUAN PENGGUNA RESMI konCHO
      ========================================================================= */
   .btn-hdr-guide {
-    background: rgba(59, 130, 246, 0.12) !important;
-    border-color: rgba(59, 130, 246, 0.38) !important;
-    color: #3b82f6 !important;
+    background: linear-gradient(135deg, #eff6ff 0%, #dbeafe 100%) !important;
+    border-color: #bfdbfe !important;
+    color: #1e40af !important;
     font-weight: 700;
   }
 
@@ -4459,10 +4459,10 @@
 
   .content-main, .main-content-area {
     margin-left: 72px !important;
-    padding-top: 80px !important;
-    padding-left: 24px !important;
-    padding-right: 24px !important;
-    padding-bottom: 40px !important;
+    padding-top: 66px !important;
+    padding-left: 18px !important;
+    padding-right: 18px !important;
+    padding-bottom: 16px !important;
     width: calc(100% - 72px) !important;
     min-height: 100vh !important;
     background-color: #f3f5f9 !important;
@@ -4484,15 +4484,65 @@
   }
   .calendar-day-cell {
     transition: all 0.18s ease-in-out;
+    background: #ffffff;
+    min-height: 56px !important;
+  }
+  @media (min-width: 640px) {
+    .calendar-day-cell {
+      min-height: 62px !important;
+    }
+  }
+  @media (min-width: 1280px) {
+    .calendar-day-cell {
+      min-height: 66px !important;
+    }
   }
   .calendar-day-cell:hover {
-    background-color: #f8faff;
+    background: linear-gradient(180deg, #f8fafc 0%, #f0f5ff 100%);
     z-index: 2;
   }
   .calendar-day-cell.is-selected {
-    background-color: #f0f5ff !important;
-    border-color: #3b82f6 !important;
-    box-shadow: inset 0 0 0 2px #2563eb;
+    background: linear-gradient(180deg, #eff6ff 0%, #dbeafe 100%) !important;
+    border: 2px solid #2563eb !important;
+    box-shadow: 0 4px 12px -2px rgba(37, 99, 235, 0.22) !important;
+    position: relative;
+    z-index: 3;
+  }
+
+  /* Right Panel & Tasks Visual Gradients */
+  .card-urgent-gradient {
+    background: linear-gradient(90deg, rgba(255, 241, 242, 0.65) 0%, #ffffff 100%) !important;
+    border-left: 3.5px solid #f43f5e !important;
+  }
+  .card-investigation-gradient {
+    background: linear-gradient(90deg, rgba(254, 243, 199, 0.65) 0%, #ffffff 100%) !important;
+    border-left: 3.5px solid #f59e0b !important;
+  }
+  .card-review-gradient {
+    background: linear-gradient(90deg, rgba(239, 246, 255, 0.65) 0%, #ffffff 100%) !important;
+    border-left: 3.5px solid #3b82f6 !important;
+  }
+  .card-meeting-gradient {
+    background: linear-gradient(90deg, rgba(248, 250, 252, 0.85) 0%, #ffffff 100%) !important;
+    border-left: 3.5px solid #061345 !important;
+  }
+
+  /* Tasks KPI Gradient Cards */
+  .tasks-kpi-total {
+    border-top: 4px solid #4f46e5 !important;
+    background: linear-gradient(135deg, rgba(238, 242, 255, 0.5) 0%, #ffffff 65%, rgba(248, 250, 252, 0.4) 100%) !important;
+  }
+  .tasks-kpi-open {
+    border-top: 4px solid #f59e0b !important;
+    background: linear-gradient(135deg, rgba(254, 243, 199, 0.5) 0%, #ffffff 65%, rgba(248, 250, 252, 0.4) 100%) !important;
+  }
+  .tasks-kpi-inprogress {
+    border-top: 4px solid #2563eb !important;
+    background: linear-gradient(135deg, rgba(239, 246, 255, 0.5) 0%, #ffffff 65%, rgba(248, 250, 252, 0.4) 100%) !important;
+  }
+  .tasks-kpi-closed {
+    border-top: 4px solid #10b981 !important;
+    background: linear-gradient(135deg, rgba(236, 253, 245, 0.5) 0%, #ffffff 65%, rgba(248, 250, 252, 0.4) 100%) !important;
   }
 
   /* Drawer Animations */
@@ -4794,7 +4844,7 @@
             </a>
 
             <!-- 2. Calendar (Active highlighted like Image 1) -->
-            <a id="nav-link-calendar" class="flex flex-col items-center justify-center w-full py-2.5 rounded-xl bg-white/15 text-white font-semibold shadow-sm border border-white/10 transition-all group cursor-pointer" href="#" title="Teams Calendar View">
+            <a id="nav-link-calendar" class="flex flex-col items-center justify-center w-full py-2.5 rounded-xl bg-white/15 text-white font-semibold shadow-sm border border-white/10 transition-all group cursor-pointer" href="#" title="konCHO Calendar View">
               <span class="material-symbols-outlined text-[22px]">calendar_month</span>
               <span class="text-[10px] font-medium mt-1 leading-tight">Calendar</span>
             </a>
@@ -4858,16 +4908,16 @@
       <main class="content-main">
 
       <!-- =====================================================================
-           VIEW 1: TEAMS CALENDAR DASHBOARD VIEW (#view-calendar)
+           VIEW 1: konCHO CALENDAR DASHBOARD VIEW (#view-calendar)
            ===================================================================== -->
-      <div id="view-calendar" class="transition-all duration-300 block mb-6">
+      <div id="view-calendar" class="transition-all duration-300 block mb-2">
         <div class="max-w-[1680px] mx-auto flex flex-col xl:flex-row gap-5 items-start">
           
           <!-- LEFT / MAIN CALENDAR WORKSPACE -->
-          <div class="flex-1 flex flex-col gap-4 min-w-0 w-full">
+          <div class="flex-1 flex flex-col gap-2.5 sm:gap-3 min-w-0 w-full">
             
             <!-- CALENDAR CONTROL BAR -->
-            <div class="bg-white rounded-xl p-3.5 sm:p-4 shadow-sm border border-slate-200/90 flex flex-col xl:flex-row xl:items-center justify-between gap-3.5">
+            <div class="bg-white rounded-xl p-2.5 sm:p-3 shadow-xs border border-slate-200/90 flex flex-col xl:flex-row xl:items-center justify-between gap-2.5">
               <!-- Left: Month Jump & Prev/Next -->
               <div class="flex flex-wrap items-center gap-2 sm:gap-3">
                 <div class="relative">
@@ -4959,7 +5009,7 @@
                 </div>
                 <div class="flex items-center gap-1 text-[11px] text-slate-500">
                   <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                  <span>Sinkronisasi Google Sheet & Teams Aktif</span>
+                  <span>Sinkronisasi Google Sheet & konCHO Aktif</span>
                 </div>
               </div>
             </div>
@@ -5083,7 +5133,7 @@
 
                 <a href="https://teams.microsoft.com" target="_blank" rel="noopener noreferrer" class="w-full h-8 bg-[#061345] hover:bg-[#1e295a] text-white text-xs font-bold rounded-lg flex items-center justify-center gap-1.5 transition-colors">
                   <span class="material-symbols-outlined text-[16px]">co_present</span>
-                  <span>Buka di Teams</span>
+                  <span>Buka di konCHO Teams</span>
                 </a>
               </div>
             </div>
@@ -5129,7 +5179,7 @@
               </button>
               <button class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#061345] hover:bg-[#1e295a] text-white text-xs font-bold shadow-sm transition-all js-switch-calendar-btn" type="button">
                 <span class="material-symbols-outlined text-[16px]">calendar_month</span>
-                <span>Lihat di Teams Calendar &rarr;</span>
+                <span>Lihat di konCHO Calendar &rarr;</span>
               </button>
             </div>
           </div>
@@ -5996,7 +6046,7 @@
     <div class="modal-dialog" style="max-width: 520px;">
       <div class="modal-head">
         <div class="modal-title-wrap">
-          <div class="modal-kicker">📅 AGENDA TEAMS</div>
+          <div class="modal-kicker">📅 AGENDA konCHO</div>
           <h2 class="modal-title">Tambah Agenda Penanganan CHO</h2>
         </div>
         <button class="modal-close-btn js-close-agenda-modal" type="button">✕</button>
@@ -6029,7 +6079,7 @@
             </select>
           </div>
           <div>
-            <label class="block font-semibold text-xs mb-1">Ruangan / Teams Link</label>
+            <label class="block font-semibold text-xs mb-1">Ruangan / Link Pertemuan</label>
             <input id="modal-agenda-room-input" type="text" placeholder="Sync Room CHO / War Room" class="form-input w-full">
           </div>
         </div>
@@ -11036,7 +11086,7 @@
     let html = '';
 
     prevSpill.forEach(d => {
-      html += '<div class="calendar-day-cell min-h-[96px] sm:min-h-[110px] p-2 bg-slate-50/60 opacity-40 flex flex-col justify-between"><span class="text-xs font-semibold text-slate-400">' + d + '</span><span class="text-[10px] text-slate-300">Bulan lalu</span></div>';
+      html += '<div class="calendar-day-cell min-h-[58px] sm:min-h-[64px] xl:min-h-[68px] p-2 bg-slate-50/60 opacity-40 flex flex-col justify-between"><span class="text-xs font-semibold text-slate-400">' + d + '</span><span class="text-[10px] text-slate-300">Bulan lalu</span></div>';
     });
 
     for (let day = 1; day <= totalDays; day++) {
@@ -11049,7 +11099,7 @@
       }
       const itemCount = dayItems.length;
 
-      html += '<div class="calendar-day-cell min-h-[96px] sm:min-h-[110px] p-2 sm:p-2.5 flex flex-col justify-between cursor-pointer border-t border-slate-100 ' + (isSelected ? 'is-selected' : isWeekend ? 'bg-slate-50/40' : 'bg-white') + '" onclick="handleCalendarDateClick(' + day + ')">';
+      html += '<div class="calendar-day-cell min-h-[58px] sm:min-h-[64px] xl:min-h-[68px] p-1.5 sm:p-2 flex flex-col justify-between cursor-pointer border-t border-slate-100 ' + (isSelected ? 'is-selected' : isWeekend ? 'bg-slate-50/40' : 'bg-white') + '" onclick="handleCalendarDateClick(' + day + ')">';
       html += '  <div class="flex items-center justify-between">';
       html += '    <span class="text-xs font-extrabold ' + (isSelected ? 'text-blue-700 font-headline' : 'text-slate-800') + '">' + day + '</span>';
       if (isSelected) {
@@ -11062,11 +11112,11 @@
       html += '  <div class="flex flex-col gap-1 mt-1 overflow-hidden">';
       dayItems.slice(0, 2).forEach(item => {
         if (item.urgent) {
-          html += '<span class="truncate px-1.5 py-0.5 rounded text-[10px] font-bold bg-rose-50 text-rose-700 border border-rose-200/80">&bull; ' + escapeHtml(item.text) + '</span>';
+          html += '<span class="truncate px-1.5 py-0.5 rounded text-[9.5px] font-bold bg-gradient-to-r from-rose-50 to-rose-100/80 text-rose-700 border border-rose-200/90">&bull; ' + escapeHtml(item.text) + '</span>';
         } else if (item.type === 'meeting') {
-          html += '<span class="truncate px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-700 border border-blue-200/70">&bull; ' + escapeHtml(item.text) + '</span>';
+          html += '<span class="truncate px-1.5 py-0.5 rounded text-[9.5px] font-medium bg-gradient-to-r from-blue-50 to-indigo-50/80 text-blue-700 border border-blue-200/80">&bull; ' + escapeHtml(item.text) + '</span>';
         } else if (item.type === 'quickwin') {
-          html += '<span class="truncate px-1.5 py-0.5 rounded text-[10px] font-medium bg-emerald-50 text-emerald-700 border border-emerald-200">&bull; ' + escapeHtml(item.text) + '</span>';
+          html += '<span class="truncate px-1.5 py-0.5 rounded text-[9.5px] font-medium bg-gradient-to-r from-emerald-50 to-teal-50/80 text-emerald-700 border border-emerald-200">&bull; ' + escapeHtml(item.text) + '</span>';
         } else {
           html += '<span class="truncate px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-700 border border-slate-200">&bull; ' + escapeHtml(item.text) + '</span>';
         }
@@ -11081,7 +11131,7 @@
     }
 
     nextSpill.forEach(d => {
-      html += '<div class="calendar-day-cell min-h-[96px] sm:min-h-[110px] p-2 bg-slate-50/60 opacity-40 flex flex-col justify-between"><span class="text-xs font-semibold text-slate-400">' + d + '</span><span class="text-[10px] text-slate-300">Bulan depan</span></div>';
+      html += '<div class="calendar-day-cell min-h-[58px] sm:min-h-[64px] xl:min-h-[68px] p-2 bg-slate-50/60 opacity-40 flex flex-col justify-between"><span class="text-xs font-semibold text-slate-400">' + d + '</span><span class="text-[10px] text-slate-300">Bulan depan</span></div>';
     });
 
     container.innerHTML = html;
@@ -11143,7 +11193,7 @@
     if (agendaContainer) {
       if (dayDetail.agendas && dayDetail.agendas.length > 0) {
         agendaContainer.innerHTML = dayDetail.agendas.map(ag => 
-          '<div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex flex-col gap-1.5 hover:border-blue-300 transition-colors">' +
+          '<div class="p-2.5 sm:p-3 card-meeting-gradient border border-slate-200 rounded-xl flex flex-col gap-1.5 hover:border-blue-300 shadow-xs transition-all">' +
           '  <div class="flex items-center justify-between">' +
           '    <span class="text-[11px] font-bold text-slate-500">' + ag.time + '</span>' +
           '    <span class="px-2 py-0.5 rounded text-[10px] font-bold ' + ag.unitClass + '">' + ag.unit + '</span>' +
@@ -11164,7 +11214,7 @@
     if (issueContainer) {
       if (dayDetail.issues && dayDetail.issues.length > 0) {
         issueContainer.innerHTML = dayDetail.issues.map(iss => 
-          '<div class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex flex-col gap-2 hover:border-slate-300 transition-colors">' +
+          '<div class="p-2.5 sm:p-3 ' + (iss.badge.includes('URGENT') ? 'card-urgent-gradient' : iss.badge.includes('INVESTIGASI') ? 'card-investigation-gradient' : 'card-review-gradient') + ' border border-slate-200 rounded-xl flex flex-col gap-2 hover:border-slate-300 shadow-xs transition-all">' +
           '  <div class="flex items-center justify-between">' +
           '    <span class="px-2 py-0.5 rounded text-[9px] font-extrabold ' + iss.badgeClass + '">' + iss.badge + '</span>' +
           '    <div class="flex items-center gap-1.5"><span class="text-[10px] font-semibold text-slate-500">' + iss.unit + '</span><span class="text-[10px] font-mono font-bold text-slate-700">' + iss.ticket + '</span></div>' +
@@ -11185,7 +11235,7 @@
     if (quickContainer) {
       if (dayDetail.quickwins && dayDetail.quickwins.length > 0) {
         quickContainer.innerHTML = dayDetail.quickwins.map(qw => 
-          '<div class="p-2.5 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between gap-2">' +
+          '<div class="p-2 sm:p-2.5 bg-gradient-to-r from-slate-50 to-white border border-slate-200 rounded-xl flex items-center justify-between gap-2">' +
           '  <div class="flex items-center gap-2 min-w-0"><input type="checkbox" ' + (qw.done ? 'checked' : '') + ' class="rounded border-slate-300 text-blue-600 focus:ring-0"><span class="text-xs text-slate-700 truncate ' + (qw.done ? 'line-through text-slate-400' : '') + '">' + escapeHtml(qw.title) + '</span></div>' +
           '  <span class="px-2 py-0.5 rounded text-[10px] font-bold shrink-0 ' + qw.statusClass + '">' + qw.status + '</span>' +
           '</div>'
