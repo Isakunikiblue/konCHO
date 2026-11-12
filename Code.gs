@@ -7,55 +7,39 @@
  * =========================================================================
  */
 
+var STANDARD_CASE_HEADERS = [
+  'ID_Tiket',                                  // Kolom A
+  'Bulan - Tahun',                             // Kolom B
+  'Case Isu yang Masuk',                       // Kolom C (Main Issue)
+  'Issue Details (Description)',               // Kolom D
+  'Progress & Quick Win (Temporary Solution)', // Kolom E
+  'Need Support',                              // Kolom F
+  'Requestor',                                 // Kolom G
+  'Status',                                    // Kolom H (Open, InProgress, Closed)
+  'Follow up to',                              // Kolom I
+  'Status Update',                             // Kolom J
+  'Tanggal_Agenda',                            // Kolom K (Tanggal Kalender YYYY-MM-DD)
+  'Terakhir_Update',                           // Kolom L
+  'File PPT',                                  // Kolom M (Google Drive Link)
+  'Input_By',                                  // Kolom N (Nama Inputer/Admin)
+  'PIC_Facilitator',                           // Kolom O (Facilitator yang Pickup / Handling)
+  'Keterangan_Progress',                       // Kolom P (Catatan saat Pickup / InProgress)
+  'Keterangan_Closed',                         // Kolom Q (Catatan penyelesaian saat Closed)
+  'Closed_By'                                  // Kolom R (Petugas penutup kasus)
+];
+
 var CONFIG = {
   SPREADSHEET_ID: '1bqispkT4gfY7GJ38ruVxqyuBk3ChdORDd2E5AiBYuDc',
   SHEET_MOBILE: 'Mobile',
   SHEET_FIXED: 'Fixed',
+  SHEET_ECARE: 'eCare',
   SHEET_LOG: 'Log_Komunikasi',
   SHEET_USERS: 'Users',
   DRIVE_FOLDER_ID: '1KHMMjAovxmRpyd0JTAehyoSgH2sWItMV',
   DRIVE_FOLDER_URL: 'https://drive.google.com/drive/folders/1KHMMjAovxmRpyd0JTAehyoSgH2sWItMV?hl=ID',
-  // Sesuai struktur kolom formulir dan sheet user:
-  // Kolom A: ID_Tiket / No
-  // Kolom B: Bulan - Tahun
-  // Kolom C: Case Isu yang Masuk
-  // Kolom D: Issue Details (Description)
-  // Kolom E: Progress & Quick Win (Temporary Solution)
-  // Kolom F: Need Support
-  // Kolom G: Requestor
-  // Kolom H: Status (Open, InProgress, Closed)
-  // Kolom I: Follow up to
-  // Kolom J: Status Update
-  // Kolom K: Terakhir_Update
-  // Kolom Tambahan: File PPT (Google Drive Link)
-  DEFAULT_HEADERS_MOBILE: [
-    'ID_Tiket', 
-    'Bulan - Tahun',
-    'Case Isu yang Masuk', 
-    'Issue Details (Description)', 
-    'Progress & Quick Win (Temporary Solution)', 
-    'Need Support', 
-    'Requestor', 
-    'Status', 
-    'Follow up to', 
-    'Status Update', 
-    'Terakhir_Update',
-    'File PPT'
-  ],
-  DEFAULT_HEADERS_FIXED: [
-    'ID_Tiket', 
-    'Bulan - Tahun',
-    'Case Isu yang Masuk', 
-    'Issue Details (Description)', 
-    'Progress & Quick Win (Temporary Solution)', 
-    'Need Support', 
-    'Requestor', 
-    'Status', 
-    'Follow up to', 
-    'Status Update', 
-    'Terakhir_Update',
-    'File PPT'
-  ],
+  DEFAULT_HEADERS_MOBILE: STANDARD_CASE_HEADERS,
+  DEFAULT_HEADERS_FIXED: STANDARD_CASE_HEADERS,
+  DEFAULT_HEADERS_ECARE: STANDARD_CASE_HEADERS,
   DEFAULT_HEADERS_LOG: [
     'Log_ID', 'ID_Tiket', 'Tipe_Layanan', 'Pengirim', 'Pesan_Update', 
     'Status_Terkait', 'Follow_Up_To', 'Waktu_Update'
@@ -165,7 +149,9 @@ function findBestSheet(ss, targetName) {
 
   var isFixed = cleanTarget.indexOf('fix') >= 0;
   var isMobile = cleanTarget.indexOf('mob') >= 0;
+  var isEcare = cleanTarget.indexOf('ecare') >= 0;
   var isLog = cleanTarget.indexOf('log') >= 0;
+  var isUsers = cleanTarget.indexOf('user') >= 0;
 
   var candidates = [];
 
@@ -178,12 +164,16 @@ function findBestSheet(ss, targetName) {
     }
   }
 
-  // Pass 2: Semantic keyword matching (Fixed vs Mobile vs Log)
+  // Pass 2: Semantic keyword matching (Fixed vs Mobile vs eCare vs Log vs Users)
   if (candidates.length === 0) {
     for (var j = 0; j < sheets.length; j++) {
       var sName2 = sheets[j].getName();
       var cleanSName2 = sName2.toLowerCase().replace(/[^a-z0-9]/g, '');
       if (isLog && cleanSName2.indexOf('log') >= 0) {
+        candidates.push(sheets[j]);
+      } else if (isUsers && cleanSName2.indexOf('user') >= 0) {
+        candidates.push(sheets[j]);
+      } else if (isEcare && cleanSName2.indexOf('ecare') >= 0) {
         candidates.push(sheets[j]);
       } else if (isFixed && cleanSName2.indexOf('fix') >= 0) {
         candidates.push(sheets[j]);
@@ -204,11 +194,11 @@ function findBestSheet(ss, targetName) {
     }
   }
 
-  // Pass 4: Fallback untuk sheet Fixed jika nama tab berbeda (misal Sheet2, Indihome, dll)
+  // Pass 4: Fallback untuk sheet Fixed jika nama tab berbeda (hindari Mobile, eCare, Log, Users)
   if (candidates.length === 0 && isFixed) {
     for (var s = 0; s < sheets.length; s++) {
       var sClean = sheets[s].getName().toLowerCase().replace(/[^a-z0-9]/g, '');
-      if (sClean.indexOf('mob') < 0 && sClean.indexOf('log') < 0) {
+      if (sClean.indexOf('mob') < 0 && sClean.indexOf('ecare') < 0 && sClean.indexOf('log') < 0 && sClean.indexOf('user') < 0) {
         candidates.push(sheets[s]);
         break;
       }
@@ -234,88 +224,124 @@ function findSheetCaseInsensitive(ss, targetName) {
 }
 
 /**
+ * Helper: Resolve target sheet metadata berdasarkan serviceType ('MOBILE' | 'FIXED' | 'ECARE')
+ */
+function resolveTargetSheetMeta(serviceType) {
+  var norm = String(serviceType || 'MOBILE').toUpperCase().trim();
+  if (norm === 'FIXED' || norm === 'CHO FIXED') {
+    return { serviceType: 'FIXED', sheetName: CONFIG.SHEET_FIXED, prefix: 'CHO-F', defaultHeaders: CONFIG.DEFAULT_HEADERS_FIXED };
+  }
+  if (norm === 'ECARE' || norm === 'E-CARE' || norm === 'CHO ECARE') {
+    return { serviceType: 'ECARE', sheetName: CONFIG.SHEET_ECARE, prefix: 'CHO-E', defaultHeaders: CONFIG.DEFAULT_HEADERS_ECARE };
+  }
+  return { serviceType: 'MOBILE', sheetName: CONFIG.SHEET_MOBILE, prefix: 'CHO-M', defaultHeaders: CONFIG.DEFAULT_HEADERS_MOBILE };
+}
+
+/**
  * Helper: Ensure sheet exists with proper headers
  */
 function ensureSheet(ss, sheetName, defaultHeaders) {
   var sheet = findSheetCaseInsensitive(ss, sheetName);
   if (!sheet) {
     sheet = ss.insertSheet(sheetName);
-    sheet.appendRow(defaultHeaders);
-    sheet.getRange(1, 1, 1, defaultHeaders.length).setFontWeight('bold').setBackground('#E2E8F0');
+    sheet.getRange(1, 1, 1, defaultHeaders.length).setValues([defaultHeaders])
+      .setFontWeight('bold').setBackground('#061345').setFontColor('#ffffff');
     sheet.setFrozenRows(1);
     return sheet;
   }
   
-  // Periksa apakah baris header sudah ada
-  if (sheet.getLastRow() === 0) {
-    sheet.appendRow(defaultHeaders);
-    sheet.getRange(1, 1, 1, defaultHeaders.length).setFontWeight('bold').setBackground('#E2E8F0');
+  // Periksa apakah baris header masih kosong (misal tab baru dibuat manual oleh user)
+  var lastRow = sheet.getLastRow();
+  var lastCol = sheet.getLastColumn();
+  var isHeaderEmpty = (lastRow === 0 || lastCol === 0);
+  if (!isHeaderEmpty) {
+    var firstRow = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
+    isHeaderEmpty = firstRow.every(function(cell) { return String(cell || '').trim() === ''; });
+  }
+
+  if (isHeaderEmpty) {
+    sheet.getRange(1, 1, 1, defaultHeaders.length).setValues([defaultHeaders])
+      .setFontWeight('bold').setBackground('#061345').setFontColor('#ffffff');
     sheet.setFrozenRows(1);
   }
   return sheet;
 }
 
 /**
- * Inisialisasi sheet & pastikan kolom tracking (Status_Informasi, Terakhir_Update) tersedia
+ * Inisialisasi seluruh sheet (Mobile, Fixed, eCare, Log_Komunikasi, Users)
+ * & pastikan semua kolom yang dibutuhkan tersedia di 3 sheet utama.
+ * Dapat dijalankan manual 1x dari editor Apps Script melalui fungsi setupAllThreeSheets().
  */
+function setupAllThreeSheets() {
+  return initializeDatabase();
+}
+
 function initializeDatabase() {
   var ss = getSpreadsheet();
   var mobileSheet = ensureSheet(ss, CONFIG.SHEET_MOBILE, CONFIG.DEFAULT_HEADERS_MOBILE);
   var fixedSheet = ensureSheet(ss, CONFIG.SHEET_FIXED, CONFIG.DEFAULT_HEADERS_FIXED);
+  var ecareSheet = ensureSheet(ss, CONFIG.SHEET_ECARE, CONFIG.DEFAULT_HEADERS_ECARE);
   var logSheet = ensureSheet(ss, CONFIG.SHEET_LOG, CONFIG.DEFAULT_HEADERS_LOG);
   var usersSheet = ensureUsersSheet(ss);
   
-  // Pastikan kolom tracking aman
+  // Pastikan seluruh kolom kalender & workflow Inputer -> Facilitator Pickup aman di 3 sheet
   try {
     ensureTrackingColumns(mobileSheet);
     ensureTrackingColumns(fixedSheet);
+    ensureTrackingColumns(ecareSheet);
   } catch (e) {
     Logger.log('ensureTrackingColumns notice: ' + e.message);
   }
   
   return {
     success: true,
-    message: 'Database konCHO siap digunakan'
+    sheets: [mobileSheet.getName(), fixedSheet.getName(), ecareSheet.getName()],
+    message: 'Database konCHO (Mobile, Fixed, eCare) beserta seluruh kolom siap digunakan'
   };
 }
 
 /**
- * Pastikan kolom 'Terakhir_Update' dan 'Status_Informasi' ada di header
+ * Pastikan seluruh kolom tracking kalender & workflow Pickup tersedia di baris header sheet
  */
 function ensureTrackingColumns(sheet) {
   if (!sheet) return;
   var lastCol = sheet.getLastColumn();
-  if (lastCol === 0) return;
+  if (lastCol === 0) {
+    sheet.getRange(1, 1, 1, STANDARD_CASE_HEADERS.length).setValues([STANDARD_CASE_HEADERS])
+      .setFontWeight('bold').setBackground('#061345').setFontColor('#ffffff');
+    sheet.setFrozenRows(1);
+    return;
+  }
+
   var headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0];
-  
-  var needsStatusInfo = !headers.some(function(h) { 
-    var cleanH = String(h).toLowerCase().replace(/[^a-z]/g, '');
-    return cleanH === 'statusinformasi' || cleanH === 'statusupdate'; 
-  });
-  var needsLastUpdate = !headers.some(function(h) { 
-    var cleanL = String(h).toLowerCase().replace(/[^a-z]/g, '');
-    return cleanL === 'terakhirupdate' || cleanL === 'lastupdate'; 
-  });
-  var needsFilePpt = !headers.some(function(h) { 
-    var cleanP = String(h).toLowerCase().replace(/[^a-z]/g, '');
-    return cleanP === 'fileppt' || cleanP === 'materippt' || cleanP === 'linkppt'; 
-  });
-  
-  if (needsStatusInfo) {
-    sheet.getRange(1, lastCol + 1).setValue('Status_Informasi').setFontWeight('bold').setBackground('#E2E8F0');
-    lastCol++;
-  }
-  if (needsLastUpdate) {
-    sheet.getRange(1, lastCol + 1).setValue('Terakhir_Update').setFontWeight('bold').setBackground('#E2E8F0');
-    lastCol++;
-  }
-  if (needsFilePpt) {
-    sheet.getRange(1, lastCol + 1).setValue('File PPT').setFontWeight('bold').setBackground('#E2E8F0');
+  var requiredCols = [
+    { label: 'Status Update', aliases: ['statusinformasi', 'statusupdate', 'keteranganupdate'] },
+    { label: 'Tanggal_Agenda', aliases: ['tanggalagenda', 'tanggalcase', 'tanggallapor', 'tanggal', 'date'] },
+    { label: 'Terakhir_Update', aliases: ['terakhirupdate', 'lastupdate', 'updateterakhir'] },
+    { label: 'File PPT', aliases: ['fileppt', 'materippt', 'linkppt', 'lampiranppt'] },
+    { label: 'Input_By', aliases: ['inputby', 'inputoleh', 'inputer', 'createdby'] },
+    { label: 'PIC_Facilitator', aliases: ['picfacilitator', 'pickupby', 'pichandling', 'facilitator'] },
+    { label: 'Keterangan_Progress', aliases: ['keteranganprogress', 'catatanprogress', 'progressnote', 'keteranganinprogress'] },
+    { label: 'Keterangan_Closed', aliases: ['keteranganclosed', 'catatanclosed', 'closingnote', 'solusi'] },
+    { label: 'Closed_By', aliases: ['closedby', 'diclosedoleh', 'picclosed'] }
+  ];
+
+  for (var r = 0; r < requiredCols.length; r++) {
+    var colDef = requiredCols[r];
+    var exists = headers.some(function(h) {
+      var cleanH = String(h || '').toLowerCase().replace(/[^a-z0-9]/g, '');
+      return colDef.aliases.indexOf(cleanH) >= 0;
+    });
+    if (!exists) {
+      lastCol++;
+      sheet.getRange(1, lastCol).setValue(colDef.label).setFontWeight('bold').setBackground('#E2E8F0');
+      headers.push(colDef.label);
+    }
   }
 }
 
 /**
- * Ambil semua data awal (Mobile, Fixed, Log_Komunikasi, dan metadata)
+ * Ambil semua data awal (Mobile, Fixed, eCare, Log_Komunikasi, Users)
  */
 function getInitialData() {
   try {
@@ -324,6 +350,7 @@ function getInitialData() {
     
     var mobileData = getSheetRecords(ss, CONFIG.SHEET_MOBILE, 'MOBILE');
     var fixedData = getSheetRecords(ss, CONFIG.SHEET_FIXED, 'FIXED');
+    var ecareData = getSheetRecords(ss, CONFIG.SHEET_ECARE, 'ECARE');
     var logData = getLogRecords(ss);
     var usersData = getUserRecords(ss);
     
@@ -333,11 +360,14 @@ function getInitialData() {
       spreadsheetName: ss.getName(),
       mobileHeaders: mobileData.headers,
       fixedHeaders: fixedData.headers,
+      ecareHeaders: ecareData.headers,
       mobileRecords: mobileData.records,
       fixedRecords: fixedData.records,
+      ecareRecords: ecareData.records,
       detectedSheets: {
         mobile: mobileData.sheetName,
         fixed: fixedData.sheetName,
+        ecare: ecareData.sheetName,
         all: ss.getSheets().map(function(s) { return s.getName(); })
       },
       logs: logData,
@@ -505,11 +535,12 @@ function getSheetRecords(ss, sheetName, serviceType) {
   if (monthColIdx < 0 && headers.length > 1) {
     monthColIdx = 1; // Kolom B fallback
   }
-  var dateIdx = findHeaderIndex(headers, ['tanggal_lapor', 'tanggal', 'tgl', 'created_at', 'date', 'timestamp', 'waktu']);
+  var dateIdx = findHeaderIndex(headers, ['tanggal_agenda', 'tanggal_case', 'tanggal_lapor', 'tanggal', 'tgl', 'created_at', 'date', 'timestamp', 'waktu']);
   var nameIdx = findHeaderIndex(headers, ['nama_pelanggan', 'nama', 'customer_name', 'pelanggan', 'akun', 'customer']);
   var numIdx = findHeaderIndex(headers, ['nomor_msisdn', 'nomor_internet_pstn', 'msisdn', 'no_layanan', 'no_internet', 'telepon', 'nomor', 'inet']);
   var catIdx = findHeaderIndex(headers, ['kategori_keluhan', 'kategori_kendala', 'kategori']);
-  var picIdx = findHeaderIndex(headers, ['pic_handling', 'pic', 'petugas']);
+  var inputByIdx = findHeaderIndex(headers, ['input_by', 'input_oleh', 'inputer', 'created_by']);
+  var picIdx = findHeaderIndex(headers, ['pic_facilitator', 'pickup_by', 'pic_handling', 'facilitator', 'pic', 'petugas']);
   var lastUpdateIdx = findHeaderIndex(headers, ['terakhir_update', 'last_update', 'update_terakhir']);
   var pptIdx = findHeaderIndex(headers, ['file ppt', 'file_ppt', 'link_ppt', 'materi ppt', 'materi_ppt', 'lampiran ppt', 'ppt', 'materi']);
   var statusInfoIdx = findHeaderIndex(headers, ['status update', 'status_update', 'status informasi', 'status_informasi', 'update_status', 'ada_update', 'status_info', 'update info', 'keterangan update']);
@@ -667,6 +698,7 @@ function getSheetRecords(ss, sheetName, serviceType) {
       detail: fullDetail || rawDetail,
       progress: rawProgress,
       needSupport: rawNeed,
+      inputBy: inputByIdx >= 0 && row[inputByIdx] ? String(row[inputByIdx]).trim() : rawReq,
       pic: picIdx >= 0 && row[picIdx] ? String(row[picIdx]).trim() : rawReq,
       terakhirUpdate: lastUpdateIdx >= 0 && row[lastUpdateIdx] ? formatDate(row[lastUpdateIdx]) : '',
       filePpt: pptIdx >= 0 && row[pptIdx] ? String(row[pptIdx]).trim() : '',
@@ -731,16 +763,16 @@ function getLogRecords(ss) {
 }
 
 /**
- * Simpan Data Baru ke Sheet (Mobile atau Fixed)
+ * Simpan Data Baru ke Sheet (Mobile, Fixed, atau eCare)
  */
 function submitNewData(payload) {
   try {
     var ss = getSpreadsheet();
-    var isFixed = (payload && payload.serviceType === 'FIXED');
-    var sheetName = isFixed ? CONFIG.SHEET_FIXED : CONFIG.SHEET_MOBILE;
-    var defaultHeaders = isFixed ? CONFIG.DEFAULT_HEADERS_FIXED : CONFIG.DEFAULT_HEADERS_MOBILE;
+    var targetMeta = resolveTargetSheetMeta(payload && payload.serviceType);
+    var sheetName = targetMeta.sheetName;
+    var defaultHeaders = targetMeta.defaultHeaders;
     
-    // Cari sheet secara cerdas (mendukung 'Mobile', 'CHO Mobile', 'Fixed', 'CHO Fixed', dll)
+    // Cari sheet secara cerdas (mendukung 'Mobile', 'Fixed', 'eCare', dll)
     var sheet = findBestSheet(ss, sheetName);
     if (!sheet) {
       sheet = ensureSheet(ss, sheetName, defaultHeaders);
@@ -751,18 +783,30 @@ function submitNewData(payload) {
     var headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0].map(function(h) { return String(h).trim(); });
     
     // Buat Ticket ID baru yang unik
-    var prefix = isFixed ? 'CHO-F' : 'CHO-M';
+    var prefix = targetMeta.prefix;
     var now = new Date();
-    var dateStr = Utilities.formatDate(now, Session.getScriptTimeZone() || 'Asia/Jakarta', 'yyyyMMdd');
+    var tz = Session.getScriptTimeZone() || 'Asia/Jakarta';
+    var dateStr = Utilities.formatDate(now, tz, 'yyyyMMdd');
     var randomSuffix = Math.floor(1000 + Math.random() * 9000);
     var ticketId = prefix + '-' + dateStr + '-' + randomSuffix;
     
-    var formattedDate = Utilities.formatDate(now, Session.getScriptTimeZone() || 'Asia/Jakarta', 'yyyy-MM-dd HH:mm:ss');
-    var finalStatus = normalizeStatus(payload.status || 'Open');
-    var defaultMonth = Utilities.formatDate(now, Session.getScriptTimeZone() || 'Asia/Jakarta', 'MMMM yyyy');
-    var selectedMonth = payload.bulan || defaultMonth;
+    var formattedDate = Utilities.formatDate(now, tz, 'yyyy-MM-dd HH:mm:ss');
+    var agendaDateStr = Utilities.formatDate(now, tz, 'yyyy-MM-dd');
+    if (payload && payload.tanggal) {
+      var parsedAgendaDate = new Date(payload.tanggal);
+      if (!isNaN(parsedAgendaDate.getTime())) {
+        agendaDateStr = Utilities.formatDate(parsedAgendaDate, tz, 'yyyy-MM-dd');
+      } else {
+        agendaDateStr = String(payload.tanggal);
+      }
+    }
 
-    // Susun baris baru sesuai urutan header yang ada di sheet target (Mobile / Fixed)
+    var finalStatus = normalizeStatus(payload.status || 'Open');
+    var defaultMonth = Utilities.formatDate(now, tz, 'MMMM yyyy');
+    var selectedMonth = payload.bulan || defaultMonth;
+    var inputByName = payload.inputBy || payload.author || payload.pic || payload.requestor || 'Inputer konCHO';
+
+    // Susun baris baru sesuai urutan header yang ada di sheet target (Mobile / Fixed / eCare)
     var newRow = [];
     for (var c = 0; c < headers.length; c++) {
       var headerNorm = headers[c].toLowerCase().replace(/[^a-z0-9]/g, '');
@@ -788,10 +832,14 @@ function submitNewData(payload) {
         val = finalStatus;
       } else if (headerNorm.indexOf('followup') >= 0 || c === 8) {
         val = payload.followUpTo || '-';
+      } else if (headerNorm.indexOf('tanggalagenda') >= 0 || headerNorm.indexOf('tanggal') >= 0 || headerNorm.indexOf('date') >= 0) {
+        val = agendaDateStr;
       } else if (headerNorm.indexOf('terakhirupdate') >= 0 || headerNorm.indexOf('lastupdate') >= 0) {
         val = formattedDate;
-      } else if (headerNorm.indexOf('tanggal') >= 0 || headerNorm.indexOf('date') >= 0) {
-        val = formattedDate;
+      } else if (headerNorm.indexOf('inputby') >= 0 || headerNorm.indexOf('inputer') >= 0 || headerNorm.indexOf('createdby') >= 0) {
+        val = inputByName;
+      } else if (headerNorm.indexOf('picfacilitator') >= 0 || headerNorm.indexOf('pickupby') >= 0 || headerNorm.indexOf('facilitator') >= 0) {
+        val = (finalStatus === 'Open') ? '' : inputByName;
       } else if (headerNorm.indexOf('msisdn') >= 0 || headerNorm.indexOf('internet') >= 0 || headerNorm.indexOf('nomor') >= 0) {
         val = payload.nomorLayanan || '';
       } else if (headerNorm.indexOf('pelanggan') >= 0 || headerNorm.indexOf('nama') >= 0) {
@@ -814,16 +862,17 @@ function submitNewData(payload) {
     // Rekam log awal di Log_Komunikasi
     var logSheet = ensureSheet(ss, CONFIG.SHEET_LOG, CONFIG.DEFAULT_HEADERS_LOG);
     var logId = 'LOG-' + dateStr + '-' + Math.floor(1000 + Math.random() * 9000);
-    var initialMessage = 'Laporan baru dibuat untuk Unit ' + (isFixed ? 'CHO Fixed' : 'CHO Mobile') + 
-      ' [Bulan: ' + selectedMonth + '] oleh Requestor: ' + (payload.requestor || '-') + 
+    var unitDisplay = targetMeta.serviceType === 'FIXED' ? 'CHO Fixed' : (targetMeta.serviceType === 'ECARE' ? 'CHO eCare' : 'CHO Mobile');
+    var initialMessage = 'Laporan baru dibuat untuk Unit ' + unitDisplay + 
+      ' [Bulan: ' + selectedMonth + ', Tgl Agenda: ' + agendaDateStr + '] oleh ' + inputByName + ' (Requestor: ' + (payload.requestor || '-') + ')' + 
       '. Isu: ' + (payload.totalCaseIsu || payload.caseIssue || '-') + 
       ' [Progress & Quick Win: ' + (payload.progressQuickWin || '-') + ']';
     
     logSheet.appendRow([
       logId,
       ticketId,
-      payload.serviceType,
-      payload.requestor || payload.pic || 'System',
+      targetMeta.serviceType,
+      inputByName,
       initialMessage,
       finalStatus,
       payload.followUpTo || '-',
@@ -833,8 +882,9 @@ function submitNewData(payload) {
     return {
       success: true,
       ticketId: ticketId,
-      serviceType: payload.serviceType,
+      serviceType: targetMeta.serviceType,
       sheetName: sheet.getName(),
+      tanggalAgenda: agendaDateStr,
       timestamp: formattedDate,
       message: 'Kasus ' + ticketId + ' berhasil ditambahkan ke sheet ' + sheet.getName() + '!'
     };
@@ -848,15 +898,17 @@ function submitNewData(payload) {
 }
 
 /**
- * Tambah Pesan / Update Informasi Komunikasi
+ * Tambah Pesan / Update Informasi Komunikasi (Termasuk Facilitator Pickup Open -> InProgress -> Closed)
  */
 function postCommunicationUpdate(payload) {
   try {
     var ss = getSpreadsheet();
     var now = new Date();
-    var formattedDate = Utilities.formatDate(now, Session.getScriptTimeZone() || 'Asia/Jakarta', 'yyyy-MM-dd HH:mm:ss');
-    var dateStr = Utilities.formatDate(now, Session.getScriptTimeZone() || 'Asia/Jakarta', 'yyyyMMdd');
+    var tz = Session.getScriptTimeZone() || 'Asia/Jakarta';
+    var formattedDate = Utilities.formatDate(now, tz, 'yyyy-MM-dd HH:mm:ss');
+    var dateStr = Utilities.formatDate(now, tz, 'yyyyMMdd');
     var finalStatus = payload.newStatus ? normalizeStatus(payload.newStatus) : '';
+    var targetMeta = resolveTargetSheetMeta(payload && payload.serviceType);
     
     // 1. Simpan ke Log_Komunikasi
     var logSheet = ensureSheet(ss, CONFIG.SHEET_LOG, CONFIG.DEFAULT_HEADERS_LOG);
@@ -867,7 +919,7 @@ function postCommunicationUpdate(payload) {
     var logRow = [
       logId,
       payload.ticketId,
-      payload.serviceType,
+      targetMeta.serviceType,
       authorName,
       payload.message,
       finalStatus,
@@ -876,9 +928,8 @@ function postCommunicationUpdate(payload) {
     ];
     logSheet.appendRow(logRow);
     
-    // 2. Update status, follow up to, dan flag update di sheet induk (Mobile / Fixed)
-    var sheetName = payload.serviceType === 'MOBILE' ? CONFIG.SHEET_MOBILE : CONFIG.SHEET_FIXED;
-    var targetSheet = findSheetCaseInsensitive(ss, sheetName);
+    // 2. Update status, follow up to, PIC Facilitator, dan flag update di sheet induk (Mobile / Fixed / eCare)
+    var targetSheet = findBestSheet(ss, targetMeta.sheetName);
     
     if (targetSheet) {
       var lastRow = targetSheet.getLastRow();
@@ -925,6 +976,12 @@ function postCommunicationUpdate(payload) {
           if (lastUpdateIdx >= 0) {
             targetSheet.getRange(targetRowIndex, lastUpdateIdx + 1).setValue(formattedDate);
           }
+
+          // Update PIC_Facilitator saat Facilitator melakukan Pickup (InProgress) atau Close
+          var picFacIdx = findHeaderIndex(headers, ['pic_facilitator', 'pickup_by', 'pic_handling', 'facilitator']);
+          if (picFacIdx >= 0 && authorName) {
+            targetSheet.getRange(targetRowIndex, picFacIdx + 1).setValue(authorName);
+          }
           
           // Cek jika kolom Closed_By, Keterangan_Closed, atau Keterangan_Progress ada di sheet
           var closedByIdx = findHeaderIndex(headers, ['closed_by', 'closedby', 'di_closed_oleh', 'pic_closed']);
@@ -948,7 +1005,7 @@ function postCommunicationUpdate(payload) {
       log: {
         logId: logId,
         ticketId: payload.ticketId,
-        serviceType: payload.serviceType,
+        serviceType: targetMeta.serviceType,
         author: authorName,
         message: payload.message,
         statusTerkait: finalStatus,
@@ -972,8 +1029,8 @@ function postCommunicationUpdate(payload) {
 function markTicketAsReviewed(ticketId, serviceType) {
   try {
     var ss = getSpreadsheet();
-    var sheetName = serviceType === 'MOBILE' ? CONFIG.SHEET_MOBILE : CONFIG.SHEET_FIXED;
-    var sheet = findSheetCaseInsensitive(ss, sheetName);
+    var targetMeta = resolveTargetSheetMeta(serviceType);
+    var sheet = findBestSheet(ss, targetMeta.sheetName);
     if (!sheet) return { success: false, error: 'Sheet tidak ditemukan' };
     
     var lastRow = sheet.getLastRow();
@@ -1281,11 +1338,11 @@ function uploadPptFile(data) {
     var fileUrl = driveFile.getUrl();
     var fileId = driveFile.getId();
 
-    // Jika terkait tiket tertentu, perbarui kolom 'File PPT' di sheet induk
+    // Jika terkait tiket tertentu, perbarui kolom 'File PPT' di sheet induk (Mobile / Fixed / eCare)
     if (data.ticketId && data.serviceType) {
       var ss = getSpreadsheet();
-      var targetSheetName = (data.serviceType === 'FIXED') ? CONFIG.SHEET_FIXED : CONFIG.SHEET_MOBILE;
-      var sheet = findBestSheet(ss, targetSheetName);
+      var targetMeta = resolveTargetSheetMeta(data.serviceType);
+      var sheet = findBestSheet(ss, targetMeta.sheetName);
 
       if (sheet) {
         var lastRow = sheet.getLastRow();
@@ -1365,8 +1422,8 @@ function deletePptFile(data) {
     }
 
     var ss = getSpreadsheet();
-    var targetSheetName = (data.serviceType === 'FIXED') ? CONFIG.SHEET_FIXED : CONFIG.SHEET_MOBILE;
-    var sheet = findBestSheet(ss, targetSheetName);
+    var targetMeta = resolveTargetSheetMeta(data.serviceType);
+    var sheet = findBestSheet(ss, targetMeta.sheetName);
     var oldFileUrl = '';
 
     if (sheet) {
