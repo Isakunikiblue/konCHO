@@ -3617,7 +3617,7 @@
    * MODAL INPUT KASUS BARU
    * =========================================================================
    */
-  function openNewModal() {
+  function openNewModal(dateContext) {
     if (state.authUser && (state.authUser.role === 'Facilitator' || state.authUser.role === 'Viewer')) {
       showToast('Akses ditolak: Peran ' + state.authUser.role + ' tidak berwenang menginput data kasus baru.', 'error');
       return;
@@ -3627,9 +3627,42 @@
     } else {
       setNewModalService('MOBILE');
     }
-    if (dom.inputBulanTahun && state.activeMonthFilter !== 'all') {
-      dom.inputBulanTahun.value = state.activeMonthFilter;
+
+    // Jika dibuka dari tanggal kalender (atau sedang di view kalender), sinkronkan Bulan - Tahun & badge tanggal
+    var ctx = (dateContext && typeof dateContext.year === 'number' && typeof dateContext.monthIndex === 'number' && typeof dateContext.day === 'number')
+      ? dateContext
+      : (state.activeView === 'calendar' && typeof state.selectedYear === 'number' && typeof state.selectedMonthIndex === 'number' && typeof state.selectedDate === 'number')
+        ? { year: state.selectedYear, monthIndex: state.selectedMonthIndex, day: state.selectedDate }
+        : null;
+
+    state.pendingCalendarDate = ctx;
+
+    var datePill = document.getElementById('newModalDatePill');
+    if (ctx && typeof CAL_MONTHS_ID !== 'undefined') {
+      var targetMonthYear = CAL_MONTHS_ID[ctx.monthIndex] + ' ' + ctx.year;
+      if (dom.inputBulanTahun) {
+        var optExists = Array.from(dom.inputBulanTahun.options).some(function(o) { return o.value === targetMonthYear; });
+        if (!optExists) {
+          var newOpt = document.createElement('option');
+          newOpt.value = targetMonthYear;
+          newOpt.textContent = targetMonthYear;
+          dom.inputBulanTahun.appendChild(newOpt);
+        }
+        dom.inputBulanTahun.value = targetMonthYear;
+      }
+      if (datePill) {
+        datePill.textContent = '📅 Tanggal Terpilih: ' + formatFullIndoDate(ctx.year, ctx.monthIndex, ctx.day);
+        datePill.style.display = 'inline-flex';
+      }
+    } else {
+      if (dom.inputBulanTahun && state.activeMonthFilter !== 'all') {
+        dom.inputBulanTahun.value = state.activeMonthFilter;
+      }
+      if (datePill) {
+        datePill.style.display = 'none';
+      }
     }
+
     // Kosongkan form inputan agar data sebelumnya tidak terbaca
     if (dom.inputCaseIssue) dom.inputCaseIssue.value = '';
     if (dom.inputRequestor) dom.inputRequestor.value = '';
@@ -3648,6 +3681,9 @@
 
   function closeNewModal() {
     dom.newDataModal.classList.remove('active');
+    state.pendingCalendarDate = null;
+    var datePill = document.getElementById('newModalDatePill');
+    if (datePill) datePill.style.display = 'none';
     if (dom.inputCaseIssue) dom.inputCaseIssue.value = '';
     if (dom.inputRequestor) dom.inputRequestor.value = '';
     if (dom.inputProgress) dom.inputProgress.value = '';
@@ -3716,9 +3752,16 @@
       return;
     }
 
+    var targetDateObj = state.pendingCalendarDate
+      ? new Date(state.pendingCalendarDate.year, state.pendingCalendarDate.monthIndex, state.pendingCalendarDate.day, 9, 0, 0)
+      : new Date();
+    var targetIsoDate = targetDateObj.toISOString();
+    var savedCalCtx = state.pendingCalendarDate ? Object.assign({}, state.pendingCalendarDate) : null;
+
     var payload = {
       serviceType: selectedNewService,
       bulan: bulan,
+      tanggal: targetIsoDate,
       totalCaseIsu: issue,
       caseIssue: issue,
       requestor: req,
@@ -3795,14 +3838,15 @@
           requestor: req,
           status: st,
           followUpTo: follow,
-          tanggal: new Date().toISOString(),
+          tanggal: targetIsoDate,
           nama: nama,
           nomorLayanan: nomor,
           detail: detail,
+          issueDetails: detail,
           progress: progressQW,
           needSupport: needSupport,
           pic: req,
-          terakhirUpdate: new Date().toISOString(),
+          terakhirUpdate: targetIsoDate,
           statusInformasi: st === 'Open' ? 'Belum Ada Update' : 'Ada Update Baru'
         };
 
@@ -3811,6 +3855,13 @@
         resetNewForm();
         updateKpiCounters();
         renderCaseList();
+        if (typeof renderCalendarGrid === 'function') renderCalendarGrid();
+        if (typeof renderTasksTable === 'function') renderTasksTable();
+        if (typeof updateTasksKpis === 'function') updateTasksKpis();
+        if (typeof renderActivityFeed === 'function') renderActivityFeed();
+        if (savedCalCtx && typeof renderCalendarRightPanel === 'function') {
+          renderCalendarRightPanel(savedCalCtx.day);
+        }
         showToast('Kasus #' + newId + ' berhasil ditambahkan ke ' + (selectedNewService === 'MOBILE' ? 'CHO Mobile' : 'CHO Fixed') + '!', 'success');
       }, 350);
     }
@@ -4329,8 +4380,25 @@
     }
 
     renderMonthYearPopover();
+    closeCalendarDayDrawer();
     renderCalendarGrid();
     renderCalendarRightPanel(state.selectedDate);
+  }
+
+  function openCalendarDayDrawer() {
+    const drawer = document.getElementById('calendar-day-drawer');
+    if (drawer) {
+      drawer.classList.remove('calendar-drawer-closed');
+      drawer.classList.add('calendar-drawer-open');
+    }
+  }
+
+  function closeCalendarDayDrawer() {
+    const drawer = document.getElementById('calendar-day-drawer');
+    if (drawer) {
+      drawer.classList.remove('calendar-drawer-open');
+      drawer.classList.add('calendar-drawer-closed');
+    }
   }
 
   function renderMonthYearPopover() {
@@ -4442,6 +4510,7 @@
       renderCalendarRightPanel(state.selectedDate);
 
       if (targetTicketId) {
+        openCalendarDayDrawer();
         showToast('Membuka Detail Isu ' + targetTicketId + ' pada Calendar', 'info');
         setTimeout(() => {
           const panel = document.getElementById('issue-cards-container');
@@ -4450,6 +4519,8 @@
             setTimeout(() => panel.classList.remove('ring-2', 'ring-blue-500', 'p-1'), 2000);
           }
         }, 300);
+      } else {
+        closeCalendarDayDrawer();
       }
     } else if (viewName === 'tasks') {
       if (vTasks) vTasks.classList.remove('hidden');
@@ -4503,13 +4574,18 @@
       }
       const itemCount = dayItems.length;
 
-      html += '<div class="calendar-day-cell min-h-[78px] sm:min-h-[90px] lg:min-h-[clamp(88px,12.2vh,118px)] p-2 sm:p-2.5 flex flex-col justify-between cursor-pointer ' + (isSelected ? 'is-selected' : isWeekend ? 'bg-slate-50/45' : 'bg-white') + '" onclick="handleCalendarDateClick(' + day + ')">';
+      const hasDetails = !!(calData.details && calData.details[day]);
+      const hasAnyDayContent = hasDetails || itemCount > 0;
+
+      html += '<div class="calendar-day-cell group min-h-[78px] sm:min-h-[90px] lg:min-h-[clamp(88px,12.2vh,118px)] p-2 sm:p-2.5 flex flex-col justify-between cursor-pointer ' + (isSelected ? 'is-selected' : isWeekend ? 'bg-slate-50/45' : 'bg-white') + '" onclick="handleCalendarDateClick(' + day + ')">';
       html += '  <div class="flex items-center justify-between gap-1">';
       html += '    <span class="text-xs sm:text-[13px] font-extrabold ' + (isSelected ? 'text-blue-700 font-headline' : isWeekend ? 'text-slate-500' : 'text-slate-800') + '">' + day + '</span>';
       if (isSelected) {
         html += '    <span class="px-2 py-0.5 rounded-full text-[9.5px] font-bold bg-blue-600 text-white shadow-xs">Dipilih</span>';
       } else if (itemCount > 0) {
         html += '    <span class="px-1.5 py-0.5 rounded-md text-[9.5px] font-bold bg-slate-100 text-slate-600">' + itemCount + ' item</span>';
+      } else {
+        html += '    <span class="opacity-0 group-hover:opacity-100 transition-opacity px-1.5 py-0.5 rounded-md text-[9px] font-bold bg-blue-50 text-blue-600 border border-blue-200/70">+ Input</span>';
       }
       html += '  </div>';
 
@@ -4530,7 +4606,10 @@
       }
       html += '  </div>';
 
-      html += '  <div class="text-[9.5px] text-slate-300 self-end mt-0.5">' + (isWeekend ? 'Akhir pekan' : '') + '</div>';
+      html += '  <div class="flex items-center justify-between text-[9.5px] mt-0.5">';
+      html += '    <span class="text-blue-600/80 font-semibold opacity-0 group-hover:opacity-100 transition-opacity">' + (hasAnyDayContent ? 'Lihat detail &rarr;' : '') + '</span>';
+      html += '    <span class="text-slate-300">' + (isWeekend ? 'Akhir pekan' : '') + '</span>';
+      html += '  </div>';
       html += '</div>';
     }
 
@@ -4544,7 +4623,24 @@
   function handleCalendarDateClick(day) {
     state.selectedDate = day;
     renderCalendarGrid();
-    renderCalendarRightPanel(day);
+
+    const calData = getCalendarMonthData(state.selectedYear, state.selectedMonthIndex);
+    const dayItems = (calData.items && calData.items[day]) ? calData.items[day].filter(it =>
+      !state.tasksFilterUnit || state.tasksFilterUnit === 'all' || it.unit === 'all' || it.unit === state.tasksFilterUnit
+    ) : [];
+    const hasDetails = !!(calData.details && calData.details[day]);
+
+    if (hasDetails || dayItems.length > 0) {
+      renderCalendarRightPanel(day);
+      openCalendarDayDrawer();
+    } else {
+      closeCalendarDayDrawer();
+      if (state.authUser && (state.authUser.role === 'Facilitator' || state.authUser.role === 'Viewer')) {
+        showToast(formatFullIndoDate(state.selectedYear, state.selectedMonthIndex, day) + ' belum memiliki agenda atau kasus.', 'info');
+      } else {
+        openNewModal({ year: state.selectedYear, monthIndex: state.selectedMonthIndex, day: day });
+      }
+    }
   }
 
   function renderCalendarRightPanel(day) {
@@ -4973,6 +5069,11 @@
     if (btnCloseDrawerFoot) btnCloseDrawerFoot.addEventListener('click', closeDrawer);
     if (drawerBackdrop) drawerBackdrop.addEventListener('click', closeDrawer);
 
+    const btnCloseCalDrawer = document.getElementById('btn-close-calendar-drawer');
+    const calDrawerBackdrop = document.getElementById('calendar-drawer-backdrop');
+    if (btnCloseCalDrawer) btnCloseCalDrawer.addEventListener('click', closeCalendarDayDrawer);
+    if (calDrawerBackdrop) calDrawerBackdrop.addEventListener('click', closeCalendarDayDrawer);
+
     // Modern Month & Year Popover Picker Events
     const btnMonthTrigger = document.getElementById('btn-month-year-trigger');
     const pickerWrap = document.getElementById('modern-month-picker-wrap');
@@ -5014,7 +5115,15 @@
       }
     });
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeMonthYearPopover();
+      if (e.key === 'Escape') {
+        closeMonthYearPopover();
+        const issDrawer = document.getElementById('issue-drawer');
+        if (issDrawer && issDrawer.classList.contains('drawer-open')) {
+          closeDrawer();
+        } else {
+          closeCalendarDayDrawer();
+        }
+      }
     });
 
     // Prev / Next / Today Month Navigation
@@ -5215,6 +5324,9 @@
   window.activateView = activateView;
   window.openDrawer = openDrawer;
   window.closeDrawer = closeDrawer;
+  window.openCalendarDayDrawer = openCalendarDayDrawer;
+  window.closeCalendarDayDrawer = closeCalendarDayDrawer;
+  window.setCalendarMonthYear = setCalendarMonthYear;
   window.handleCalendarDateClick = handleCalendarDateClick;
 
   // Bootstrap saat DOM siap

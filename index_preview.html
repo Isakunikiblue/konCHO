@@ -4580,6 +4580,7 @@
 
   /* Drawer Animations */
   #issue-drawer {
+    z-index: 70 !important;
     transition: opacity 0.3s ease, visibility 0.3s ease;
   }
   #issue-drawer.drawer-open {
@@ -4611,6 +4612,45 @@
   }
   #issue-drawer.drawer-closed #drawer-backdrop {
     opacity: 0 !important;
+  }
+
+  /* Calendar Day Slide-Over Drawer (Right Overlay) */
+  #calendar-day-drawer {
+    z-index: 60 !important;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+  }
+  #calendar-day-drawer.calendar-drawer-open {
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+  #calendar-day-drawer.calendar-drawer-closed {
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+  #right-detail-panel {
+    transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  #calendar-day-drawer.calendar-drawer-open #right-detail-panel {
+    transform: translateX(0) !important;
+  }
+  #calendar-day-drawer.calendar-drawer-closed #right-detail-panel {
+    transform: translateX(100%) !important;
+  }
+  #calendar-drawer-backdrop {
+    transition: opacity 0.25s ease;
+  }
+  #calendar-day-drawer.calendar-drawer-open #calendar-drawer-backdrop {
+    opacity: 1 !important;
+  }
+  #calendar-day-drawer.calendar-drawer-closed #calendar-drawer-backdrop {
+    opacity: 0 !important;
+  }
+
+  /* Ensure Modals appear above Drawers */
+  .modal-backdrop {
+    z-index: 250 !important;
   }
 
 </style>
@@ -4913,10 +4953,10 @@
            VIEW 1: konCHO CALENDAR DASHBOARD VIEW (#view-calendar)
            ===================================================================== -->
       <div id="view-calendar" class="transition-all duration-300 block mb-2">
-        <div class="max-w-[1680px] mx-auto flex flex-col xl:flex-row gap-5 items-start">
+        <div class="max-w-[1680px] mx-auto flex flex-col gap-3 w-full">
           
-          <!-- LEFT / MAIN CALENDAR WORKSPACE -->
-          <div class="flex-1 flex flex-col gap-2.5 sm:gap-3 min-w-0 w-full">
+          <!-- FULL-WIDTH MAIN CALENDAR WORKSPACE -->
+          <div class="flex flex-col gap-2.5 sm:gap-3 min-w-0 w-full">
             
             <!-- CALENDAR CONTROL BAR -->
             <div class="bg-white rounded-xl p-2.5 sm:p-3 shadow-xs border border-slate-200/90 flex flex-col xl:flex-row xl:items-center justify-between gap-2.5">
@@ -5048,124 +5088,139 @@
 
           </div>
 
-          <!-- RIGHT MONITORING & AGENDA PANEL -->
-          <div id="right-detail-panel" class="w-full xl:w-[370px] 2xl:w-[395px] shrink-0 flex flex-col gap-3">
-            
-            <!-- Panel Header Card -->
-            <div class="bg-white rounded-xl p-4 shadow-sm border border-slate-200/90 flex flex-col gap-3">
-              <div class="flex items-start justify-between">
-                <div>
-                  <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Monitoring & Agenda Harian</span>
-                  <h2 class="font-headline text-lg sm:text-xl font-extrabold text-[#061345] tracking-tight mt-0.5" id="panel-selected-date">Sabtu, 24 Oktober 2026</h2>
-                </div>
-                <span id="panel-agenda-badge" class="bg-blue-100 text-[#061345] text-xs font-bold px-2.5 py-0.5 rounded-full">
-                  3 Agenda
-                </span>
-              </div>
+          <!-- SLIDE-OVER DAY DETAIL DRAWER (RIGHT OVERLAY WHEN FILLED DATE IS CLICKED) -->
+          <div id="calendar-day-drawer" class="fixed inset-0 overflow-hidden calendar-drawer-closed" role="dialog" aria-modal="true" aria-labelledby="panel-selected-date">
+            <div id="calendar-drawer-backdrop" class="fixed inset-0 bg-slate-900/45 backdrop-blur-[2px] cursor-pointer"></div>
 
-              <div class="flex items-center pt-1.5 border-t border-slate-100">
-                <button class="btn-hdr btn-primary w-full flex-1 h-9 bg-gradient-to-r from-[#061345] to-[#1e295a] hover:from-[#1e295a] hover:to-[#2e3b78] text-white text-xs font-bold rounded-lg shadow-sm hover:shadow transition-all flex items-center justify-center gap-1.5 cursor-pointer" id="btnOpenNewModal" type="button" title="Input Kasus / Isu Baru" onclick="if(window.openNewModal) openNewModal()">
-                  <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
-                  <span>+ Input Case Baru</span>
-                </button>
-              </div>
-            </div>
-
-            <!-- DAFTAR AGENDA PERTEMUAN -->
-            <div id="card-agenda-pertemuan" class="bg-white rounded-xl p-4 shadow-sm border border-slate-200/90 flex flex-col gap-3">
-              <div class="flex items-center justify-between">
-                <h3 class="font-headline text-xs font-bold text-slate-900 uppercase tracking-wide flex items-center gap-1.5">
-                  <span class="material-symbols-outlined text-[16px] text-blue-600">calendar_today</span>
-                  <span>Daftar Agenda Pertemuan</span>
-                </h3>
-                <span class="text-[10px] text-slate-400 font-medium">Zona WIB</span>
-              </div>
-
-              <div id="agenda-cards-container" class="flex flex-col gap-2.5">
-                <!-- Populated dynamically -->
-              </div>
-            </div>
-
-            <!-- DAFTAR ISU & KENDALA -->
-            <div id="card-isu-kendala" class="bg-white rounded-xl p-4 shadow-sm border border-slate-200/90 flex flex-col gap-3">
-              <div class="flex items-center justify-between">
-                <h3 class="font-headline text-xs font-bold text-slate-900 uppercase tracking-wide flex items-center gap-1.5">
-                  <span class="material-symbols-outlined text-[16px] text-rose-500">warning</span>
-                  <span>Daftar Isu & Kendala</span>
-                </h3>
-                <button id="btn-report-issue" class="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-0.5" type="button">
-                  <span class="material-symbols-outlined text-[14px]">add</span>
-                  <span>Laporkan</span>
-                </button>
-              </div>
-
-              <div id="issue-cards-container" class="flex flex-col gap-2.5">
-                <!-- Populated dynamically -->
-              </div>
-            </div>
-
-            <!-- QUICK WINS & SOLUSI CEPAT -->
-            <div id="card-quickwins" class="bg-white rounded-xl p-4 shadow-sm border border-slate-200/90 flex flex-col gap-3">
-              <div class="flex items-center justify-between">
-                <h3 class="font-headline text-xs font-bold text-slate-900 uppercase tracking-wide flex items-center gap-1.5">
-                  <span class="material-symbols-outlined text-[16px] text-emerald-600">bolt</span>
-                  <span>Quick Wins & Solusi Cepat</span>
-                </h3>
-                <button id="btn-add-quickwin" class="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-0.5" type="button">
-                  <span class="material-symbols-outlined text-[14px]">add</span>
-                  <span>Tambah</span>
-                </button>
-              </div>
-
-              <div id="quickwins-container" class="flex flex-col gap-2">
-                <!-- Populated dynamically -->
-              </div>
-            </div>
-
-            <!-- DOKUMEN PRESENTASI & MATERI PPT -->
-            <div id="card-dokumen-presentasi" class="bg-white rounded-xl p-4 shadow-sm border border-slate-200/90 flex flex-col gap-3">
-              <div class="flex items-center justify-between">
-                <h3 class="font-headline text-xs font-bold text-slate-900 uppercase tracking-wide flex items-center gap-1.5">
-                  <span class="material-symbols-outlined text-[16px] text-indigo-600">description</span>
-                  <span>Dokumen Presentasi</span>
-                </h3>
-                <span class="text-[10px] font-medium text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">Tersinkronisasi</span>
-              </div>
-
-              <div id="presentation-deck-container" class="flex flex-col gap-2.5">
-                <div id="calendar-ppt-dropzone" class="border-2 border-dashed border-slate-200 hover:border-blue-400 rounded-xl p-4 text-center cursor-pointer transition-colors bg-slate-50/50" onclick="if(window.openUploadPptModal) openUploadPptModal('1', 'MOBILE')">
-                  <span class="material-symbols-outlined text-[28px] text-slate-400">cloud_upload</span>
-                  <p class="text-xs font-semibold text-slate-700 mt-1">Tarik & lepas file PPT / PDF ke sini</p>
-                  <p class="text-[11px] text-slate-400">atau <span class="text-blue-600 font-semibold underline">Pilih dari Komputer</span> (Maks. 50 MB)</p>
-                </div>
-
-                <div id="calendar-ppt-file-card" class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between gap-2">
-                  <div class="flex items-center gap-2.5 min-w-0">
-                    <div class="w-8 h-8 rounded-lg bg-red-100 text-red-600 flex items-center justify-center shrink-0">
-                      <span class="material-symbols-outlined text-[18px]">slideshow</span>
+            <div class="fixed inset-y-0 right-0 max-w-full flex pl-8 sm:pl-12 pointer-events-none">
+              <div id="right-detail-panel" class="pointer-events-auto w-screen max-w-[420px] bg-slate-50 shadow-2xl border-l border-slate-200 flex flex-col h-full">
+                
+                <!-- Drawer Sticky Header -->
+                <div class="bg-white p-4 border-b border-slate-200/90 flex flex-col gap-3 shrink-0 shadow-xs">
+                  <div class="flex items-start justify-between gap-2">
+                    <div class="min-w-0">
+                      <div class="flex items-center gap-2 flex-wrap">
+                        <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Agenda &amp; Isu Tanggal</span>
+                        <span id="panel-agenda-badge" class="bg-blue-100 text-[#061345] text-[10px] font-bold px-2 py-0.5 rounded-full">
+                          2 Agenda
+                        </span>
+                      </div>
+                      <h2 class="font-headline text-base sm:text-lg font-extrabold text-[#061345] tracking-tight mt-0.5 truncate" id="panel-selected-date">Sabtu, 24 Oktober 2026</h2>
                     </div>
-                    <div class="flex flex-col min-w-0">
-                      <span id="presentation-deck-name" class="text-xs font-bold text-slate-800 truncate">Materi_Konsolidasi_CHO_v2.4.pptx</span>
-                      <span id="presentation-deck-meta" class="text-[10px] text-slate-500">14.8 MB • Diupload AU</span>
-                    </div>
+                    <button id="btn-close-calendar-drawer" type="button" class="w-8 h-8 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-600 flex items-center justify-center transition-colors shrink-0 cursor-pointer" title="Tutup Detail Tanggal">
+                      <span class="material-symbols-outlined text-[18px]">close</span>
+                    </button>
                   </div>
-                  <div class="flex items-center gap-1 shrink-0">
-                    <a id="btn-download-deck" href="https://drive.google.com/drive/folders/1KHMMjAovxmRpyd0JTAehyoSgH2sWItMV?hl=ID" target="_blank" rel="noopener noreferrer" class="w-7 h-7 rounded bg-white hover:bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600" title="Unduh PPT">
-                      <span class="material-symbols-outlined text-[15px]">download</span>
-                    </a>
-                    <button id="btn-delete-deck" class="w-7 h-7 rounded bg-rose-50 hover:bg-rose-100 border border-rose-200 flex items-center justify-center text-rose-600" title="Hapus PPT (Role Admin)" onclick="if(window.handleDeletePpt) handleDeletePpt('1', 'MOBILE')">
-                      <span class="material-symbols-outlined text-[15px]">delete</span>
+
+                  <div class="flex items-center">
+                    <button class="btn-hdr btn-primary w-full flex-1 h-9 bg-gradient-to-r from-[#061345] to-[#1e295a] hover:from-[#1e295a] hover:to-[#2e3b78] text-white text-xs font-bold rounded-lg shadow-sm hover:shadow transition-all flex items-center justify-center gap-1.5 cursor-pointer" id="btnOpenNewModal" type="button" title="Input Kasus / Isu Baru" onclick="if(window.openNewModal) openNewModal()">
+                      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"></line><line x1="5" y1="12" x2="19" y2="12"></line></svg>
+                      <span>+ Input Case Baru</span>
                     </button>
                   </div>
                 </div>
 
-                <a href="https://teams.microsoft.com" target="_blank" rel="noopener noreferrer" class="w-full h-8 bg-[#061345] hover:bg-[#1e295a] text-white text-xs font-bold rounded-lg flex items-center justify-center gap-1.5 transition-colors">
-                  <span class="material-symbols-outlined text-[16px]">co_present</span>
-                  <span>Buka di konCHO Teams</span>
-                </a>
+                <!-- Drawer Scrollable Body -->
+                <div class="flex-1 overflow-y-auto p-4 flex flex-col gap-3.5">
+
+                  <!-- DAFTAR AGENDA PERTEMUAN -->
+                  <div id="card-agenda-pertemuan" class="bg-white rounded-xl p-3.5 shadow-xs border border-slate-200/90 flex flex-col gap-2.5">
+                    <div class="flex items-center justify-between">
+                      <h3 class="font-headline text-xs font-bold text-slate-900 uppercase tracking-wide flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-[16px] text-blue-600">calendar_today</span>
+                        <span>Daftar Agenda Pertemuan</span>
+                      </h3>
+                      <span class="text-[10px] text-slate-400 font-medium">Zona WIB</span>
+                    </div>
+
+                    <div id="agenda-cards-container" class="flex flex-col gap-2">
+                      <!-- Populated dynamically -->
+                    </div>
+                  </div>
+
+                  <!-- DAFTAR ISU & KENDALA -->
+                  <div id="card-isu-kendala" class="bg-white rounded-xl p-3.5 shadow-xs border border-slate-200/90 flex flex-col gap-2.5">
+                    <div class="flex items-center justify-between">
+                      <h3 class="font-headline text-xs font-bold text-slate-900 uppercase tracking-wide flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-[16px] text-rose-500">warning</span>
+                        <span>Daftar Isu &amp; Kendala</span>
+                      </h3>
+                      <button id="btn-report-issue" class="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-0.5 cursor-pointer" type="button" onclick="if(window.openNewModal) openNewModal()">
+                        <span class="material-symbols-outlined text-[14px]">add</span>
+                        <span>Laporkan</span>
+                      </button>
+                    </div>
+
+                    <div id="issue-cards-container" class="flex flex-col gap-2">
+                      <!-- Populated dynamically -->
+                    </div>
+                  </div>
+
+                  <!-- QUICK WINS & SOLUSI CEPAT -->
+                  <div id="card-quickwins" class="bg-white rounded-xl p-3.5 shadow-xs border border-slate-200/90 flex flex-col gap-2.5">
+                    <div class="flex items-center justify-between">
+                      <h3 class="font-headline text-xs font-bold text-slate-900 uppercase tracking-wide flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-[16px] text-emerald-600">bolt</span>
+                        <span>Quick Wins &amp; Solusi Cepat</span>
+                      </h3>
+                      <button id="btn-add-quickwin" class="text-xs font-bold text-blue-600 hover:text-blue-800 flex items-center gap-0.5 cursor-pointer" type="button" onclick="if(window.openNewModal) openNewModal()">
+                        <span class="material-symbols-outlined text-[14px]">add</span>
+                        <span>Tambah</span>
+                      </button>
+                    </div>
+
+                    <div id="quickwins-container" class="flex flex-col gap-2">
+                      <!-- Populated dynamically -->
+                    </div>
+                  </div>
+
+                  <!-- DOKUMEN PRESENTASI & MATERI PPT -->
+                  <div id="card-dokumen-presentasi" class="bg-white rounded-xl p-3.5 shadow-xs border border-slate-200/90 flex flex-col gap-2.5">
+                    <div class="flex items-center justify-between">
+                      <h3 class="font-headline text-xs font-bold text-slate-900 uppercase tracking-wide flex items-center gap-1.5">
+                        <span class="material-symbols-outlined text-[16px] text-indigo-600">description</span>
+                        <span>Dokumen Presentasi</span>
+                      </h3>
+                      <span class="text-[10px] font-medium text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">Tersinkronisasi</span>
+                    </div>
+
+                    <div id="presentation-deck-container" class="flex flex-col gap-2.5">
+                      <div id="calendar-ppt-dropzone" class="border-2 border-dashed border-slate-200 hover:border-blue-400 rounded-xl p-3.5 text-center cursor-pointer transition-colors bg-slate-50/50" onclick="if(window.openUploadPptModal) openUploadPptModal('1', 'MOBILE')">
+                        <span class="material-symbols-outlined text-[26px] text-slate-400">cloud_upload</span>
+                        <p class="text-xs font-semibold text-slate-700 mt-1">Tarik &amp; lepas file PPT / PDF ke sini</p>
+                        <p class="text-[11px] text-slate-400">atau <span class="text-blue-600 font-semibold underline">Pilih dari Komputer</span> (Maks. 50 MB)</p>
+                      </div>
+
+                      <div id="calendar-ppt-file-card" class="p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between gap-2">
+                        <div class="flex items-center gap-2.5 min-w-0">
+                          <div class="w-8 h-8 rounded-lg bg-red-100 text-red-600 flex items-center justify-center shrink-0">
+                            <span class="material-symbols-outlined text-[18px]">slideshow</span>
+                          </div>
+                          <div class="flex flex-col min-w-0">
+                            <span id="presentation-deck-name" class="text-xs font-bold text-slate-800 truncate">Materi_Konsolidasi_CHO_v2.4.pptx</span>
+                            <span id="presentation-deck-meta" class="text-[10px] text-slate-500">14.8 MB • Diupload AU</span>
+                          </div>
+                        </div>
+                        <div class="flex items-center gap-1 shrink-0">
+                          <a id="btn-download-deck" href="https://drive.google.com/drive/folders/1KHMMjAovxmRpyd0JTAehyoSgH2sWItMV?hl=ID" target="_blank" rel="noopener noreferrer" class="w-7 h-7 rounded bg-white hover:bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-600" title="Unduh PPT">
+                            <span class="material-symbols-outlined text-[15px]">download</span>
+                          </a>
+                          <button id="btn-delete-deck" class="w-7 h-7 rounded bg-rose-50 hover:bg-rose-100 border border-rose-200 flex items-center justify-center text-rose-600" title="Hapus PPT (Role Admin)" onclick="if(window.handleDeletePpt) handleDeletePpt('1', 'MOBILE')">
+                            <span class="material-symbols-outlined text-[15px]">delete</span>
+                          </button>
+                        </div>
+                      </div>
+
+                      <a href="https://teams.microsoft.com" target="_blank" rel="noopener noreferrer" class="w-full h-8 bg-[#061345] hover:bg-[#1e295a] text-white text-xs font-bold rounded-lg flex items-center justify-center gap-1.5 transition-colors">
+                        <span class="material-symbols-outlined text-[16px]">co_present</span>
+                        <span>Buka di konCHO Teams</span>
+                      </a>
+                    </div>
+                  </div>
+
+                </div>
               </div>
             </div>
-
           </div>
 
         </div>
@@ -5914,6 +5969,7 @@
           <div class="modal-title-wrap">
             <div class="modal-kicker">Tambah Data Laporan</div>
             <h2 class="modal-title">Input Case Isu CHO Baru</h2>
+            <div id="newModalDatePill" style="display:none; margin-top:6px; align-items:center; gap:5px; padding:3px 10px; border-radius:9999px; font-size:11px; font-weight:700; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe;"></div>
           </div>
           <button class="modal-close-btn" id="btnCloseModal" title="Tutup">✕</button>
         </div>
@@ -10519,7 +10575,7 @@
    * MODAL INPUT KASUS BARU
    * =========================================================================
    */
-  function openNewModal() {
+  function openNewModal(dateContext) {
     if (state.authUser && (state.authUser.role === 'Facilitator' || state.authUser.role === 'Viewer')) {
       showToast('Akses ditolak: Peran ' + state.authUser.role + ' tidak berwenang menginput data kasus baru.', 'error');
       return;
@@ -10529,9 +10585,42 @@
     } else {
       setNewModalService('MOBILE');
     }
-    if (dom.inputBulanTahun && state.activeMonthFilter !== 'all') {
-      dom.inputBulanTahun.value = state.activeMonthFilter;
+
+    // Jika dibuka dari tanggal kalender (atau sedang di view kalender), sinkronkan Bulan - Tahun & badge tanggal
+    var ctx = (dateContext && typeof dateContext.year === 'number' && typeof dateContext.monthIndex === 'number' && typeof dateContext.day === 'number')
+      ? dateContext
+      : (state.activeView === 'calendar' && typeof state.selectedYear === 'number' && typeof state.selectedMonthIndex === 'number' && typeof state.selectedDate === 'number')
+        ? { year: state.selectedYear, monthIndex: state.selectedMonthIndex, day: state.selectedDate }
+        : null;
+
+    state.pendingCalendarDate = ctx;
+
+    var datePill = document.getElementById('newModalDatePill');
+    if (ctx && typeof CAL_MONTHS_ID !== 'undefined') {
+      var targetMonthYear = CAL_MONTHS_ID[ctx.monthIndex] + ' ' + ctx.year;
+      if (dom.inputBulanTahun) {
+        var optExists = Array.from(dom.inputBulanTahun.options).some(function(o) { return o.value === targetMonthYear; });
+        if (!optExists) {
+          var newOpt = document.createElement('option');
+          newOpt.value = targetMonthYear;
+          newOpt.textContent = targetMonthYear;
+          dom.inputBulanTahun.appendChild(newOpt);
+        }
+        dom.inputBulanTahun.value = targetMonthYear;
+      }
+      if (datePill) {
+        datePill.textContent = '📅 Tanggal Terpilih: ' + formatFullIndoDate(ctx.year, ctx.monthIndex, ctx.day);
+        datePill.style.display = 'inline-flex';
+      }
+    } else {
+      if (dom.inputBulanTahun && state.activeMonthFilter !== 'all') {
+        dom.inputBulanTahun.value = state.activeMonthFilter;
+      }
+      if (datePill) {
+        datePill.style.display = 'none';
+      }
     }
+
     // Kosongkan form inputan agar data sebelumnya tidak terbaca
     if (dom.inputCaseIssue) dom.inputCaseIssue.value = '';
     if (dom.inputRequestor) dom.inputRequestor.value = '';
@@ -10550,6 +10639,9 @@
 
   function closeNewModal() {
     dom.newDataModal.classList.remove('active');
+    state.pendingCalendarDate = null;
+    var datePill = document.getElementById('newModalDatePill');
+    if (datePill) datePill.style.display = 'none';
     if (dom.inputCaseIssue) dom.inputCaseIssue.value = '';
     if (dom.inputRequestor) dom.inputRequestor.value = '';
     if (dom.inputProgress) dom.inputProgress.value = '';
@@ -10618,9 +10710,16 @@
       return;
     }
 
+    var targetDateObj = state.pendingCalendarDate
+      ? new Date(state.pendingCalendarDate.year, state.pendingCalendarDate.monthIndex, state.pendingCalendarDate.day, 9, 0, 0)
+      : new Date();
+    var targetIsoDate = targetDateObj.toISOString();
+    var savedCalCtx = state.pendingCalendarDate ? Object.assign({}, state.pendingCalendarDate) : null;
+
     var payload = {
       serviceType: selectedNewService,
       bulan: bulan,
+      tanggal: targetIsoDate,
       totalCaseIsu: issue,
       caseIssue: issue,
       requestor: req,
@@ -10697,14 +10796,15 @@
           requestor: req,
           status: st,
           followUpTo: follow,
-          tanggal: new Date().toISOString(),
+          tanggal: targetIsoDate,
           nama: nama,
           nomorLayanan: nomor,
           detail: detail,
+          issueDetails: detail,
           progress: progressQW,
           needSupport: needSupport,
           pic: req,
-          terakhirUpdate: new Date().toISOString(),
+          terakhirUpdate: targetIsoDate,
           statusInformasi: st === 'Open' ? 'Belum Ada Update' : 'Ada Update Baru'
         };
 
@@ -10713,6 +10813,13 @@
         resetNewForm();
         updateKpiCounters();
         renderCaseList();
+        if (typeof renderCalendarGrid === 'function') renderCalendarGrid();
+        if (typeof renderTasksTable === 'function') renderTasksTable();
+        if (typeof updateTasksKpis === 'function') updateTasksKpis();
+        if (typeof renderActivityFeed === 'function') renderActivityFeed();
+        if (savedCalCtx && typeof renderCalendarRightPanel === 'function') {
+          renderCalendarRightPanel(savedCalCtx.day);
+        }
         showToast('Kasus #' + newId + ' berhasil ditambahkan ke ' + (selectedNewService === 'MOBILE' ? 'CHO Mobile' : 'CHO Fixed') + '!', 'success');
       }, 350);
     }
@@ -11231,8 +11338,25 @@
     }
 
     renderMonthYearPopover();
+    closeCalendarDayDrawer();
     renderCalendarGrid();
     renderCalendarRightPanel(state.selectedDate);
+  }
+
+  function openCalendarDayDrawer() {
+    const drawer = document.getElementById('calendar-day-drawer');
+    if (drawer) {
+      drawer.classList.remove('calendar-drawer-closed');
+      drawer.classList.add('calendar-drawer-open');
+    }
+  }
+
+  function closeCalendarDayDrawer() {
+    const drawer = document.getElementById('calendar-day-drawer');
+    if (drawer) {
+      drawer.classList.remove('calendar-drawer-open');
+      drawer.classList.add('calendar-drawer-closed');
+    }
   }
 
   function renderMonthYearPopover() {
@@ -11344,6 +11468,7 @@
       renderCalendarRightPanel(state.selectedDate);
 
       if (targetTicketId) {
+        openCalendarDayDrawer();
         showToast('Membuka Detail Isu ' + targetTicketId + ' pada Calendar', 'info');
         setTimeout(() => {
           const panel = document.getElementById('issue-cards-container');
@@ -11352,6 +11477,8 @@
             setTimeout(() => panel.classList.remove('ring-2', 'ring-blue-500', 'p-1'), 2000);
           }
         }, 300);
+      } else {
+        closeCalendarDayDrawer();
       }
     } else if (viewName === 'tasks') {
       if (vTasks) vTasks.classList.remove('hidden');
@@ -11405,13 +11532,18 @@
       }
       const itemCount = dayItems.length;
 
-      html += '<div class="calendar-day-cell min-h-[78px] sm:min-h-[90px] lg:min-h-[clamp(88px,12.2vh,118px)] p-2 sm:p-2.5 flex flex-col justify-between cursor-pointer ' + (isSelected ? 'is-selected' : isWeekend ? 'bg-slate-50/45' : 'bg-white') + '" onclick="handleCalendarDateClick(' + day + ')">';
+      const hasDetails = !!(calData.details && calData.details[day]);
+      const hasAnyDayContent = hasDetails || itemCount > 0;
+
+      html += '<div class="calendar-day-cell group min-h-[78px] sm:min-h-[90px] lg:min-h-[clamp(88px,12.2vh,118px)] p-2 sm:p-2.5 flex flex-col justify-between cursor-pointer ' + (isSelected ? 'is-selected' : isWeekend ? 'bg-slate-50/45' : 'bg-white') + '" onclick="handleCalendarDateClick(' + day + ')">';
       html += '  <div class="flex items-center justify-between gap-1">';
       html += '    <span class="text-xs sm:text-[13px] font-extrabold ' + (isSelected ? 'text-blue-700 font-headline' : isWeekend ? 'text-slate-500' : 'text-slate-800') + '">' + day + '</span>';
       if (isSelected) {
         html += '    <span class="px-2 py-0.5 rounded-full text-[9.5px] font-bold bg-blue-600 text-white shadow-xs">Dipilih</span>';
       } else if (itemCount > 0) {
         html += '    <span class="px-1.5 py-0.5 rounded-md text-[9.5px] font-bold bg-slate-100 text-slate-600">' + itemCount + ' item</span>';
+      } else {
+        html += '    <span class="opacity-0 group-hover:opacity-100 transition-opacity px-1.5 py-0.5 rounded-md text-[9px] font-bold bg-blue-50 text-blue-600 border border-blue-200/70">+ Input</span>';
       }
       html += '  </div>';
 
@@ -11432,7 +11564,10 @@
       }
       html += '  </div>';
 
-      html += '  <div class="text-[9.5px] text-slate-300 self-end mt-0.5">' + (isWeekend ? 'Akhir pekan' : '') + '</div>';
+      html += '  <div class="flex items-center justify-between text-[9.5px] mt-0.5">';
+      html += '    <span class="text-blue-600/80 font-semibold opacity-0 group-hover:opacity-100 transition-opacity">' + (hasAnyDayContent ? 'Lihat detail &rarr;' : '') + '</span>';
+      html += '    <span class="text-slate-300">' + (isWeekend ? 'Akhir pekan' : '') + '</span>';
+      html += '  </div>';
       html += '</div>';
     }
 
@@ -11446,7 +11581,24 @@
   function handleCalendarDateClick(day) {
     state.selectedDate = day;
     renderCalendarGrid();
-    renderCalendarRightPanel(day);
+
+    const calData = getCalendarMonthData(state.selectedYear, state.selectedMonthIndex);
+    const dayItems = (calData.items && calData.items[day]) ? calData.items[day].filter(it =>
+      !state.tasksFilterUnit || state.tasksFilterUnit === 'all' || it.unit === 'all' || it.unit === state.tasksFilterUnit
+    ) : [];
+    const hasDetails = !!(calData.details && calData.details[day]);
+
+    if (hasDetails || dayItems.length > 0) {
+      renderCalendarRightPanel(day);
+      openCalendarDayDrawer();
+    } else {
+      closeCalendarDayDrawer();
+      if (state.authUser && (state.authUser.role === 'Facilitator' || state.authUser.role === 'Viewer')) {
+        showToast(formatFullIndoDate(state.selectedYear, state.selectedMonthIndex, day) + ' belum memiliki agenda atau kasus.', 'info');
+      } else {
+        openNewModal({ year: state.selectedYear, monthIndex: state.selectedMonthIndex, day: day });
+      }
+    }
   }
 
   function renderCalendarRightPanel(day) {
@@ -11875,6 +12027,11 @@
     if (btnCloseDrawerFoot) btnCloseDrawerFoot.addEventListener('click', closeDrawer);
     if (drawerBackdrop) drawerBackdrop.addEventListener('click', closeDrawer);
 
+    const btnCloseCalDrawer = document.getElementById('btn-close-calendar-drawer');
+    const calDrawerBackdrop = document.getElementById('calendar-drawer-backdrop');
+    if (btnCloseCalDrawer) btnCloseCalDrawer.addEventListener('click', closeCalendarDayDrawer);
+    if (calDrawerBackdrop) calDrawerBackdrop.addEventListener('click', closeCalendarDayDrawer);
+
     // Modern Month & Year Popover Picker Events
     const btnMonthTrigger = document.getElementById('btn-month-year-trigger');
     const pickerWrap = document.getElementById('modern-month-picker-wrap');
@@ -11916,7 +12073,15 @@
       }
     });
     document.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape') closeMonthYearPopover();
+      if (e.key === 'Escape') {
+        closeMonthYearPopover();
+        const issDrawer = document.getElementById('issue-drawer');
+        if (issDrawer && issDrawer.classList.contains('drawer-open')) {
+          closeDrawer();
+        } else {
+          closeCalendarDayDrawer();
+        }
+      }
     });
 
     // Prev / Next / Today Month Navigation
@@ -12117,6 +12282,9 @@
   window.activateView = activateView;
   window.openDrawer = openDrawer;
   window.closeDrawer = closeDrawer;
+  window.openCalendarDayDrawer = openCalendarDayDrawer;
+  window.closeCalendarDayDrawer = closeCalendarDayDrawer;
+  window.setCalendarMonthYear = setCalendarMonthYear;
   window.handleCalendarDateClick = handleCalendarDateClick;
 
   // Bootstrap saat DOM siap

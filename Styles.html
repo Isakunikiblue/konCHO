@@ -4563,6 +4563,7 @@
 
   /* Drawer Animations */
   #issue-drawer {
+    z-index: 70 !important;
     transition: opacity 0.3s ease, visibility 0.3s ease;
   }
   #issue-drawer.drawer-open {
@@ -4594,6 +4595,45 @@
   }
   #issue-drawer.drawer-closed #drawer-backdrop {
     opacity: 0 !important;
+  }
+
+  /* Calendar Day Slide-Over Drawer (Right Overlay) */
+  #calendar-day-drawer {
+    z-index: 60 !important;
+    transition: opacity 0.25s ease, visibility 0.25s ease;
+  }
+  #calendar-day-drawer.calendar-drawer-open {
+    visibility: visible !important;
+    opacity: 1 !important;
+    pointer-events: auto !important;
+  }
+  #calendar-day-drawer.calendar-drawer-closed {
+    visibility: hidden !important;
+    opacity: 0 !important;
+    pointer-events: none !important;
+  }
+  #right-detail-panel {
+    transition: transform 0.32s cubic-bezier(0.16, 1, 0.3, 1);
+  }
+  #calendar-day-drawer.calendar-drawer-open #right-detail-panel {
+    transform: translateX(0) !important;
+  }
+  #calendar-day-drawer.calendar-drawer-closed #right-detail-panel {
+    transform: translateX(100%) !important;
+  }
+  #calendar-drawer-backdrop {
+    transition: opacity 0.25s ease;
+  }
+  #calendar-day-drawer.calendar-drawer-open #calendar-drawer-backdrop {
+    opacity: 1 !important;
+  }
+  #calendar-day-drawer.calendar-drawer-closed #calendar-drawer-backdrop {
+    opacity: 0 !important;
+  }
+
+  /* Ensure Modals appear above Drawers */
+  .modal-backdrop {
+    z-index: 250 !important;
   }
 
 </style>
