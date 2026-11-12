@@ -5444,6 +5444,7 @@
                   <tr class="bg-slate-50/80 border-b border-slate-200 font-headline font-bold text-slate-600 uppercase text-[11px] tracking-wider">
                     <th class="py-3 px-4 w-12 text-center">NO</th>
                     <th class="py-3 px-4 w-32">PERIODE</th>
+                    <th class="py-3 px-4 w-36">TANGGAL (KOLOM K)</th>
                     <th class="py-3 px-4 w-28">UNIT</th>
                     <th class="py-3 px-4 min-w-[220px]">MAIN ISSUE (KOLOM C)<span class="block text-[10px] font-normal text-slate-400">&mdash; klik untuk buka calendar</span></th>
                     <th class="py-3 px-4 min-w-[320px]">DETAIL KENDALA (KOLOM D)</th>
@@ -5570,9 +5571,10 @@
             
             <div class="p-5 border-b border-slate-200 bg-slate-50 flex items-start justify-between">
               <div class="flex flex-col gap-1 pr-4">
-                <div class="flex items-center gap-2">
+                <div class="flex items-center gap-2 flex-wrap">
                   <span id="drawer-unit-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-[#061345]">CHO MOBILE</span>
                   <span id="drawer-period-badge" class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-200 text-slate-700">Oktober 2026</span>
+                  <span id="drawer-date-badge" class="px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">-</span>
                   <span id="drawer-status" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">Open</span>
                 </div>
                 <h2 id="drawer-issue-title" class="font-headline text-base font-bold text-slate-900 mt-1">Detail Tiket Isu</h2>
@@ -6005,8 +6007,15 @@
             </div>
           </div>
 
-          <!-- Baris 1: Bulan - Tahun & Requestor -->
+          <!-- Baris 1: Tanggal Agenda (Kolom K) & Bulan - Tahun -->
           <div class="form-row-2">
+            <div class="form-group">
+              <label class="form-label" for="inputTanggalAgenda">
+                Tanggal Agenda (Kolom K) <span class="req-star">*</span>
+              </label>
+              <input type="date" id="inputTanggalAgenda" class="form-control">
+            </div>
+
             <div class="form-group">
               <label class="form-label" for="inputBulanTahun">
                 Bulan - Tahun <span class="req-star">*</span>
@@ -6042,13 +6051,14 @@
                 </optgroup>
               </select>
             </div>
+          </div>
 
-            <div class="form-group">
-              <label class="form-label" for="inputRequestor">
-                Requestor <span class="req-star">*</span>
-              </label>
-              <input type="text" id="inputRequestor" class="form-control" placeholder="Contoh: Dimas (B2B Care) / Call Center 188 / Customer Care">
-            </div>
+          <!-- Baris 2: Requestor -->
+          <div class="form-group">
+            <label class="form-label" for="inputRequestor">
+              Requestor <span class="req-star">*</span>
+            </label>
+            <input type="text" id="inputRequestor" class="form-control" placeholder="Contoh: Dimas (B2B Care) / Call Center 188 / Customer Care">
           </div>
 
           <!-- Baris 2: Case Isu yang Masuk -->
@@ -6999,6 +7009,7 @@
     currentView: 'home',            // 'home' | 'detail' (Default: 'home')
     searchQuery: '',
     currentActionTicket: null,      // Tiket yang sedang ditargetkan oleh modal
+    dataSource: 'live',             // 'live' | 'simulation'
     theme: localStorage.getItem('koncho_theme') || 'dark',
     defaultAuthor: localStorage.getItem('koncho_pic_name') || ''
   };
@@ -7083,6 +7094,7 @@
     toggleMobile: document.getElementById('toggleMobile'),
     toggleFixed: document.getElementById('toggleFixed'),
     toggleEcare: document.getElementById('toggleEcare'),
+    inputTanggalAgenda: document.getElementById('inputTanggalAgenda'),
     inputBulanTahun: document.getElementById('inputBulanTahun'),
     inputCaseIssue: document.getElementById('inputCaseIssue'),
     inputRequestor: document.getElementById('inputRequestor'),
@@ -8878,7 +8890,7 @@
       google.script.run
         .withSuccessHandler(function(res) {
           if (res && res.success) {
-            processLoadedData(res);
+            processLoadedData(res, false);
             if (showToastAlert) showToast('Data berhasil diperbarui dari Spreadsheet!', 'success');
           } else {
             showToast('Gagal memuat: ' + (res ? res.error : 'Unknown'), 'error');
@@ -8897,7 +8909,7 @@
         })
         .then(function(res) {
           if (res && res.success) {
-            processLoadedData(res);
+            processLoadedData(res, false);
             
             if (showToastAlert) showToast('Data live terhubung dari Google Spreadsheet!', 'success');
           } else {
@@ -8917,7 +8929,7 @@
   function loadFallbackData(showToastAlert) {
     setTimeout(function() {
       var mock = generateMockData();
-      processLoadedData(mock);
+      processLoadedData(mock, true);
       
       if (showToastAlert) showToast('Data simulasi dimuat!', 'info');
     }, 250);
@@ -8926,7 +8938,8 @@
   /**
    * Proses data dari spreadsheet dan hubungkan keterangan log terbaru
    */
-  function processLoadedData(data) {
+  function processLoadedData(data, isSimulation) {
+    state.dataSource = isSimulation ? 'simulation' : 'live';
     state.mobileHeaders = data.mobileHeaders || [];
     state.fixedHeaders = data.fixedHeaders || [];
     state.ecareHeaders = data.ecareHeaders || [];
@@ -9517,6 +9530,7 @@
     html += '        <tr>';
     html += '          <th style="width: 50px; text-align: center;">No</th>';
     html += '          <th style="width: 135px; text-align: center;">Bulan</th>';
+    html += '          <th style="width: 130px; text-align: center;">Tanggal (Kolom K)</th>';
     html += '          <th style="width: 140px; min-width: 140px; text-align: center;">Unit</th>';
     html += '          <th style="min-width: 240px;">Main Issue (Kolom C)</th>';
     html += '          <th style="width: 155px; min-width: 155px; text-align: center;">Materi PPT (Drive)</th>';
@@ -9560,6 +9574,9 @@
       html += '          <td style="text-align: center; font-weight: 700; color: var(--text-muted);">' + (idx + 1) + '</td>';
       html += '          <td style="text-align: center;">';
       html += '            <span class="badge-month-pill">📅 ' + escapeHtml(item.bulan || 'Oktober 2026') + '</span>';
+      html += '          </td>';
+      html += '          <td style="text-align: center; white-space: nowrap;">';
+      html += '            <span class="badge-month-pill">🗓️ ' + escapeHtml(formatShortIndoDate(item.tanggal || item.terakhirUpdate) || '-') + '</span>';
       html += '          </td>';
       html += '          <td style="text-align: center; white-space: nowrap;">';
       html += '            <span class="badge-srv ' + srvClass + '">' + escapeHtml(srvLabel) + '</span>';
@@ -10626,6 +10643,51 @@
    * MODAL INPUT KASUS BARU
    * =========================================================================
    */
+  function parseDateParts(val) {
+    if (!val) return null;
+    if (val instanceof Date && !isNaN(val.getTime())) {
+      return { year: val.getFullYear(), monthIndex: val.getMonth(), day: val.getDate() };
+    }
+    var s = String(val).trim();
+    if (!s) return null;
+    var isoMatch = s.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+    if (isoMatch) {
+      var y = parseInt(isoMatch[1], 10);
+      var m = parseInt(isoMatch[2], 10) - 1;
+      var d = parseInt(isoMatch[3], 10);
+      if (m >= 0 && m <= 11 && d >= 1 && d <= 31) return { year: y, monthIndex: m, day: d };
+    }
+    var slashMatch = s.match(/^(\d{1,2})[\/-](\d{1,2})[\/-](\d{4})/);
+    if (slashMatch) {
+      var d2 = parseInt(slashMatch[1], 10);
+      var m2 = parseInt(slashMatch[2], 10) - 1;
+      var y2 = parseInt(slashMatch[3], 10);
+      if (m2 >= 0 && m2 <= 11 && d2 >= 1 && d2 <= 31) return { year: y2, monthIndex: m2, day: d2 };
+    }
+    var parsed = new Date(s);
+    if (!isNaN(parsed.getTime())) {
+      return { year: parsed.getFullYear(), monthIndex: parsed.getMonth(), day: parsed.getDate() };
+    }
+    return null;
+  }
+
+  function toIsoDateString(year, monthIndex, day) {
+    var mm = String(monthIndex + 1);
+    if (mm.length < 2) mm = '0' + mm;
+    var dd = String(day);
+    if (dd.length < 2) dd = '0' + dd;
+    return String(year) + '-' + mm + '-' + dd;
+  }
+
+  function formatShortIndoDate(val) {
+    var p = parseDateParts(val);
+    if (!p) return '-';
+    var shortMonths = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+    var dd = String(p.day);
+    if (dd.length < 2) dd = '0' + dd;
+    return dd + ' ' + (shortMonths[p.monthIndex] || '') + ' ' + p.year;
+  }
+
   function openNewModal(dateContext) {
     if (state.authUser && (state.authUser.role === 'Facilitator' || state.authUser.role === 'Viewer')) {
       showToast('Akses ditolak: Peran ' + state.authUser.role + ' tidak berwenang menginput data kasus baru.', 'error');
@@ -10639,14 +10701,19 @@
       setNewModalService('MOBILE');
     }
 
-    // Jika dibuka dari tanggal kalender (atau sedang di view kalender), sinkronkan Bulan - Tahun & badge tanggal
+    // Jika dibuka dari tanggal kalender (atau sedang di view kalender), sinkronkan Tanggal Agenda & Bulan - Tahun
+    var now = new Date();
     var ctx = (dateContext && typeof dateContext.year === 'number' && typeof dateContext.monthIndex === 'number' && typeof dateContext.day === 'number')
       ? dateContext
       : (state.activeView === 'calendar' && typeof state.selectedYear === 'number' && typeof state.selectedMonthIndex === 'number' && typeof state.selectedDate === 'number')
         ? { year: state.selectedYear, monthIndex: state.selectedMonthIndex, day: state.selectedDate }
-        : null;
+        : { year: now.getFullYear(), monthIndex: now.getMonth(), day: now.getDate() };
 
     state.pendingCalendarDate = ctx;
+
+    if (dom.inputTanggalAgenda) {
+      dom.inputTanggalAgenda.value = toIsoDateString(ctx.year, ctx.monthIndex, ctx.day);
+    }
 
     var datePill = document.getElementById('newModalDatePill');
     if (ctx && typeof CAL_MONTHS_ID !== 'undefined') {
@@ -10768,11 +10835,18 @@
       return;
     }
 
-    var targetDateObj = state.pendingCalendarDate
-      ? new Date(state.pendingCalendarDate.year, state.pendingCalendarDate.monthIndex, state.pendingCalendarDate.day, 9, 0, 0)
-      : new Date();
-    var targetIsoDate = targetDateObj.toISOString();
-    var savedCalCtx = state.pendingCalendarDate ? Object.assign({}, state.pendingCalendarDate) : null;
+    var rawDateInputVal = dom.inputTanggalAgenda ? dom.inputTanggalAgenda.value : '';
+    var pickedParts = parseDateParts(rawDateInputVal) || state.pendingCalendarDate;
+    var nowFallback = new Date();
+    if (!pickedParts) {
+      pickedParts = { year: nowFallback.getFullYear(), monthIndex: nowFallback.getMonth(), day: nowFallback.getDate() };
+    }
+    var targetIsoDate = toIsoDateString(pickedParts.year, pickedParts.monthIndex, pickedParts.day);
+    var savedCalCtx = { year: pickedParts.year, monthIndex: pickedParts.monthIndex, day: pickedParts.day };
+
+    if (!bulan && typeof CAL_MONTHS_ID !== 'undefined') {
+      bulan = CAL_MONTHS_ID[pickedParts.monthIndex] + ' ' + pickedParts.year;
+    }
 
     var currentInputUser = getCurrentLoggedInUserName();
     var targetSheetName = selectedNewService === 'MOBILE' ? 'Mobile' : (selectedNewService === 'ECARE' ? 'eCare' : 'Fixed');
@@ -11271,7 +11345,7 @@
       nextMonthSpill.push(i);
     }
 
-    const base = DEFAULT_CALENDAR_DATA[key] || null;
+    const base = (state.dataSource === 'simulation' && DEFAULT_CALENDAR_DATA[key]) ? DEFAULT_CALENDAR_DATA[key] : null;
     const items = {};
     const details = {};
 
@@ -11292,19 +11366,18 @@
         if (!rec) return;
         const recMonthStr = (rec.bulan || '').trim().toLowerCase();
         const expectedMonthStr = title.toLowerCase();
-        let recDateObj = rec.tanggal ? new Date(rec.tanggal) : (rec.terakhirUpdate ? new Date(rec.terakhirUpdate) : null);
+        const recParts = parseDateParts(rec.tanggal || rec.terakhirUpdate);
         let matchesMonth = false;
         let recDay = null;
 
-        if (recDateObj && !isNaN(recDateObj.getTime())) {
-          if (recDateObj.getFullYear() === year && recDateObj.getMonth() === monthIndex) {
+        if (recParts) {
+          if (recParts.year === year && recParts.monthIndex === monthIndex) {
             matchesMonth = true;
-            recDay = recDateObj.getDate();
+            recDay = recParts.day;
+          } else if (recMonthStr === expectedMonthStr) {
+            matchesMonth = true;
+            recDay = recParts.day;
           }
-        }
-        if (!matchesMonth && recMonthStr === expectedMonthStr && recDateObj && !isNaN(recDateObj.getTime())) {
-          matchesMonth = true;
-          recDay = recDateObj.getDate();
         }
 
         if (!matchesMonth || !recDay || recDay < 1 || recDay > totalDays) return;
@@ -11449,9 +11522,9 @@
     monthsGridEl.innerHTML = CAL_MONTHS_SHORT.map((shortName, mIdx) => {
       const isSelected = (browseYear === state.selectedYear && mIdx === state.selectedMonthIndex);
       const key = getCalendarMonthKey(browseYear, mIdx);
-      const hasData = !!DEFAULT_CALENDAR_DATA[key] || (Array.isArray(state.records) && state.records.some(r => {
-        const dt = r.tanggal ? new Date(r.tanggal) : null;
-        return dt && !isNaN(dt.getTime()) && dt.getFullYear() === browseYear && dt.getMonth() === mIdx;
+      const hasData = (state.dataSource === 'simulation' && !!DEFAULT_CALENDAR_DATA[key]) || (Array.isArray(state.records) && state.records.some(r => {
+        const dp = parseDateParts(r.tanggal || r.terakhirUpdate);
+        return dp && dp.year === browseYear && dp.monthIndex === mIdx;
       }));
 
       return '<button type="button" data-picker-month="' + mIdx + '" class="month-picker-pill relative py-2 px-2 rounded-xl text-xs font-bold cursor-pointer flex items-center justify-center gap-1 ' +
@@ -11901,7 +11974,7 @@
     if (info) info.textContent = 'Menampilkan 1 - ' + visible.length + ' dari ' + visible.length + ' Kasus';
 
     if (visible.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="8" class="text-center py-8 text-slate-400">Tidak ada kasus yang sesuai dengan filter.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="9" class="text-center py-8 text-slate-400">Tidak ada kasus yang sesuai dengan filter.</td></tr>';
       return;
     }
 
@@ -11951,16 +12024,24 @@
       const mainIssueText = item.totalCaseIsu || item.caseTitle || '-';
       const detailText = item.issueDetails || item.detail || '-';
       const noteText = item.progress || item.keterangan || 'Belum Ada Update';
+      const rawDateStr = item.tanggal || item.terakhirUpdate || '';
+      const dateDisplayText = formatShortIndoDate(rawDateStr);
 
       return '<tr class="hover:bg-slate-50/80 transition-colors">' +
         '<td class="py-3 px-4 text-center font-bold text-slate-500">' + (idx + 1) + '</td>' +
         '<td class="py-3 px-4 font-semibold text-slate-700">' + escapeHtml(item.bulan || 'Oktober 2026') + '</td>' +
+        '<td class="py-3 px-4 whitespace-nowrap">' +
+        '  <button type="button" class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-semibold bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200 transition-colors" title="Klik untuk buka tanggal ini di Calendar" onclick="jumpToCalendarDate(\'' + escapeHtml(rawDateStr) + '\', \'' + item.id + '\')">' +
+        '    <span class="material-symbols-outlined text-[13px] text-blue-600">calendar_today</span>' +
+        '    <span>' + escapeHtml(dateDisplayText) + '</span>' +
+        '  </button>' +
+        '</td>' +
         '<td class="py-3 px-4">' + unitBadge + '</td>' +
         '<td class="py-3 px-4">' +
         '  <div class="flex flex-col gap-1">' +
         '    <a href="#" class="font-bold text-slate-900 hover:text-blue-600 transition-colors leading-snug" onclick="openDrawer(\'' + item.id + '\', \'' + sType + '\'); return false;">' + escapeHtml(mainIssueText) + '</a>' +
         '    <div class="flex items-center gap-2 mt-0.5">' +
-        '      <button type="button" class="text-[11px] font-semibold text-blue-600 hover:underline flex items-center gap-0.5" onclick="activateView(\'calendar\', \'' + item.id + '\', 24)">' +
+        '      <button type="button" class="text-[11px] font-semibold text-blue-600 hover:underline flex items-center gap-0.5" onclick="jumpToCalendarDate(\'' + escapeHtml(rawDateStr) + '\', \'' + item.id + '\')">' +
         '        <span>Buka Calendar</span><span class="material-symbols-outlined text-[13px]">arrow_forward</span>' +
         '      </button>' +
         '      <span class="text-slate-300">&bull;</span><span class="text-[10px] text-slate-400 font-mono">#CHO-' + item.id + '</span>' +
@@ -12085,6 +12166,16 @@
     }).join('');
   }
 
+  function jumpToCalendarDate(dateStr, ticketId) {
+    const dp = parseDateParts(dateStr);
+    if (dp) {
+      setCalendarMonthYear(dp.year, dp.monthIndex, dp.day);
+      activateView('calendar', ticketId || '', dp.day);
+    } else {
+      activateView('calendar', ticketId || '', state.selectedDate || 24);
+    }
+  }
+
   function openDrawer(ticketId, serviceType) {
     const drawer = document.getElementById('issue-drawer');
     if (!drawer) return;
@@ -12098,6 +12189,7 @@
     const titleEl = document.getElementById('drawer-issue-title');
     const unitBadge = document.getElementById('drawer-unit-badge');
     const periodBadge = document.getElementById('drawer-period-badge');
+    const dateBadge = document.getElementById('drawer-date-badge');
     const statusBadge = document.getElementById('drawer-status');
     const detailEl = document.getElementById('drawer-issue-detail');
     const picEl = document.getElementById('drawer-pic');
@@ -12112,6 +12204,7 @@
       unitBadge.className = 'px-2 py-0.5 rounded text-[10px] font-bold ' + uMeta.badgeClass;
     }
     if (periodBadge) periodBadge.textContent = ticket.bulan || 'Oktober 2026';
+    if (dateBadge) dateBadge.textContent = '📅 ' + formatShortIndoDate(ticket.tanggal || ticket.terakhirUpdate);
     if (statusBadge) statusBadge.textContent = ticket.status || 'Open';
     if (detailEl) detailEl.textContent = ticket.issueDetails || ticket.detail || 'Tidak ada keterangan kendala.';
     if (picEl) picEl.textContent = ticket.pic || '-';
@@ -12175,10 +12268,13 @@
 
   // Hook into processLoadedData to update new Google Stitch views
   const oldProcessLoadedData = processLoadedData;
-  processLoadedData = function(data) {
-    oldProcessLoadedData(data);
+  processLoadedData = function(data, isSimulation) {
+    oldProcessLoadedData(data, isSimulation);
     renderCalendarGrid();
     renderCalendarRightPanel(state.selectedDate || 24);
+    if (!state.records || state.records.length === 0) {
+      closeCalendarDayDrawer();
+    }
     renderTasksTable();
     updateTasksKpis();
     renderActivityFeed();
@@ -12186,6 +12282,30 @@
 
   // Bind Google Stitch UI listeners
   function bindStitchEvents() {
+    const inputTglEl = document.getElementById('inputTanggalAgenda');
+    if (inputTglEl) {
+      inputTglEl.addEventListener('change', () => {
+        const dp = parseDateParts(inputTglEl.value);
+        if (!dp) return;
+        state.pendingCalendarDate = dp;
+        const targetMonthYear = CAL_MONTHS_ID[dp.monthIndex] + ' ' + dp.year;
+        if (dom.inputBulanTahun) {
+          const optExists = Array.from(dom.inputBulanTahun.options).some(o => o.value === targetMonthYear);
+          if (!optExists) {
+            const newOpt = document.createElement('option');
+            newOpt.value = targetMonthYear;
+            newOpt.textContent = targetMonthYear;
+            dom.inputBulanTahun.appendChild(newOpt);
+          }
+          dom.inputBulanTahun.value = targetMonthYear;
+        }
+        const datePill = document.getElementById('newModalDatePill');
+        if (datePill) {
+          datePill.textContent = '📅 Tanggal Terpilih: ' + formatFullIndoDate(dp.year, dp.monthIndex, dp.day);
+          datePill.style.display = 'inline-flex';
+        }
+      });
+    }
     const btnNewCase = document.getElementById('btnOpenNewModal');
     if (btnNewCase) {
       btnNewCase.addEventListener('click', (e) => {
@@ -12488,6 +12608,7 @@
   window.closeCalendarDayDrawer = closeCalendarDayDrawer;
   window.setCalendarMonthYear = setCalendarMonthYear;
   window.handleCalendarDateClick = handleCalendarDateClick;
+  window.jumpToCalendarDate = jumpToCalendarDate;
 
   // Bootstrap saat DOM siap
   document.addEventListener('DOMContentLoaded', init);

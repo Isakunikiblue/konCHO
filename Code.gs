@@ -404,6 +404,15 @@ function parseMonthString(val) {
   var str = String(val).toLowerCase().trim();
   if (!str) return '';
 
+  // Cek format ISO YYYY-MM-DD (misal dari Tanggal_Agenda: 2026-11-05)
+  var isoDateMatch = str.match(/^(\d{4})-(\d{1,2})-(\d{1,2})/);
+  if (isoDateMatch) {
+    var mNum = parseInt(isoDateMatch[2], 10);
+    if (mNum >= 1 && mNum <= 12) {
+      return monthNames[mNum - 1] + ' ' + isoDateMatch[1];
+    }
+  }
+
   var monthRegexes = [
     { name: 'Januari', regex: /januari|january|\bjan\b/ },
     { name: 'Februari', regex: /februari|february|\bfeb\b/ },
@@ -793,11 +802,17 @@ function submitNewData(payload) {
     var formattedDate = Utilities.formatDate(now, tz, 'yyyy-MM-dd HH:mm:ss');
     var agendaDateStr = Utilities.formatDate(now, tz, 'yyyy-MM-dd');
     if (payload && payload.tanggal) {
-      var parsedAgendaDate = new Date(payload.tanggal);
-      if (!isNaN(parsedAgendaDate.getTime())) {
-        agendaDateStr = Utilities.formatDate(parsedAgendaDate, tz, 'yyyy-MM-dd');
+      var rawTgl = String(payload.tanggal).trim();
+      var isoTglMatch = rawTgl.match(/^(\d{4})-(\d{2})-(\d{2})/);
+      if (isoTglMatch) {
+        agendaDateStr = isoTglMatch[1] + '-' + isoTglMatch[2] + '-' + isoTglMatch[3];
       } else {
-        agendaDateStr = String(payload.tanggal);
+        var parsedAgendaDate = new Date(rawTgl);
+        if (!isNaN(parsedAgendaDate.getTime())) {
+          agendaDateStr = Utilities.formatDate(parsedAgendaDate, tz, 'yyyy-MM-dd');
+        } else {
+          agendaDateStr = rawTgl;
+        }
       }
     }
 
