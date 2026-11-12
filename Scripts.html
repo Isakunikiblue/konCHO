@@ -4916,29 +4916,92 @@
           let pickupBtnHtml = '';
           if (canPickup && iss.ticketId) {
             if (stNorm === 'inprogress') {
-              pickupBtnHtml = '<button type="button" class="px-2 py-1 rounded text-[10px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors" onclick="openClosedModal(\'' + iss.ticketId + '\', \'' + sType + '\')">✅ Closed</button>';
+              pickupBtnHtml = '<button type="button" class="flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-[13px] font-extrabold tracking-wide bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm flex items-center justify-center gap-1.5 transition-all cursor-pointer" onclick="openClosedModal(\'' + iss.ticketId + '\', \'' + sType + '\')"><span>✅</span><span>Selesaikan (Closed)</span></button>';
             } else if (stNorm !== 'closed') {
-              pickupBtnHtml = '<button type="button" class="px-2 py-1 rounded text-[10px] font-bold bg-[#061345] hover:bg-[#1e295a] text-white transition-colors" onclick="openInProgressModal(\'' + iss.ticketId + '\', false, \'' + sType + '\')">🚀 Pickup</button>';
+              pickupBtnHtml = '<button type="button" class="flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-[13px] font-extrabold tracking-wide bg-[#061345] hover:bg-[#1e295a] text-white shadow-sm flex items-center justify-center gap-1.5 transition-all cursor-pointer" onclick="openInProgressModal(\'' + iss.ticketId + '\', false, \'' + sType + '\')"><span>🚀</span><span>Pickup Case</span></button>';
             }
           }
 
-          return '<div class="p-2.5 sm:p-3 ' + (iss.badge.includes('URGENT') ? 'card-urgent-gradient' : stNorm === 'inprogress' ? 'card-investigation-gradient' : 'card-review-gradient') + ' border border-slate-200 rounded-xl flex flex-col gap-2 hover:border-slate-300 shadow-xs transition-all">' +
+          return '<div class="p-3 sm:p-3.5 ' + (iss.badge.includes('URGENT') ? 'card-urgent-gradient' : stNorm === 'inprogress' ? 'card-investigation-gradient' : 'card-review-gradient') + ' border border-slate-200 rounded-xl flex flex-col gap-2.5 hover:border-slate-300 shadow-xs transition-all">' +
           '  <div class="flex items-center justify-between">' +
           '    <span class="px-2 py-0.5 rounded text-[9px] font-extrabold ' + iss.badgeClass + '">' + iss.badge + '</span>' +
           '    <div class="flex items-center gap-1.5"><span class="px-1.5 py-0.5 rounded text-[9px] font-bold border ' + uMeta.pillClass + '">' + uMeta.label + '</span><span class="text-[10px] font-mono font-bold text-slate-700">' + iss.ticket + '</span></div>' +
           '  </div>' +
           '  <p class="text-xs font-semibold text-slate-800 leading-relaxed">' + escapeHtml(iss.title) + '</p>' +
-          '  <div class="flex items-center justify-between gap-2 pt-1.5 border-t border-slate-200/60">' +
-          '    <span class="text-[11px] text-slate-500 truncate">PIC: ' + escapeHtml((liveRec && liveRec.pic) || iss.pic) + '</span>' +
-          '    <div class="flex items-center gap-1.5 shrink-0">' + pickupBtnHtml +
-          '      <button type="button" class="px-2.5 py-1 rounded text-[10px] font-bold border ' + iss.actionClass + ' hover:opacity-90 transition-opacity" onclick="openDrawer(\'' + (iss.ticketId || 1) + '\', \'' + sType + '\')">' + iss.actionText + '</button>' +
-          '    </div>' +
+          '  <div class="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-200/60">' +
+          '    <span class="truncate">PIC: <strong class="text-slate-700">' + escapeHtml((liveRec && liveRec.pic) || iss.pic) + '</strong></span>' +
+          '  </div>' +
+          '  <div class="flex flex-wrap items-center gap-2">' + pickupBtnHtml +
+          '    <button type="button" class="' + (pickupBtnHtml ? 'px-3.5 py-2.5' : 'w-full py-2 px-3.5') + ' rounded-xl text-xs font-bold border ' + iss.actionClass + ' hover:opacity-90 transition-opacity cursor-pointer" onclick="openDrawer(\'' + (iss.ticketId || 1) + '\', \'' + sType + '\')">' + iss.actionText + '</button>' +
           '  </div>' +
           '</div>';
         }).join('');
       } else {
         issueContainer.innerHTML = '';
       }
+    }
+
+    // Sinkronisasi kartu Dokumen Presentasi secara dinamis sesuai data aktual (tanpa teks dummy statis)
+    const canUploadRole = currentRole === 'Administrator' || currentRole === 'Inputer';
+    const isAdminRole = currentRole === 'Administrator';
+    const targetTicketForPpt = issues.find(i => i.ticketId) || dayItems.find(it => it.ticketId) || null;
+    const dropzoneEl = document.getElementById('calendar-ppt-dropzone');
+    const pptCardEl = document.getElementById('calendar-ppt-file-card');
+    const pptNameEl = document.getElementById('presentation-deck-name');
+    const pptMetaEl = document.getElementById('presentation-deck-meta');
+    const btnDownloadDeck = document.getElementById('btn-download-deck');
+    const btnDeleteDeck = document.getElementById('btn-delete-deck');
+
+    let foundPpt = null;
+    let foundPptTicket = targetTicketForPpt;
+    const candidateItems = issues.length > 0 ? issues : dayItems;
+    for (let idxP = 0; idxP < candidateItems.length; idxP++) {
+      const cItem = candidateItems[idxP];
+      if (!cItem || !cItem.ticketId) continue;
+      const cSvc = cItem.serviceType || normalizeUnitKey(cItem.unit) || 'MOBILE';
+      const pInfo = getCasePptAttachment(cSvc, cItem.ticketId);
+      if (pInfo && (pInfo.fileUrl || pInfo.url)) {
+        foundPpt = pInfo;
+        foundPptTicket = { ticketId: cItem.ticketId, serviceType: cSvc };
+        break;
+      }
+    }
+
+    if (dropzoneEl) {
+      if (canUploadRole && targetTicketForPpt && targetTicketForPpt.ticketId) {
+        const dzSvc = targetTicketForPpt.serviceType || normalizeUnitKey(targetTicketForPpt.unit) || 'MOBILE';
+        dropzoneEl.classList.remove('hidden');
+        dropzoneEl.onclick = function() {
+          if (window.openUploadPptModal) openUploadPptModal(targetTicketForPpt.ticketId, dzSvc);
+        };
+      } else {
+        dropzoneEl.classList.add('hidden');
+        dropzoneEl.onclick = null;
+      }
+    }
+
+    if (pptCardEl) {
+      if (foundPpt && (foundPpt.fileUrl || foundPpt.url)) {
+        pptCardEl.classList.remove('hidden');
+        if (pptNameEl) pptNameEl.textContent = foundPpt.fileName || foundPpt.name || 'Materi_Presentasi.pptx';
+        if (pptMetaEl) pptMetaEl.textContent = 'Diupload oleh ' + (foundPpt.uploadedBy || 'Tim CHO');
+        if (btnDownloadDeck) btnDownloadDeck.href = foundPpt.fileUrl || foundPpt.url;
+        if (btnDeleteDeck) {
+          btnDeleteDeck.classList.toggle('hidden', !isAdminRole);
+          btnDeleteDeck.onclick = function() {
+            if (window.handleDeletePpt && foundPptTicket) {
+              handleDeletePpt(foundPptTicket.ticketId, foundPptTicket.serviceType || 'MOBILE');
+            }
+          };
+        }
+      } else {
+        pptCardEl.classList.add('hidden');
+      }
+    }
+
+    if (cardPresentasi) {
+      const showPresentasiCard = hasAnyContent && ((canUploadRole && !!(targetTicketForPpt && targetTicketForPpt.ticketId)) || !!foundPpt);
+      cardPresentasi.classList.toggle('hidden', !showPresentasiCard);
     }
 
     const quickContainer = document.getElementById('quickwins-container');
@@ -5005,16 +5068,16 @@
       const rawStatus = (item.status || 'Open').toLowerCase().replace(/\s+/g, '');
       let statusPill = '';
       if (rawStatus === 'inprogress') {
-        statusPill = '<div class="flex flex-wrap items-center gap-1">' +
+        statusPill = '<div class="flex flex-wrap items-center gap-1.5">' +
           '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800 cursor-pointer hover:bg-blue-200" onclick="openInProgressModal(\'' + item.id + '\', true, \'' + sType + '\')"><span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>In Progress</span>' +
-          (canPickup ? '<button type="button" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-600 hover:bg-emerald-700 text-white transition-colors" onclick="openClosedModal(\'' + item.id + '\', \'' + sType + '\')">✅ Closed</button>' : '') +
+          (canPickup ? '<button type="button" class="px-3.5 py-1.5 rounded-lg text-xs font-extrabold tracking-wide bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition-colors cursor-pointer" onclick="openClosedModal(\'' + item.id + '\', \'' + sType + '\')">✅ Closed</button>' : '') +
           '</div>';
       } else if (rawStatus === 'closed') {
-        statusPill = '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800"><span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>Closed</span>';
+        statusPill = '<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200"><span class="w-2 h-2 rounded-full bg-emerald-600"></span>Closed</span>';
       } else {
-        statusPill = '<div class="flex flex-wrap items-center gap-1">' +
+        statusPill = '<div class="flex flex-wrap items-center gap-1.5">' +
           '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 cursor-pointer hover:bg-amber-200" onclick="openInProgressModal(\'' + item.id + '\', false, \'' + sType + '\')"><span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>Open</span>' +
-          (canPickup ? '<button type="button" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-[#061345] hover:bg-[#1e295a] text-white transition-colors" onclick="openInProgressModal(\'' + item.id + '\', false, \'' + sType + '\')">🚀 Pickup</button>' : '') +
+          (canPickup ? '<button type="button" class="px-3.5 py-1.5 rounded-lg text-xs font-extrabold tracking-wide bg-[#061345] hover:bg-[#1e295a] text-white shadow-xs transition-colors cursor-pointer" onclick="openInProgressModal(\'' + item.id + '\', false, \'' + sType + '\')">🚀 Pickup</button>' : '') +
           '</div>';
       }
 
