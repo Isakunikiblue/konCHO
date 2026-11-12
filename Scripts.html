@@ -4313,7 +4313,7 @@
   state.selectedDate = 24;
   state.selectedMonth = 'oktober-2026';
   state.tasksFilterUnit = 'all';
-  state.calendarStatusFilter = 'active';
+  state.calendarStatusFilter = 'all';
   state.tasksFilterStatus = 'all';
   state.tasksFilterPeriod = 'all';
 
@@ -4761,19 +4761,23 @@
       const hasDetails = !!(calData.details && calData.details[day]);
       const hasAnyDayContent = hasDetails || itemCount > 0;
 
-      // Kumpulkan badge status unik pada tanggal ini (Open = Merah, InProgress = Orange, Closed = Hijau)
-      const uniqueStatusKeys = [];
+      // Kumpulkan badge status + unit name unik pada tanggal ini (Open = Merah, InProgress = Orange, Closed = Hijau)
+      const seenStatusUnits = [];
       dayItems.forEach(it => {
         if (it.type === 'meeting') return;
         const stKey = it.statusNorm
           || (it.record && (it.record.status || 'open').toLowerCase().replace(/\s+/g, ''))
           || (it.type === 'quickwin' ? 'closed' : (it.urgent ? 'open' : 'inprogress'));
         const normKey = stKey === 'closed' ? 'closed' : (stKey === 'inprogress' ? 'inprogress' : 'open');
-        if (!uniqueStatusKeys.includes(normKey)) uniqueStatusKeys.push(normKey);
+        const uMeta = getUnitMeta(it.serviceType || it.unit);
+        const comboKey = normKey + '|' + uMeta.key;
+        if (!seenStatusUnits.some(x => x.comboKey === comboKey)) {
+          seenStatusUnits.push({ comboKey: comboKey, statusKey: normKey, unitLabel: uMeta.label });
+        }
       });
-      const dayStatusBadgesHtml = uniqueStatusKeys.map(sk => {
-        const sm = getCalendarStatusMeta(sk);
-        return '<span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold leading-none ' + sm.topBadgeClass + '">' + sm.label + '</span>';
+      const dayStatusBadgesHtml = seenStatusUnits.map(entry => {
+        const sm = getCalendarStatusMeta(entry.statusKey);
+        return '<span class="px-1.5 py-0.5 rounded text-[8.5px] font-extrabold leading-tight ' + sm.topBadgeClass + '">' + sm.label + ' &bull; ' + escapeHtml(entry.unitLabel) + '</span>';
       }).join('');
 
       html += '<div class="calendar-day-cell group min-h-[78px] sm:min-h-[90px] lg:min-h-[clamp(88px,12.2vh,118px)] p-2 sm:p-2.5 flex flex-col justify-between cursor-pointer ' + (isSelected ? 'is-selected' : isWeekend ? 'bg-slate-50/45' : 'bg-white') + '" onclick="handleCalendarDateClick(' + day + ')">';
