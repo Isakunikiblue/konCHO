@@ -4139,12 +4139,276 @@
     }
   };
 
+  const CAL_MONTHS_ID = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+  const CAL_MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+  const CAL_DAYS_ID = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+
   state.activeView = 'calendar';
+  state.selectedYear = 2026;
+  state.selectedMonthIndex = 9; // Oktober (0-based)
+  state.pickerBrowseYear = 2026;
   state.selectedDate = 24;
   state.selectedMonth = 'oktober-2026';
   state.tasksFilterUnit = 'all';
+  state.calendarStatusFilter = 'active';
   state.tasksFilterStatus = 'all';
   state.tasksFilterPeriod = 'all';
+
+  function getCalendarMonthKey(year, monthIndex) {
+    const name = (CAL_MONTHS_ID[monthIndex] || 'Oktober').toLowerCase();
+    return name + '-' + year;
+  }
+
+  function parseMonthKey(key) {
+    if (!key || typeof key !== 'string') return { year: 2026, monthIndex: 9 };
+    const parts = key.toLowerCase().split('-');
+    const mIdx = CAL_MONTHS_ID.findIndex(m => m.toLowerCase() === parts[0]);
+    const yr = parseInt(parts[1], 10);
+    return {
+      monthIndex: mIdx >= 0 ? mIdx : 9,
+      year: !isNaN(yr) ? yr : 2026
+    };
+  }
+
+  function formatFullIndoDate(year, monthIndex, day) {
+    const dt = new Date(year, monthIndex, day);
+    const dayName = CAL_DAYS_ID[dt.getDay()] || 'Tanggal';
+    return dayName + ', ' + day + ' ' + CAL_MONTHS_ID[monthIndex] + ' ' + year;
+  }
+
+  function getCalendarMonthData(year, monthIndex) {
+    const key = getCalendarMonthKey(year, monthIndex);
+    const title = CAL_MONTHS_ID[monthIndex] + ' ' + year;
+    const badge = 'Cycle CHO • ' + CAL_MONTHS_SHORT[monthIndex] + ' ' + year;
+
+    const totalDays = new Date(year, monthIndex + 1, 0).getDate();
+    const firstDayJs = new Date(year, monthIndex, 1).getDay();
+    const startDayIndex = (firstDayJs + 6) % 7; // 0: Sen .. 6: Min
+
+    const prevMonthLastDay = new Date(year, monthIndex, 0).getDate();
+    const prevMonthSpill = [];
+    for (let i = startDayIndex - 1; i >= 0; i--) {
+      prevMonthSpill.push(prevMonthLastDay - i);
+    }
+
+    const totalGridCells = startDayIndex + totalDays;
+    const trailingCount = (7 - (totalGridCells % 7)) % 7;
+    const nextMonthSpill = [];
+    for (let i = 1; i <= trailingCount; i++) {
+      nextMonthSpill.push(i);
+    }
+
+    const base = DEFAULT_CALENDAR_DATA[key] || null;
+    const items = {};
+    const details = {};
+
+    if (base && base.items) {
+      Object.keys(base.items).forEach(d => {
+        items[d] = base.items[d].map(it => Object.assign({}, it));
+      });
+    }
+    if (base && base.details) {
+      Object.keys(base.details).forEach(d => {
+        details[d] = JSON.parse(JSON.stringify(base.details[d]));
+      });
+    }
+
+    // Integrasikan record live dari Spreadsheet/state.records yang cocok bulan & tahun
+    if (Array.isArray(state.records)) {
+      state.records.forEach(rec => {
+        if (!rec) return;
+        const recMonthStr = (rec.bulan || '').trim().toLowerCase();
+        const expectedMonthStr = title.toLowerCase();
+        let recDateObj = rec.tanggal ? new Date(rec.tanggal) : (rec.terakhirUpdate ? new Date(rec.terakhirUpdate) : null);
+        let matchesMonth = false;
+        let recDay = null;
+
+        if (recDateObj && !isNaN(recDateObj.getTime())) {
+          if (recDateObj.getFullYear() === year && recDateObj.getMonth() === monthIndex) {
+            matchesMonth = true;
+            recDay = recDateObj.getDate();
+          }
+        }
+        if (!matchesMonth && recMonthStr === expectedMonthStr && recDateObj && !isNaN(recDateObj.getTime())) {
+          matchesMonth = true;
+          recDay = recDateObj.getDate();
+        }
+
+        if (!matchesMonth || !recDay || recDay < 1 || recDay > totalDays) return;
+
+        // Status filter
+        const st = (rec.status || 'Open').toLowerCase();
+        if (state.calendarStatusFilter === 'active' && st === 'closed') return;
+        if (state.calendarStatusFilter === 'closed' && st !== 'closed') return;
+
+        if (!items[recDay]) items[recDay] = [];
+        const unitKey = rec.serviceType === 'FIXED' ? 'fixed' : 'mobile';
+        const titleText = rec.totalCaseIsu || 'Isu CHO';
+        const alreadyListed = items[recDay].some(it =>
+          (it.ticketId && String(it.ticketId) === String(rec.id)) ||
+          (it.text && it.text.toLowerCase().includes(titleText.slice(0, 14).toLowerCase()))
+        );
+
+        if (!alreadyListed) {
+          items[recDay].push({
+            type: st === 'closed' ? 'quickwin' : 'issue',
+            unit: unitKey,
+            text: titleText,
+            urgent: st === 'open',
+            ticketId: rec.id,
+            serviceType: rec.serviceType || 'MOBILE',
+            record: rec
+          });
+        }
+      });
+    }
+
+    let summaryAgendas = base && base.summary ? base.summary.agendas : 0;
+    let summaryIssues = base && base.summary ? base.summary.issues : 0;
+    let summaryQuickwins = base && base.summary ? base.summary.quickwins : 0;
+
+    if (!base) {
+      Object.keys(items).forEach(d => {
+        (items[d] || []).forEach(it => {
+          if (it.type === 'meeting') summaryAgendas++;
+          else if (it.type === 'quickwin') summaryQuickwins++;
+          else summaryIssues++;
+        });
+      });
+    }
+
+    return {
+      key: key,
+      title: title,
+      badge: badge,
+      year: year,
+      monthIndex: monthIndex,
+      startDayIndex: startDayIndex,
+      totalDays: totalDays,
+      prevMonthSpill: prevMonthSpill,
+      nextMonthSpill: nextMonthSpill,
+      items: items,
+      details: details,
+      summary: {
+        agendas: summaryAgendas,
+        issues: summaryIssues,
+        quickwins: summaryQuickwins
+      }
+    };
+  }
+
+  function setCalendarMonthYear(year, monthIndex, targetDay) {
+    state.selectedYear = year;
+    state.selectedMonthIndex = monthIndex;
+    state.pickerBrowseYear = year;
+    state.selectedMonth = getCalendarMonthKey(year, monthIndex);
+
+    const totalDays = new Date(year, monthIndex + 1, 0).getDate();
+    if (typeof targetDay === 'number' && !isNaN(targetDay)) {
+      state.selectedDate = Math.max(1, Math.min(totalDays, targetDay));
+    } else if (state.selectedDate > totalDays) {
+      state.selectedDate = totalDays;
+    }
+
+    const monthLabelEl = document.getElementById('calendar-month-label');
+    if (monthLabelEl) monthLabelEl.textContent = CAL_MONTHS_ID[monthIndex] + ' ' + year;
+
+    const cycleBadgeEl = document.getElementById('calendar-cycle-badge');
+    if (cycleBadgeEl) cycleBadgeEl.textContent = 'Cycle CHO • ' + CAL_MONTHS_SHORT[monthIndex] + ' ' + year;
+
+    const selectEl = document.getElementById('select-month-jump');
+    if (selectEl) {
+      let opt = Array.from(selectEl.options).find(o => o.value === state.selectedMonth);
+      if (!opt) {
+        opt = document.createElement('option');
+        opt.value = state.selectedMonth;
+        opt.textContent = CAL_MONTHS_ID[monthIndex] + ' ' + year;
+        selectEl.appendChild(opt);
+      }
+      selectEl.value = state.selectedMonth;
+    }
+
+    renderMonthYearPopover();
+    renderCalendarGrid();
+    renderCalendarRightPanel(state.selectedDate);
+  }
+
+  function renderMonthYearPopover() {
+    const yearPillsEl = document.getElementById('picker-year-pills');
+    const monthsGridEl = document.getElementById('picker-months-grid');
+    if (!yearPillsEl || !monthsGridEl) return;
+
+    const browseYear = state.pickerBrowseYear || state.selectedYear;
+    const years = [browseYear - 1, browseYear, browseYear + 1, browseYear + 2];
+
+    yearPillsEl.innerHTML = years.map(yr => {
+      const isActiveYear = yr === browseYear;
+      return '<button type="button" class="year-picker-pill px-2 py-1 rounded-lg text-xs font-bold cursor-pointer ' +
+        (isActiveYear ? 'is-active bg-[#061345] text-white shadow-xs' : 'text-slate-600 hover:bg-slate-100') +
+        '" data-picker-year="' + yr + '">' + yr + '</button>';
+    }).join('');
+
+    yearPillsEl.querySelectorAll('[data-picker-year]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        state.pickerBrowseYear = parseInt(btn.getAttribute('data-picker-year'), 10);
+        renderMonthYearPopover();
+      });
+    });
+
+    monthsGridEl.innerHTML = CAL_MONTHS_SHORT.map((shortName, mIdx) => {
+      const isSelected = (browseYear === state.selectedYear && mIdx === state.selectedMonthIndex);
+      const key = getCalendarMonthKey(browseYear, mIdx);
+      const hasData = !!DEFAULT_CALENDAR_DATA[key] || (Array.isArray(state.records) && state.records.some(r => {
+        const dt = r.tanggal ? new Date(r.tanggal) : null;
+        return dt && !isNaN(dt.getTime()) && dt.getFullYear() === browseYear && dt.getMonth() === mIdx;
+      }));
+
+      return '<button type="button" data-picker-month="' + mIdx + '" class="month-picker-pill relative py-2 px-2 rounded-xl text-xs font-bold cursor-pointer flex items-center justify-center gap-1 ' +
+        (isSelected ? 'is-active bg-[#061345] text-white' : 'bg-slate-50/90 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200/70') + '">' +
+        '<span>' + shortName + '</span>' +
+        (hasData && !isSelected ? '<span class="w-1.5 h-1.5 rounded-full bg-blue-500"></span>' : '') +
+        '</button>';
+    }).join('');
+
+    monthsGridEl.querySelectorAll('[data-picker-month]').forEach(btn => {
+      btn.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const mIdx = parseInt(btn.getAttribute('data-picker-month'), 10);
+        setCalendarMonthYear(browseYear, mIdx);
+        closeMonthYearPopover();
+      });
+    });
+  }
+
+  function openMonthYearPopover() {
+    const pop = document.getElementById('modern-month-popover');
+    const trig = document.getElementById('btn-month-year-trigger');
+    const chev = document.getElementById('month-picker-chevron');
+    if (!pop) return;
+    state.pickerBrowseYear = state.selectedYear;
+    renderMonthYearPopover();
+    pop.classList.remove('hidden');
+    if (trig) trig.setAttribute('aria-expanded', 'true');
+    if (chev) chev.style.transform = 'rotate(180deg)';
+  }
+
+  function closeMonthYearPopover() {
+    const pop = document.getElementById('modern-month-popover');
+    const trig = document.getElementById('btn-month-year-trigger');
+    const chev = document.getElementById('month-picker-chevron');
+    if (!pop) return;
+    pop.classList.add('hidden');
+    if (trig) trig.setAttribute('aria-expanded', 'false');
+    if (chev) chev.style.transform = 'rotate(0deg)';
+  }
+
+  function toggleMonthYearPopover() {
+    const pop = document.getElementById('modern-month-popover');
+    if (!pop) return;
+    if (pop.classList.contains('hidden')) openMonthYearPopover();
+    else closeMonthYearPopover();
+  }
 
   function activateView(viewName, targetTicketId, targetDate) {
     const vActivity = document.getElementById('view-activity');
@@ -4205,16 +4469,28 @@
     const container = document.getElementById('calendar-grid-cells');
     if (!container) return;
 
-    const calData = DEFAULT_CALENDAR_DATA[state.selectedMonth] || DEFAULT_CALENDAR_DATA['oktober-2026'];
+    const calData = getCalendarMonthData(state.selectedYear, state.selectedMonthIndex);
     const startDay = calData.startDayIndex;
     const totalDays = calData.totalDays;
     const prevSpill = calData.prevMonthSpill || [];
     const nextSpill = calData.nextMonthSpill || [];
 
+    const monthLabelEl = document.getElementById('calendar-month-label');
+    if (monthLabelEl) monthLabelEl.textContent = calData.title;
+    const cycleBadgeEl = document.getElementById('calendar-cycle-badge');
+    if (cycleBadgeEl) cycleBadgeEl.textContent = calData.badge;
+
+    const agSumEl = document.getElementById('summary-agenda-count');
+    const isSumEl = document.getElementById('summary-issue-count');
+    const qwSumEl = document.getElementById('summary-quickwin-count');
+    if (agSumEl) agSumEl.textContent = calData.summary.agendas;
+    if (isSumEl) isSumEl.textContent = calData.summary.issues;
+    if (qwSumEl) qwSumEl.textContent = calData.summary.quickwins;
+
     let html = '';
 
     prevSpill.forEach(d => {
-      html += '<div class="calendar-day-cell min-h-[58px] sm:min-h-[64px] xl:min-h-[68px] p-2 bg-slate-50/60 opacity-40 flex flex-col justify-between"><span class="text-xs font-semibold text-slate-400">' + d + '</span><span class="text-[10px] text-slate-300">Bulan lalu</span></div>';
+      html += '<div class="calendar-day-cell min-h-[78px] sm:min-h-[90px] lg:min-h-[clamp(88px,12.2vh,118px)] p-2 sm:p-2.5 bg-slate-50/70 opacity-45 flex flex-col justify-between"><span class="text-xs sm:text-[13px] font-semibold text-slate-400">' + d + '</span><span class="text-[10px] text-slate-300">Bulan lalu</span></div>';
     });
 
     for (let day = 1; day <= totalDays; day++) {
@@ -4227,39 +4503,39 @@
       }
       const itemCount = dayItems.length;
 
-      html += '<div class="calendar-day-cell min-h-[58px] sm:min-h-[64px] xl:min-h-[68px] p-1.5 sm:p-2 flex flex-col justify-between cursor-pointer border-t border-slate-100 ' + (isSelected ? 'is-selected' : isWeekend ? 'bg-slate-50/40' : 'bg-white') + '" onclick="handleCalendarDateClick(' + day + ')">';
-      html += '  <div class="flex items-center justify-between">';
-      html += '    <span class="text-xs font-extrabold ' + (isSelected ? 'text-blue-700 font-headline' : 'text-slate-800') + '">' + day + '</span>';
+      html += '<div class="calendar-day-cell min-h-[78px] sm:min-h-[90px] lg:min-h-[clamp(88px,12.2vh,118px)] p-2 sm:p-2.5 flex flex-col justify-between cursor-pointer ' + (isSelected ? 'is-selected' : isWeekend ? 'bg-slate-50/45' : 'bg-white') + '" onclick="handleCalendarDateClick(' + day + ')">';
+      html += '  <div class="flex items-center justify-between gap-1">';
+      html += '    <span class="text-xs sm:text-[13px] font-extrabold ' + (isSelected ? 'text-blue-700 font-headline' : isWeekend ? 'text-slate-500' : 'text-slate-800') + '">' + day + '</span>';
       if (isSelected) {
-        html += '    <span class="px-1.5 py-0.2 rounded-full text-[9px] font-bold bg-blue-600 text-white">Dipilih</span>';
+        html += '    <span class="px-2 py-0.5 rounded-full text-[9.5px] font-bold bg-blue-600 text-white shadow-xs">Dipilih</span>';
       } else if (itemCount > 0) {
-        html += '    <span class="px-1.5 py-0.2 rounded-md text-[9px] font-bold bg-slate-100 text-slate-600">' + itemCount + ' item</span>';
+        html += '    <span class="px-1.5 py-0.5 rounded-md text-[9.5px] font-bold bg-slate-100 text-slate-600">' + itemCount + ' item</span>';
       }
       html += '  </div>';
 
-      html += '  <div class="flex flex-col gap-1 mt-1 overflow-hidden">';
+      html += '  <div class="flex flex-col gap-1 mt-1.5 overflow-hidden">';
       dayItems.slice(0, 2).forEach(item => {
         if (item.urgent) {
-          html += '<span class="truncate px-1.5 py-0.5 rounded text-[9.5px] font-bold bg-gradient-to-r from-rose-50 to-rose-100/80 text-rose-700 border border-rose-200/90">&bull; ' + escapeHtml(item.text) + '</span>';
+          html += '<span class="truncate px-2 py-0.5 rounded-md text-[10px] sm:text-[10.5px] font-bold bg-gradient-to-r from-rose-50 to-rose-100/80 text-rose-700 border border-rose-200/90">&bull; ' + escapeHtml(item.text) + '</span>';
         } else if (item.type === 'meeting') {
-          html += '<span class="truncate px-1.5 py-0.5 rounded text-[9.5px] font-medium bg-gradient-to-r from-blue-50 to-indigo-50/80 text-blue-700 border border-blue-200/80">&bull; ' + escapeHtml(item.text) + '</span>';
+          html += '<span class="truncate px-2 py-0.5 rounded-md text-[10px] sm:text-[10.5px] font-semibold bg-gradient-to-r from-blue-50 to-indigo-50/80 text-blue-700 border border-blue-200/80">&bull; ' + escapeHtml(item.text) + '</span>';
         } else if (item.type === 'quickwin') {
-          html += '<span class="truncate px-1.5 py-0.5 rounded text-[9.5px] font-medium bg-gradient-to-r from-emerald-50 to-teal-50/80 text-emerald-700 border border-emerald-200">&bull; ' + escapeHtml(item.text) + '</span>';
+          html += '<span class="truncate px-2 py-0.5 rounded-md text-[10px] sm:text-[10.5px] font-semibold bg-gradient-to-r from-emerald-50 to-teal-50/80 text-emerald-700 border border-emerald-200">&bull; ' + escapeHtml(item.text) + '</span>';
         } else {
-          html += '<span class="truncate px-1.5 py-0.5 rounded text-[10px] font-medium bg-slate-100 text-slate-700 border border-slate-200">&bull; ' + escapeHtml(item.text) + '</span>';
+          html += '<span class="truncate px-2 py-0.5 rounded-md text-[10px] sm:text-[10.5px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">&bull; ' + escapeHtml(item.text) + '</span>';
         }
       });
       if (itemCount > 2) {
-        html += '<span class="text-[9px] text-slate-400 font-semibold pl-1">+' + (itemCount - 2) + ' lainnya</span>';
+        html += '<span class="text-[10px] text-slate-500 font-semibold pl-1">+' + (itemCount - 2) + ' lainnya</span>';
       }
       html += '  </div>';
 
-      html += '  <div class="text-[9px] text-slate-300 self-end">' + (isWeekend ? 'Akhir pekan' : '') + '</div>';
+      html += '  <div class="text-[9.5px] text-slate-300 self-end mt-0.5">' + (isWeekend ? 'Akhir pekan' : '') + '</div>';
       html += '</div>';
     }
 
     nextSpill.forEach(d => {
-      html += '<div class="calendar-day-cell min-h-[58px] sm:min-h-[64px] xl:min-h-[68px] p-2 bg-slate-50/60 opacity-40 flex flex-col justify-between"><span class="text-xs font-semibold text-slate-400">' + d + '</span><span class="text-[10px] text-slate-300">Bulan depan</span></div>';
+      html += '<div class="calendar-day-cell min-h-[78px] sm:min-h-[90px] lg:min-h-[clamp(88px,12.2vh,118px)] p-2 sm:p-2.5 bg-slate-50/70 opacity-45 flex flex-col justify-between"><span class="text-xs sm:text-[13px] font-semibold text-slate-400">' + d + '</span><span class="text-[10px] text-slate-300">Bulan depan</span></div>';
     });
 
     container.innerHTML = html;
@@ -4272,55 +4548,91 @@
   }
 
   function renderCalendarRightPanel(day) {
-    const calData = DEFAULT_CALENDAR_DATA[state.selectedMonth] || DEFAULT_CALENDAR_DATA['oktober-2026'];
-    const dayDetail = (calData.details && calData.details[day]) ? calData.details[day] : {
-      dateStr: "Tanggal " + day + " " + (calData.title || "Oktober 2026"),
-      agendaCount: 1,
-      agendas: [
-        {
-          time: "10:00 - 11:30 WIB",
-          unit: "CHO Mobile",
-          unitClass: "bg-blue-50 text-blue-700 border-blue-200",
-          title: "Sesi Koordinasi & Review Isu Harian CHO",
-          host: "PIC CHO / Administrator",
-          roomText: "Sync Room CHO",
-          isWarRoom: false
+    const calData = getCalendarMonthData(state.selectedYear, state.selectedMonthIndex);
+    const fullDateStr = formatFullIndoDate(state.selectedYear, state.selectedMonthIndex, day);
+
+    let agendas = [];
+    let issues = [];
+    let quickwins = [];
+
+    let dayItems = (calData.items && calData.items[day]) ? [...calData.items[day]] : [];
+    if (state.tasksFilterUnit && state.tasksFilterUnit !== 'all') {
+      dayItems = dayItems.filter(it => it.unit === 'all' || it.unit === state.tasksFilterUnit);
+    }
+
+    if (calData.details && calData.details[day]) {
+      const d = calData.details[day];
+      agendas = d.agendas ? [...d.agendas] : [];
+      issues = d.issues ? [...d.issues] : [];
+      quickwins = d.quickwins ? [...d.quickwins] : [];
+    } else if (dayItems.length > 0) {
+      dayItems.forEach(it => {
+        if (it.type === 'meeting') {
+          agendas.push({
+            time: '09:00 - 10:30 WIB',
+            unit: it.unit === 'fixed' ? 'CHO Fixed' : 'CHO Mobile',
+            unitClass: it.unit === 'fixed' ? 'bg-teal-50 text-teal-700 border-teal-200' : 'bg-blue-50 text-blue-700 border-blue-200',
+            title: it.text,
+            host: 'Tim CHO / PIC Terkait',
+            roomText: 'Sync Room CHO',
+            isWarRoom: false
+          });
+        } else if (it.type === 'quickwin') {
+          quickwins.push({
+            title: it.text,
+            status: 'Selesai',
+            statusClass: 'bg-emerald-100 text-emerald-800',
+            pic: 'Oleh Tim CHO',
+            done: true
+          });
+        } else {
+          const rec = it.record || {};
+          const st = (rec.status || (it.urgent ? 'Open' : 'InProgress')).toLowerCase();
+          issues.push({
+            badge: it.urgent ? 'URGENT / BLOCKER' : st === 'inprogress' ? 'DALAM INVESTIGASI' : 'OPEN / REVIEW',
+            badgeClass: it.urgent ? 'bg-rose-100 text-rose-700 border-rose-200' : st === 'inprogress' ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-blue-100 text-blue-800 border-blue-200',
+            unit: it.unit === 'fixed' ? 'CHO Fixed' : 'CHO Mobile',
+            ticket: it.ticketId ? '#' + it.ticketId : '#CHO-' + day,
+            title: rec.issueDetails || rec.detail || it.text,
+            pic: rec.pic || rec.requestor || 'Tim CHO',
+            actionText: 'Detail Isu',
+            actionClass: it.urgent ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-blue-50 text-blue-800 border-blue-200',
+            ticketId: it.ticketId || '1',
+            serviceType: it.serviceType || (it.unit === 'fixed' ? 'FIXED' : 'MOBILE')
+          });
         }
-      ],
-      issues: [
-        {
-          badge: "OPEN / REVIEW",
-          badgeClass: "bg-blue-100 text-blue-800 border-blue-200",
-          unit: "CHO Mobile",
-          ticket: "#CHO-" + day,
-          title: "Pemantauan berkala tiket kendala operasional CHO.",
-          pic: "Tim CHO Mobile",
-          actionText: "Verifikasi Log",
-          actionClass: "bg-blue-50 text-blue-800 border-blue-200",
-          ticketId: '1',
-          serviceType: 'MOBILE'
-        }
-      ],
-      quickwins: [
-        {
-          title: "Verifikasi status sinkronisasi Master Spreadsheet",
-          status: "Selesai",
-          statusClass: "bg-emerald-100 text-emerald-800",
-          pic: "Oleh Sistem",
-          done: true
-        }
-      ]
-    };
+      });
+    }
 
     const titleEl = document.getElementById('panel-selected-date');
     const badgeEl = document.getElementById('panel-agenda-badge');
-    if (titleEl) titleEl.textContent = dayDetail.dateStr;
-    if (badgeEl) badgeEl.textContent = (dayDetail.agendas ? dayDetail.agendas.length : 1) + ' Agenda';
+    if (titleEl) titleEl.textContent = fullDateStr;
+    if (badgeEl) {
+      badgeEl.textContent = agendas.length + ' Agenda';
+      badgeEl.className = agendas.length > 0
+        ? 'bg-blue-100 text-[#061345] text-xs font-bold px-2.5 py-0.5 rounded-full'
+        : 'bg-slate-100 text-slate-500 text-xs font-semibold px-2.5 py-0.5 rounded-full';
+    }
+
+    const cardAgenda = document.getElementById('card-agenda-pertemuan');
+    const cardIssue = document.getElementById('card-isu-kendala');
+    const cardQuickwin = document.getElementById('card-quickwins');
+    const cardPresentasi = document.getElementById('card-dokumen-presentasi');
+
+    const hasAgendas = agendas.length > 0;
+    const hasIssues = issues.length > 0;
+    const hasQuickwins = quickwins.length > 0;
+    const hasAnyContent = hasAgendas || hasIssues || hasQuickwins;
+
+    if (cardAgenda) cardAgenda.classList.toggle('hidden', !hasAgendas);
+    if (cardIssue) cardIssue.classList.toggle('hidden', !hasIssues);
+    if (cardQuickwin) cardQuickwin.classList.toggle('hidden', !hasQuickwins);
+    if (cardPresentasi) cardPresentasi.classList.toggle('hidden', !hasAnyContent);
 
     const agendaContainer = document.getElementById('agenda-cards-container');
     if (agendaContainer) {
-      if (dayDetail.agendas && dayDetail.agendas.length > 0) {
-        agendaContainer.innerHTML = dayDetail.agendas.map(ag => 
+      if (hasAgendas) {
+        agendaContainer.innerHTML = agendas.map(ag =>
           '<div class="p-2.5 sm:p-3 card-meeting-gradient border border-slate-200 rounded-xl flex flex-col gap-1.5 hover:border-blue-300 shadow-xs transition-all">' +
           '  <div class="flex items-center justify-between">' +
           '    <span class="text-[11px] font-bold text-slate-500">' + ag.time + '</span>' +
@@ -4334,14 +4646,14 @@
           '</div>'
         ).join('');
       } else {
-        agendaContainer.innerHTML = '<p class="text-xs text-slate-400 py-2 text-center">Tidak ada agenda pertemuan pada tanggal ini.</p>';
+        agendaContainer.innerHTML = '';
       }
     }
 
     const issueContainer = document.getElementById('issue-cards-container');
     if (issueContainer) {
-      if (dayDetail.issues && dayDetail.issues.length > 0) {
-        issueContainer.innerHTML = dayDetail.issues.map(iss => 
+      if (hasIssues) {
+        issueContainer.innerHTML = issues.map(iss =>
           '<div class="p-2.5 sm:p-3 ' + (iss.badge.includes('URGENT') ? 'card-urgent-gradient' : iss.badge.includes('INVESTIGASI') ? 'card-investigation-gradient' : 'card-review-gradient') + ' border border-slate-200 rounded-xl flex flex-col gap-2 hover:border-slate-300 shadow-xs transition-all">' +
           '  <div class="flex items-center justify-between">' +
           '    <span class="px-2 py-0.5 rounded text-[9px] font-extrabold ' + iss.badgeClass + '">' + iss.badge + '</span>' +
@@ -4355,21 +4667,21 @@
           '</div>'
         ).join('');
       } else {
-        issueContainer.innerHTML = '<p class="text-xs text-slate-400 py-2 text-center">Tidak ada kendala aktif pada tanggal ini.</p>';
+        issueContainer.innerHTML = '';
       }
     }
 
     const quickContainer = document.getElementById('quickwins-container');
     if (quickContainer) {
-      if (dayDetail.quickwins && dayDetail.quickwins.length > 0) {
-        quickContainer.innerHTML = dayDetail.quickwins.map(qw => 
+      if (hasQuickwins) {
+        quickContainer.innerHTML = quickwins.map(qw =>
           '<div class="p-2 sm:p-2.5 bg-gradient-to-r from-slate-50 to-white border border-slate-200 rounded-xl flex items-center justify-between gap-2">' +
           '  <div class="flex items-center gap-2 min-w-0"><input type="checkbox" ' + (qw.done ? 'checked' : '') + ' class="rounded border-slate-300 text-blue-600 focus:ring-0"><span class="text-xs text-slate-700 truncate ' + (qw.done ? 'line-through text-slate-400' : '') + '">' + escapeHtml(qw.title) + '</span></div>' +
           '  <span class="px-2 py-0.5 rounded text-[10px] font-bold shrink-0 ' + qw.statusClass + '">' + qw.status + '</span>' +
           '</div>'
         ).join('');
       } else {
-        quickContainer.innerHTML = '<p class="text-xs text-slate-400 py-2 text-center">Belum ada catatan quick win.</p>';
+        quickContainer.innerHTML = '';
       }
     }
   }
@@ -4661,12 +4973,83 @@
     if (btnCloseDrawerFoot) btnCloseDrawerFoot.addEventListener('click', closeDrawer);
     if (drawerBackdrop) drawerBackdrop.addEventListener('click', closeDrawer);
 
+    // Modern Month & Year Popover Picker Events
+    const btnMonthTrigger = document.getElementById('btn-month-year-trigger');
+    const pickerWrap = document.getElementById('modern-month-picker-wrap');
+    const btnPrevYear = document.getElementById('btn-picker-prev-year');
+    const btnNextYear = document.getElementById('btn-picker-next-year');
+    const btnCurrMonth = document.getElementById('btn-picker-current-month');
+
+    if (btnMonthTrigger) {
+      btnMonthTrigger.addEventListener('click', (e) => {
+        e.stopPropagation();
+        toggleMonthYearPopover();
+      });
+    }
+    if (btnPrevYear) {
+      btnPrevYear.addEventListener('click', (e) => {
+        e.stopPropagation();
+        state.pickerBrowseYear = (state.pickerBrowseYear || state.selectedYear) - 1;
+        renderMonthYearPopover();
+      });
+    }
+    if (btnNextYear) {
+      btnNextYear.addEventListener('click', (e) => {
+        e.stopPropagation();
+        state.pickerBrowseYear = (state.pickerBrowseYear || state.selectedYear) + 1;
+        renderMonthYearPopover();
+      });
+    }
+    if (btnCurrMonth) {
+      btnCurrMonth.addEventListener('click', (e) => {
+        e.stopPropagation();
+        const now = new Date();
+        setCalendarMonthYear(now.getFullYear(), now.getMonth(), now.getDate());
+        closeMonthYearPopover();
+      });
+    }
+    document.addEventListener('click', (e) => {
+      if (pickerWrap && !pickerWrap.contains(e.target)) {
+        closeMonthYearPopover();
+      }
+    });
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeMonthYearPopover();
+    });
+
+    // Prev / Next / Today Month Navigation
+    const btnPrevMonth = document.getElementById('btn-prev-month');
+    const btnNextMonth = document.getElementById('btn-next-month');
+    const btnToday = document.getElementById('btn-today');
+
+    if (btnPrevMonth) {
+      btnPrevMonth.addEventListener('click', () => {
+        let m = state.selectedMonthIndex - 1;
+        let y = state.selectedYear;
+        if (m < 0) { m = 11; y -= 1; }
+        setCalendarMonthYear(y, m);
+      });
+    }
+    if (btnNextMonth) {
+      btnNextMonth.addEventListener('click', () => {
+        let m = state.selectedMonthIndex + 1;
+        let y = state.selectedYear;
+        if (m > 11) { m = 0; y += 1; }
+        setCalendarMonthYear(y, m);
+      });
+    }
+    if (btnToday) {
+      btnToday.addEventListener('click', () => {
+        const now = new Date();
+        setCalendarMonthYear(now.getFullYear(), now.getMonth(), now.getDate());
+      });
+    }
+
     const monthSelect = document.getElementById('select-month-jump');
     if (monthSelect) {
       monthSelect.addEventListener('change', (e) => {
-        state.selectedMonth = e.target.value;
-        renderCalendarGrid();
-        renderCalendarRightPanel(state.selectedDate);
+        const parsed = parseMonthKey(e.target.value);
+        setCalendarMonthYear(parsed.year, parsed.monthIndex);
       });
     }
 
@@ -4675,6 +5058,16 @@
       calUnitFilter.addEventListener('change', (e) => {
         state.tasksFilterUnit = e.target.value;
         renderCalendarGrid();
+        renderCalendarRightPanel(state.selectedDate);
+      });
+    }
+
+    const calStatusFilter = document.getElementById('filter-status-select');
+    if (calStatusFilter) {
+      calStatusFilter.addEventListener('change', (e) => {
+        state.calendarStatusFilter = e.target.value;
+        renderCalendarGrid();
+        renderCalendarRightPanel(state.selectedDate);
       });
     }
 
