@@ -4399,9 +4399,13 @@
         if (!matchesMonth || !recDay || recDay < 1 || recDay > totalDays) return;
 
         // Status filter
-        const st = (rec.status || 'Open').toLowerCase();
-        if (state.calendarStatusFilter === 'active' && st === 'closed') return;
-        if (state.calendarStatusFilter === 'closed' && st !== 'closed') return;
+        const stNorm = (rec.status || 'Open').toLowerCase().replace(/\s+/g, '');
+        const isClosed = stNorm === 'closed';
+        const isInProg = stNorm === 'inprogress';
+        const statusKey = isClosed ? 'closed' : (isInProg ? 'inprogress' : 'open');
+
+        if (state.calendarStatusFilter === 'active' && isClosed) return;
+        if (state.calendarStatusFilter === 'closed' && !isClosed) return;
 
         if (!items[recDay]) items[recDay] = [];
         const unitKey = rec.serviceType === 'FIXED' ? 'fixed' : (rec.serviceType === 'ECARE' ? 'ecare' : 'mobile');
@@ -4413,10 +4417,11 @@
 
         if (!alreadyListed) {
           items[recDay].push({
-            type: st === 'closed' ? 'quickwin' : 'issue',
+            type: isClosed ? 'quickwin' : 'issue',
             unit: unitKey,
             text: titleText,
-            urgent: st === 'open',
+            statusNorm: statusKey,
+            urgent: statusKey === 'open',
             ticketId: rec.id,
             serviceType: rec.serviceType || 'MOBILE',
             record: rec
@@ -4685,6 +4690,35 @@
     };
   }
 
+  function getCalendarStatusMeta(statusVal) {
+    const s = String(statusVal || 'open').toLowerCase().replace(/\s+/g, '');
+    if (s === 'closed') {
+      return {
+        key: 'closed',
+        label: 'Closed',
+        topBadgeClass: 'bg-emerald-100 text-emerald-700 border border-emerald-300',
+        pillClass: 'bg-gradient-to-r from-emerald-50 to-teal-100/80 text-emerald-700 border border-emerald-300 font-bold',
+        cardBadgeClass: 'bg-emerald-100 text-emerald-700 border-emerald-200'
+      };
+    }
+    if (s === 'inprogress') {
+      return {
+        key: 'inprogress',
+        label: 'InProgress',
+        topBadgeClass: 'bg-orange-100 text-orange-700 border border-orange-300',
+        pillClass: 'bg-gradient-to-r from-orange-50 to-amber-100/90 text-orange-700 border border-orange-300 font-bold',
+        cardBadgeClass: 'bg-orange-100 text-orange-700 border-orange-200'
+      };
+    }
+    return {
+      key: 'open',
+      label: 'Open',
+      topBadgeClass: 'bg-rose-100 text-rose-700 border border-rose-300',
+      pillClass: 'bg-gradient-to-r from-rose-50 to-rose-100/90 text-rose-700 border border-rose-300 font-bold',
+      cardBadgeClass: 'bg-rose-100 text-rose-700 border-rose-200'
+    };
+  }
+
   function renderCalendarGrid() {
     const container = document.getElementById('calendar-grid-cells');
     if (!container) return;
@@ -4727,28 +4761,48 @@
       const hasDetails = !!(calData.details && calData.details[day]);
       const hasAnyDayContent = hasDetails || itemCount > 0;
 
+      // Kumpulkan badge status unik pada tanggal ini (Open = Merah, InProgress = Orange, Closed = Hijau)
+      const uniqueStatusKeys = [];
+      dayItems.forEach(it => {
+        if (it.type === 'meeting') return;
+        const stKey = it.statusNorm
+          || (it.record && (it.record.status || 'open').toLowerCase().replace(/\s+/g, ''))
+          || (it.type === 'quickwin' ? 'closed' : (it.urgent ? 'open' : 'inprogress'));
+        const normKey = stKey === 'closed' ? 'closed' : (stKey === 'inprogress' ? 'inprogress' : 'open');
+        if (!uniqueStatusKeys.includes(normKey)) uniqueStatusKeys.push(normKey);
+      });
+      const dayStatusBadgesHtml = uniqueStatusKeys.map(sk => {
+        const sm = getCalendarStatusMeta(sk);
+        return '<span class="px-1.5 py-0.5 rounded text-[9px] font-extrabold leading-none ' + sm.topBadgeClass + '">' + sm.label + '</span>';
+      }).join('');
+
       html += '<div class="calendar-day-cell group min-h-[78px] sm:min-h-[90px] lg:min-h-[clamp(88px,12.2vh,118px)] p-2 sm:p-2.5 flex flex-col justify-between cursor-pointer ' + (isSelected ? 'is-selected' : isWeekend ? 'bg-slate-50/45' : 'bg-white') + '" onclick="handleCalendarDateClick(' + day + ')">';
       html += '  <div class="flex items-center justify-between gap-1">';
-      html += '    <span class="text-xs sm:text-[13px] font-extrabold ' + (isSelected ? 'text-blue-700 font-headline' : isWeekend ? 'text-slate-500' : 'text-slate-800') + '">' + day + '</span>';
+      html += '    <div class="flex items-center gap-1.5 min-w-0 flex-wrap">';
+      html += '      <span class="text-xs sm:text-[13px] font-extrabold ' + (isSelected ? 'text-blue-700 font-headline' : isWeekend ? 'text-slate-500' : 'text-slate-800') + '">' + day + '</span>';
+      if (dayStatusBadgesHtml) {
+        html += '      ' + dayStatusBadgesHtml;
+      }
+      html += '    </div>';
       if (isSelected) {
-        html += '    <span class="px-2 py-0.5 rounded-full text-[9.5px] font-bold bg-blue-600 text-white shadow-xs">Dipilih</span>';
+        html += '    <span class="px-2 py-0.5 rounded-full text-[9.5px] font-bold bg-blue-600 text-white shadow-xs shrink-0">Dipilih</span>';
       } else if (itemCount > 0) {
-        html += '    <span class="px-1.5 py-0.5 rounded-md text-[9.5px] font-bold bg-slate-100 text-slate-600">' + itemCount + ' item</span>';
+        html += '    <span class="px-1.5 py-0.5 rounded-md text-[9.5px] font-bold bg-slate-100 text-slate-600 shrink-0">' + itemCount + ' item</span>';
       } else {
-        html += '    <span class="opacity-0 group-hover:opacity-100 transition-opacity px-1.5 py-0.5 rounded-md text-[9px] font-bold bg-blue-50 text-blue-600 border border-blue-200/70">+ Input</span>';
+        html += '    <span class="opacity-0 group-hover:opacity-100 transition-opacity px-1.5 py-0.5 rounded-md text-[9px] font-bold bg-blue-50 text-blue-600 border border-blue-200/70 shrink-0">+ Input</span>';
       }
       html += '  </div>';
 
       html += '  <div class="flex flex-col gap-1 mt-1.5 overflow-hidden">';
       dayItems.slice(0, 2).forEach(item => {
-        if (item.urgent) {
-          html += '<span class="truncate px-2 py-0.5 rounded-md text-[10px] sm:text-[10.5px] font-bold bg-gradient-to-r from-rose-50 to-rose-100/80 text-rose-700 border border-rose-200/90">&bull; ' + escapeHtml(item.text) + '</span>';
-        } else if (item.type === 'meeting') {
+        if (item.type === 'meeting') {
           html += '<span class="truncate px-2 py-0.5 rounded-md text-[10px] sm:text-[10.5px] font-semibold bg-gradient-to-r from-blue-50 to-indigo-50/80 text-blue-700 border border-blue-200/80">&bull; ' + escapeHtml(item.text) + '</span>';
-        } else if (item.type === 'quickwin') {
-          html += '<span class="truncate px-2 py-0.5 rounded-md text-[10px] sm:text-[10.5px] font-semibold bg-gradient-to-r from-emerald-50 to-teal-50/80 text-emerald-700 border border-emerald-200">&bull; ' + escapeHtml(item.text) + '</span>';
         } else {
-          html += '<span class="truncate px-2 py-0.5 rounded-md text-[10px] sm:text-[10.5px] font-semibold bg-slate-100 text-slate-700 border border-slate-200">&bull; ' + escapeHtml(item.text) + '</span>';
+          const itemStKey = item.statusNorm
+            || (item.record && (item.record.status || 'open').toLowerCase().replace(/\s+/g, ''))
+            || (item.type === 'quickwin' ? 'closed' : (item.urgent ? 'open' : 'inprogress'));
+          const sm = getCalendarStatusMeta(itemStKey);
+          html += '<span class="truncate px-2 py-0.5 rounded-md text-[10px] sm:text-[10.5px] ' + sm.pillClass + '">&bull; ' + escapeHtml(item.text) + '</span>';
         }
       });
       if (itemCount > 2) {
@@ -4826,7 +4880,7 @@
             roomText: 'Sync Room CHO',
             isWarRoom: false
           });
-        } else if (it.type === 'quickwin') {
+        } else if (it.type === 'quickwin' && !it.record) {
           quickwins.push({
             title: it.text,
             status: 'Selesai',
@@ -4836,18 +4890,19 @@
           });
         } else {
           const rec = it.record || {};
-          const st = (rec.status || (it.urgent ? 'Open' : 'InProgress')).toLowerCase().replace(/\s+/g, '');
+          const st = (rec.status || it.statusNorm || (it.urgent ? 'Open' : 'InProgress')).toLowerCase().replace(/\s+/g, '');
+          const sm = getCalendarStatusMeta(st);
           issues.push({
-            badge: it.urgent ? 'URGENT / BLOCKER' : st === 'inprogress' ? 'DALAM INVESTIGASI' : 'OPEN / REVIEW',
-            badgeClass: it.urgent ? 'bg-rose-100 text-rose-700 border-rose-200' : st === 'inprogress' ? 'bg-amber-100 text-amber-800 border-amber-200' : 'bg-blue-100 text-blue-800 border-blue-200',
+            badge: sm.key === 'closed' ? 'CLOSED' : (sm.key === 'inprogress' ? 'IN PROGRESS' : 'OPEN'),
+            badgeClass: sm.cardBadgeClass,
             unit: uMeta.label,
             unitClass: uMeta.pillClass,
             ticket: it.ticketId ? '#' + it.ticketId : '#CHO-' + day,
             title: rec.issueDetails || rec.detail || it.text,
             pic: rec.pic || rec.requestor || 'Tim CHO',
-            statusNorm: st,
+            statusNorm: sm.key,
             actionText: 'Detail Isu',
-            actionClass: it.urgent ? 'bg-rose-50 text-rose-700 border-rose-200' : 'bg-blue-50 text-blue-800 border-blue-200',
+            actionClass: sm.key === 'closed' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : (sm.key === 'inprogress' ? 'bg-orange-50 text-orange-700 border-orange-200' : 'bg-rose-50 text-rose-700 border-rose-200'),
             ticketId: it.ticketId || '1',
             serviceType: it.serviceType || uMeta.key
           });
@@ -4922,9 +4977,15 @@
             }
           }
 
-          return '<div class="p-3 sm:p-3.5 ' + (iss.badge.includes('URGENT') ? 'card-urgent-gradient' : stNorm === 'inprogress' ? 'card-investigation-gradient' : 'card-review-gradient') + ' border border-slate-200 rounded-xl flex flex-col gap-2.5 hover:border-slate-300 shadow-xs transition-all">' +
+          const liveSm = getCalendarStatusMeta(stNorm);
+          const liveBadgeText = stNorm === 'closed' ? 'CLOSED' : (stNorm === 'inprogress' ? 'IN PROGRESS' : 'OPEN');
+          const cardToneClass = stNorm === 'closed'
+            ? 'bg-gradient-to-br from-emerald-50/90 to-white border-emerald-200'
+            : (stNorm === 'inprogress' ? 'bg-gradient-to-br from-orange-50/90 to-white border-orange-200' : 'bg-gradient-to-br from-rose-50/90 to-white border-rose-200');
+
+          return '<div class="p-3 sm:p-3.5 ' + cardToneClass + ' border rounded-xl flex flex-col gap-2.5 hover:border-slate-300 shadow-xs transition-all">' +
           '  <div class="flex items-center justify-between">' +
-          '    <span class="px-2 py-0.5 rounded text-[9px] font-extrabold ' + iss.badgeClass + '">' + iss.badge + '</span>' +
+          '    <span class="px-2.5 py-0.5 rounded text-[10px] font-extrabold border ' + liveSm.cardBadgeClass + '">' + liveBadgeText + '</span>' +
           '    <div class="flex items-center gap-1.5"><span class="px-1.5 py-0.5 rounded text-[9px] font-bold border ' + uMeta.pillClass + '">' + uMeta.label + '</span><span class="text-[10px] font-mono font-bold text-slate-700">' + iss.ticket + '</span></div>' +
           '  </div>' +
           '  <p class="text-xs font-semibold text-slate-800 leading-relaxed">' + escapeHtml(iss.title) + '</p>' +
