@@ -5457,11 +5457,9 @@
         if (typeof openNewModal === 'function') openNewModal();
       });
     }
-    const navAct = document.getElementById('nav-link-activity');
     const navCal = document.getElementById('nav-link-calendar');
     const navTsk = document.getElementById('nav-link-tasks');
 
-    if (navAct) navAct.addEventListener('click', (e) => { e.preventDefault(); activateView('activity'); closeMobileSidebar(); });
     if (navCal) navCal.addEventListener('click', (e) => { e.preventDefault(); activateView('calendar'); closeMobileSidebar(); });
     if (navTsk) navTsk.addEventListener('click', (e) => { e.preventDefault(); activateView('tasks'); closeMobileSidebar(); });
 
