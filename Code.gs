@@ -33,6 +33,7 @@ var CONFIG = {
   SHEET_MOBILE: 'Mobile',
   SHEET_FIXED: 'Fixed',
   SHEET_ECARE: 'eCare',
+  SHEET_PRIORITY: 'Priority',
   SHEET_LOG: 'Log_Komunikasi',
   SHEET_USERS: 'Users',
   DRIVE_FOLDER_ID: '1KHMMjAovxmRpyd0JTAehyoSgH2sWItMV',
@@ -40,6 +41,7 @@ var CONFIG = {
   DEFAULT_HEADERS_MOBILE: STANDARD_CASE_HEADERS,
   DEFAULT_HEADERS_FIXED: STANDARD_CASE_HEADERS,
   DEFAULT_HEADERS_ECARE: STANDARD_CASE_HEADERS,
+  DEFAULT_HEADERS_PRIORITY: STANDARD_CASE_HEADERS,
   DEFAULT_HEADERS_LOG: [
     'Log_ID', 'ID_Tiket', 'Tipe_Layanan', 'Pengirim', 'Pesan_Update', 
     'Status_Terkait', 'Follow_Up_To', 'Waktu_Update'
@@ -150,6 +152,7 @@ function findBestSheet(ss, targetName) {
   var isFixed = cleanTarget.indexOf('fix') >= 0;
   var isMobile = cleanTarget.indexOf('mob') >= 0;
   var isEcare = cleanTarget.indexOf('ecare') >= 0;
+  var isPriority = cleanTarget.indexOf('prior') >= 0 || cleanTarget.indexOf('prio') >= 0;
   var isLog = cleanTarget.indexOf('log') >= 0;
   var isUsers = cleanTarget.indexOf('user') >= 0;
 
@@ -164,7 +167,7 @@ function findBestSheet(ss, targetName) {
     }
   }
 
-  // Pass 2: Semantic keyword matching (Fixed vs Mobile vs eCare vs Log vs Users)
+  // Pass 2: Semantic keyword matching (Fixed vs Mobile vs eCare vs Priority vs Log vs Users)
   if (candidates.length === 0) {
     for (var j = 0; j < sheets.length; j++) {
       var sName2 = sheets[j].getName();
@@ -172,6 +175,8 @@ function findBestSheet(ss, targetName) {
       if (isLog && cleanSName2.indexOf('log') >= 0) {
         candidates.push(sheets[j]);
       } else if (isUsers && cleanSName2.indexOf('user') >= 0) {
+        candidates.push(sheets[j]);
+      } else if (isPriority && (cleanSName2.indexOf('prior') >= 0 || cleanSName2.indexOf('prio') >= 0)) {
         candidates.push(sheets[j]);
       } else if (isEcare && cleanSName2.indexOf('ecare') >= 0) {
         candidates.push(sheets[j]);
@@ -194,11 +199,11 @@ function findBestSheet(ss, targetName) {
     }
   }
 
-  // Pass 4: Fallback untuk sheet Fixed jika nama tab berbeda (hindari Mobile, eCare, Log, Users)
+  // Pass 4: Fallback untuk sheet Fixed jika nama tab berbeda (hindari Mobile, eCare, Priority, Log, Users)
   if (candidates.length === 0 && isFixed) {
     for (var s = 0; s < sheets.length; s++) {
       var sClean = sheets[s].getName().toLowerCase().replace(/[^a-z0-9]/g, '');
-      if (sClean.indexOf('mob') < 0 && sClean.indexOf('ecare') < 0 && sClean.indexOf('log') < 0 && sClean.indexOf('user') < 0) {
+      if (sClean.indexOf('mob') < 0 && sClean.indexOf('ecare') < 0 && sClean.indexOf('prio') < 0 && sClean.indexOf('prior') < 0 && sClean.indexOf('log') < 0 && sClean.indexOf('user') < 0) {
         candidates.push(sheets[s]);
         break;
       }
@@ -224,7 +229,7 @@ function findSheetCaseInsensitive(ss, targetName) {
 }
 
 /**
- * Helper: Resolve target sheet metadata berdasarkan serviceType ('MOBILE' | 'FIXED' | 'ECARE')
+ * Helper: Resolve target sheet metadata berdasarkan serviceType ('MOBILE' | 'FIXED' | 'ECARE' | 'PRIORITY')
  */
 function resolveTargetSheetMeta(serviceType) {
   var norm = String(serviceType || 'MOBILE').toUpperCase().trim();
@@ -233,6 +238,9 @@ function resolveTargetSheetMeta(serviceType) {
   }
   if (norm === 'ECARE' || norm === 'E-CARE' || norm === 'CHO ECARE') {
     return { serviceType: 'ECARE', sheetName: CONFIG.SHEET_ECARE, prefix: 'CHO-E', defaultHeaders: CONFIG.DEFAULT_HEADERS_ECARE };
+  }
+  if (norm === 'PRIORITY' || norm === 'PRIO' || norm === 'CHO PRIORITY' || norm === 'PRIOTITY' || norm === 'PRIORITAS') {
+    return { serviceType: 'PRIORITY', sheetName: CONFIG.SHEET_PRIORITY, prefix: 'CHO-P', defaultHeaders: CONFIG.DEFAULT_HEADERS_PRIORITY };
   }
   return { serviceType: 'MOBILE', sheetName: CONFIG.SHEET_MOBILE, prefix: 'CHO-M', defaultHeaders: CONFIG.DEFAULT_HEADERS_MOBILE };
 }
@@ -268,10 +276,14 @@ function ensureSheet(ss, sheetName, defaultHeaders) {
 }
 
 /**
- * Inisialisasi seluruh sheet (Mobile, Fixed, eCare, Log_Komunikasi, Users)
- * & pastikan semua kolom yang dibutuhkan tersedia di 3 sheet utama.
- * Dapat dijalankan manual 1x dari editor Apps Script melalui fungsi setupAllThreeSheets().
+ * Inisialisasi seluruh sheet (Mobile, Fixed, eCare, Priority, Log_Komunikasi, Users)
+ * & pastikan semua 18 kolom standar tersedia di seluruh sheet kasus.
+ * Dapat dijalankan manual 1x dari editor Apps Script melalui fungsi setupAllSheets() atau setupAllThreeSheets().
  */
+function setupAllSheets() {
+  return initializeDatabase();
+}
+
 function setupAllThreeSheets() {
   return initializeDatabase();
 }
@@ -281,22 +293,24 @@ function initializeDatabase() {
   var mobileSheet = ensureSheet(ss, CONFIG.SHEET_MOBILE, CONFIG.DEFAULT_HEADERS_MOBILE);
   var fixedSheet = ensureSheet(ss, CONFIG.SHEET_FIXED, CONFIG.DEFAULT_HEADERS_FIXED);
   var ecareSheet = ensureSheet(ss, CONFIG.SHEET_ECARE, CONFIG.DEFAULT_HEADERS_ECARE);
+  var prioritySheet = ensureSheet(ss, CONFIG.SHEET_PRIORITY, CONFIG.DEFAULT_HEADERS_PRIORITY);
   var logSheet = ensureSheet(ss, CONFIG.SHEET_LOG, CONFIG.DEFAULT_HEADERS_LOG);
   var usersSheet = ensureUsersSheet(ss);
   
-  // Pastikan seluruh kolom kalender & workflow Inputer -> Facilitator Pickup aman di 3 sheet
+  // Pastikan seluruh kolom kalender & workflow Inputer -> Facilitator Pickup aman di seluruh sheet kasus
   try {
     ensureTrackingColumns(mobileSheet);
     ensureTrackingColumns(fixedSheet);
     ensureTrackingColumns(ecareSheet);
+    ensureTrackingColumns(prioritySheet);
   } catch (e) {
     Logger.log('ensureTrackingColumns notice: ' + e.message);
   }
   
   return {
     success: true,
-    sheets: [mobileSheet.getName(), fixedSheet.getName(), ecareSheet.getName()],
-    message: 'Database konCHO (Mobile, Fixed, eCare) beserta seluruh kolom siap digunakan'
+    sheets: [mobileSheet.getName(), fixedSheet.getName(), ecareSheet.getName(), prioritySheet.getName()],
+    message: 'Database konCHO (Mobile, Fixed, eCare, Priority) beserta seluruh kolom siap digunakan'
   };
 }
 
@@ -341,7 +355,7 @@ function ensureTrackingColumns(sheet) {
 }
 
 /**
- * Ambil semua data awal (Mobile, Fixed, eCare, Log_Komunikasi, Users)
+ * Ambil semua data awal (Mobile, Fixed, eCare, Priority, Log_Komunikasi, Users)
  */
 function getInitialData() {
   try {
@@ -351,6 +365,7 @@ function getInitialData() {
     var mobileData = getSheetRecords(ss, CONFIG.SHEET_MOBILE, 'MOBILE');
     var fixedData = getSheetRecords(ss, CONFIG.SHEET_FIXED, 'FIXED');
     var ecareData = getSheetRecords(ss, CONFIG.SHEET_ECARE, 'ECARE');
+    var priorityData = getSheetRecords(ss, CONFIG.SHEET_PRIORITY, 'PRIORITY');
     var logData = getLogRecords(ss);
     var usersData = getUserRecords(ss);
     
@@ -361,13 +376,16 @@ function getInitialData() {
       mobileHeaders: mobileData.headers,
       fixedHeaders: fixedData.headers,
       ecareHeaders: ecareData.headers,
+      priorityHeaders: priorityData.headers,
       mobileRecords: mobileData.records,
       fixedRecords: fixedData.records,
       ecareRecords: ecareData.records,
+      priorityRecords: priorityData.records,
       detectedSheets: {
         mobile: mobileData.sheetName,
         fixed: fixedData.sheetName,
         ecare: ecareData.sheetName,
+        priority: priorityData.sheetName,
         all: ss.getSheets().map(function(s) { return s.getName(); })
       },
       logs: logData,
@@ -877,7 +895,7 @@ function submitNewData(payload) {
     // Rekam log awal di Log_Komunikasi
     var logSheet = ensureSheet(ss, CONFIG.SHEET_LOG, CONFIG.DEFAULT_HEADERS_LOG);
     var logId = 'LOG-' + dateStr + '-' + Math.floor(1000 + Math.random() * 9000);
-    var unitDisplay = targetMeta.serviceType === 'FIXED' ? 'CHO Fixed' : (targetMeta.serviceType === 'ECARE' ? 'CHO eCare' : 'CHO Mobile');
+    var unitDisplay = targetMeta.serviceType === 'FIXED' ? 'CHO Fixed' : (targetMeta.serviceType === 'ECARE' ? 'CHO eCare' : (targetMeta.serviceType === 'PRIORITY' ? 'CHO Priority' : 'CHO Mobile'));
     var initialMessage = 'Laporan baru dibuat untuk Unit ' + unitDisplay + 
       ' [Bulan: ' + selectedMonth + ', Tgl Agenda: ' + agendaDateStr + '] oleh ' + inputByName + ' (Requestor: ' + (payload.requestor || '-') + ')' + 
       '. Isu: ' + (payload.totalCaseIsu || payload.caseIssue || '-') + 

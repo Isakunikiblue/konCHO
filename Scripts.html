@@ -110,6 +110,7 @@
     toggleMobile: document.getElementById('toggleMobile'),
     toggleFixed: document.getElementById('toggleFixed'),
     toggleEcare: document.getElementById('toggleEcare'),
+    togglePriority: document.getElementById('togglePriority'),
     inputTanggalAgenda: document.getElementById('inputTanggalAgenda'),
     inputBulanTahun: document.getElementById('inputBulanTahun'),
     inputCaseIssue: document.getElementById('inputCaseIssue'),
@@ -1770,6 +1771,7 @@
     if (dom.toggleMobile) dom.toggleMobile.addEventListener('click', function() { setNewModalService('MOBILE'); });
     if (dom.toggleFixed) dom.toggleFixed.addEventListener('click', function() { setNewModalService('FIXED'); });
     if (dom.toggleEcare) dom.toggleEcare.addEventListener('click', function() { setNewModalService('ECARE'); });
+    if (dom.togglePriority) dom.togglePriority.addEventListener('click', function() { setNewModalService('PRIORITY'); });
     if (dom.btnSubmitNewReport) dom.btnSubmitNewReport.addEventListener('click', handleSubmitNewReport);
 
     // 11. User Guide Modal Events
@@ -1890,6 +1892,7 @@
     if (state.activeServiceScope === 'MOBILE') srvText = 'CHO Mobile';
     else if (state.activeServiceScope === 'FIXED') srvText = 'CHO Fixed';
     else if (state.activeServiceScope === 'ECARE') srvText = 'CHO eCare';
+    else if (state.activeServiceScope === 'PRIORITY') srvText = 'CHO Priority';
 
     var monthText = state.activeMonthFilter === 'all' ? 'Semua Periode (Jan - Des)' : state.activeMonthFilter;
     dom.activeScopeLabel.textContent = 'Unit: ' + srvText + ' • Periode: ' + monthText;
@@ -1959,13 +1962,15 @@
     state.mobileHeaders = data.mobileHeaders || [];
     state.fixedHeaders = data.fixedHeaders || [];
     state.ecareHeaders = data.ecareHeaders || [];
+    state.priorityHeaders = data.priorityHeaders || [];
     state.logs = data.logs || [];
 
     var mob = (data.mobileRecords || []).map(function(r) { r.serviceType = 'MOBILE'; return r; });
     var fix = (data.fixedRecords || []).map(function(r) { r.serviceType = 'FIXED'; return r; });
     var ecare = (data.ecareRecords || []).map(function(r) { r.serviceType = 'ECARE'; return r; });
+    var prio = (data.priorityRecords || []).map(function(r) { r.serviceType = 'PRIORITY'; return r; });
 
-    var all = mob.concat(fix).concat(ecare);
+    var all = mob.concat(fix).concat(ecare).concat(prio);
 
     // Hubungkan catatan in progress dan closed terbaru dari log komunikasi
     all.forEach(function(ticket) {
@@ -2069,6 +2074,7 @@
       if (scope === 'MOBILE' && item.serviceType !== 'MOBILE') return;
       if (scope === 'FIXED' && item.serviceType !== 'FIXED') return;
       if (scope === 'ECARE' && item.serviceType !== 'ECARE') return;
+      if (scope === 'PRIORITY' && item.serviceType !== 'PRIORITY') return;
 
       counts.total++;
       if (itemMatchesStatus(item, 'Open')) counts.open++;
@@ -2168,10 +2174,11 @@
       // 1. Filter Periode Bulan
       if (!itemMatchesMonth(item, state.activeMonthFilter)) return false;
 
-      // 2. Filter Layanan (Mobile vs Fixed vs eCare vs Semua)
+      // 2. Filter Layanan (Mobile vs Fixed vs eCare vs Priority vs Semua)
       if (state.activeServiceScope === 'MOBILE' && item.serviceType !== 'MOBILE') return false;
       if (state.activeServiceScope === 'FIXED' && item.serviceType !== 'FIXED') return false;
       if (state.activeServiceScope === 'ECARE' && item.serviceType !== 'ECARE') return false;
+      if (state.activeServiceScope === 'PRIORITY' && item.serviceType !== 'PRIORITY') return false;
 
       // 3. Filter Status (All, Open, InProgress, Closed)
       if (state.activeStatusFilter && state.activeStatusFilter !== 'all') {
@@ -2203,7 +2210,7 @@
       dom.caseCountBadge.textContent = filtered.length + ' Case Ditemukan';
     }
     if (dom.footerSummaryText) {
-      var srvLabel = state.activeServiceScope === 'ALL' ? 'Semua Unit' : (state.activeServiceScope === 'MOBILE' ? 'CHO Mobile' : (state.activeServiceScope === 'ECARE' ? 'CHO eCare' : 'CHO Fixed'));
+      var srvLabel = state.activeServiceScope === 'ALL' ? 'Semua Unit' : (state.activeServiceScope === 'MOBILE' ? 'CHO Mobile' : (state.activeServiceScope === 'ECARE' ? 'CHO eCare' : (state.activeServiceScope === 'PRIORITY' ? 'CHO Priority' : 'CHO Fixed')));
       var monthLabel = state.activeMonthFilter === 'all' ? 'Semua Periode (Jan - Des)' : state.activeMonthFilter;
       dom.footerSummaryText.textContent = 'Menampilkan ' + filtered.length + ' case • ' + srvLabel + ' • Periode: ' + monthLabel;
     }
@@ -2247,36 +2254,41 @@
     var openMob = filtered.filter(function(i) { return i.serviceType === 'MOBILE' && itemMatchesStatus(i, 'Open'); }).length;
     var openFix = filtered.filter(function(i) { return i.serviceType === 'FIXED' && itemMatchesStatus(i, 'Open'); }).length;
     var openEc = filtered.filter(function(i) { return i.serviceType === 'ECARE' && itemMatchesStatus(i, 'Open'); }).length;
+    var openPrio = filtered.filter(function(i) { return i.serviceType === 'PRIORITY' && itemMatchesStatus(i, 'Open'); }).length;
+
     var inprogMob = filtered.filter(function(i) { return i.serviceType === 'MOBILE' && itemMatchesStatus(i, 'InProgress'); }).length;
     var inprogFix = filtered.filter(function(i) { return i.serviceType === 'FIXED' && itemMatchesStatus(i, 'InProgress'); }).length;
     var inprogEc = filtered.filter(function(i) { return i.serviceType === 'ECARE' && itemMatchesStatus(i, 'InProgress'); }).length;
+    var inprogPrio = filtered.filter(function(i) { return i.serviceType === 'PRIORITY' && itemMatchesStatus(i, 'InProgress'); }).length;
+
     var closedMob = filtered.filter(function(i) { return i.serviceType === 'MOBILE' && itemMatchesStatus(i, 'Closed'); }).length;
     var closedFix = filtered.filter(function(i) { return i.serviceType === 'FIXED' && itemMatchesStatus(i, 'Closed'); }).length;
     var closedEc = filtered.filter(function(i) { return i.serviceType === 'ECARE' && itemMatchesStatus(i, 'Closed'); }).length;
+    var closedPrio = filtered.filter(function(i) { return i.serviceType === 'PRIORITY' && itemMatchesStatus(i, 'Closed'); }).length;
 
     html += '<div class="beranda-kpi-grid">';
     html += '<div class="beranda-kpi-card kpi-card-total" data-quick-filter="all" title="Klik untuk menampilkan semua kasus">';
     html += '<div class="beranda-kpi-title"><span>🏠 Beranda (Total Case)</span><span style="font-size:14px;">📦</span></div>';
     html += '<div class="beranda-kpi-num">' + totalAll + '</div>';
-    html += '<div class="beranda-kpi-sub">Konsolidasi CHO Mobile, Fixed &amp; eCare</div>';
+    html += '<div class="beranda-kpi-sub">Konsolidasi CHO Mobile, Fixed, eCare &amp; Priority</div>';
     html += '</div>';
 
     html += '<div class="beranda-kpi-card kpi-card-open" data-quick-filter="Open" title="Klik untuk filter kasus Open">';
     html += '<div class="beranda-kpi-title"><span>🟡 Open (Kolom H)</span><span style="font-size:12px;">⏳</span></div>';
     html += '<div class="beranda-kpi-num">' + openCount + '</div>';
-    html += '<div class="beranda-kpi-sub">' + openMob + ' Mobile • ' + openFix + ' Fixed • ' + openEc + ' eCare</div>';
+    html += '<div class="beranda-kpi-sub">' + openMob + ' Mobile • ' + openFix + ' Fixed • ' + openEc + ' eCare • ' + openPrio + ' Priority</div>';
     html += '</div>';
 
     html += '<div class="beranda-kpi-card kpi-card-inprog" data-quick-filter="InProgress" title="Klik untuk filter kasus In Progress">';
     html += '<div class="beranda-kpi-title"><span>🔵 In Progress (Kolom H)</span><span style="font-size:12px;">⚙️</span></div>';
     html += '<div class="beranda-kpi-num">' + inprogCount + '</div>';
-    html += '<div class="beranda-kpi-sub">' + inprogMob + ' Mobile • ' + inprogFix + ' Fixed • ' + inprogEc + ' eCare</div>';
+    html += '<div class="beranda-kpi-sub">' + inprogMob + ' Mobile • ' + inprogFix + ' Fixed • ' + inprogEc + ' eCare • ' + inprogPrio + ' Priority</div>';
     html += '</div>';
 
     html += '<div class="beranda-kpi-card kpi-card-closed" data-quick-filter="Closed" title="Klik untuk filter kasus Closed">';
     html += '<div class="beranda-kpi-title"><span>🟢 Closed (Kolom H)</span><span style="font-size:12px;">✅</span></div>';
     html += '<div class="beranda-kpi-num">' + closedCount + '</div>';
-    html += '<div class="beranda-kpi-sub">' + closedMob + ' Mobile • ' + closedFix + ' Fixed • ' + closedEc + ' eCare</div>';
+    html += '<div class="beranda-kpi-sub">' + closedMob + ' Mobile • ' + closedFix + ' Fixed • ' + closedEc + ' eCare • ' + closedPrio + ' Priority</div>';
     html += '</div>';
     html += '</div>';
 
@@ -2297,7 +2309,7 @@
     var isBerandaMode = (!state.activeStatusFilter || state.activeStatusFilter === 'all');
 
     filtered.forEach(function(item) {
-      var srvClass = item.serviceType === 'MOBILE' ? 'mobile' : (item.serviceType === 'ECARE' ? 'ecare' : 'fixed');
+      var srvClass = item.serviceType === 'MOBILE' ? 'mobile' : (item.serviceType === 'ECARE' ? 'ecare' : (item.serviceType === 'PRIORITY' ? 'priority' : 'fixed'));
       var stNorm = (item.status || 'Open').toLowerCase().replace(/[^a-z]/g, '');
       var statusKey = 'open';
       var statusLabel = 'Open';
@@ -2560,8 +2572,9 @@
     items.forEach(function(item, idx) {
       var isMobile = item.serviceType === 'MOBILE';
       var isEcare = item.serviceType === 'ECARE';
-      var srvLabel = isMobile ? 'CHO Mobile' : (isEcare ? 'CHO eCare' : 'CHO Fixed');
-      var srvClass = isMobile ? 'mobile' : (isEcare ? 'ecare' : 'fixed');
+      var isPriority = item.serviceType === 'PRIORITY';
+      var srvLabel = isMobile ? 'CHO Mobile' : (isEcare ? 'CHO eCare' : (isPriority ? 'CHO Priority' : 'CHO Fixed'));
+      var srvClass = isMobile ? 'mobile' : (isEcare ? 'ecare' : (isPriority ? 'priority' : 'fixed'));
 
       var stNorm = (item.status || 'Open').toLowerCase().replace(/[^a-z]/g, '');
       var statusKey = 'open';
@@ -2785,7 +2798,7 @@
     dom.inProgressModalTitle.textContent = isUpdateOnly ? 'Update Catatan In Progress' : 'Pickup Kasus & Ubah Status ke In Progress';
     dom.inProgressTicketId.textContent = 'Case #' + ticket.id;
     dom.inProgressBadgeService.textContent = ticket.serviceType;
-    dom.inProgressBadgeService.className = 'info-badge ' + (ticket.serviceType === 'MOBILE' ? 'badge-srv mobile' : ticket.serviceType === 'ECARE' ? 'badge-srv ecare' : 'badge-srv fixed');
+    dom.inProgressBadgeService.className = 'info-badge ' + (ticket.serviceType === 'MOBILE' ? 'badge-srv mobile' : (ticket.serviceType === 'ECARE' ? 'badge-srv ecare' : (ticket.serviceType === 'PRIORITY' ? 'badge-srv priority' : 'badge-srv fixed')));
     dom.inProgressRequestor.textContent = ticket.requestor || '-';
     dom.inProgressIssueText.textContent = ticket.totalCaseIsu || '-';
 
@@ -2940,7 +2953,7 @@
     dom.closedModalTitle.textContent = 'Selesaikan Kasus (Closed)';
     dom.closedTicketId.textContent = 'Kasus #' + ticket.id;
     dom.closedBadgeService.textContent = ticket.serviceType;
-    dom.closedBadgeService.className = 'info-badge ' + (ticket.serviceType === 'MOBILE' ? 'badge-srv mobile' : ticket.serviceType === 'ECARE' ? 'badge-srv ecare' : 'badge-srv fixed');
+    dom.closedBadgeService.className = 'info-badge ' + (ticket.serviceType === 'MOBILE' ? 'badge-srv mobile' : (ticket.serviceType === 'ECARE' ? 'badge-srv ecare' : (ticket.serviceType === 'PRIORITY' ? 'badge-srv priority' : 'badge-srv fixed')));
     dom.closedRequestor.textContent = ticket.requestor || '-';
     dom.closedIssueText.textContent = ticket.totalCaseIsu || '-';
 
@@ -3144,7 +3157,7 @@
     if (dom.uploadPptTicketId) dom.uploadPptTicketId.textContent = 'Case #' + ticket.id;
     if (dom.uploadPptBadgeService) {
       dom.uploadPptBadgeService.textContent = ticket.serviceType;
-      dom.uploadPptBadgeService.className = 'info-badge ' + (ticket.serviceType === 'MOBILE' ? 'badge-srv mobile' : (ticket.serviceType === 'ECARE' ? 'badge-srv ecare' : 'badge-srv fixed'));
+      dom.uploadPptBadgeService.className = 'info-badge ' + (ticket.serviceType === 'MOBILE' ? 'badge-srv mobile' : (ticket.serviceType === 'ECARE' ? 'badge-srv ecare' : (ticket.serviceType === 'PRIORITY' ? 'badge-srv priority' : 'badge-srv fixed')));
     }
     if (dom.uploadPptIssueText) dom.uploadPptIssueText.textContent = ticket.totalCaseIsu || ticket.mainIssue || '-';
 
@@ -3373,7 +3386,7 @@
     }
 
     // 2. Kosongkan di memory record
-    var allItems = (serviceType === 'MOBILE' ? state.mobileRecords : (serviceType === 'ECARE' ? state.ecareRecords : state.fixedRecords)) || [];
+    var allItems = (serviceType === 'MOBILE' ? state.mobileRecords : (serviceType === 'ECARE' ? state.ecareRecords : (serviceType === 'PRIORITY' ? state.priorityRecords : state.fixedRecords))) || [];
     var targetRec = allItems.find(function(r) { return String(r.id) === String(ticketId); });
     if (targetRec) {
       targetRec.filePpt = '';
@@ -3713,6 +3726,8 @@
       setNewModalService('FIXED');
     } else if (state.activeServiceScope === 'ECARE') {
       setNewModalService('ECARE');
+    } else if (state.activeServiceScope === 'PRIORITY') {
+      setNewModalService('PRIORITY');
     } else {
       setNewModalService('MOBILE');
     }
@@ -3793,6 +3808,7 @@
     if (dom.toggleMobile) dom.toggleMobile.classList.toggle('active', srv === 'MOBILE');
     if (dom.toggleFixed) dom.toggleFixed.classList.toggle('active', srv === 'FIXED');
     if (dom.toggleEcare) dom.toggleEcare.classList.toggle('active', srv === 'ECARE');
+    if (dom.togglePriority) dom.togglePriority.classList.toggle('active', srv === 'PRIORITY');
 
     if (srv === 'MOBILE') {
       if (dom.lblNomorLayanan) dom.lblNomorLayanan.textContent = 'Nomor MSISDN Pelanggan';
@@ -3804,6 +3820,11 @@
       if (dom.lblWilayah) dom.lblWilayah.textContent = 'Channel / Touchpoint eCare';
       if (dom.inputNomorLayanan) dom.inputNomorLayanan.placeholder = 'Contoh: EC-20261105-001 / MyTelkomsel';
       if (dom.inputWilayah) dom.inputWilayah.placeholder = 'Contoh: MyTelkomsel / Veronika / Portal Web';
+    } else if (srv === 'PRIORITY') {
+      if (dom.lblNomorLayanan) dom.lblNomorLayanan.textContent = 'Nomor Tiket / ID Layanan Priority';
+      if (dom.lblWilayah) dom.lblWilayah.textContent = 'Kategori / Segment Priority';
+      if (dom.inputNomorLayanan) dom.inputNomorLayanan.placeholder = 'Contoh: PRIO-20261113-001 / VIP Customer';
+      if (dom.inputWilayah) dom.inputWilayah.placeholder = 'Contoh: Enterprise / Platinum / High-Value';
     } else {
       if (dom.lblNomorLayanan) dom.lblNomorLayanan.textContent = 'Nomor Internet / PSTN';
       if (dom.lblWilayah) dom.lblWilayah.textContent = 'Witel / Datel / ODP';
@@ -3865,8 +3886,8 @@
     }
 
     var currentInputUser = getCurrentLoggedInUserName();
-    var targetSheetName = selectedNewService === 'MOBILE' ? 'Mobile' : (selectedNewService === 'ECARE' ? 'eCare' : 'Fixed');
-    var targetUnitLabel = selectedNewService === 'MOBILE' ? 'CHO Mobile' : (selectedNewService === 'ECARE' ? 'CHO eCare' : 'CHO Fixed');
+    var targetSheetName = selectedNewService === 'MOBILE' ? 'Mobile' : (selectedNewService === 'ECARE' ? 'eCare' : (selectedNewService === 'PRIORITY' ? 'Priority' : 'Fixed'));
+    var targetUnitLabel = selectedNewService === 'MOBILE' ? 'CHO Mobile' : (selectedNewService === 'ECARE' ? 'CHO eCare' : (selectedNewService === 'PRIORITY' ? 'CHO Priority' : 'CHO Fixed'));
 
     var payload = {
       serviceType: selectedNewService,
@@ -4053,6 +4074,9 @@
       success: true,
       mobileHeaders: ['ID_Tiket', 'Total Case Isu yang masuk', 'Nomor_MSISDN', 'Nama_Pelanggan', 'Regional_Cluster', 'Kategori_Keluhan', 'Requestor', 'Status', 'Follow up to', 'Detail_Kendala', 'Terakhir_Update', 'Status_Informasi'],
       fixedHeaders: ['ID_Tiket', 'Total Case Isu yang masuk', 'Nomor_Internet_PSTN', 'Nama_Pelanggan', 'Witel_Datel', 'Kategori_Kendala', 'Requestor', 'Status', 'Follow up to', 'Detail_Kendala', 'Terakhir_Update', 'Status_Informasi'],
+      ecareHeaders: ['ID_Tiket', 'Bulan - Tahun', 'Case Isu yang Masuk', 'Issue Details (Description)', 'Progress & Quick Win (Temporary Solution)', 'Need Support', 'Requestor', 'Status', 'Follow up to', 'Status Update', 'Tanggal_Agenda', 'Terakhir_Update', 'File PPT', 'Input_By', 'PIC_Facilitator', 'Keterangan_Progress', 'Keterangan_Closed', 'Closed_By'],
+      priorityHeaders: ['ID_Tiket', 'Bulan - Tahun', 'Case Isu yang Masuk', 'Issue Details (Description)', 'Progress & Quick Win (Temporary Solution)', 'Need Support', 'Requestor', 'Status', 'Follow up to', 'Status Update', 'Tanggal_Agenda', 'Terakhir_Update', 'File PPT', 'Input_By', 'PIC_Facilitator', 'Keterangan_Progress', 'Keterangan_Closed', 'Closed_By'],
+      priorityRecords: [],
       mobileRecords: [
         {
           id: '1',
@@ -4408,7 +4432,7 @@
         if (state.calendarStatusFilter === 'closed' && !isClosed) return;
 
         if (!items[recDay]) items[recDay] = [];
-        const unitKey = rec.serviceType === 'FIXED' ? 'fixed' : (rec.serviceType === 'ECARE' ? 'ecare' : 'mobile');
+        const unitKey = rec.serviceType === 'FIXED' ? 'fixed' : (rec.serviceType === 'ECARE' ? 'ecare' : (rec.serviceType === 'PRIORITY' ? 'priority' : 'mobile'));
         const titleText = rec.totalCaseIsu || 'Isu CHO';
         const alreadyListed = items[recDay].some(it =>
           (it.ticketId && String(it.ticketId) === String(rec.id)) ||
@@ -4655,6 +4679,7 @@
   function normalizeUnitKey(val) {
     const s = String(val || '').trim().toUpperCase();
     if (!s || s === 'ALL') return 'ALL';
+    if (s.includes('PRIORITY') || s.includes('PRIORITAS') || s.includes('PRIO')) return 'PRIORITY';
     if (s.includes('ECARE') || s.includes('E-CARE')) return 'ECARE';
     if (s.includes('FIXED')) return 'FIXED';
     if (s.includes('MOBILE')) return 'MOBILE';
@@ -4663,6 +4688,15 @@
 
   function getUnitMeta(val) {
     const key = normalizeUnitKey(val);
+    if (key === 'PRIORITY') {
+      return {
+        key: 'PRIORITY',
+        label: 'CHO Priority',
+        shortBadge: 'CHO PRIORITY',
+        pillClass: 'bg-amber-50 text-amber-800 border-amber-200',
+        badgeClass: 'bg-amber-100 text-amber-900'
+      };
+    }
     if (key === 'FIXED') {
       return {
         key: 'FIXED',
@@ -5203,9 +5237,9 @@
   function updateTasksKpis() {
     const records = state.records || [];
     const total = records.length;
-    let open = 0, openMob = 0, openFix = 0, openEc = 0;
-    let inprog = 0, inprogMob = 0, inprogFix = 0, inprogEc = 0;
-    let closed = 0, closedMob = 0, closedFix = 0, closedEc = 0;
+    let open = 0, openMob = 0, openFix = 0, openEc = 0, openPrio = 0;
+    let inprog = 0, inprogMob = 0, inprogFix = 0, inprogEc = 0, inprogPrio = 0;
+    let closed = 0, closedMob = 0, closedFix = 0, closedEc = 0, closedPrio = 0;
 
     records.forEach(r => {
       const st = (r.status || 'Open').toLowerCase().replace(/\s+/g, '');
@@ -5214,16 +5248,19 @@
         inprog++;
         if (uKey === 'MOBILE') inprogMob++;
         else if (uKey === 'ECARE') inprogEc++;
+        else if (uKey === 'PRIORITY') inprogPrio++;
         else inprogFix++;
       } else if (st === 'closed') {
         closed++;
         if (uKey === 'MOBILE') closedMob++;
         else if (uKey === 'ECARE') closedEc++;
+        else if (uKey === 'PRIORITY') closedPrio++;
         else closedFix++;
       } else {
         open++;
         if (uKey === 'MOBILE') openMob++;
         else if (uKey === 'ECARE') openEc++;
+        else if (uKey === 'PRIORITY') openPrio++;
         else openFix++;
       }
     });
@@ -5240,17 +5277,17 @@
 
     const subOpen = document.getElementById('kpi-open-sub');
     const pctOpen = document.getElementById('kpi-open-pct');
-    if (subOpen) subOpen.textContent = openMob + ' Mobile • ' + openFix + ' Fixed • ' + openEc + ' eCare';
+    if (subOpen) subOpen.textContent = openMob + ' Mob • ' + openFix + ' Fix • ' + openEc + ' eCare • ' + openPrio + ' Priority';
     if (pctOpen && total > 0) pctOpen.textContent = ((open / total) * 100).toFixed(1) + '% Total';
 
     const subInprog = document.getElementById('kpi-inprogress-sub');
     const pctInprog = document.getElementById('kpi-inprogress-pct');
-    if (subInprog) subInprog.textContent = inprogMob + ' Mobile • ' + inprogFix + ' Fixed • ' + inprogEc + ' eCare';
+    if (subInprog) subInprog.textContent = inprogMob + ' Mob • ' + inprogFix + ' Fix • ' + inprogEc + ' eCare • ' + inprogPrio + ' Priority';
     if (pctInprog && total > 0) pctInprog.textContent = ((inprog / total) * 100).toFixed(1) + '% Total';
 
     const subClosed = document.getElementById('kpi-closed-sub');
     const pctClosed = document.getElementById('kpi-closed-pct');
-    if (subClosed) subClosed.textContent = closedMob + ' Mobile • ' + closedFix + ' Fixed • ' + closedEc + ' eCare';
+    if (subClosed) subClosed.textContent = closedMob + ' Mob • ' + closedFix + ' Fix • ' + closedEc + ' eCare • ' + closedPrio + ' Priority';
     if (pctClosed && total > 0) pctClosed.textContent = ((closed / total) * 100).toFixed(1) + '% Target';
   }
 
