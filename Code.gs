@@ -25,7 +25,9 @@ var STANDARD_CASE_HEADERS = [
   'PIC_Facilitator',                           // Kolom O (Facilitator yang Pickup / Handling)
   'Keterangan_Progress',                       // Kolom P (Catatan saat Pickup / InProgress)
   'Keterangan_Closed',                         // Kolom Q (Catatan penyelesaian saat Closed)
-  'Closed_By'                                  // Kolom R (Petugas penutup kasus)
+  'Closed_By',                                 // Kolom R (Petugas penutup kasus)
+  'Tanggal_Input',                             // Kolom S (Tanggal Awal Input oleh Inputer)
+  'History_Reschedule'                         // Kolom T (Riwayat Perubahan Tanggal oleh Facilitator)
 ];
 
 var CONFIG = {
@@ -103,6 +105,8 @@ function doPost(e) {
       result = uploadPptFile(data);
     } else if (action === 'deletePptFile') {
       result = deletePptFile(data);
+    } else if (action === 'rescheduleCaseDate') {
+      result = rescheduleCaseDate(data);
     } else if (action === 'saveUserAccount') {
       result = saveUserAccount(data);
     } else if (action === 'deleteUserAccount') {
@@ -337,7 +341,9 @@ function ensureTrackingColumns(sheet) {
     { label: 'PIC_Facilitator', aliases: ['picfacilitator', 'pickupby', 'pichandling', 'facilitator'] },
     { label: 'Keterangan_Progress', aliases: ['keteranganprogress', 'catatanprogress', 'progressnote', 'keteranganinprogress'] },
     { label: 'Keterangan_Closed', aliases: ['keteranganclosed', 'catatanclosed', 'closingnote', 'solusi'] },
-    { label: 'Closed_By', aliases: ['closedby', 'diclosedoleh', 'picclosed'] }
+    { label: 'Closed_By', aliases: ['closedby', 'diclosedoleh', 'picclosed'] },
+    { label: 'Tanggal_Input', aliases: ['tanggalinput', 'tanggal_input', 'tanggalinputawal', 'tglinput', 'createdat'] },
+    { label: 'History_Reschedule', aliases: ['historyreschedule', 'history_reschedule', 'riwayatreschedule', 'riwayat_reschedule'] }
   ];
 
   for (var r = 0; r < requiredCols.length; r++) {
@@ -563,6 +569,8 @@ function getSheetRecords(ss, sheetName, serviceType) {
     monthColIdx = 1; // Kolom B fallback
   }
   var dateIdx = findHeaderIndex(headers, ['tanggal_agenda', 'tanggal_case', 'tanggal_lapor', 'tanggal', 'tgl', 'created_at', 'date', 'timestamp', 'waktu']);
+  var tglInputIdx = findHeaderIndex(headers, ['tanggal_input', 'tanggal_input_awal', 'tgl_input', 'created_at', 'input_date']);
+  var historyRescheduleIdx = findHeaderIndex(headers, ['history_reschedule', 'riwayat_reschedule', 'reschedule_history', 'history_tanggal']);
   var nameIdx = findHeaderIndex(headers, ['nama_pelanggan', 'nama', 'customer_name', 'pelanggan', 'akun', 'customer']);
   var numIdx = findHeaderIndex(headers, ['nomor_msisdn', 'nomor_internet_pstn', 'msisdn', 'no_layanan', 'no_internet', 'telepon', 'nomor', 'inet']);
   var catIdx = findHeaderIndex(headers, ['kategori_keluhan', 'kategori_kendala', 'kategori']);
@@ -718,6 +726,9 @@ function getSheetRecords(ss, sheetName, serviceType) {
       followUpTo: rawFollowUp,
       bulan: detectedMonth,
       tanggal: dateIdx >= 0 && row[dateIdx] ? formatDate(row[dateIdx]) : '',
+      tanggalAgenda: dateIdx >= 0 && row[dateIdx] ? formatDate(row[dateIdx]) : '',
+      tanggalInput: tglInputIdx >= 0 && row[tglInputIdx] ? formatDate(row[tglInputIdx]) : (dateIdx >= 0 && row[dateIdx] ? formatDate(row[dateIdx]) : ''),
+      historyReschedule: historyRescheduleIdx >= 0 && row[historyRescheduleIdx] ? String(row[historyRescheduleIdx]).trim() : '',
       nama: rawName,
       nomorLayanan: rawNum,
       kategori: catIdx >= 0 && row[catIdx] ? String(row[catIdx]).trim() : 'General',
@@ -883,6 +894,10 @@ function submitNewData(payload) {
         val = payload.pic || payload.requestor || 'CHO Team';
       } else if (headerNorm.indexOf('fileppt') >= 0 || headerNorm.indexOf('materippt') >= 0 || headerNorm.indexOf('linkppt') >= 0) {
         val = payload.filePpt || '';
+      } else if (headerNorm.indexOf('tanggalinput') >= 0 || headerNorm.indexOf('tglinput') >= 0) {
+        val = agendaDateStr;
+      } else if (headerNorm.indexOf('historyreschedule') >= 0 || headerNorm.indexOf('riwayatreschedule') >= 0) {
+        val = '';
       } else if (payload.customFields && payload.customFields[headers[c]] !== undefined) {
         val = payload.customFields[headers[c]];
       }
@@ -1053,6 +1068,140 @@ function postCommunicationUpdate(payload) {
       success: false,
       error: err.message
     };
+  }
+}
+
+/**
+ * Ubah Tanggal Agenda Kasus (Reschedule) oleh Facilitator / Administrator
+ */
+function rescheduleCaseDate(data) {
+  try {
+    if (!data || !data.ticketId || !data.newDate) {
+      return { success: false, error: 'Data tiket atau tanggal baru tidak lengkap' };
+    }
+    var ss = getSpreadsheet();
+    var targetMeta = resolveTargetSheetMeta(data.serviceType);
+    var sheet = findBestSheet(ss, targetMeta.sheetName);
+    if (!sheet) return { success: false, error: 'Sheet tidak ditemukan: ' + targetMeta.sheetName };
+
+    var lastRow = sheet.getLastRow();
+    var lastCol = sheet.getLastColumn();
+    if (lastRow < 2 || lastCol < 1) return { success: false, error: 'Data sheet kosong' };
+
+    var headers = sheet.getRange(1, 1, 1, lastCol).getValues()[0].map(function(h) { return String(h).trim(); });
+    var idIdx = findHeaderIndex(headers, ['id_tiket', 'id', 'notiket', 'ticket_id']);
+    if (idIdx < 0) idIdx = 0;
+
+    var dateIdx = findHeaderIndex(headers, ['tanggal_agenda', 'tanggal', 'date']);
+    var tglInputIdx = findHeaderIndex(headers, ['tanggal_input', 'tanggal_input_awal', 'tgl_input', 'created_at']);
+    var histIdx = findHeaderIndex(headers, ['history_reschedule', 'riwayat_reschedule', 'reschedule_history', 'history_tanggal']);
+    var lastUpdateIdx = findHeaderIndex(headers, ['terakhir_update', 'last_update']);
+    var facilitatorIdx = findHeaderIndex(headers, ['pic_facilitator', 'facilitator', 'pickup_by']);
+    var statusInfoIdx = findHeaderIndex(headers, ['status update', 'status_update', 'status informasi']);
+
+    var idValues = sheet.getRange(2, idIdx + 1, lastRow - 1, 1).getValues();
+    var targetRow = -1;
+    for (var r = 0; r < idValues.length; r++) {
+      if (String(idValues[r][0]).trim() === String(data.ticketId).trim()) {
+        targetRow = r + 2;
+        break;
+      }
+    }
+    if (targetRow < 2) return { success: false, error: 'Tiket #' + data.ticketId + ' tidak ditemukan di sheet ' + targetMeta.sheetName };
+
+    var now = new Date();
+    var tz = Session.getScriptTimeZone() || 'Asia/Jakarta';
+    var formattedDate = Utilities.formatDate(now, tz, 'yyyy-MM-dd HH:mm:ss');
+    var actor = data.rescheduledBy || data.author || 'Facilitator';
+    var reason = data.reason || '';
+
+    // Ambil tanggal lama
+    var oldDate = '';
+    if (dateIdx >= 0) {
+      var rawOld = sheet.getRange(targetRow, dateIdx + 1).getValue();
+      oldDate = rawOld ? formatDate(rawOld) : '';
+    }
+
+    var newIsoDate = String(data.newDate).trim();
+    var matchIso = newIsoDate.match(/^(\d{4})-(\d{2})-(\d{2})/);
+    if (!matchIso) {
+      var pDate = new Date(newIsoDate);
+      if (!isNaN(pDate.getTime())) {
+        newIsoDate = Utilities.formatDate(pDate, tz, 'yyyy-MM-dd');
+      }
+    }
+
+    // Update Tanggal_Agenda di baris target
+    if (dateIdx >= 0) {
+      sheet.getRange(targetRow, dateIdx + 1).setValue(newIsoDate);
+    }
+
+    // Jika Tanggal_Input belum ada di sheet, buat kolomnya atau isi tanggal lama
+    if (tglInputIdx >= 0) {
+      var curInputDate = sheet.getRange(targetRow, tglInputIdx + 1).getValue();
+      if (!curInputDate) {
+        sheet.getRange(targetRow, tglInputIdx + 1).setValue(oldDate || newIsoDate);
+      }
+    }
+
+    // Susun riwayat reschedule
+    var historyEntry = '[' + formattedDate + '] Diubah dari ' + (oldDate || '-') + ' ke ' + newIsoDate + ' oleh ' + actor + (reason ? ' (Alasan: ' + reason + ')' : '');
+    if (histIdx >= 0) {
+      var existingHist = String(sheet.getRange(targetRow, histIdx + 1).getValue() || '');
+      var updatedHist = existingHist ? existingHist + ' | ' + historyEntry : historyEntry;
+      sheet.getRange(targetRow, histIdx + 1).setValue(updatedHist);
+    }
+
+    // Update Terakhir_Update
+    if (lastUpdateIdx >= 0) {
+      sheet.getRange(targetRow, lastUpdateIdx + 1).setValue(formattedDate);
+    }
+
+    // Update PIC Facilitator jika masih kosong
+    if (facilitatorIdx >= 0) {
+      var curFac = sheet.getRange(targetRow, facilitatorIdx + 1).getValue();
+      if (!curFac || String(curFac).trim() === '') {
+        sheet.getRange(targetRow, facilitatorIdx + 1).setValue(actor);
+      }
+    }
+
+    // Update Status Update
+    if (statusInfoIdx >= 0) {
+      sheet.getRange(targetRow, statusInfoIdx + 1).setValue('Rescheduled ke ' + newIsoDate + ' oleh ' + actor);
+    }
+
+    // Catat di Log_Komunikasi
+    try {
+      var logSheet = ensureSheet(ss, CONFIG.SHEET_LOG, CONFIG.DEFAULT_HEADERS_LOG);
+      var dateStr = Utilities.formatDate(now, tz, 'yyyyMMdd');
+      var logId = 'LOG-' + dateStr + '-' + Math.floor(1000 + Math.random() * 9000);
+      logSheet.appendRow([
+        logId,
+        data.ticketId,
+        targetMeta.serviceType,
+        actor,
+        'Reschedule Tanggal Agenda dari ' + (oldDate || '-') + ' ke ' + newIsoDate + (reason ? '. Alasan: ' + reason : ''),
+        'Reschedule',
+        'Agenda Kalender',
+        formattedDate
+      ]);
+    } catch (logErr) {
+      Logger.log('Log reschedule error: ' + logErr.message);
+    }
+
+    return {
+      success: true,
+      ticketId: data.ticketId,
+      serviceType: targetMeta.serviceType,
+      oldDate: oldDate,
+      newDate: newIsoDate,
+      rescheduledBy: actor,
+      historyEntry: historyEntry,
+      message: 'Tanggal agenda tiket #' + data.ticketId + ' berhasil diubah menjadi ' + newIsoDate + ' oleh ' + actor
+    };
+  } catch (err) {
+    Logger.log('rescheduleCaseDate error: ' + err.stack);
+    return { success: false, error: err.message };
   }
 }
 

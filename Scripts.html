@@ -152,6 +152,25 @@
     uploadPptPercent: document.getElementById('uploadPptPercent'),
     uploadPptBar: document.getElementById('uploadPptBar'),
 
+    // Modal Reschedule Date (Facilitator / Admin)
+    modalRescheduleDate: document.getElementById('modalRescheduleDate'),
+    btnCloseRescheduleModal: document.getElementById('btnCloseRescheduleModal'),
+    btnCancelRescheduleModal: document.getElementById('btnCancelRescheduleModal'),
+    btnSubmitReschedule: document.getElementById('btnSubmitReschedule'),
+    rescheduleModalTitle: document.getElementById('rescheduleModalTitle'),
+    rescheduleBadgeService: document.getElementById('rescheduleBadgeService'),
+    rescheduleTicketId: document.getElementById('rescheduleTicketId'),
+    rescheduleStatusBadge: document.getElementById('rescheduleStatusBadge'),
+    rescheduleIssueText: document.getElementById('rescheduleIssueText'),
+    rescheduleTglInputVal: document.getElementById('rescheduleTglInputVal'),
+    rescheduleInputerVal: document.getElementById('rescheduleInputerVal'),
+    rescheduleTglCurrentVal: document.getElementById('rescheduleTglCurrentVal'),
+    inputRescheduleNewDate: document.getElementById('inputRescheduleNewDate'),
+    inputRescheduleReason: document.getElementById('inputRescheduleReason'),
+    inputReschedulePic: document.getElementById('inputReschedulePic'),
+    rescheduleHistorySection: document.getElementById('rescheduleHistorySection'),
+    rescheduleHistoryList: document.getElementById('rescheduleHistoryList'),
+
     // Toast
     toastContainer: document.getElementById('toastContainer')
   };
@@ -1852,8 +1871,13 @@
       });
     }
 
+    // 13. Modal Reschedule Date Events (Facilitator & Administrator)
+    if (dom.btnCloseRescheduleModal) dom.btnCloseRescheduleModal.addEventListener('click', closeRescheduleModal);
+    if (dom.btnCancelRescheduleModal) dom.btnCancelRescheduleModal.addEventListener('click', closeRescheduleModal);
+    if (dom.btnSubmitReschedule) dom.btnSubmitReschedule.addEventListener('click', handleSubmitReschedule);
+
     // Tutup modal jika klik di luar box modal
-    [dom.modalInProgress, dom.modalClosed, dom.modalLog, dom.newDataModal, dom.modalUploadPpt, document.getElementById('modalManageUsers'), document.getElementById('modalUserGuide')].forEach(function(m) {
+    [dom.modalInProgress, dom.modalClosed, dom.modalLog, dom.newDataModal, dom.modalUploadPpt, dom.modalRescheduleDate, document.getElementById('modalManageUsers'), document.getElementById('modalUserGuide')].forEach(function(m) {
       if (!m) return;
       m.addEventListener('click', function(e) {
         if (e.target === m) {
@@ -3435,6 +3459,231 @@
   }
 
   /**
+   * =========================================================================
+   * FITUR RESCHEDULE TANGGAL AGENDA (KHUSUS ROLE FACILITATOR & ADMINISTRATOR)
+   * Mengubah Tanggal_Agenda (Kolom K) dan merekam History_Reschedule
+   * =========================================================================
+   */
+  function openRescheduleModal(ticketId, serviceType) {
+    var currentRole = (state.authUser && state.authUser.role) ? state.authUser.role : 'Administrator';
+    if (currentRole === 'Inputer' || currentRole === 'Viewer') {
+      showToast('Akses ditolak: Hanya peran Facilitator & Administrator yang berwenang merubah tanggal agenda.', 'error');
+      return;
+    }
+
+    var ticket = (state.records || []).find(function(r) {
+      return String(r.id) === String(ticketId) && (!serviceType || r.serviceType === serviceType);
+    }) || (state.records || []).find(function(r) { return String(r.id) === String(ticketId); });
+    if (!ticket) return;
+
+    state.currentRescheduleTicket = ticket;
+
+    if (dom.rescheduleModalTitle) dom.rescheduleModalTitle.textContent = 'Ubah Tanggal Agenda: Kasus #' + ticket.id;
+    if (dom.rescheduleTicketId) dom.rescheduleTicketId.textContent = 'Case #' + ticket.id;
+    if (dom.rescheduleBadgeService) {
+      dom.rescheduleBadgeService.textContent = ticket.serviceType;
+      dom.rescheduleBadgeService.className = 'info-badge ' + (ticket.serviceType === 'MOBILE' ? 'badge-srv mobile' : (ticket.serviceType === 'ECARE' ? 'badge-srv ecare' : (ticket.serviceType === 'PRIORITY' ? 'badge-srv priority' : 'badge-srv fixed')));
+    }
+    if (dom.rescheduleStatusBadge) {
+      var sm = getCalendarStatusMeta(ticket.status);
+      dom.rescheduleStatusBadge.textContent = ticket.status || 'Open';
+      dom.rescheduleStatusBadge.className = 'text-xs px-2.5 py-0.5 rounded-full font-bold border ' + sm.cardBadgeClass;
+    }
+    if (dom.rescheduleIssueText) dom.rescheduleIssueText.textContent = ticket.totalCaseIsu || ticket.caseTitle || '-';
+
+    var tglInputDisplay = formatShortIndoDate(ticket.tanggalInput || ticket.tanggal);
+    var tglCurrentDisplay = formatShortIndoDate(ticket.tanggalAgenda || ticket.tanggal);
+    if (dom.rescheduleTglInputVal) dom.rescheduleTglInputVal.textContent = tglInputDisplay;
+    if (dom.rescheduleInputerVal) dom.rescheduleInputerVal.textContent = 'Oleh: ' + (ticket.inputBy || ticket.requestor || 'Inputer');
+    if (dom.rescheduleTglCurrentVal) dom.rescheduleTglCurrentVal.textContent = tglCurrentDisplay;
+
+    // Prefill input date
+    var rawDate = ticket.tanggalAgenda || ticket.tanggal || '';
+    var parsedDate = '';
+    if (rawDate) {
+      var dp = parseDateParts(rawDate);
+      if (dp) {
+        var mm = String(dp.monthIndex + 1).padStart(2, '0');
+        var dd = String(dp.day).padStart(2, '0');
+        parsedDate = dp.year + '-' + mm + '-' + dd;
+      }
+    }
+    if (dom.inputRescheduleNewDate) dom.inputRescheduleNewDate.value = parsedDate;
+    if (dom.inputRescheduleReason) dom.inputRescheduleReason.value = '';
+    if (dom.inputReschedulePic) dom.inputReschedulePic.value = getCurrentLoggedInUserName();
+
+    // History
+    if (dom.rescheduleHistorySection && dom.rescheduleHistoryList) {
+      if (ticket.historyReschedule) {
+        dom.rescheduleHistorySection.style.display = 'block';
+        var histLines = ticket.historyReschedule.split('|');
+        dom.rescheduleHistoryList.innerHTML = histLines.map(function(h) {
+          return '<div class="py-1 border-b border-slate-200/60 last:border-0">' + escapeHtml(h.trim()) + '</div>';
+        }).join('');
+      } else {
+        dom.rescheduleHistorySection.style.display = 'none';
+        dom.rescheduleHistoryList.innerHTML = '';
+      }
+    }
+
+    if (dom.modalRescheduleDate) dom.modalRescheduleDate.classList.add('active');
+    setTimeout(function() { if (dom.inputRescheduleNewDate) dom.inputRescheduleNewDate.focus(); }, 100);
+  }
+
+  function closeRescheduleModal() {
+    if (dom.modalRescheduleDate) dom.modalRescheduleDate.classList.remove('active');
+    state.currentRescheduleTicket = null;
+    if (dom.inputRescheduleReason) dom.inputRescheduleReason.value = '';
+  }
+
+  function handleSubmitReschedule() {
+    var ticket = state.currentRescheduleTicket;
+    if (!ticket) return;
+
+    var newDate = dom.inputRescheduleNewDate ? dom.inputRescheduleNewDate.value : '';
+    var reason = dom.inputRescheduleReason ? dom.inputRescheduleReason.value.trim() : '';
+    var picName = dom.inputReschedulePic ? dom.inputReschedulePic.value.trim() : getCurrentLoggedInUserName();
+
+    if (!newDate) {
+      showToast('Pilih tanggal agenda baru terlebih dahulu!', 'error');
+      if (dom.inputRescheduleNewDate) dom.inputRescheduleNewDate.focus();
+      return;
+    }
+    if (!reason) {
+      showToast('Harap masukkan alasan atau catatan perubahan tanggal!', 'error');
+      if (dom.inputRescheduleReason) dom.inputRescheduleReason.focus();
+      return;
+    }
+
+    if (dom.btnSubmitReschedule) {
+      dom.btnSubmitReschedule.disabled = true;
+      dom.btnSubmitReschedule.innerHTML = '<span>Menyimpan ke Sheet...</span>';
+    }
+
+    var payload = {
+      action: 'rescheduleCaseDate',
+      ticketId: ticket.id,
+      serviceType: ticket.serviceType,
+      newDate: newDate,
+      reason: reason,
+      rescheduledBy: picName
+    };
+
+    if (state.isGasEnvironment) {
+      google.script.run
+        .withSuccessHandler(function(res) {
+          if (dom.btnSubmitReschedule) {
+            dom.btnSubmitReschedule.disabled = false;
+            dom.btnSubmitReschedule.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg><span>Simpan Perubahan Tanggal</span>';
+          }
+          if (res && res.success) {
+            applyRescheduleUpdateLocal(ticket, payload, res);
+            closeRescheduleModal();
+            showToast('Tanggal agenda kasus #' + ticket.id + ' berhasil diubah ke ' + newDate + '!', 'success');
+          } else {
+            showToast('Gagal mengubah tanggal: ' + (res ? res.error : 'Unknown'), 'error');
+          }
+        })
+        .withFailureHandler(function(err) {
+          if (dom.btnSubmitReschedule) {
+            dom.btnSubmitReschedule.disabled = false;
+            dom.btnSubmitReschedule.innerHTML = '<span>Simpan Perubahan Tanggal</span>';
+          }
+          showToast('Apps Script error: ' + err.message, 'error');
+        })
+        .rescheduleCaseDate(payload);
+    } else if (state.gasApiUrl) {
+      fetch(state.gasApiUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+        body: JSON.stringify(payload)
+      })
+        .then(function(r) { return r.json(); })
+        .then(function(res) {
+          if (dom.btnSubmitReschedule) {
+            dom.btnSubmitReschedule.disabled = false;
+            dom.btnSubmitReschedule.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg><span>Simpan Perubahan Tanggal</span>';
+          }
+          if (res && res.success) {
+            applyRescheduleUpdateLocal(ticket, payload, res);
+            closeRescheduleModal();
+            showToast('Tanggal agenda kasus #' + ticket.id + ' berhasil diubah ke ' + newDate + '!', 'success');
+          } else {
+            applyRescheduleUpdateLocal(ticket, payload, null);
+            closeRescheduleModal();
+            showToast('Perubahan tanggal tersimpan secara lokal (' + newDate + ')', 'info');
+          }
+        })
+        .catch(function() {
+          if (dom.btnSubmitReschedule) {
+            dom.btnSubmitReschedule.disabled = false;
+            dom.btnSubmitReschedule.innerHTML = '<span>Simpan Perubahan Tanggal</span>';
+          }
+          applyRescheduleUpdateLocal(ticket, payload, null);
+          closeRescheduleModal();
+          showToast('Tersimpan secara lokal: tanggal agenda dipindahkan ke ' + newDate, 'info');
+        });
+    } else {
+      setTimeout(function() {
+        if (dom.btnSubmitReschedule) {
+          dom.btnSubmitReschedule.disabled = false;
+          dom.btnSubmitReschedule.innerHTML = '<span>Simpan Perubahan Tanggal</span>';
+        }
+        applyRescheduleUpdateLocal(ticket, payload, null);
+        closeRescheduleModal();
+        showToast('Tanggal agenda kasus #' + ticket.id + ' berhasil diubah ke ' + newDate + ' (Mode Simulasi)', 'success');
+      }, 300);
+    }
+  }
+
+  function applyRescheduleUpdateLocal(ticket, payload, res) {
+    if (!ticket) return;
+    var newDate = payload.newDate;
+    var actor = payload.rescheduledBy || 'Facilitator';
+    var reason = payload.reason || '';
+
+    if (!ticket.tanggalInput) {
+      ticket.tanggalInput = ticket.tanggalAgenda || ticket.tanggal || newDate;
+    }
+    var oldDate = ticket.tanggalAgenda || ticket.tanggal || '';
+    ticket.tanggalAgenda = newDate;
+    ticket.tanggal = newDate;
+    ticket.terakhirUpdate = new Date().toISOString().slice(0, 10);
+    ticket.pic = actor;
+
+    var auditEntry = '[' + new Date().toISOString().slice(0, 10) + '] Oleh ' + actor + ': ' + (oldDate ? oldDate + ' -> ' : '') + newDate + (reason ? ' (' + reason + ')' : '');
+    if (res && res.historyReschedule) {
+      ticket.historyReschedule = res.historyReschedule;
+    } else {
+      ticket.historyReschedule = ticket.historyReschedule ? (ticket.historyReschedule + ' | ' + auditEntry) : auditEntry;
+    }
+
+    var logMsg = 'Reschedule Tanggal Agenda dari ' + (oldDate || '-') + ' ke ' + newDate + '. Alasan: ' + reason;
+    var localLog = {
+      ticketId: ticket.id,
+      serviceType: ticket.serviceType,
+      author: actor,
+      timestamp: new Date().toLocaleTimeString(),
+      message: logMsg,
+      newStatus: ticket.status
+    };
+    if (Array.isArray(state.logs)) {
+      state.logs.unshift(localLog);
+    }
+
+    // Refresh views
+    if (typeof renderCalendarView === 'function') renderCalendarView();
+    if (state.selectedDay && typeof renderCalendarRightPanel === 'function') {
+      renderCalendarRightPanel(state.selectedDay);
+    }
+    if (typeof renderTasksTable === 'function') renderTasksTable();
+    if (typeof updateTasksKpis === 'function') updateTasksKpis();
+    if (state.activeDrawerTicket && String(state.activeDrawerTicket.id) === String(ticket.id) && typeof openDrawer === 'function') {
+      openDrawer(ticket.id, ticket.serviceType);
+    }
+  }
+
+  /**
    * Reopen / Kembalikan Status
    */
   function handleQuickReopen(ticketId, targetStatus) {
@@ -5007,7 +5256,9 @@
           const stNorm = ((liveRec && liveRec.status) || iss.statusNorm || (iss.badge.includes('INVESTIGASI') ? 'inprogress' : 'open')).toLowerCase().replace(/\s+/g, '');
 
           let pickupBtnHtml = '';
+          let rescheduleBtnHtml = '';
           if (canPickup && iss.ticketId) {
+            rescheduleBtnHtml = '<button type="button" class="py-2.5 px-3 rounded-xl text-xs font-bold border border-blue-200 bg-blue-50/90 hover:bg-blue-100 text-blue-700 shadow-xs flex items-center justify-center gap-1 transition-all cursor-pointer" onclick="openRescheduleModal(\'' + iss.ticketId + '\', \'' + sType + '\')" title="Ubah tanggal agenda kasus ini"><span>📅</span><span>Ubah Tanggal</span></button>';
             if (stNorm === 'inprogress') {
               pickupBtnHtml = '<button type="button" class="flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-[13px] font-extrabold tracking-wide bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm flex items-center justify-center gap-1.5 transition-all cursor-pointer" onclick="openClosedModal(\'' + iss.ticketId + '\', \'' + sType + '\')"><span>✅</span><span>Selesaikan (Closed)</span></button>';
             } else if (stNorm !== 'closed') {
@@ -5030,8 +5281,8 @@
           '  <div class="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-200/60">' +
           '    <span class="truncate">PIC: <strong class="text-slate-700">' + escapeHtml((liveRec && liveRec.pic) || iss.pic) + '</strong></span>' +
           '  </div>' +
-          '  <div class="flex flex-wrap items-center gap-2">' + pickupBtnHtml +
-          '    <button type="button" class="' + (pickupBtnHtml ? 'px-3.5 py-2.5' : 'w-full py-2 px-3.5') + ' rounded-xl text-xs font-bold border ' + iss.actionClass + ' hover:opacity-90 transition-opacity cursor-pointer" onclick="openDrawer(\'' + (iss.ticketId || 1) + '\', \'' + sType + '\')">' + iss.actionText + '</button>' +
+          '  <div class="flex flex-wrap items-center gap-2">' + pickupBtnHtml + rescheduleBtnHtml +
+          '    <button type="button" class="' + (pickupBtnHtml ? 'px-3.5 py-2.5' : 'flex-1 py-2 px-3.5') + ' rounded-xl text-xs font-bold border ' + iss.actionClass + ' hover:opacity-90 transition-opacity cursor-pointer" onclick="openDrawer(\'' + (iss.ticketId || 1) + '\', \'' + sType + '\')">' + iss.actionText + '</button>' +
           '  </div>' +
           '</div>';
         }).join('');
@@ -5152,7 +5403,7 @@
     if (info) info.textContent = 'Menampilkan 1 - ' + visible.length + ' dari ' + visible.length + ' Kasus';
 
     if (visible.length === 0) {
-      tbody.innerHTML = '<tr><td colspan="9" class="text-center py-8 text-slate-400">Tidak ada kasus yang sesuai dengan filter.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="10" class="text-center py-8 text-slate-400">Tidak ada kasus yang sesuai dengan filter.</td></tr>';
       return;
     }
 
@@ -5202,24 +5453,60 @@
       const mainIssueText = item.totalCaseIsu || item.caseTitle || '-';
       const detailText = item.issueDetails || item.detail || '-';
       const noteText = item.progress || item.keterangan || 'Belum Ada Update';
-      const rawDateStr = item.tanggal || item.terakhirUpdate || '';
-      const dateDisplayText = formatShortIndoDate(rawDateStr);
+
+      // 1. Tanggal Input (oleh Inputer)
+      const rawInputDate = item.tanggalInput || item.tanggal || item.terakhirUpdate || '';
+      const inputDateDisplay = formatShortIndoDate(rawInputDate);
+      const inputerName = item.inputBy || item.requestor || 'Inputer';
+
+      // 2. Tanggal Agenda Saat Ini (Kolom K)
+      const rawAgendaDate = item.tanggalAgenda || item.tanggal || item.terakhirUpdate || '';
+      const agendaDateDisplay = formatShortIndoDate(rawAgendaDate);
+      const hasRescheduled = !!(item.historyReschedule || (item.tanggalInput && item.tanggalAgenda && item.tanggalInput !== item.tanggalAgenda));
+
+      let rescheduleBadge = '';
+      if (hasRescheduled) {
+        rescheduleBadge = '<span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded text-[9.5px] font-bold bg-amber-50 text-amber-800 border border-amber-200 mt-1 cursor-pointer" title="' + escapeHtml(item.historyReschedule || 'Pernah diubah oleh Facilitator') + '">' +
+          '<span class="material-symbols-outlined text-[11px] text-amber-600">sync_alt</span>' +
+          '<span>Rescheduled</span>' +
+        '</span>';
+      }
+
+      const ubahTanggalBtn = canPickup ? (
+        '<button type="button" class="mt-1 text-[10.5px] font-bold text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-0.5 cursor-pointer" onclick="openRescheduleModal(\'' + item.id + '\', \'' + sType + '\')" title="Ubah tanggal agenda kasus ini">' +
+        '  <span class="material-symbols-outlined text-[12px]">edit_calendar</span>' +
+        '  <span>Ubah Tanggal</span>' +
+        '</button>'
+      ) : '';
 
       return '<tr class="hover:bg-slate-50/80 transition-colors">' +
         '<td class="py-3 px-4 text-center font-bold text-slate-500">' + (idx + 1) + '</td>' +
         '<td class="py-3 px-4 font-semibold text-slate-700">' + escapeHtml(item.bulan || 'Oktober 2026') + '</td>' +
         '<td class="py-3 px-4 whitespace-nowrap">' +
-        '  <button type="button" class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-semibold bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200 transition-colors" title="Klik untuk buka tanggal ini di Calendar" onclick="jumpToCalendarDate(\'' + escapeHtml(rawDateStr) + '\', \'' + item.id + '\')">' +
-        '    <span class="material-symbols-outlined text-[13px] text-blue-600">calendar_today</span>' +
-        '    <span>' + escapeHtml(dateDisplayText) + '</span>' +
-        '  </button>' +
+        '  <div class="flex flex-col gap-0.5">' +
+        '    <span class="text-xs font-semibold text-slate-800 flex items-center gap-1">' +
+        '      <span class="material-symbols-outlined text-[13px] text-slate-400">event</span>' +
+        '      <span>' + escapeHtml(inputDateDisplay) + '</span>' +
+        '    </span>' +
+        '    <span class="text-[10px] text-slate-500 font-medium truncate max-w-[130px]" title="Inputer: ' + escapeHtml(inputerName) + '">Oleh: ' + escapeHtml(inputerName) + '</span>' +
+        '  </div>' +
+        '</td>' +
+        '<td class="py-3 px-4 whitespace-nowrap">' +
+        '  <div class="flex flex-col items-start gap-0.5">' +
+        '    <button type="button" class="inline-flex items-center gap-1 px-2 py-1 rounded-md text-[11px] font-semibold bg-slate-100 hover:bg-blue-50 text-slate-700 hover:text-blue-700 border border-slate-200 transition-colors cursor-pointer" title="Klik untuk buka tanggal ini di Calendar" onclick="jumpToCalendarDate(\'' + escapeHtml(rawAgendaDate) + '\', \'' + item.id + '\')">' +
+        '      <span class="material-symbols-outlined text-[13px] text-blue-600">calendar_today</span>' +
+        '      <span>' + escapeHtml(agendaDateDisplay) + '</span>' +
+        '    </button>' +
+        rescheduleBadge +
+        ubahTanggalBtn +
+        '  </div>' +
         '</td>' +
         '<td class="py-3 px-4">' + unitBadge + '</td>' +
         '<td class="py-3 px-4">' +
         '  <div class="flex flex-col gap-1">' +
         '    <a href="#" class="font-bold text-slate-900 hover:text-blue-600 transition-colors leading-snug" onclick="openDrawer(\'' + item.id + '\', \'' + sType + '\'); return false;">' + escapeHtml(mainIssueText) + '</a>' +
         '    <div class="flex items-center gap-2 mt-0.5">' +
-        '      <button type="button" class="text-[11px] font-semibold text-blue-600 hover:underline flex items-center gap-0.5" onclick="jumpToCalendarDate(\'' + escapeHtml(rawDateStr) + '\', \'' + item.id + '\')">' +
+        '      <button type="button" class="text-[11px] font-semibold text-blue-600 hover:underline flex items-center gap-0.5" onclick="jumpToCalendarDate(\'' + escapeHtml(rawAgendaDate) + '\', \'' + item.id + '\')">' +
         '        <span>Buka Calendar</span><span class="material-symbols-outlined text-[13px]">arrow_forward</span>' +
         '      </button>' +
         '      <span class="text-slate-300">&bull;</span><span class="text-[10px] text-slate-400 font-mono">#CHO-' + item.id + '</span>' +
@@ -5232,6 +5519,32 @@
         '<td class="py-3 px-4"><div class="flex items-center justify-between gap-1"><span class="text-slate-500 truncate max-w-[120px]">' + escapeHtml(noteText) + '</span><button type="button" class="w-6 h-6 rounded hover:bg-slate-200 flex items-center justify-center text-slate-500" title="Buka Detail" onclick="openDrawer(\'' + item.id + '\', \'' + sType + '\')"><span class="material-symbols-outlined text-[15px]">open_in_new</span></button></div></td>' +
         '</tr>';
     }).join('');
+  }
+
+  function setTasksUnitFilter(unitKey) {
+    var raw = String(unitKey || '').trim().toUpperCase();
+    var target = 'all';
+    if (raw.includes('MOBILE')) target = 'CHO Mobile';
+    else if (raw.includes('FIXED')) target = 'CHO Fixed';
+    else if (raw.includes('ECARE')) target = 'CHO eCare';
+    else if (raw.includes('PRIOR')) target = 'CHO Priority';
+
+    state.tasksFilterUnit = target;
+
+    // Update filter pills styling
+    document.querySelectorAll('[data-filter-unit]').forEach(function(pill) {
+      var pUnit = pill.getAttribute('data-filter-unit') || '';
+      var pNorm = normalizeUnitKey(pUnit);
+      var tNorm = normalizeUnitKey(target);
+      var isActive = (pNorm === tNorm);
+      pill.classList.toggle('bg-[#061345]', isActive);
+      pill.classList.toggle('text-white', isActive);
+      pill.classList.toggle('font-bold', isActive);
+      pill.classList.toggle('bg-slate-100', !isActive);
+      pill.classList.toggle('text-slate-600', !isActive);
+    });
+
+    renderTasksTable();
   }
 
   function updateTasksKpis() {
@@ -5265,15 +5578,47 @@
       }
     });
 
-    const elTotal = document.getElementById('kpi-total-val');
-    const elOpen = document.getElementById('kpi-open-val');
-    const elInprog = document.getElementById('kpi-inprogress-val');
-    const elClosed = document.getElementById('kpi-closed-val');
+    const setTxt = function(id, val) {
+      const el = document.getElementById(id);
+      if (el) el.textContent = val;
+    };
 
-    if (elTotal) elTotal.textContent = total;
-    if (elOpen) elOpen.textContent = open;
-    if (elInprog) elInprog.textContent = inprog;
-    if (elClosed) elClosed.textContent = closed;
+    // 1. TOTAL Case Card
+    setTxt('kpi-total-val', total);
+    setTxt('kpi-total-summary', total > 0 ? (open + ' Open • ' + inprog + ' InProg • ' + closed + ' Closed') : '0 Open • 0 InProgress • 0 Closed');
+
+    // 2. CHO Mobile Card
+    const mobTotal = openMob + inprogMob + closedMob;
+    setTxt('kpi-mob-total', mobTotal);
+    setTxt('kpi-mob-open', openMob + ' Open');
+    setTxt('kpi-mob-inprog', inprogMob + ' InProg');
+    setTxt('kpi-mob-closed', closedMob + ' Closed');
+
+    // 3. CHO Fixed Card
+    const fixTotal = openFix + inprogFix + closedFix;
+    setTxt('kpi-fix-total', fixTotal);
+    setTxt('kpi-fix-open', openFix + ' Open');
+    setTxt('kpi-fix-inprog', inprogFix + ' InProg');
+    setTxt('kpi-fix-closed', closedFix + ' Closed');
+
+    // 4. CHO eCare Card
+    const ecTotal = openEc + inprogEc + closedEc;
+    setTxt('kpi-ecare-total', ecTotal);
+    setTxt('kpi-ecare-open', openEc + ' Open');
+    setTxt('kpi-ecare-inprog', inprogEc + ' InProg');
+    setTxt('kpi-ecare-closed', closedEc + ' Closed');
+
+    // 5. Priority Card
+    const prioTotal = openPrio + inprogPrio + closedPrio;
+    setTxt('kpi-prio-total', prioTotal);
+    setTxt('kpi-prio-open', openPrio + ' Open');
+    setTxt('kpi-prio-inprog', inprogPrio + ' InProg');
+    setTxt('kpi-prio-closed', closedPrio + ' Closed');
+
+    // Compatibility hooks for legacy test assertions
+    setTxt('kpi-open-val', open);
+    setTxt('kpi-inprogress-val', inprog);
+    setTxt('kpi-closed-val', closed);
 
     const subOpen = document.getElementById('kpi-open-sub');
     const pctOpen = document.getElementById('kpi-open-pct');
@@ -5282,7 +5627,7 @@
 
     const subInprog = document.getElementById('kpi-inprogress-sub');
     const pctInprog = document.getElementById('kpi-inprogress-pct');
-    if (subInprog) subInprog.textContent = inprogMob + ' Mob • ' + inprogFix + ' Fix • ' + inprogEc + ' eCare • ' + inprogPrio + ' Priority';
+    if (subInprog) subInprog.textContent = inprogMob + ' Mob • ' + inprogFix + ' Fix • ' + inprogEc + ' eCare • ' + openPrio + ' Priority';
     if (pctInprog && total > 0) pctInprog.textContent = ((inprog / total) * 100).toFixed(1) + '% Total';
 
     const subClosed = document.getElementById('kpi-closed-sub');
@@ -5385,7 +5730,41 @@
       unitBadge.className = 'px-2 py-0.5 rounded text-[10px] font-bold ' + uMeta.badgeClass;
     }
     if (periodBadge) periodBadge.textContent = ticket.bulan || 'Oktober 2026';
-    if (dateBadge) dateBadge.textContent = '📅 ' + formatShortIndoDate(ticket.tanggal || ticket.terakhirUpdate);
+    if (dateBadge) dateBadge.textContent = '📅 ' + formatShortIndoDate(ticket.tanggalAgenda || ticket.tanggal || ticket.terakhirUpdate);
+
+    // Tanggal Input (Inputer) & Tanggal Agenda (Kolom K)
+    const elTglInput = document.getElementById('drawer-tgl-input');
+    const elInputer = document.getElementById('drawer-inputer-name');
+    const elTglAgenda = document.getElementById('drawer-tgl-agenda');
+    const elReschedBadge = document.getElementById('drawer-reschedule-badge');
+    const elReschedCont = document.getElementById('drawer-reschedule-history-container');
+    const elReschedHist = document.getElementById('drawer-reschedule-history-text');
+
+    const tglInputStr = formatShortIndoDate(ticket.tanggalInput || ticket.tanggal);
+    const tglAgendaStr = formatShortIndoDate(ticket.tanggalAgenda || ticket.tanggal);
+    if (elTglInput) elTglInput.textContent = tglInputStr;
+    if (elInputer) elInputer.textContent = 'Oleh: ' + (ticket.inputBy || ticket.requestor || 'Inputer');
+    if (elTglAgenda) elTglAgenda.textContent = tglAgendaStr;
+
+    const hasResched = !!(ticket.historyReschedule || (ticket.tanggalInput && ticket.tanggalAgenda && ticket.tanggalInput !== ticket.tanggalAgenda));
+    if (elReschedBadge) {
+      if (hasResched) {
+        elReschedBadge.className = 'px-1.5 py-0.5 rounded text-[9.5px] font-bold bg-amber-100 text-amber-800 border border-amber-200';
+        elReschedBadge.textContent = '🔄 Rescheduled';
+      } else {
+        elReschedBadge.className = '';
+        elReschedBadge.textContent = '';
+      }
+    }
+    if (elReschedCont && elReschedHist) {
+      if (ticket.historyReschedule) {
+        elReschedCont.classList.remove('hidden');
+        elReschedHist.textContent = ticket.historyReschedule;
+      } else {
+        elReschedCont.classList.add('hidden');
+        elReschedHist.textContent = '';
+      }
+    }
     if (statusBadge) statusBadge.textContent = ticket.status || 'Open';
     if (detailEl) detailEl.textContent = ticket.issueDetails || ticket.detail || 'Tidak ada keterangan kendala.';
     if (picEl) picEl.textContent = ticket.pic || '-';
@@ -5400,16 +5779,20 @@
 
       if (canPickup) {
         pickupActionsEl.className = 'mt-3 pt-3 border-t border-slate-200 flex flex-wrap items-center gap-2';
+        const reschedBtn = '<button type="button" class="px-3 py-1.5 rounded-lg text-xs font-bold border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors flex items-center gap-1 cursor-pointer" onclick="openRescheduleModal(\'' + ticket.id + '\', \'' + ticket.serviceType + '\')" title="Ubah tanggal agenda kasus ini"><span>📅</span><span>Ubah Tanggal</span></button>';
         if (stNorm === 'inprogress') {
           pickupActionsEl.innerHTML =
-            '<button type="button" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition-colors" onclick="openInProgressModal(\'' + ticket.id + '\', true, \'' + ticket.serviceType + '\')">📝 Update Progress</button>' +
-            '<button type="button" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 shadow-xs transition-colors" onclick="openClosedModal(\'' + ticket.id + '\', \'' + ticket.serviceType + '\')">✅ Selesaikan (Closed)</button>';
+            '<button type="button" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition-colors cursor-pointer" onclick="openInProgressModal(\'' + ticket.id + '\', true, \'' + ticket.serviceType + '\')">📝 Update Progress</button>' +
+            '<button type="button" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 shadow-xs transition-colors cursor-pointer" onclick="openClosedModal(\'' + ticket.id + '\', \'' + ticket.serviceType + '\')">✅ Selesaikan (Closed)</button>' +
+            reschedBtn;
         } else if (stNorm === 'closed') {
           pickupActionsEl.innerHTML =
-            '<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">✅ Case Selesai (Ditutup oleh ' + escapeHtml(ticket.closedBy || ticket.pic || 'Tim CHO') + ')</span>';
+            '<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">✅ Case Selesai (Ditutup oleh ' + escapeHtml(ticket.closedBy || ticket.pic || 'Tim CHO') + ')</span>' +
+            reschedBtn;
         } else {
           pickupActionsEl.innerHTML =
-            '<button type="button" class="w-full sm:w-auto px-3.5 py-2 rounded-lg text-xs font-bold bg-[#061345] hover:bg-[#1e295a] text-white shadow-xs transition-colors flex items-center justify-center gap-1.5" onclick="openInProgressModal(\'' + ticket.id + '\', false, \'' + ticket.serviceType + '\')">🚀 Pickup Case (Ubah ke In Progress)</button>';
+            '<button type="button" class="w-full sm:w-auto px-3.5 py-2 rounded-lg text-xs font-bold bg-[#061345] hover:bg-[#1e295a] text-white shadow-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer" onclick="openInProgressModal(\'' + ticket.id + '\', false, \'' + ticket.serviceType + '\')">🚀 Pickup Case (Ubah ke In Progress)</button>' +
+            reschedBtn;
         }
       } else {
         pickupActionsEl.className = 'hidden';
@@ -5788,6 +6171,9 @@
   window.setCalendarMonthYear = setCalendarMonthYear;
   window.handleCalendarDateClick = handleCalendarDateClick;
   window.jumpToCalendarDate = jumpToCalendarDate;
+  window.openRescheduleModal = openRescheduleModal;
+  window.closeRescheduleModal = closeRescheduleModal;
+  window.setTasksUnitFilter = setTasksUnitFilter;
 
   // Bootstrap saat DOM siap
   document.addEventListener('DOMContentLoaded', init);
