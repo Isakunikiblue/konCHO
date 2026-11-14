@@ -158,9 +158,9 @@
         
         <!-- Top Section: App Logo & 3 Main Menus (Matching Image 1) -->
         <div class="flex flex-col items-center w-full gap-4">
-          <!-- Top Grid App Icon (Matching Image 1) -->
-          <div class="w-10 h-10 rounded-xl bg-white/10 flex items-center justify-center text-white font-headline text-lg font-bold shadow-inner border border-white/10 cursor-pointer" title="konCHO Teams">
-            <span class="material-symbols-outlined text-[22px]">grid_view</span>
+          <!-- Top App Icon with Golden K Logo -->
+          <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-900/30 via-slate-900/40 to-blue-950/40 flex items-center justify-center p-1 shadow-inner border border-amber-500/30 cursor-pointer overflow-hidden group hover:border-amber-400 transition-all" title="konCHO">
+            <img src="{{ asset('assets/images/logo_k_gold.jpg') }}" alt="konCHO Logo" class="w-full h-full object-contain filter drop-shadow">
           </div>
 
           <!-- 2 MAIN MENUS: Calendar, Tasks -->
@@ -1369,168 +1369,176 @@
     </div>
 
     <!-- 6. MODAL: INPUT KASUS BARU -->
+    <!-- 6. MODAL: INPUT KASUS BARU -->
     <div class="modal-backdrop" id="newDataModal">
       <div class="modal-dialog">
         <div class="modal-head">
           <div class="modal-title-wrap">
-            <div class="modal-kicker">Tambah Data Laporan</div>
-            <h2 class="modal-title">Input Case Isu CHO Baru</h2>
-            <div id="newModalDatePill" style="display:none; margin-top:6px; align-items:center; gap:5px; padding:3px 10px; border-radius:9999px; font-size:11px; font-weight:700; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe;"></div>
+            <h2 class="modal-title">Input Case</h2>
+            <div id="newModalDatePill" style="display:none; margin-top:4px; align-items:center; gap:5px; padding:2px 8px; border-radius:9999px; font-size:11px; font-weight:700; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe;"></div>
           </div>
           <button class="modal-close-btn" id="btnCloseModal" title="Tutup">✕</button>
         </div>
 
         <div class="modal-body">
           
-          <!-- Toggle Tipe Layanan (CHO Mobile vs CHO Fixed vs CHO eCare vs CHO Priority) -->
-          <div class="form-group">
-            <label class="form-label">Pilih Sheet Database Layanan <span class="req-star">*</span></label>
-            <div class="modal-service-toggle">
-              <button type="button" class="service-toggle-btn active" id="toggleMobile">
-                📱 CHO Mobile (Sheet Mobile)
+          <!-- Toggle Tipe Layanan (Pilih Unit) -->
+          <div class="form-group" style="margin-bottom: 12px;">
+            <label class="form-label" style="font-size: 12px; margin-bottom: 6px;">Pilih Unit <span class="req-star">*</span></label>
+            <div class="modal-service-toggle" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
+              <button type="button" class="service-toggle-btn active" id="toggleMobile" style="padding: 7px 6px; font-size: 12px; font-weight: 700; justify-content: center;">
+                📱 CHO Mobile
               </button>
-              <button type="button" class="service-toggle-btn" id="toggleFixed">
-                🌐 CHO Fixed (Sheet Fixed)
+              <button type="button" class="service-toggle-btn" id="toggleFixed" style="padding: 7px 6px; font-size: 12px; font-weight: 700; justify-content: center;">
+                🌐 CHO Fixed
               </button>
-              <button type="button" class="service-toggle-btn" id="toggleEcare">
-                💬 CHO eCare (Sheet eCare)
+              <button type="button" class="service-toggle-btn" id="toggleEcare" style="padding: 7px 6px; font-size: 12px; font-weight: 700; justify-content: center;">
+                💬 CHO eCare
               </button>
-              <button type="button" class="service-toggle-btn" id="togglePriority">
-                ⭐ CHO Priority (Sheet Priority)
+              <button type="button" class="service-toggle-btn" id="togglePriority" style="padding: 7px 6px; font-size: 12px; font-weight: 700; justify-content: center;">
+                ⭐ CHO Priority
               </button>
             </div>
           </div>
 
-          <!-- Baris 1: Tanggal Agenda (Kolom K) & Bulan - Tahun -->
-          <div class="form-row-2">
-            <div class="form-group">
-              <label class="form-label" for="inputTanggalAgenda">
-                Tanggal Agenda (Kolom K) <span class="req-star">*</span>
+          <!-- Form Grid 2 Kolom untuk Efisiensi Ruang & Bebas Scroll -->
+          <div class="form-grid-2">
+            <!-- Kolom Kiri: Tgl Input Case -->
+            <div class="form-group" style="margin-bottom: 10px;">
+              <label class="form-label" for="inputTanggalAgenda" style="font-size: 12px; margin-bottom: 4px;">
+                Tgl Input Case <span class="req-star">*</span>
               </label>
-              <input type="date" id="inputTanggalAgenda" class="form-control">
+              <input type="date" id="inputTanggalAgenda" class="form-control" style="height: 38px;">
             </div>
 
-            <div class="form-group">
-              <label class="form-label" for="inputBulanTahun">
+            <!-- Kolom Kanan: Bulan - Tahun -->
+            <div class="form-group" style="margin-bottom: 10px;">
+              <label class="form-label" for="inputBulanTahun" style="font-size: 12px; margin-bottom: 4px;">
                 Bulan - Tahun <span class="req-star">*</span>
               </label>
-              <select id="inputBulanTahun" class="form-control">
-                <optgroup label="Tahun 2026">
-                  <option value="Januari 2026">Januari 2026</option>
-                  <option value="Februari 2026">Februari 2026</option>
-                  <option value="Maret 2026">Maret 2026</option>
-                  <option value="April 2026">April 2026</option>
-                  <option value="Mei 2026">Mei 2026</option>
-                  <option value="Juni 2026">Juni 2026</option>
-                  <option value="Juli 2026">Juli 2026</option>
-                  <option value="Agustus 2026">Agustus 2026</option>
-                  <option value="September 2026">September 2026</option>
-                  <option value="Oktober 2026" selected>Oktober 2026</option>
-                  <option value="November 2026">November 2026</option>
-                  <option value="Desember 2026">Desember 2026</option>
-                </optgroup>
-                <optgroup label="Tahun 2027">
-                  <option value="Januari 2027">Januari 2027</option>
-                  <option value="Februari 2027">Februari 2027</option>
-                  <option value="Maret 2027">Maret 2027</option>
-                  <option value="April 2027">April 2027</option>
-                  <option value="Mei 2027">Mei 2027</option>
-                  <option value="Juni 2027">Juni 2027</option>
-                  <option value="Juli 2027">Juli 2027</option>
-                  <option value="Agustus 2027">Agustus 2027</option>
-                  <option value="September 2027">September 2027</option>
-                  <option value="Oktober 2027">Oktober 2027</option>
-                  <option value="November 2027">November 2027</option>
-                  <option value="Desember 2027">Desember 2027</option>
-                </optgroup>
-              </select>
+              <div class="select-dropdown-wrap">
+                <select id="inputBulanTahun" class="form-control" style="height: 38px;">
+                  <optgroup label="Tahun 2026">
+                    <option value="Januari 2026">Januari 2026</option>
+                    <option value="Februari 2026">Februari 2026</option>
+                    <option value="Maret 2026">Maret 2026</option>
+                    <option value="April 2026">April 2026</option>
+                    <option value="Mei 2026">Mei 2026</option>
+                    <option value="Juni 2026">Juni 2026</option>
+                    <option value="Juli 2026">Juli 2026</option>
+                    <option value="Agustus 2026">Agustus 2026</option>
+                    <option value="September 2026">September 2026</option>
+                    <option value="Oktober 2026">Oktober 2026</option>
+                    <option value="November 2026" selected>November 2026</option>
+                    <option value="Desember 2026">Desember 2026</option>
+                  </optgroup>
+                  <optgroup label="Tahun 2027">
+                    <option value="Januari 2027">Januari 2027</option>
+                    <option value="Februari 2027">Februari 2027</option>
+                    <option value="Maret 2027">Maret 2027</option>
+                    <option value="April 2027">April 2027</option>
+                    <option value="Mei 2027">Mei 2027</option>
+                    <option value="Juni 2027">Juni 2027</option>
+                    <option value="Juli 2027">Juli 2027</option>
+                    <option value="Agustus 2027">Agustus 2027</option>
+                    <option value="September 2027">September 2027</option>
+                    <option value="Oktober 2027">Oktober 2027</option>
+                    <option value="November 2027">November 2027</option>
+                    <option value="Desember 2027">Desember 2027</option>
+                  </optgroup>
+                </select>
+                <div class="dropdown-chevron">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+                </div>
+              </div>
             </div>
-          </div>
 
-          <!-- Baris 2: Requestor (Auto-Locked Sesuai Akun Login) -->
-          <div class="form-group">
-            <div class="flex items-center justify-between" style="margin-bottom: 6px;">
-              <label class="form-label" for="inputRequestor" style="margin-bottom: 0;">
+            <!-- Kolom Kiri: Requestor (Kotak Abu-Abu, Disabled, Tanpa Tulisan Terkunci) -->
+            <div class="form-group" style="margin-bottom: 10px;">
+              <label class="form-label" for="inputRequestor" style="font-size: 12px; margin-bottom: 4px;">
                 Requestor <span class="req-star">*</span>
               </label>
-              <span class="inline-flex items-center gap-1 text-[11px] font-bold text-slate-600 bg-slate-100 border border-slate-300 px-2 py-0.5 rounded-full" title="Terkunci otomatis sesuai akun login">
-                <span>🔒</span><span>Terkunci Sesuai Akun Login</span>
-              </span>
+              <input type="text" id="inputRequestor" class="form-control" disabled readonly placeholder="Memuat nama akun..." style="height: 38px; background-color: #e2e8f0 !important; color: #475569 !important; border-color: #cbd5e1 !important; cursor: not-allowed !important; font-weight: 600;">
             </div>
-            <input type="text" id="inputRequestor" class="form-control input-locked" readonly placeholder="Memuat nama akun..." title="Kolom Requestor otomatis terkunci sesuai akun login Anda">
-          </div>
 
-          <!-- Baris 2: Case Isu yang Masuk -->
-          <div class="form-group">
-            <label class="form-label" for="inputCaseIssue">
-              Case Isu yang Masuk <span class="req-star">*</span>
-            </label>
-            <input type="text" id="inputCaseIssue" class="form-control" placeholder="Contoh: Kendala charge MU pada paket bundling / Perhitungan Paket PDD...">
-          </div>
+            <!-- Kolom Kanan: Case -->
+            <div class="form-group" style="margin-bottom: 10px;">
+              <label class="form-label" for="inputCaseIssue" style="font-size: 12px; margin-bottom: 4px;">
+                Case <span class="req-star">*</span>
+              </label>
+              <input type="text" id="inputCaseIssue" class="form-control" placeholder="Contoh: Kendala charge MU / Perhitungan Paket PDD..." style="height: 38px;">
+            </div>
 
-          <!-- Baris 3: Status Awal & Urgency Case -->
-          <div class="form-row-2">
-            <div class="form-group">
-              <label class="form-label" for="inputStatus">
+            <!-- Kolom Kiri: Status Awal dengan Dropdown Chevron -->
+            <div class="form-group" style="margin-bottom: 10px;">
+              <label class="form-label" for="inputStatus" style="font-size: 12px; margin-bottom: 4px;">
                 Status Awal
               </label>
-              <select id="inputStatus" class="form-control">
-                <option value="Open" selected>Open</option>
-                <option value="InProgress">InProgress</option>
-                <option value="Closed">Closed</option>
-              </select>
+              <div class="select-dropdown-wrap">
+                <select id="inputStatus" class="form-control" style="height: 38px;">
+                  <option value="Open" selected>Open</option>
+                  <option value="InProgress">InProgress</option>
+                  <option value="Closed">Closed</option>
+                </select>
+                <div class="dropdown-chevron">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+                </div>
+              </div>
             </div>
 
-            <div class="form-group">
-              <label class="form-label" for="inputUrgency">
+            <!-- Kolom Kanan: Urgency Case dengan Dropdown Chevron & Default Low -->
+            <div class="form-group" style="margin-bottom: 10px;">
+              <label class="form-label" for="inputUrgency" style="font-size: 12px; margin-bottom: 4px;">
                 Urgency Case <span class="req-star">*</span>
               </label>
-              <select id="inputUrgency" class="form-control" style="font-weight:700;">
-                <option value="Low" style="color:#16a34a; font-weight:700;">🟢 Low (Rendah)</option>
-                <option value="Middle" selected style="color:#d97706; font-weight:700;">🟡 Middle (Sedang)</option>
-                <option value="High" style="color:#dc2626; font-weight:700;">🔴 High (Tinggi / Urgent)</option>
-              </select>
+              <div class="select-dropdown-wrap">
+                <select id="inputUrgency" class="form-control" style="height: 38px; font-weight:700;">
+                  <option value="Low" selected style="color:#16a34a; font-weight:700;">🟢 Low (Rendah)</option>
+                  <option value="Middle" style="color:#d97706; font-weight:700;">🟡 Middle (Sedang)</option>
+                  <option value="High" style="color:#dc2626; font-weight:700;">🔴 High (Tinggi / Urgent)</option>
+                </select>
+                <div class="dropdown-chevron">
+                  <svg width="14" height="14" fill="none" stroke="currentColor" stroke-width="2.5" viewBox="0 0 24 24"><path d="M6 9l6 6 6-6"/></svg>
+                </div>
+              </div>
             </div>
-          </div>
 
-          <!-- Progress & Quick Win (Temporary Solution) -->
-          <div class="form-group">
-            <label class="form-label" for="inputProgressQuickWin">
-              Progress & Quick Win (Temporary Solution)
-            </label>
-            <input type="text" id="inputProgressQuickWin" class="form-control" placeholder="Contoh: Remove MU berdasarkan KMI... / Eskalasi ke IT">
-          </div>
+            <!-- Kolom Kiri: Progress & Quick Win -->
+            <div class="form-group" style="margin-bottom: 10px;">
+              <label class="form-label" for="inputProgressQuickWin" style="font-size: 12px; margin-bottom: 4px;">
+                Progress & Quick Win (Temporary Solution)
+              </label>
+              <input type="text" id="inputProgressQuickWin" class="form-control" placeholder="Contoh: Remove MU berdasarkan KMI... / Eskalasi ke IT" style="height: 38px;">
+            </div>
 
-          <!-- Baris 4: Issue Details (Description) -->
-          <div class="form-group">
-            <label class="form-label" for="inputDetail">
-              Issue Details (Description) <span class="req-star">*</span>
-            </label>
-            <textarea id="inputDetail" class="form-control" rows="3" placeholder="Deskripsikan detail kendala kasus secara lengkap..."></textarea>
-          </div>
+            <!-- Kolom Kanan: Lampiran Dokumen PDF (Opsional) -->
+            <div class="form-group" style="margin-bottom: 10px;">
+              <label class="form-label" for="newCasePptFile" style="font-size: 12px; margin-bottom: 4px;">
+                Lampiran PDF (Opsional)
+              </label>
+              <input type="file" id="newCasePptFile" class="form-control" accept=".pdf,application/pdf" style="height: 38px; padding: 4px 8px;">
+            </div>
 
-          <!-- Baris 5: Need Support -->
-          <div class="form-group">
-            <label class="form-label" for="inputNeedSupport">
-              Need Support
-            </label>
-            <textarea id="inputNeedSupport" class="form-control" rows="2" placeholder="Contoh: Optimalisasi proses fixing secara berkala, approval pengajuan keyword..."></textarea>
-          </div>
+            <!-- Kolom Kiri: Issue Details (Description) -->
+            <div class="form-group" style="margin-bottom: 6px;">
+              <label class="form-label" for="inputDetail" style="font-size: 12px; margin-bottom: 4px;">
+                Issue Details (Description) <span class="req-star">*</span>
+              </label>
+              <textarea id="inputDetail" class="form-control" rows="2" placeholder="Deskripsikan detail kendala kasus secara lengkap..."></textarea>
+            </div>
 
-          
-
-          <!-- Opsional: Upload Dokumen PDF Langsung -->
-          <div class="form-group" style="margin-top: 8px;">
-            <label class="form-label" for="newCasePptFile">
-              <span>Lampiran Dokumen PDF (Opsional - Khusus Format PDF)</span>
-            </label>
-            <input type="file" id="newCasePptFile" class="form-control" accept=".pdf,application/pdf">
-            <span class="form-hint">Format khusus dokumen PDF (.pdf). Berkas otomatis diunggah &amp; tersimpan ke folder Google Drive konCHO.</span>
+            <!-- Kolom Kanan: Need Support -->
+            <div class="form-group" style="margin-bottom: 6px;">
+              <label class="form-label" for="inputNeedSupport" style="font-size: 12px; margin-bottom: 4px;">
+                Need Support
+              </label>
+              <textarea id="inputNeedSupport" class="form-control" rows="2" placeholder="Contoh: Optimalisasi proses fixing secara berkala..."></textarea>
+            </div>
           </div>
 
         </div>
 
-        <div class="modal-foot">
+        <div class="modal-foot" style="padding: 12px 22px;">
           <button class="btn-secondary" id="btnCancelModal">Batal</button>
           <button class="btn-primary" id="btnSubmitNewReport">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>

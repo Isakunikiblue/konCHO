@@ -5005,4 +5005,76 @@ input:focus, select:focus, textarea:focus {
 [data-theme="light"] #calendar-summary-footer strong {
   color: #0f172a !important;
 }
+
+/* =========================================================================
+   NEW CASE MODAL (WIDER 2-COLUMN NO-SCROLL LAYOUT & SELECT CHEVRONS)
+   ========================================================================= */
+#newDataModal .modal-dialog {
+  max-width: 860px !important;
+  width: 95% !important;
+  max-height: 94vh !important;
+}
+
+#newDataModal .modal-body {
+  padding: 16px 24px !important;
+  max-height: calc(94vh - 120px) !important;
+  overflow-y: auto !important;
+}
+
+#newDataModal .form-grid-2 {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px 18px;
+}
+
+@media (max-width: 640px) {
+  #newDataModal .form-grid-2 {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+#inputRequestor:disabled, 
+#inputRequestor[disabled], 
+#inputRequestor.input-locked {
+  background-color: #e2e8f0 !important;
+  color: #475569 !important;
+  border-color: #cbd5e1 !important;
+  cursor: not-allowed !important;
+  font-weight: 600 !important;
+}
+
+[data-theme="dark"] #inputRequestor:disabled,
+[data-theme="dark"] #inputRequestor[disabled],
+[data-theme="dark"] #inputRequestor.input-locked {
+  background-color: #1a2744 !important;
+  color: #94a3b8 !important;
+  border-color: #273b64 !important;
+}
+
+/* Custom Select Dropdown Container with Chevron */
+.select-dropdown-wrap {
+  position: relative;
+  width: 100%;
+}
+.select-dropdown-wrap select {
+  appearance: none !important;
+  -webkit-appearance: none !important;
+  -moz-appearance: none !important;
+  padding-right: 34px !important;
+  cursor: pointer;
+}
+.select-dropdown-wrap .dropdown-chevron {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  pointer-events: none;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+[data-theme="dark"] .select-dropdown-wrap .dropdown-chevron {
+  color: #94a3b8;
+}
 </style>

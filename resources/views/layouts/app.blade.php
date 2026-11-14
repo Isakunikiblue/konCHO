@@ -14,7 +14,7 @@
   <title>{{ $title ?? 'konCHO - Konsolidasi Complaint Handling Officer (Mobile, Fixed, eCare, Priority)' }}</title>
 
   <!-- Favicon -->
-  <link rel="icon" type="image/png" href="{{ asset('assets/images/logo_clean_navy.png') }}">
+  <link rel="icon" type="image/jpeg" href="{{ asset('assets/images/logo_k_gold.jpg') }}">
 
   <!-- Google Fonts: Plus Jakarta Sans -->
   <link rel="preconnect" href="https://fonts.googleapis.com">

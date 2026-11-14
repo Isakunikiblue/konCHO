@@ -4400,7 +4400,7 @@
       dom.inputRequestor.classList.add('input-locked');
     }
     if (dom.inputUrgency) {
-      dom.inputUrgency.value = 'Middle';
+      dom.inputUrgency.value = 'Low';
     }
     if (dom.inputProgress) dom.inputProgress.value = '';
     if (dom.inputDetailKendala) dom.inputDetailKendala.value = '';
@@ -4524,7 +4524,7 @@
       }
     }
 
-    var urgency = (dom.inputUrgency ? dom.inputUrgency.value : 'Middle') || 'Middle';
+    var urgency = (dom.inputUrgency ? dom.inputUrgency.value : 'Low') || 'Low';
     var assignedFacilitator = getFacilitatorForRequestor(req);
     var currentInputUser = getCurrentLoggedInUserName();
     var targetSheetName = selectedNewService === 'MOBILE' ? 'Mobile' : (selectedNewService === 'ECARE' ? 'eCare' : (selectedNewService === 'PRIORITY' ? 'Priority' : 'Fixed'));
@@ -4656,7 +4656,7 @@
       dom.inputRequestor.readOnly = true;
     }
     dom.inputStatus.value = 'Open';
-    if (dom.inputUrgency) dom.inputUrgency.value = 'Middle';
+    if (dom.inputUrgency) dom.inputUrgency.value = 'Low';
     if (dom.inputProgressQuickWin) dom.inputProgressQuickWin.value = '';
     if (dom.inputDetail) dom.inputDetail.value = '';
     if (dom.inputNeedSupport) dom.inputNeedSupport.value = '';
