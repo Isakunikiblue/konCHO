@@ -239,6 +239,7 @@
     display: flex;
     align-items: center;
     gap: 10px;
+    margin-left: auto;
   }
 
   .btn-hdr {
@@ -428,17 +429,28 @@
     gap: 12px;
   }
 
-  .drawer-user-avatar {
+  .drawer-user-avatar, #drawerUserAvatar {
     width: 38px;
     height: 38px;
     border-radius: 50%;
-    background: var(--bg-card);
-    border: 1px solid var(--border-color);
+    background: linear-gradient(135deg, #061345 0%, #1e3a8a 100%);
+    color: #ffffff;
+    border: 2px solid rgba(255, 255, 255, 0.85);
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 18px;
+    font-size: 13.5px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
     flex-shrink: 0;
+    text-transform: uppercase;
+    box-shadow: 0 2px 4px rgba(6, 19, 69, 0.25);
+  }
+  [data-theme="dark"] .drawer-user-avatar,
+  [data-theme="dark"] #drawerUserAvatar {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.25);
   }
 
   .drawer-user-details {
@@ -2234,16 +2246,26 @@
   }
 
   .user-avatar {
-    width: 26px;
-    height: 26px;
+    width: 28px;
+    height: 28px;
     border-radius: 50%;
-    background: rgba(212, 175, 55, 0.2);
-    color: #f6c84c;
+    background: linear-gradient(135deg, #061345 0%, #1e3a8a 100%);
+    color: #ffffff;
     display: flex;
     align-items: center;
     justify-content: center;
-    font-size: 13px;
-    font-weight: 700;
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.5px;
+    box-shadow: 0 1px 3px rgba(6, 19, 69, 0.25);
+    border: 1.5px solid rgba(255, 255, 255, 0.85);
+    flex-shrink: 0;
+    text-transform: uppercase;
+  }
+  [data-theme="dark"] .user-avatar {
+    background: linear-gradient(135deg, #1e3a8a 0%, #3b82f6 100%);
+    color: #ffffff;
+    border-color: rgba(255, 255, 255, 0.25);
   }
 
   .user-info {
@@ -4772,19 +4794,47 @@
   }
   .routing-select {
     width: 100%;
-    padding: 6px 12px;
+    padding: 7px 32px 7px 12px;
     border-radius: 8px;
-    border: 1px solid #cbd5e1;
+    border: 1.5px solid #cbd5e1;
     font-size: 13px;
-    font-weight: 600;
-    background: #ffffff;
-    color: #1e293b;
+    font-weight: 700;
+    background-color: #ffffff;
+    color: #0f172a;
     outline: none;
-    transition: border-color 0.2s ease;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%23475569' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 10px center;
+    background-size: 14px 14px;
+    transition: all 0.2s ease;
+    box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+  }
+  .routing-select:hover {
+    border-color: #3b82f6;
+    background-color: #f8fafc;
   }
   .routing-select:focus {
-    border-color: #3b82f6;
-    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+    border-color: #2563eb;
+    background-color: #ffffff;
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.18);
+  }
+  [data-theme="dark"] .routing-select {
+    background-color: #1e293b;
+    border-color: #334155;
+    color: #f1f5f9;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='16' height='16' viewBox='0 0 24 24' fill='none' stroke='%2394a3b8' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+  }
+  [data-theme="dark"] .routing-select:hover {
+    border-color: #60a5fa;
+    background-color: #334155;
+  }
+  [data-theme="dark"] .routing-select:focus {
+    border-color: #60a5fa;
+    box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.25);
   }
 
 </style>
@@ -4969,21 +5019,6 @@
       </div>
 
       <div class="header-actions">
-        <!-- User Profile Badge & Logout -->
-        <div class="user-profile-badge" id="userProfileBadge">
-          <div class="user-avatar" id="hdrUserAvatar">👑</div>
-          <div class="user-info">
-            <span class="user-name" id="hdrUserName">admin_koncho</span>
-            <div class="user-role" id="hdrUserRole">
-              <span class="badge-role role-admin">👑 Administrator</span>
-            </div>
-          </div>
-          <button type="button" class="btn-logout" id="btnLogout" title="Keluar dari Akun">
-            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-            <span>Keluar</span>
-          </button>
-        </div>
-
         <button class="btn-hdr" id="btnRefresh" title="Muat Ulang Data dari Google Sheet">
           <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.5 2v6h-6M21.34 15.57a10 10 0 1 1-.57-8.38l5.67-5.67"/></svg>
           <span>Refresh</span>
@@ -4992,6 +5027,21 @@
         <button class="btn-hdr" id="btnToggleTheme" title="Ganti Tema Gelap / Terang">
           <span id="themeIcon">☀️</span>
         </button>
+
+        <!-- User Profile Badge & Logout (Diletakkan di sebelah pojok kanan atas) -->
+        <div class="user-profile-badge" id="userProfileBadge">
+          <div class="user-avatar" id="hdrUserAvatar">AU</div>
+          <div class="user-info">
+            <span class="user-name" id="hdrUserName">Administrator Utama</span>
+            <div class="user-role" id="hdrUserRole">
+              <span class="badge-role role-admin">ADMINISTRATOR</span>
+            </div>
+          </div>
+          <button type="button" class="btn-logout" id="btnLogout" title="Keluar dari Akun">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            <span>Keluar</span>
+          </button>
+        </div>
       </div>
     </header>
 
@@ -5045,9 +5095,9 @@
             <button type="button" class="btn-close-drawer" id="btnCloseMobileSidebar"></button>
           </div>
           <div id="drawerUserCard">
-            <div id="drawerUserAvatar">👑</div>
-            <span id="drawerUserName">admin_koncho</span>
-            <span id="drawerUserRole">👑 Administrator</span>
+            <div id="drawerUserAvatar">AU</div>
+            <span id="drawerUserName">Administrator Utama</span>
+            <span id="drawerUserRole">ADMINISTRATOR</span>
             <button type="button" id="btnDrawerRefresh"></button>
             <button type="button" id="btnDrawerLogout"></button>
           </div>
@@ -6461,7 +6511,7 @@
     <div class="modal-dialog modal-lg">
       <div class="modal-head">
         <div class="modal-title-wrap">
-          <div class="modal-kicker gold-kicker">👑 ADMINISTRASI HAK AKSES SISTEM</div>
+          <div class="modal-kicker gold-kicker">🛡️ ADMINISTRASI HAK AKSES SISTEM</div>
           <h2 class="modal-title">Kelola Pengguna & Hak Akses konCHO</h2>
         </div>
         <button class="modal-close-btn" id="btnCloseManageUsersModal" title="Tutup">✕</button>
@@ -7730,12 +7780,32 @@
     if (!tbody) return;
 
     var routing = state.facilitatorRouting || getStoredFacilitatorRouting();
-    var facilitators = ['Galih', 'Reza', 'Ajun', 'Yurina', 'Kenny'];
     
+    // Ambil seluruh user yang dibuat / terdaftar dengan role 'Facilitator'
     var accounts = getStoredUserAccounts();
-    accounts.forEach(function(acc) {
-      if (acc.role === 'Facilitator' && acc.name && facilitators.indexOf(acc.name) === -1) {
-        facilitators.push(acc.name);
+    var facilitatorUsers = accounts.filter(function(acc) {
+      return acc && (acc.role === 'Facilitator' || String(acc.role).toLowerCase() === 'facilitator');
+    });
+
+    var facilitators = [];
+    facilitatorUsers.forEach(function(acc) {
+      var displayName = (acc.name && acc.name.trim()) ? acc.name.trim() : (acc.username ? acc.username.trim() : '');
+      if (displayName && facilitators.indexOf(displayName) === -1) {
+        facilitators.push(displayName);
+      }
+    });
+
+    // Masukkan fasilitator standar default jika belum ada di list
+    ['Galih', 'Reza', 'Ajun', 'Yurina', 'Kenny'].forEach(function(defFac) {
+      if (facilitators.indexOf(defFac) === -1) {
+        facilitators.push(defFac);
+      }
+    });
+
+    // Pastikan nilai fasilitator saat ini di setiap baris routing juga ada di list opsi
+    routing.forEach(function(item) {
+      if (item.facilitator && facilitators.indexOf(item.facilitator) === -1) {
+        facilitators.push(item.facilitator);
       }
     });
 
@@ -7753,7 +7823,7 @@
         '<td><strong class="text-slate-800">' + escapeHtml(item.site) + '</strong></td>' +
         '<td>' + unitBadge + '</td>' +
         '<td>' +
-        '  <select class="routing-select" data-site-index="' + idx + '">' +
+        '  <select class="routing-select" data-site-index="' + idx + '" title="Pilih Fasilitator Penanggung Jawab untuk ' + escapeHtml(item.site) + '">' +
              optionsHtml +
         '  </select>' +
         '</td>' +
@@ -7940,7 +8010,7 @@
     var html = '';
     users.forEach(function(u) {
       var isCurrent = u.username.toLowerCase() === currentUsername.toLowerCase();
-      var roleIcon = '👑';
+      var roleIcon = '🛡️';
       var roleBadgeClass = 'role-admin';
       if (u.role === 'Facilitator') {
         roleIcon = '🛠️';
@@ -8207,6 +8277,7 @@
 
     hideUserForm();
     renderUserMgmtList();
+    renderRoutingTable();
   }
 
   // Hapus Pengguna (Delete) & Sinkronkan ke Google Sheet
@@ -8240,6 +8311,7 @@
 
       showToast('Akun @' + cleanU + ' berhasil dihapus dari sistem dan Google Sheet.', 'info');
       renderUserMgmtList();
+      renderRoutingTable();
     }
   };
 
@@ -8378,6 +8450,17 @@
     return 'Administrator Utama';
   }
 
+  function getUserInitials(name) {
+    if (!name || typeof name !== 'string') return 'AU';
+    var clean = name.replace(/[^\w\s]/gi, '').trim();
+    if (!clean) return 'AU';
+    var words = clean.split(/\s+/).filter(Boolean);
+    if (words.length >= 2) {
+      return (words[0].charAt(0) + words[words.length - 1].charAt(0)).toUpperCase();
+    }
+    return words[0].slice(0, words[0].length >= 2 ? 2 : 1).toUpperCase();
+  }
+
   function applyRolePermissions() {
     var role = (state.authUser && state.authUser.role) ? state.authUser.role : 'Administrator';
     
@@ -8386,8 +8469,9 @@
     var roleEl = document.getElementById('hdrUserRole');
     var avatarEl = document.getElementById('hdrUserAvatar');
 
-    if (nameEl && state.authUser) {
-      var displayName = state.authUser.name;
+    var displayName = '';
+    if (state.authUser) {
+      displayName = state.authUser.name;
       // Jika displayName masih berupa @username atau sama dengan username, sinkronkan nama lengkap dari database akun
       if (!displayName || displayName.indexOf('@') === 0 || displayName === state.authUser.username) {
         var accounts = getStoredUserAccounts();
@@ -8402,45 +8486,51 @@
           role = matched.role || role;
         }
       }
-      nameEl.textContent = displayName || 'Administrator Utama';
-    }
-    if (roleEl) {
-      var badgeClass = 'role-admin';
-      var badgeIcon = '👑';
-      if (role === 'Facilitator') {
-        badgeClass = 'role-facilitator';
-        badgeIcon = '🛠️';
-      } else if (role === 'Inputer') {
-        badgeClass = 'role-inputer';
-        badgeIcon = '📝';
-      } else if (role === 'Viewer') {
-        badgeClass = 'role-viewer';
-        badgeIcon = '👁️';
+      // Jangan pernah fallback ke email bila name kosong, ambil fallback username atau "Administrator Utama"
+      if (!displayName || displayName.indexOf('@') !== -1) {
+        displayName = state.authUser.username ? getDisplayNameFromUsername(state.authUser.username) : 'Administrator Utama';
       }
-      roleEl.innerHTML = '<span class="badge-role ' + badgeClass + '">' + badgeIcon + ' ' + escapeHtml(role) + '</span>';
     }
+    if (!displayName) displayName = 'Administrator Utama';
+
+    if (nameEl) {
+      nameEl.textContent = displayName;
+    }
+
+    var badgeClass = 'role-admin';
+    if (role === 'Facilitator') {
+      badgeClass = 'role-facilitator';
+    } else if (role === 'Inputer') {
+      badgeClass = 'role-inputer';
+    } else if (role === 'Viewer') {
+      badgeClass = 'role-viewer';
+    }
+    
+    // Badge role bersih tanpa emoji mahkota 👑
+    if (roleEl) {
+      roleEl.innerHTML = '<span class="badge-role ' + badgeClass + '">' + escapeHtml(role.toUpperCase()) + '</span>';
+    }
+
+    // Logo avatar inisial nama akun (contoh: Administrator Utama -> AU, Reza Trianto -> RT)
+    var initials = getUserInitials(displayName);
     if (avatarEl) {
-      if (role === 'Administrator') avatarEl.textContent = '👑';
-      else if (role === 'Facilitator') avatarEl.textContent = '🛠️';
-      else if (role === 'Viewer') avatarEl.textContent = '👁️';
-      else avatarEl.textContent = '📝';
+      avatarEl.textContent = initials;
+      avatarEl.title = displayName + ' (' + role + ')';
     }
 
     // 1b. Sinkronkan juga pada kartu profil mobile drawer (jika ada)
     var drawerNameEl = document.getElementById('drawerUserName');
     var drawerRoleEl = document.getElementById('drawerUserRole');
     var drawerAvatarEl = document.getElementById('drawerUserAvatar');
-    if (drawerNameEl && state.authUser) {
-      drawerNameEl.textContent = (nameEl ? nameEl.textContent : state.authUser.name) || 'Administrator Utama';
+    if (drawerNameEl) {
+      drawerNameEl.textContent = displayName;
     }
     if (drawerRoleEl) {
-      drawerRoleEl.innerHTML = '<span class="badge-role ' + badgeClass + '">' + badgeIcon + ' ' + escapeHtml(role) + '</span>';
+      drawerRoleEl.innerHTML = '<span class="badge-role ' + badgeClass + '">' + escapeHtml(role.toUpperCase()) + '</span>';
     }
     if (drawerAvatarEl) {
-      if (role === 'Administrator') drawerAvatarEl.textContent = '👑';
-      else if (role === 'Facilitator') drawerAvatarEl.textContent = '🛠️';
-      else if (role === 'Viewer') drawerAvatarEl.textContent = '👁️';
-      else drawerAvatarEl.textContent = '📝';
+      drawerAvatarEl.textContent = initials;
+      drawerAvatarEl.title = displayName + ' (' + role + ')';
     }
 
     // 2. Kontrol Tombol Input Kasus Baru:

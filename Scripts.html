@@ -446,12 +446,32 @@
     if (!tbody) return;
 
     var routing = state.facilitatorRouting || getStoredFacilitatorRouting();
-    var facilitators = ['Galih', 'Reza', 'Ajun', 'Yurina', 'Kenny'];
     
+    // Ambil seluruh user yang dibuat / terdaftar dengan role 'Facilitator'
     var accounts = getStoredUserAccounts();
-    accounts.forEach(function(acc) {
-      if (acc.role === 'Facilitator' && acc.name && facilitators.indexOf(acc.name) === -1) {
-        facilitators.push(acc.name);
+    var facilitatorUsers = accounts.filter(function(acc) {
+      return acc && (acc.role === 'Facilitator' || String(acc.role).toLowerCase() === 'facilitator');
+    });
+
+    var facilitators = [];
+    facilitatorUsers.forEach(function(acc) {
+      var displayName = (acc.name && acc.name.trim()) ? acc.name.trim() : (acc.username ? acc.username.trim() : '');
+      if (displayName && facilitators.indexOf(displayName) === -1) {
+        facilitators.push(displayName);
+      }
+    });
+
+    // Masukkan fasilitator standar default jika belum ada di list
+    ['Galih', 'Reza', 'Ajun', 'Yurina', 'Kenny'].forEach(function(defFac) {
+      if (facilitators.indexOf(defFac) === -1) {
+        facilitators.push(defFac);
+      }
+    });
+
+    // Pastikan nilai fasilitator saat ini di setiap baris routing juga ada di list opsi
+    routing.forEach(function(item) {
+      if (item.facilitator && facilitators.indexOf(item.facilitator) === -1) {
+        facilitators.push(item.facilitator);
       }
     });
 
@@ -469,7 +489,7 @@
         '<td><strong class="text-slate-800">' + escapeHtml(item.site) + '</strong></td>' +
         '<td>' + unitBadge + '</td>' +
         '<td>' +
-        '  <select class="routing-select" data-site-index="' + idx + '">' +
+        '  <select class="routing-select" data-site-index="' + idx + '" title="Pilih Fasilitator Penanggung Jawab untuk ' + escapeHtml(item.site) + '">' +
              optionsHtml +
         '  </select>' +
         '</td>' +
@@ -656,7 +676,7 @@
     var html = '';
     users.forEach(function(u) {
       var isCurrent = u.username.toLowerCase() === currentUsername.toLowerCase();
-      var roleIcon = '👑';
+      var roleIcon = '🛡️';
       var roleBadgeClass = 'role-admin';
       if (u.role === 'Facilitator') {
         roleIcon = '🛠️';
@@ -923,6 +943,7 @@
 
     hideUserForm();
     renderUserMgmtList();
+    renderRoutingTable();
   }
 
   // Hapus Pengguna (Delete) & Sinkronkan ke Google Sheet
@@ -956,6 +977,7 @@
 
       showToast('Akun @' + cleanU + ' berhasil dihapus dari sistem dan Google Sheet.', 'info');
       renderUserMgmtList();
+      renderRoutingTable();
     }
   };
 
@@ -1094,6 +1116,17 @@
     return 'Administrator Utama';
   }
 
+  function getUserInitials(name) {
+    if (!name || typeof name !== 'string') return 'AU';
+    var clean = name.replace(/[^\w\s]/gi, '').trim();
+    if (!clean) return 'AU';
+    var words = clean.split(/\s+/).filter(Boolean);
+    if (words.length >= 2) {
+      return (words[0].charAt(0) + words[words.length - 1].charAt(0)).toUpperCase();
+    }
+    return words[0].slice(0, words[0].length >= 2 ? 2 : 1).toUpperCase();
+  }
+
   function applyRolePermissions() {
     var role = (state.authUser && state.authUser.role) ? state.authUser.role : 'Administrator';
     
@@ -1102,8 +1135,9 @@
     var roleEl = document.getElementById('hdrUserRole');
     var avatarEl = document.getElementById('hdrUserAvatar');
 
-    if (nameEl && state.authUser) {
-      var displayName = state.authUser.name;
+    var displayName = '';
+    if (state.authUser) {
+      displayName = state.authUser.name;
       // Jika displayName masih berupa @username atau sama dengan username, sinkronkan nama lengkap dari database akun
       if (!displayName || displayName.indexOf('@') === 0 || displayName === state.authUser.username) {
         var accounts = getStoredUserAccounts();
@@ -1118,45 +1152,51 @@
           role = matched.role || role;
         }
       }
-      nameEl.textContent = displayName || 'Administrator Utama';
-    }
-    if (roleEl) {
-      var badgeClass = 'role-admin';
-      var badgeIcon = '👑';
-      if (role === 'Facilitator') {
-        badgeClass = 'role-facilitator';
-        badgeIcon = '🛠️';
-      } else if (role === 'Inputer') {
-        badgeClass = 'role-inputer';
-        badgeIcon = '📝';
-      } else if (role === 'Viewer') {
-        badgeClass = 'role-viewer';
-        badgeIcon = '👁️';
+      // Jangan pernah fallback ke email bila name kosong, ambil fallback username atau "Administrator Utama"
+      if (!displayName || displayName.indexOf('@') !== -1) {
+        displayName = state.authUser.username ? getDisplayNameFromUsername(state.authUser.username) : 'Administrator Utama';
       }
-      roleEl.innerHTML = '<span class="badge-role ' + badgeClass + '">' + badgeIcon + ' ' + escapeHtml(role) + '</span>';
     }
+    if (!displayName) displayName = 'Administrator Utama';
+
+    if (nameEl) {
+      nameEl.textContent = displayName;
+    }
+
+    var badgeClass = 'role-admin';
+    if (role === 'Facilitator') {
+      badgeClass = 'role-facilitator';
+    } else if (role === 'Inputer') {
+      badgeClass = 'role-inputer';
+    } else if (role === 'Viewer') {
+      badgeClass = 'role-viewer';
+    }
+    
+    // Badge role bersih tanpa emoji mahkota 👑
+    if (roleEl) {
+      roleEl.innerHTML = '<span class="badge-role ' + badgeClass + '">' + escapeHtml(role.toUpperCase()) + '</span>';
+    }
+
+    // Logo avatar inisial nama akun (contoh: Administrator Utama -> AU, Reza Trianto -> RT)
+    var initials = getUserInitials(displayName);
     if (avatarEl) {
-      if (role === 'Administrator') avatarEl.textContent = '👑';
-      else if (role === 'Facilitator') avatarEl.textContent = '🛠️';
-      else if (role === 'Viewer') avatarEl.textContent = '👁️';
-      else avatarEl.textContent = '📝';
+      avatarEl.textContent = initials;
+      avatarEl.title = displayName + ' (' + role + ')';
     }
 
     // 1b. Sinkronkan juga pada kartu profil mobile drawer (jika ada)
     var drawerNameEl = document.getElementById('drawerUserName');
     var drawerRoleEl = document.getElementById('drawerUserRole');
     var drawerAvatarEl = document.getElementById('drawerUserAvatar');
-    if (drawerNameEl && state.authUser) {
-      drawerNameEl.textContent = (nameEl ? nameEl.textContent : state.authUser.name) || 'Administrator Utama';
+    if (drawerNameEl) {
+      drawerNameEl.textContent = displayName;
     }
     if (drawerRoleEl) {
-      drawerRoleEl.innerHTML = '<span class="badge-role ' + badgeClass + '">' + badgeIcon + ' ' + escapeHtml(role) + '</span>';
+      drawerRoleEl.innerHTML = '<span class="badge-role ' + badgeClass + '">' + escapeHtml(role.toUpperCase()) + '</span>';
     }
     if (drawerAvatarEl) {
-      if (role === 'Administrator') drawerAvatarEl.textContent = '👑';
-      else if (role === 'Facilitator') drawerAvatarEl.textContent = '🛠️';
-      else if (role === 'Viewer') drawerAvatarEl.textContent = '👁️';
-      else drawerAvatarEl.textContent = '📝';
+      drawerAvatarEl.textContent = initials;
+      drawerAvatarEl.title = displayName + ' (' + role + ')';
     }
 
     // 2. Kontrol Tombol Input Kasus Baru:
