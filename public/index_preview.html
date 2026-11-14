@@ -5134,21 +5134,34 @@ input:focus, select:focus, textarea:focus {
   font-weight: 600 !important;
 }
 
-/* Custom Select Dropdown Container with Chevron */
+/* Custom Select Dropdown Container with Chevron positioned right inside the select box */
 .select-dropdown-wrap {
   position: relative;
-  width: 100%;
+  display: inline-block;
+  width: auto;
+  max-width: 100%;
 }
 .select-dropdown-wrap select {
   appearance: none !important;
   -webkit-appearance: none !important;
   -moz-appearance: none !important;
-  padding-right: 34px !important;
+  padding-right: 32px !important;
+  padding-left: 12px !important;
   cursor: pointer;
+  width: auto !important;
+}
+#newDataModal #inputStatus {
+  min-width: 120px;
+}
+#newDataModal #inputUrgency {
+  min-width: 185px;
+}
+#newDataModal #inputBulanTahun {
+  min-width: 175px;
 }
 .select-dropdown-wrap .dropdown-chevron {
   position: absolute;
-  right: 12px;
+  right: 10px;
   top: 50%;
   transform: translateY(-50%);
   pointer-events: none;
