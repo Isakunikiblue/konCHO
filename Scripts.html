@@ -270,6 +270,7 @@
       username: '23255029',
       name: 'Putri Wahyu Febriani',
       role: 'Inputer',
+      site: 'CHO Mobile CC Bandung',
       password: 'koncho123',
       createdAt: '2026-10-22'
     },
@@ -277,6 +278,7 @@
       username: '23255561',
       name: 'MARTA DEWI RAKHMANITA',
       role: 'Inputer',
+      site: 'CHO Fixed CC Semarang',
       password: 'koncho123',
       createdAt: '2026-10-25'
     },
@@ -704,7 +706,14 @@
       html += '    </div>';
       html += '  </td>';
       html += '  <td><strong>' + escapeHtml(u.name || '-') + '</strong></td>';
-      html += '  <td><span class="badge-role ' + roleBadgeClass + '">' + roleIcon + ' ' + escapeHtml(u.role) + '</span></td>';
+      var siteBadge = '';
+      if (u.role === 'Inputer') {
+        var siteName = u.site || (u.name && u.name.indexOf('CHO') >= 0 ? u.name : '');
+        if (siteName) {
+          siteBadge = '<div class="user-site-tag"><span style="width:5px; height:5px; border-radius:50%; background:#0284c7; flex-shrink:0;"></span>' + escapeHtml(siteName) + '</div>';
+        }
+      }
+      html += '  <td><div style="display:flex; flex-direction:column; align-items:flex-start; gap:2px;"><span class="badge-role ' + roleBadgeClass + '">' + roleIcon + ' ' + escapeHtml(u.role) + '</span>' + siteBadge + '</div></td>';
       html += '  <td><code style="background:var(--bg-elevated); padding:3px 8px; border-radius:6px; font-size:12px; color:var(--text-primary); border:1px solid var(--border-color);">' + escapeHtml(u.password || '••••••••') + '</code></td>';
       html += '  <td style="text-align: right; white-space: nowrap;">';
       html += '    <button type="button" class="btn-table-action btn-table-edit" onclick="editUserAccount(\'' + escapeHtml(u.username) + '\')" title="Edit Akun">';
@@ -731,14 +740,18 @@
   function updateRoleDescHint() {
     var roleInp = document.getElementById('inpUserRole');
     var roleDescHint = document.getElementById('roleDescHint');
+    var grpUserSite = document.getElementById('grpUserSite');
     if (!roleInp || !roleDescHint) return;
     var val = roleInp.value;
+    if (grpUserSite) {
+      grpUserSite.style.display = (val === 'Inputer') ? 'block' : 'none';
+    }
     if (val === 'Administrator') {
       roleDescHint.textContent = 'Administrator memiliki akses penuh ke seluruh sistem dan menu kelola user.';
     } else if (val === 'Facilitator') {
       roleDescHint.textContent = 'Facilitator berwenang mengubah status kasus (In Progress, Closed, Reopen) dan menambah catatan log.';
     } else if (val === 'Inputer') {
-      roleDescHint.textContent = 'Inputer berwenang menginput kasus baru ke Google Sheets.';
+      roleDescHint.textContent = 'Inputer berwenang menginput kasus baru sesuai Site asal yang dipilih.';
     } else if (val === 'Viewer') {
       roleDescHint.textContent = 'Viewer hanya dapat memantau dan membaca seluruh data kasus tanpa hak input maupun edit (Read-Only).';
     }
@@ -753,6 +766,7 @@
     var uInp = document.getElementById('inpUserUsername');
     var nameInp = document.getElementById('inpUserFullName');
     var roleInp = document.getElementById('inpUserRole');
+    var siteInp = document.getElementById('inpUserSite');
     var passInp = document.getElementById('inpUserPassword');
     var lblToggle = document.getElementById('lblToggleAddUser');
 
@@ -766,6 +780,7 @@
     }
     if (nameInp) nameInp.value = '';
     if (roleInp) roleInp.value = 'Facilitator';
+    if (siteInp) siteInp.value = 'CHO Fixed CC Bandung';
     updateRoleDescHint();
     if (passInp) {
       passInp.value = ''; // Jangan default koncho123, diisi manual oleh user
@@ -811,6 +826,7 @@
     var uInp = document.getElementById('inpUserUsername');
     var nameInp = document.getElementById('inpUserFullName');
     var roleInp = document.getElementById('inpUserRole');
+    var siteInp = document.getElementById('inpUserSite');
     var passInp = document.getElementById('inpUserPassword');
     var lblToggle = document.getElementById('lblToggleAddUser');
 
@@ -824,6 +840,7 @@
     }
     if (nameInp) nameInp.value = found.name || '';
     if (roleInp) roleInp.value = found.role || 'Facilitator';
+    if (siteInp) siteInp.value = found.site || (found.name && found.name.indexOf('CHO') >= 0 ? found.name : 'CHO Fixed CC Bandung');
     updateRoleDescHint();
     if (passInp) {
       passInp.value = found.password || ''; // Tampilkan kata sandi saat ini & dapat diedit manual
@@ -843,6 +860,8 @@
     var username = (document.getElementById('inpUserUsername') ? document.getElementById('inpUserUsername').value : '').trim().replace(/^@+/, '');
     var name = (document.getElementById('inpUserFullName') ? document.getElementById('inpUserFullName').value : '').trim();
     var role = (document.getElementById('inpUserRole') ? document.getElementById('inpUserRole').value : 'Facilitator').trim();
+    var siteInp = document.getElementById('inpUserSite');
+    var site = (role === 'Inputer' && siteInp) ? siteInp.value : '';
     var password = (document.getElementById('inpUserPassword') ? document.getElementById('inpUserPassword').value : '').trim();
 
     if (!username) {
@@ -884,6 +903,7 @@
         users[idx].username = username;
         users[idx].name = name;
         users[idx].role = role;
+        users[idx].site = site;
         users[idx].password = password;
         users[idx].updatedAt = new Date().toISOString();
         saveStoredUserAccounts(users);
@@ -894,6 +914,7 @@
           username: username,
           name: name,
           role: role,
+          site: site,
           password: password
         });
 
@@ -908,6 +929,7 @@
           state.authUser.username = username;
           state.authUser.name = name;
           state.authUser.role = role;
+          state.authUser.site = site;
           try { localStorage.setItem('koncho_auth_user', JSON.stringify(state.authUser)); } catch(err){}
           applyRolePermissions();
         }
@@ -924,6 +946,7 @@
         username: username,
         name: name,
         role: role,
+        site: site,
         password: password,
         createdAt: new Date().toISOString().split('T')[0]
       };
@@ -935,6 +958,7 @@
         username: username,
         name: name,
         role: role,
+        site: site,
         password: password
       });
 
@@ -1172,9 +1196,26 @@
       badgeClass = 'role-viewer';
     }
     
-    // Badge role bersih tanpa emoji mahkota 👑
+    // Label role bersih; khusus Inputer tampilkan unit/site asal
+    var roleLabel = role.toUpperCase();
+    if (role === 'Inputer' && state.authUser) {
+      var userSite = state.authUser.site;
+      if (!userSite) {
+        var accounts = getStoredUserAccounts();
+        var cleanU = (state.authUser.username || state.authUser.name || '').replace(/^@+/, '').trim().toLowerCase();
+        var matched = accounts.find(function(a) {
+          return (a.username || '').replace(/^@+/, '').trim().toLowerCase() === cleanU;
+        });
+        if (matched && matched.site) userSite = matched.site;
+        else if (matched && matched.name && matched.name.indexOf('CHO') >= 0) userSite = matched.name;
+      }
+      if (userSite) {
+        roleLabel = 'INPUTER • ' + userSite.toUpperCase();
+      }
+    }
+
     if (roleEl) {
-      roleEl.innerHTML = '<span class="badge-role ' + badgeClass + '">' + escapeHtml(role.toUpperCase()) + '</span>';
+      roleEl.innerHTML = '<span class="badge-role ' + badgeClass + '">' + escapeHtml(roleLabel) + '</span>';
     }
 
     // Logo avatar inisial nama akun (contoh: Administrator Utama -> AU, Reza Trianto -> RT)
@@ -1192,7 +1233,7 @@
       drawerNameEl.textContent = displayName;
     }
     if (drawerRoleEl) {
-      drawerRoleEl.innerHTML = '<span class="badge-role ' + badgeClass + '">' + escapeHtml(role.toUpperCase()) + '</span>';
+      drawerRoleEl.innerHTML = '<span class="badge-role ' + badgeClass + '">' + escapeHtml(roleLabel) + '</span>';
     }
     if (drawerAvatarEl) {
       drawerAvatarEl.textContent = initials;
@@ -1321,6 +1362,7 @@
         name: fullName,
         username: found.username,
         role: role,
+        site: found.site || (found.name && found.name.indexOf('CHO') >= 0 ? found.name : ''),
         loginTime: new Date().toISOString()
       };
       
