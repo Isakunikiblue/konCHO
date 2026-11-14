@@ -4664,4 +4664,110 @@
     z-index: 250 !important;
   }
 
+
+  /* Urgency Badges */
+  .badge-urgency-low {
+    background-color: #dcfce7;
+    color: #166534;
+    border: 1px solid #bbf7d0;
+  }
+  .badge-urgency-middle {
+    background-color: #fef3c7;
+    color: #92400e;
+    border: 1px solid #fde68a;
+  }
+  .badge-urgency-high {
+    background-color: #fee2e2;
+    color: #991b1b;
+    border: 1px solid #fecaca;
+  }
+
+  /* Locked Input Styling */
+  .form-control.input-locked {
+    background-color: #f8fafc !important;
+    color: #334155 !important;
+    font-weight: 600 !important;
+    cursor: not-allowed !important;
+    border-color: #cbd5e1 !important;
+  }
+
+  /* User Management Tabs */
+  .mgmt-nav-tabs {
+    display: flex;
+    gap: 8px;
+    border-bottom: 2px solid #e2e8f0;
+    margin-bottom: 16px;
+    padding-bottom: 2px;
+  }
+  .mgmt-tab-btn {
+    padding: 8px 16px;
+    font-size: 13px;
+    font-weight: 700;
+    color: #64748b;
+    background: transparent;
+    border: none;
+    border-bottom: 3px solid transparent;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    transition: all 0.2s ease;
+  }
+  .mgmt-tab-btn:hover {
+    color: #1e293b;
+  }
+  .mgmt-tab-btn.active {
+    color: #061345;
+    border-bottom-color: #061345;
+  }
+
+  /* Routing Table Styling */
+  .routing-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    overflow: hidden;
+  }
+  .routing-table th {
+    background: #f8fafc;
+    color: #475569;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.05em;
+    padding: 10px 14px;
+    border-bottom: 1px solid #e2e8f0;
+    text-align: left;
+  }
+  .routing-table td {
+    padding: 11px 14px;
+    border-bottom: 1px solid #f1f5f9;
+    font-size: 13px;
+    vertical-align: middle;
+  }
+  .routing-table tr:last-child td {
+    border-bottom: none;
+  }
+  .routing-table tr:hover td {
+    background: #f8fafc;
+  }
+  .routing-select {
+    width: 100%;
+    padding: 6px 12px;
+    border-radius: 8px;
+    border: 1px solid #cbd5e1;
+    font-size: 13px;
+    font-weight: 600;
+    background: #ffffff;
+    color: #1e293b;
+    outline: none;
+    transition: border-color 0.2s ease;
+  }
+  .routing-select:focus {
+    border-color: #3b82f6;
+    box-shadow: 0 0 0 2px rgba(59, 130, 246, 0.15);
+  }
+
 </style>

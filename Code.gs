@@ -27,7 +27,18 @@ var STANDARD_CASE_HEADERS = [
   'Keterangan_Closed',                         // Kolom Q (Catatan penyelesaian saat Closed)
   'Closed_By',                                 // Kolom R (Petugas penutup kasus)
   'Tanggal_Input',                             // Kolom S (Tanggal Awal Input oleh Inputer)
-  'History_Reschedule'                         // Kolom T (Riwayat Perubahan Tanggal oleh Facilitator)
+  'History_Reschedule',                        // Kolom T (Riwayat Perubahan Tanggal oleh Facilitator)
+  'Urgency'                                    // Kolom U (Urgency Case: Low, Middle, High)
+];
+
+var DEFAULT_FACILITATOR_ROUTING = [
+  { site: 'CHO Fixed CC Bandung', unit: 'CHO Fixed', serviceType: 'FIXED', facilitator: 'Galih' },
+  { site: 'CHO Fixed CC Semarang', unit: 'CHO Fixed', serviceType: 'FIXED', facilitator: 'Reza' },
+  { site: 'CHO Mobile CC Bandung', unit: 'CHO Mobile', serviceType: 'MOBILE', facilitator: 'Galih' },
+  { site: 'CHO Mobile CC Semarang', unit: 'CHO Mobile', serviceType: 'MOBILE', facilitator: 'Reza' },
+  { site: 'CHO E Care', unit: 'CHO eCare', serviceType: 'ECARE', facilitator: 'Ajun' },
+  { site: 'CHO Priority Semarang', unit: 'CHO Priority', serviceType: 'PRIORITY', facilitator: 'Yurina' },
+  { site: 'CHO Priority Bandung', unit: 'CHO Priority', serviceType: 'PRIORITY', facilitator: 'Kenny' }
 ];
 
 var CONFIG = {
@@ -111,6 +122,10 @@ function doPost(e) {
       result = saveUserAccount(data);
     } else if (action === 'deleteUserAccount') {
       result = deleteUserAccount(data.username || data);
+    } else if (action === 'saveFacilitatorRouting') {
+      result = saveFacilitatorRoutingGas(data.routing || data);
+    } else if (action === 'getFacilitatorRouting') {
+      result = { success: true, routing: getStoredFacilitatorRoutingGas() };
     } else {
       result = { success: false, error: 'Aksi POST tidak valid' };
     }
@@ -321,6 +336,68 @@ function initializeDatabase() {
 /**
  * Pastikan seluruh kolom tracking kalender & workflow Pickup tersedia di baris header sheet
  */
+
+/**
+ * Ambil alur routing fasilitator yang tersimpan (atau fallback ke default)
+ */
+function getStoredFacilitatorRoutingGas() {
+  try {
+    var props = PropertiesService.getScriptProperties();
+    var val = props.getProperty('FACILITATOR_ROUTING');
+    if (val) {
+      var parsed = JSON.parse(val);
+      if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+    }
+  } catch (err) {
+    Logger.log('getStoredFacilitatorRoutingGas error: ' + err.message);
+  }
+  return DEFAULT_FACILITATOR_ROUTING;
+}
+
+/**
+ * Simpan alur routing fasilitator baru dari Admin
+ */
+function saveFacilitatorRoutingGas(routingArray) {
+  try {
+    if (!Array.isArray(routingArray) || routingArray.length === 0) {
+      return { success: false, error: 'Data routing tidak valid' };
+    }
+    var props = PropertiesService.getScriptProperties();
+    props.setProperty('FACILITATOR_ROUTING', JSON.stringify(routingArray));
+    return { success: true, message: 'Alur routing fasilitator berhasil disimpan!' };
+  } catch (err) {
+    Logger.log('saveFacilitatorRoutingGas error: ' + err.message);
+    return { success: false, error: err.message };
+  }
+}
+
+/**
+ * Cocokkan nama requestor / site dengan Facilitator yang ditugaskan
+ */
+function resolveFacilitatorForRequestor(requestorName, routingList) {
+  var list = routingList || getStoredFacilitatorRoutingGas();
+  var req = String(requestorName || '').toLowerCase().trim();
+  if (!req) return 'Galih';
+
+  for (var i = 0; i < list.length; i++) {
+    var entry = list[i];
+    var siteNorm = String(entry.site || '').toLowerCase().trim();
+    if (siteNorm === req || req.indexOf(siteNorm) >= 0 || siteNorm.indexOf(req) >= 0) {
+      return entry.facilitator;
+    }
+  }
+
+  if (req.indexOf('fixed') >= 0 && req.indexOf('bandung') >= 0) return 'Galih';
+  if (req.indexOf('fixed') >= 0 && req.indexOf('semarang') >= 0) return 'Reza';
+  if (req.indexOf('mobile') >= 0 && req.indexOf('bandung') >= 0) return 'Galih';
+  if (req.indexOf('mobile') >= 0 && req.indexOf('semarang') >= 0) return 'Reza';
+  if (req.indexOf('ecare') >= 0 || req.indexOf('e care') >= 0 || req.indexOf('e-care') >= 0) return 'Ajun';
+  if (req.indexOf('priority') >= 0 && req.indexOf('semarang') >= 0) return 'Yurina';
+  if (req.indexOf('priority') >= 0 && req.indexOf('bandung') >= 0) return 'Kenny';
+
+  return 'Galih';
+}
+
 function ensureTrackingColumns(sheet) {
   if (!sheet) return;
   var lastCol = sheet.getLastColumn();
@@ -343,7 +420,8 @@ function ensureTrackingColumns(sheet) {
     { label: 'Keterangan_Closed', aliases: ['keteranganclosed', 'catatanclosed', 'closingnote', 'solusi'] },
     { label: 'Closed_By', aliases: ['closedby', 'diclosedoleh', 'picclosed'] },
     { label: 'Tanggal_Input', aliases: ['tanggalinput', 'tanggal_input', 'tanggalinputawal', 'tglinput', 'createdat'] },
-    { label: 'History_Reschedule', aliases: ['historyreschedule', 'history_reschedule', 'riwayatreschedule', 'riwayat_reschedule'] }
+    { label: 'History_Reschedule', aliases: ['historyreschedule', 'history_reschedule', 'riwayatreschedule', 'riwayat_reschedule'] },
+    { label: 'Urgency', aliases: ['urgency', 'urgensi', 'tingkaturgensi', 'urgencycase'] }
   ];
 
   for (var r = 0; r < requiredCols.length; r++) {
@@ -396,6 +474,7 @@ function getInitialData() {
       },
       logs: logData,
       users: usersData,
+      facilitatorRouting: getStoredFacilitatorRoutingGas(),
       timestamp: new Date().toISOString()
     };
   } catch (err) {
@@ -571,6 +650,7 @@ function getSheetRecords(ss, sheetName, serviceType) {
   var dateIdx = findHeaderIndex(headers, ['tanggal_agenda', 'tanggal_case', 'tanggal_lapor', 'tanggal', 'tgl', 'created_at', 'date', 'timestamp', 'waktu']);
   var tglInputIdx = findHeaderIndex(headers, ['tanggal_input', 'tanggal_input_awal', 'tgl_input', 'created_at', 'input_date']);
   var historyRescheduleIdx = findHeaderIndex(headers, ['history_reschedule', 'riwayat_reschedule', 'reschedule_history', 'history_tanggal']);
+  var urgencyIdx = findHeaderIndex(headers, ['urgency', 'urgensi', 'tingkat_urgensi', 'tingkaturgensi', 'urgency_case', 'urgencycase']);
   var nameIdx = findHeaderIndex(headers, ['nama_pelanggan', 'nama', 'customer_name', 'pelanggan', 'akun', 'customer']);
   var numIdx = findHeaderIndex(headers, ['nomor_msisdn', 'nomor_internet_pstn', 'msisdn', 'no_layanan', 'no_internet', 'telepon', 'nomor', 'inet']);
   var catIdx = findHeaderIndex(headers, ['kategori_keluhan', 'kategori_kendala', 'kategori']);
@@ -729,6 +809,7 @@ function getSheetRecords(ss, sheetName, serviceType) {
       tanggalAgenda: dateIdx >= 0 && row[dateIdx] ? formatDate(row[dateIdx]) : '',
       tanggalInput: tglInputIdx >= 0 && row[tglInputIdx] ? formatDate(row[tglInputIdx]) : (dateIdx >= 0 && row[dateIdx] ? formatDate(row[dateIdx]) : ''),
       historyReschedule: historyRescheduleIdx >= 0 && row[historyRescheduleIdx] ? String(row[historyRescheduleIdx]).trim() : '',
+      urgency: urgencyIdx >= 0 && row[urgencyIdx] ? String(row[urgencyIdx]).trim() : 'Middle',
       nama: rawName,
       nomorLayanan: rawNum,
       kategori: catIdx >= 0 && row[catIdx] ? String(row[catIdx]).trim() : 'General',
@@ -882,8 +963,12 @@ function submitNewData(payload) {
         val = formattedDate;
       } else if (headerNorm.indexOf('inputby') >= 0 || headerNorm.indexOf('inputer') >= 0 || headerNorm.indexOf('createdby') >= 0) {
         val = inputByName;
+      } else if (headerNorm.indexOf('urgency') >= 0 || headerNorm.indexOf('urgensi') >= 0) {
+        val = payload.urgency || 'Middle';
       } else if (headerNorm.indexOf('picfacilitator') >= 0 || headerNorm.indexOf('pickupby') >= 0 || headerNorm.indexOf('facilitator') >= 0) {
-        val = (finalStatus === 'Open') ? '' : inputByName;
+        val = payload.picFacilitator || resolveFacilitatorForRequestor(payload.requestor || inputByName);
+      } else if (headerNorm.indexOf('pic') >= 0) {
+        val = payload.pic || payload.requestor || inputByName;
       } else if (headerNorm.indexOf('msisdn') >= 0 || headerNorm.indexOf('internet') >= 0 || headerNorm.indexOf('nomor') >= 0) {
         val = payload.nomorLayanan || '';
       } else if (headerNorm.indexOf('pelanggan') >= 0 || headerNorm.indexOf('nama') >= 0) {

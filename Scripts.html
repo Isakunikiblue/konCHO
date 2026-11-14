@@ -27,7 +27,8 @@
     currentActionTicket: null,      // Tiket yang sedang ditargetkan oleh modal
     dataSource: 'live',             // 'live' | 'simulation'
     theme: localStorage.getItem('koncho_theme') || 'dark',
-    defaultAuthor: localStorage.getItem('koncho_pic_name') || ''
+    defaultAuthor: localStorage.getItem('koncho_pic_name') || '',
+    facilitatorRouting: null
   };
 
   // DOM Elements Cache
@@ -171,6 +172,21 @@
     rescheduleHistorySection: document.getElementById('rescheduleHistorySection'),
     rescheduleHistoryList: document.getElementById('rescheduleHistoryList'),
 
+    // Urgency Case
+    inputUrgency: document.getElementById('inputUrgency'),
+
+    // Day Drawer Add Case
+    btnDrawerAddCaseSameDay: document.getElementById('btn-drawer-add-case-same-day'),
+
+    // Routing Management Tabs
+    tabBtnUsers: document.getElementById('tabBtnUsers'),
+    tabBtnRouting: document.getElementById('tabBtnRouting'),
+    tabContentUsers: document.getElementById('tabContentUsers'),
+    tabContentRouting: document.getElementById('tabContentRouting'),
+    routingTableBody: document.getElementById('routingTableBody'),
+    btnSaveRouting: document.getElementById('btnSaveRouting'),
+    btnResetRoutingDefault: document.getElementById('btnResetRoutingDefault'),
+
     // Toast
     toastContainer: document.getElementById('toastContainer')
   };
@@ -263,8 +279,266 @@
       role: 'Inputer',
       password: 'koncho123',
       createdAt: '2026-10-25'
+    },
+    // Site Requestor Accounts
+    {
+      username: 'cho_fixed_bdg',
+      name: 'CHO Fixed CC Bandung',
+      site: 'CHO Fixed CC Bandung',
+      role: 'Inputer',
+      password: 'koncho123',
+      createdAt: '2026-11-13'
+    },
+    {
+      username: 'cho_fixed_smg',
+      name: 'CHO Fixed CC Semarang',
+      site: 'CHO Fixed CC Semarang',
+      role: 'Inputer',
+      password: 'koncho123',
+      createdAt: '2026-11-13'
+    },
+    {
+      username: 'cho_mobile_bdg',
+      name: 'CHO Mobile CC Bandung',
+      site: 'CHO Mobile CC Bandung',
+      role: 'Inputer',
+      password: 'koncho123',
+      createdAt: '2026-11-13'
+    },
+    {
+      username: 'cho_mobile_smg',
+      name: 'CHO Mobile CC Semarang',
+      site: 'CHO Mobile CC Semarang',
+      role: 'Inputer',
+      password: 'koncho123',
+      createdAt: '2026-11-13'
+    },
+    {
+      username: 'cho_ecare',
+      name: 'CHO E Care',
+      site: 'CHO E Care',
+      role: 'Inputer',
+      password: 'koncho123',
+      createdAt: '2026-11-13'
+    },
+    {
+      username: 'cho_priority_smg',
+      name: 'CHO Priority Semarang',
+      site: 'CHO Priority Semarang',
+      role: 'Inputer',
+      password: 'koncho123',
+      createdAt: '2026-11-13'
+    },
+    {
+      username: 'cho_priority_bdg',
+      name: 'CHO Priority Bandung',
+      site: 'CHO Priority Bandung',
+      role: 'Inputer',
+      password: 'koncho123',
+      createdAt: '2026-11-13'
+    },
+    // Facilitator Accounts
+    {
+      username: 'galih',
+      name: 'Galih',
+      role: 'Facilitator',
+      password: 'koncho123',
+      createdAt: '2026-11-13'
+    },
+    {
+      username: 'reza',
+      name: 'Reza',
+      role: 'Facilitator',
+      password: 'koncho123',
+      createdAt: '2026-11-13'
+    },
+    {
+      username: 'ajun',
+      name: 'Ajun',
+      role: 'Facilitator',
+      password: 'koncho123',
+      createdAt: '2026-11-13'
+    },
+    {
+      username: 'yurina',
+      name: 'Yurina',
+      role: 'Facilitator',
+      password: 'koncho123',
+      createdAt: '2026-11-13'
+    },
+    {
+      username: 'kenny',
+      name: 'Kenny',
+      role: 'Facilitator',
+      password: 'koncho123',
+      createdAt: '2026-11-13'
     }
   ];
+
+  // =========================================================================
+  // ALUR FLAGGING ROLE FASILITATOR BERDASARKAN SITE REQUESTOR
+  // =========================================================================
+  var DEFAULT_FACILITATOR_ROUTING = [
+    { site: 'CHO Fixed CC Bandung', unit: 'CHO Fixed', serviceType: 'FIXED', facilitator: 'Galih' },
+    { site: 'CHO Fixed CC Semarang', unit: 'CHO Fixed', serviceType: 'FIXED', facilitator: 'Reza' },
+    { site: 'CHO Mobile CC Bandung', unit: 'CHO Mobile', serviceType: 'MOBILE', facilitator: 'Galih' },
+    { site: 'CHO Mobile CC Semarang', unit: 'CHO Mobile', serviceType: 'MOBILE', facilitator: 'Reza' },
+    { site: 'CHO E Care', unit: 'CHO eCare', serviceType: 'ECARE', facilitator: 'Ajun' },
+    { site: 'CHO Priority Semarang', unit: 'CHO Priority', serviceType: 'PRIORITY', facilitator: 'Yurina' },
+    { site: 'CHO Priority Bandung', unit: 'CHO Priority', serviceType: 'PRIORITY', facilitator: 'Kenny' }
+  ];
+
+  function getStoredFacilitatorRouting() {
+    try {
+      var saved = localStorage.getItem('koncho_facilitator_routing');
+      if (saved) {
+        var parsed = JSON.parse(saved);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch (e) {}
+    return DEFAULT_FACILITATOR_ROUTING.map(function(r) { return Object.assign({}, r); });
+  }
+
+  function saveStoredFacilitatorRouting(routingList) {
+    try {
+      localStorage.setItem('koncho_facilitator_routing', JSON.stringify(routingList));
+    } catch (e) {}
+    state.facilitatorRouting = routingList;
+  }
+
+  function getFacilitatorForRequestor(requestorName, routingList) {
+    var list = routingList || state.facilitatorRouting || getStoredFacilitatorRouting();
+    var req = String(requestorName || '').toLowerCase().trim();
+    if (!req) return 'Galih';
+
+    for (var i = 0; i < list.length; i++) {
+      var entry = list[i];
+      var siteNorm = String(entry.site || '').toLowerCase().trim();
+      if (siteNorm === req || req.indexOf(siteNorm) >= 0 || siteNorm.indexOf(req) >= 0) {
+        return entry.facilitator;
+      }
+    }
+
+    if (req.includes('fixed') && req.includes('bandung')) return 'Galih';
+    if (req.includes('fixed') && req.includes('semarang')) return 'Reza';
+    if (req.includes('mobile') && req.includes('bandung')) return 'Galih';
+    if (req.includes('mobile') && req.includes('semarang')) return 'Reza';
+    if (req.includes('ecare') || req.includes('e care') || req.includes('e-care')) return 'Ajun';
+    if (req.includes('priority') && req.includes('semarang')) return 'Yurina';
+    if (req.includes('priority') && req.includes('bandung')) return 'Kenny';
+
+    return 'Galih';
+  }
+
+  function getUrgencyBadgeHtml(urgency) {
+    var u = String(urgency || 'Middle').trim().toLowerCase();
+    if (u === 'high' || u === 'tinggi') {
+      return '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-extrabold badge-urgency-high" title="Tingkat Urgensi: High"><span class="w-1.5 h-1.5 rounded-full bg-rose-600"></span>High</span>';
+    }
+    if (u === 'low' || u === 'rendah') {
+      return '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-extrabold badge-urgency-low" title="Tingkat Urgensi: Low"><span class="w-1.5 h-1.5 rounded-full bg-emerald-600"></span>Low</span>';
+    }
+    return '<span class="inline-flex items-center gap-1 px-2 py-0.5 rounded text-[10px] font-extrabold badge-urgency-middle" title="Tingkat Urgensi: Middle"><span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>Middle</span>';
+  }
+
+  function renderRoutingTable() {
+    var tbody = dom.routingTableBody || document.getElementById('routingTableBody');
+    if (!tbody) return;
+
+    var routing = state.facilitatorRouting || getStoredFacilitatorRouting();
+    var facilitators = ['Galih', 'Reza', 'Ajun', 'Yurina', 'Kenny'];
+    
+    var accounts = getStoredUserAccounts();
+    accounts.forEach(function(acc) {
+      if (acc.role === 'Facilitator' && acc.name && facilitators.indexOf(acc.name) === -1) {
+        facilitators.push(acc.name);
+      }
+    });
+
+    tbody.innerHTML = routing.map(function(item, idx) {
+      var optionsHtml = facilitators.map(function(fac) {
+        var isSelected = (item.facilitator && item.facilitator.toLowerCase() === fac.toLowerCase()) ? 'selected' : '';
+        return '<option value="' + escapeHtml(fac) + '" ' + isSelected + '>' + escapeHtml(fac) + '</option>';
+      }).join('');
+
+      var uMeta = getUnitMeta(item.serviceType || item.unit);
+      var unitBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold ' + uMeta.badgeClass + '">' + escapeHtml(item.unit || uMeta.label) + '</span>';
+
+      return '<tr>' +
+        '<td style="text-align:center; font-weight:700; color:#64748b;">' + (idx + 1) + '</td>' +
+        '<td><strong class="text-slate-800">' + escapeHtml(item.site) + '</strong></td>' +
+        '<td>' + unitBadge + '</td>' +
+        '<td>' +
+        '  <select class="routing-select" data-site-index="' + idx + '">' +
+             optionsHtml +
+        '  </select>' +
+        '</td>' +
+        '</tr>';
+    }).join('');
+  }
+
+  function handleSaveRouting() {
+    var tbody = dom.routingTableBody || document.getElementById('routingTableBody');
+    if (!tbody) return;
+
+    var selects = tbody.querySelectorAll('.routing-select');
+    var currentRouting = state.facilitatorRouting || getStoredFacilitatorRouting();
+    var updatedRouting = [];
+
+    selects.forEach(function(sel, idx) {
+      var item = currentRouting[idx] ? Object.assign({}, currentRouting[idx]) : {};
+      item.facilitator = sel.value;
+      updatedRouting.push(item);
+    });
+
+    saveStoredFacilitatorRouting(updatedRouting);
+
+    if (state.isGasEnvironment) {
+      google.script.run
+        .withSuccessHandler(function(res) {
+          showToast('Alur routing fasilitator berhasil disimpan ke server!', 'success');
+        })
+        .saveFacilitatorRoutingGas(updatedRouting);
+    } else if (state.gasApiUrl) {
+      try {
+        fetch(state.gasApiUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'saveFacilitatorRouting', routing: updatedRouting })
+        });
+      } catch(e) {}
+    }
+
+    showToast('Alur Flagging Fasilitator berhasil diperbarui dan disimpan!', 'success');
+  }
+
+  function handleResetRoutingDefault() {
+    var resetList = DEFAULT_FACILITATOR_ROUTING.map(function(r) { return Object.assign({}, r); });
+    saveStoredFacilitatorRouting(resetList);
+    renderRoutingTable();
+    showToast('Alur routing dikembalikan ke standar awal.', 'info');
+  }
+
+  function switchMgmtTab(tab) {
+    var btnUsers = dom.tabBtnUsers || document.getElementById('tabBtnUsers');
+    var btnRouting = dom.tabBtnRouting || document.getElementById('tabBtnRouting');
+    var contentUsers = dom.tabContentUsers || document.getElementById('tabContentUsers');
+    var contentRouting = dom.tabContentRouting || document.getElementById('tabContentRouting');
+
+    if (tab === 'routing') {
+      if (btnUsers) btnUsers.classList.remove('active');
+      if (btnRouting) btnRouting.classList.add('active');
+      if (contentUsers) contentUsers.style.display = 'none';
+      if (contentRouting) contentRouting.style.display = 'block';
+      renderRoutingTable();
+    } else {
+      if (btnUsers) btnUsers.classList.add('active');
+      if (btnRouting) btnRouting.classList.remove('active');
+      if (contentUsers) contentUsers.style.display = 'block';
+      if (contentRouting) contentRouting.style.display = 'none';
+    }
+  }
 
   // Auto-clean akun demo viewer_koncho agar tidak pernah muncul lagi
   (function ensureViewerDemoRemoved() {
@@ -349,6 +623,8 @@
       return;
     }
     renderUserMgmtList();
+    renderRoutingTable();
+    switchMgmtTab('users');
     hideUserForm();
     var modal = document.getElementById('modalManageUsers');
     if (modal) modal.classList.add('active');
@@ -2001,6 +2277,9 @@
       enrichTicketWithLogs(ticket, state.logs);
     });
 
+    if (data.facilitatorRouting && Array.isArray(data.facilitatorRouting) && data.facilitatorRouting.length > 0) {
+      saveStoredFacilitatorRouting(data.facilitatorRouting);
+    }
     state.records = all;
 
     // Urutkan tiket: yang terbaru di atas
@@ -3225,9 +3504,9 @@
   function handlePptFileSelect(file) {
     if (!file) return;
     var ext = file.name.split('.').pop().toLowerCase();
-    var allowed = ['ppt', 'pptx', 'pdf'];
+    var allowed = ['pdf'];
     if (allowed.indexOf(ext) < 0) {
-      showToast('Format file tidak didukung! Harap pilih file PowerPoint (.ppt, .pptx) atau PDF.', 'error');
+      showToast('Format file tidak didukung! Format khusus dokumen PDF (.pdf).', 'error');
       return;
     }
     if (file.size > 26214400) { // 25MB
@@ -4021,9 +4300,20 @@
       }
     }
 
-    // Kosongkan form inputan agar data sebelumnya tidak terbaca
+    // Kosongkan form inputan dan kunci Requestor sesuai user login
     if (dom.inputCaseIssue) dom.inputCaseIssue.value = '';
-    if (dom.inputRequestor) dom.inputRequestor.value = '';
+    if (dom.inputRequestor) {
+      var loggedInUser = state.authUser;
+      var lockedReq = (loggedInUser && (loggedInUser.site || loggedInUser.name || loggedInUser.username)) 
+        ? (loggedInUser.site || loggedInUser.name || loggedInUser.username) 
+        : 'Administrator Utama';
+      dom.inputRequestor.value = lockedReq;
+      dom.inputRequestor.readOnly = true;
+      dom.inputRequestor.classList.add('input-locked');
+    }
+    if (dom.inputUrgency) {
+      dom.inputUrgency.value = 'Middle';
+    }
     if (dom.inputProgress) dom.inputProgress.value = '';
     if (dom.inputDetailKendala) dom.inputDetailKendala.value = '';
     if (dom.inputNeedSupport) dom.inputNeedSupport.value = '';
@@ -4043,7 +4333,10 @@
     var datePill = document.getElementById('newModalDatePill');
     if (datePill) datePill.style.display = 'none';
     if (dom.inputCaseIssue) dom.inputCaseIssue.value = '';
-    if (dom.inputRequestor) dom.inputRequestor.value = '';
+    if (dom.inputRequestor) {
+      var loggedInUser = state.authUser;
+      dom.inputRequestor.value = (loggedInUser && (loggedInUser.site || loggedInUser.name || loggedInUser.username)) ? (loggedInUser.site || loggedInUser.name || loggedInUser.username) : 'Administrator Utama';
+    }
     if (dom.inputProgress) dom.inputProgress.value = '';
     if (dom.inputDetailKendala) dom.inputDetailKendala.value = '';
     if (dom.inputNeedSupport) dom.inputNeedSupport.value = '';
@@ -4134,6 +4427,17 @@
       bulan = CAL_MONTHS_ID[pickedParts.monthIndex] + ' ' + pickedParts.year;
     }
 
+    // Validasi upload format khusus PDF jika user memilih file
+    if (dom.newCasePptFile && dom.newCasePptFile.files && dom.newCasePptFile.files.length > 0) {
+      var fileExt = dom.newCasePptFile.files[0].name.split('.').pop().toLowerCase();
+      if (fileExt !== 'pdf') {
+        showToast('Format file lampiran harus PDF (.pdf)!', 'error');
+        return;
+      }
+    }
+
+    var urgency = (dom.inputUrgency ? dom.inputUrgency.value : 'Middle') || 'Middle';
+    var assignedFacilitator = getFacilitatorForRequestor(req);
     var currentInputUser = getCurrentLoggedInUserName();
     var targetSheetName = selectedNewService === 'MOBILE' ? 'Mobile' : (selectedNewService === 'ECARE' ? 'eCare' : (selectedNewService === 'PRIORITY' ? 'Priority' : 'Fixed'));
     var targetUnitLabel = selectedNewService === 'MOBILE' ? 'CHO Mobile' : (selectedNewService === 'ECARE' ? 'CHO eCare' : (selectedNewService === 'PRIORITY' ? 'CHO Priority' : 'CHO Fixed'));
@@ -4147,6 +4451,8 @@
       requestor: req,
       inputBy: currentInputUser,
       status: st,
+      urgency: urgency,
+      picFacilitator: assignedFacilitator,
       progressQuickWin: progressQW,
       progress: progressQW,
       detail: detail,
@@ -4219,6 +4525,8 @@
           requestor: req,
           inputBy: currentInputUser,
           status: st,
+          urgency: urgency,
+          picFacilitator: assignedFacilitator,
           followUpTo: follow,
           tanggal: targetIsoDate,
           nama: nama,
@@ -4254,8 +4562,13 @@
       dom.inputBulanTahun.value = state.activeMonthFilter !== 'all' ? state.activeMonthFilter : 'Oktober 2026';
     }
     dom.inputCaseIssue.value = '';
-    dom.inputRequestor.value = '';
+    if (dom.inputRequestor) {
+      var loggedInUser = state.authUser;
+      dom.inputRequestor.value = (loggedInUser && (loggedInUser.site || loggedInUser.name || loggedInUser.username)) ? (loggedInUser.site || loggedInUser.name || loggedInUser.username) : 'Administrator Utama';
+      dom.inputRequestor.readOnly = true;
+    }
     dom.inputStatus.value = 'Open';
+    if (dom.inputUrgency) dom.inputUrgency.value = 'Middle';
     if (dom.inputProgressQuickWin) dom.inputProgressQuickWin.value = '';
     if (dom.inputDetail) dom.inputDetail.value = '';
     if (dom.inputNeedSupport) dom.inputNeedSupport.value = '';
@@ -4684,8 +4997,7 @@
         const unitKey = rec.serviceType === 'FIXED' ? 'fixed' : (rec.serviceType === 'ECARE' ? 'ecare' : (rec.serviceType === 'PRIORITY' ? 'priority' : 'mobile'));
         const titleText = rec.totalCaseIsu || 'Isu CHO';
         const alreadyListed = items[recDay].some(it =>
-          (it.ticketId && String(it.ticketId) === String(rec.id)) ||
-          (it.text && it.text.toLowerCase().includes(titleText.slice(0, 14).toLowerCase()))
+          it.ticketId && String(it.ticketId) === String(rec.id)
         );
 
         if (!alreadyListed) {
@@ -4697,6 +5009,8 @@
             urgent: statusKey === 'open',
             ticketId: rec.id,
             serviceType: rec.serviceType || 'MOBILE',
+            urgency: rec.urgency || 'Middle',
+            picFacilitator: rec.picFacilitator || getFacilitatorForRequestor(rec.requestor),
             record: rec
           });
         }
@@ -5149,12 +5463,7 @@
       dayItems = dayItems.filter(it => normalizeUnitKey(it.unit) === 'ALL' || normalizeUnitKey(it.unit) === activeCalUnit);
     }
 
-    if (calData.details && calData.details[day]) {
-      const d = calData.details[day];
-      agendas = d.agendas ? [...d.agendas] : [];
-      issues = d.issues ? [...d.issues] : [];
-      quickwins = d.quickwins ? [...d.quickwins] : [];
-    } else if (dayItems.length > 0) {
+    if (dayItems.length > 0) {
       dayItems.forEach(it => {
         const uMeta = getUnitMeta(it.serviceType || it.unit);
         if (it.type === 'meeting') {
@@ -5177,7 +5486,7 @@
           });
         } else {
           const rec = it.record || {};
-          const st = (rec.status || it.statusNorm || (it.urgent ? 'Open' : 'InProgress')).toLowerCase().replace(/\s+/g, '');
+          const st = (rec.status || it.statusNorm || (it.urgent ? 'Open' : 'InProgress')).toLowerCase().replace(/s+/g, '');
           const sm = getCalendarStatusMeta(st);
           issues.push({
             badge: sm.key === 'closed' ? 'CLOSED' : (sm.key === 'inprogress' ? 'IN PROGRESS' : 'OPEN'),
@@ -5187,6 +5496,9 @@
             ticket: it.ticketId ? '#' + it.ticketId : '#CHO-' + day,
             title: rec.issueDetails || rec.detail || it.text,
             pic: rec.pic || rec.requestor || 'Tim CHO',
+            requestor: rec.requestor || rec.pic || 'Tim CHO',
+            urgency: rec.urgency || it.urgency || 'Middle',
+            picFacilitator: rec.picFacilitator || it.picFacilitator || getFacilitatorForRequestor(rec.requestor),
             statusNorm: sm.key,
             actionText: 'Detail Isu',
             actionClass: sm.key === 'closed' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : (sm.key === 'inprogress' ? 'bg-orange-50 text-orange-700 border-orange-200' : 'bg-rose-50 text-rose-700 border-rose-200'),
@@ -5195,6 +5507,11 @@
           });
         }
       });
+    } else if (calData.details && calData.details[day]) {
+      const d = calData.details[day];
+      agendas = d.agendas ? [...d.agendas] : [];
+      issues = d.issues ? [...d.issues] : [];
+      quickwins = d.quickwins ? [...d.quickwins] : [];
     }
 
     const titleEl = document.getElementById('panel-selected-date');
@@ -5272,14 +5589,19 @@
             ? 'bg-gradient-to-br from-emerald-50/90 to-white border-emerald-200'
             : (stNorm === 'inprogress' ? 'bg-gradient-to-br from-orange-50/90 to-white border-orange-200' : 'bg-gradient-to-br from-rose-50/90 to-white border-rose-200');
 
+          const urg = (liveRec && liveRec.urgency) || iss.urgency || 'Middle';
+          const urgBadge = getUrgencyBadgeHtml(urg);
+          const facName = (liveRec && liveRec.picFacilitator) || iss.picFacilitator || getFacilitatorForRequestor((liveRec && (liveRec.requestor || liveRec.pic)) || iss.requestor || iss.pic);
+
           return '<div class="p-3 sm:p-3.5 ' + cardToneClass + ' border rounded-xl flex flex-col gap-2.5 hover:border-slate-300 shadow-xs transition-all">' +
-          '  <div class="flex items-center justify-between">' +
-          '    <span class="px-2.5 py-0.5 rounded text-[10px] font-extrabold border ' + liveSm.cardBadgeClass + '">' + liveBadgeText + '</span>' +
+          '  <div class="flex items-center justify-between flex-wrap gap-1">' +
+          '    <div class="flex items-center gap-1.5 flex-wrap"><span class="px-2.5 py-0.5 rounded text-[10px] font-extrabold border ' + liveSm.cardBadgeClass + '">' + liveBadgeText + '</span>' + urgBadge + '</div>' +
           '    <div class="flex items-center gap-1.5"><span class="px-1.5 py-0.5 rounded text-[9px] font-bold border ' + uMeta.pillClass + '">' + uMeta.label + '</span><span class="text-[10px] font-mono font-bold text-slate-700">' + iss.ticket + '</span></div>' +
           '  </div>' +
           '  <p class="text-xs font-semibold text-slate-800 leading-relaxed">' + escapeHtml(iss.title) + '</p>' +
-          '  <div class="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-200/60">' +
-          '    <span class="truncate">PIC: <strong class="text-slate-700">' + escapeHtml((liveRec && liveRec.pic) || iss.pic) + '</strong></span>' +
+          '  <div class="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-200/60 flex-wrap gap-1">' +
+          '    <span class="truncate" title="Requestor">Requestor: <strong class="text-slate-700">' + escapeHtml((liveRec && (liveRec.requestor || liveRec.pic)) || iss.pic) + '</strong></span>' +
+          '    <span class="text-blue-700 font-semibold flex items-center gap-0.5" title="Fasilitator Ditugaskan"><span class="material-symbols-outlined text-[13px]">assignment_ind</span><span>' + escapeHtml(facName) + '</span></span>' +
           '  </div>' +
           '  <div class="flex flex-wrap items-center gap-2">' + pickupBtnHtml + rescheduleBtnHtml +
           '    <button type="button" class="' + (pickupBtnHtml ? 'px-3.5 py-2.5' : 'flex-1 py-2 px-3.5') + ' rounded-xl text-xs font-bold border ' + iss.actionClass + ' hover:opacity-90 transition-opacity cursor-pointer" onclick="openDrawer(\'' + (iss.ticketId || 1) + '\', \'' + sType + '\')">' + iss.actionText + '</button>' +
@@ -5479,7 +5801,15 @@
         '</button>'
       ) : '';
 
-      return '<tr class="hover:bg-slate-50/80 transition-colors">' +
+      const taskUrgency = item.urgency || 'Middle';
+      const taskUrgencyBadge = getUrgencyBadgeHtml(taskUrgency);
+      const taskFacilitator = item.picFacilitator || getFacilitatorForRequestor(item.requestor);
+      const isMyTask = currentRole === 'Facilitator' && state.authUser && (
+        (taskFacilitator && taskFacilitator.toLowerCase().includes((state.authUser.name || '').toLowerCase())) ||
+        ((state.authUser.name || '').toLowerCase().includes((taskFacilitator || '').toLowerCase()))
+      );
+
+      return '<tr class="hover:bg-slate-50/80 transition-colors' + (isMyTask ? ' bg-blue-50/30' : '') + '">' +
         '<td class="py-3 px-4 text-center font-bold text-slate-500">' + (idx + 1) + '</td>' +
         '<td class="py-3 px-4 font-semibold text-slate-700">' + escapeHtml(item.bulan || 'Oktober 2026') + '</td>' +
         '<td class="py-3 px-4 whitespace-nowrap">' +
@@ -5505,11 +5835,15 @@
         '<td class="py-3 px-4">' +
         '  <div class="flex flex-col gap-1">' +
         '    <a href="#" class="font-bold text-slate-900 hover:text-blue-600 transition-colors leading-snug" onclick="openDrawer(\'' + item.id + '\', \'' + sType + '\'); return false;">' + escapeHtml(mainIssueText) + '</a>' +
-        '    <div class="flex items-center gap-2 mt-0.5">' +
+        '    <div class="flex items-center gap-2 mt-0.5 flex-wrap">' +
         '      <button type="button" class="text-[11px] font-semibold text-blue-600 hover:underline flex items-center gap-0.5" onclick="jumpToCalendarDate(\'' + escapeHtml(rawAgendaDate) + '\', \'' + item.id + '\')">' +
         '        <span>Buka Calendar</span><span class="material-symbols-outlined text-[13px]">arrow_forward</span>' +
         '      </button>' +
         '      <span class="text-slate-300">&bull;</span><span class="text-[10px] text-slate-400 font-mono">#CHO-' + item.id + '</span>' +
+        '      <span class="text-slate-300">&bull;</span>' +
+        '      ' + taskUrgencyBadge +
+        '      <span class="inline-flex items-center gap-1 text-[10.5px] font-semibold text-slate-600"><span class="material-symbols-outlined text-[12px] text-blue-600">assignment_ind</span><span>Fasilitator: <strong class="text-slate-800">' + escapeHtml(taskFacilitator) + '</strong></span></span>' +
+        (isMyTask ? '<span class="px-1.5 py-0.5 rounded text-[9.5px] font-extrabold bg-blue-100 text-blue-800 border border-blue-200">⭐ Kasus Saya</span>' : '') +
         '    </div>' +
         '  </div>' +
         '</td>' +
@@ -5903,6 +6237,30 @@
     const calDrawerBackdrop = document.getElementById('calendar-drawer-backdrop');
     if (btnCloseCalDrawer) btnCloseCalDrawer.addEventListener('click', closeCalendarDayDrawer);
     if (calDrawerBackdrop) calDrawerBackdrop.addEventListener('click', closeCalendarDayDrawer);
+
+    // Tombol + Input Kasus Baru di Tanggal Ini pada Calendar Day Drawer
+    var btnAddSameDay = document.getElementById('btn-drawer-add-case-same-day');
+    if (btnAddSameDay) {
+      btnAddSameDay.addEventListener('click', function() {
+        if (state.authUser && (state.authUser.role === 'Facilitator' || state.authUser.role === 'Viewer')) {
+          showToast('Akses ditolak: Peran ' + state.authUser.role + ' tidak berwenang menginput data kasus baru.', 'error');
+          return;
+        }
+        openNewModal({ year: state.selectedYear, monthIndex: state.selectedMonthIndex, day: state.selectedDate });
+      });
+    }
+
+    // Tab Switcher pada Kelola Pengguna (Akun Pengguna vs Alur Routing Fasilitator)
+    var tabBtnUsers = document.getElementById('tabBtnUsers');
+    var tabBtnRouting = document.getElementById('tabBtnRouting');
+    if (tabBtnUsers) tabBtnUsers.addEventListener('click', function() { switchMgmtTab('users'); });
+    if (tabBtnRouting) tabBtnRouting.addEventListener('click', function() { switchMgmtTab('routing'); });
+
+    var btnSaveRouting = document.getElementById('btnSaveRouting');
+    if (btnSaveRouting) btnSaveRouting.addEventListener('click', handleSaveRouting);
+
+    var btnResetRouting = document.getElementById('btnResetRoutingDefault');
+    if (btnResetRouting) btnResetRouting.addEventListener('click', handleResetRoutingDefault);
 
     // Modern Month & Year Popover Picker Events
     const btnMonthTrigger = document.getElementById('btn-month-year-trigger');
