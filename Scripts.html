@@ -343,6 +343,7 @@
     {
       username: 'galih',
       name: 'Galih',
+      site: 'CHO Fixed CC Bandung',
       role: 'Facilitator',
       password: 'koncho123',
       createdAt: '2026-11-13'
@@ -350,6 +351,7 @@
     {
       username: 'reza',
       name: 'Reza',
+      site: 'CHO Fixed CC Semarang',
       role: 'Facilitator',
       password: 'koncho123',
       createdAt: '2026-11-13'
@@ -357,6 +359,7 @@
     {
       username: 'ajun',
       name: 'Ajun',
+      site: 'CHO E Care',
       role: 'Facilitator',
       password: 'koncho123',
       createdAt: '2026-11-13'
@@ -364,6 +367,7 @@
     {
       username: 'yurina',
       name: 'Yurina',
+      site: 'CHO Priority Semarang',
       role: 'Facilitator',
       password: 'koncho123',
       createdAt: '2026-11-13'
@@ -371,6 +375,7 @@
     {
       username: 'kenny',
       name: 'Kenny',
+      site: 'CHO Priority Bandung',
       role: 'Facilitator',
       password: 'koncho123',
       createdAt: '2026-11-13'
@@ -707,11 +712,11 @@
       html += '  </td>';
       html += '  <td><strong>' + escapeHtml(u.name || '-') + '</strong></td>';
       var siteBadge = '';
-      if (u.role === 'Inputer') {
-        var siteName = u.site || (u.name && u.name.indexOf('CHO') >= 0 ? u.name : '');
-        if (siteName) {
-          siteBadge = '<div class="user-site-tag"><span style="width:5px; height:5px; border-radius:50%; background:#0284c7; flex-shrink:0;"></span>' + escapeHtml(siteName) + '</div>';
-        }
+      var siteName = u.site || (u.name && u.name.indexOf('CHO') >= 0 ? u.name : '');
+      if (siteName && siteName !== 'Semua Unit') {
+        siteBadge = '<div class="user-site-tag"><span style="width:5px; height:5px; border-radius:50%; background:#0284c7; flex-shrink:0;"></span>' + escapeHtml(siteName) + '</div>';
+      } else if (u.role === 'Administrator' || siteName === 'Semua Unit') {
+        siteBadge = '<div class="user-site-tag" style="background:#f1f5f9; color:#475569; border-color:#e2e8f0;"><span style="width:5px; height:5px; border-radius:50%; background:#64748b; flex-shrink:0;"></span>Semua Unit</div>';
       }
       html += '  <td><div style="display:flex; flex-direction:column; align-items:flex-start; gap:2px;"><span class="badge-role ' + roleBadgeClass + '">' + roleIcon + ' ' + escapeHtml(u.role) + '</span>' + siteBadge + '</div></td>';
       html += '  <td><code style="background:var(--bg-elevated); padding:3px 8px; border-radius:6px; font-size:12px; color:var(--text-primary); border:1px solid var(--border-color);">' + escapeHtml(u.password || '••••••••') + '</code></td>';
@@ -740,20 +745,21 @@
   function updateRoleDescHint() {
     var roleInp = document.getElementById('inpUserRole');
     var roleDescHint = document.getElementById('roleDescHint');
-    var grpUserSite = document.getElementById('grpUserSite');
+    var siteDescHint = document.getElementById('siteDescHint');
     if (!roleInp || !roleDescHint) return;
     var val = roleInp.value;
-    if (grpUserSite) {
-      grpUserSite.style.display = (val === 'Inputer') ? 'block' : 'none';
-    }
     if (val === 'Administrator') {
       roleDescHint.textContent = 'Administrator memiliki akses penuh ke seluruh sistem dan menu kelola user.';
+      if (siteDescHint) siteDescHint.textContent = 'Pilih "Semua Unit" atau unit spesifik penanggung jawab.';
     } else if (val === 'Facilitator') {
       roleDescHint.textContent = 'Facilitator berwenang mengubah status kasus (In Progress, Closed, Reopen) dan menambah catatan log.';
+      if (siteDescHint) siteDescHint.textContent = 'Site / Unit utama yang ditangani oleh fasilitator ini.';
     } else if (val === 'Inputer') {
       roleDescHint.textContent = 'Inputer berwenang menginput kasus baru sesuai Site asal yang dipilih.';
+      if (siteDescHint) siteDescHint.textContent = 'Menentukan alur otomatis flagging kasus ke Fasilitator penanggung jawab saat input kasus.';
     } else if (val === 'Viewer') {
       roleDescHint.textContent = 'Viewer hanya dapat memantau dan membaca seluruh data kasus tanpa hak input maupun edit (Read-Only).';
+      if (siteDescHint) siteDescHint.textContent = 'Unit atau site yang dipantau (atau Semua Unit).';
     }
   }
 
@@ -780,7 +786,7 @@
     }
     if (nameInp) nameInp.value = '';
     if (roleInp) roleInp.value = 'Facilitator';
-    if (siteInp) siteInp.value = 'CHO Fixed CC Bandung';
+    if (siteInp) siteInp.value = 'CHO Fixed CC Semarang';
     updateRoleDescHint();
     if (passInp) {
       passInp.value = ''; // Jangan default koncho123, diisi manual oleh user
@@ -840,7 +846,7 @@
     }
     if (nameInp) nameInp.value = found.name || '';
     if (roleInp) roleInp.value = found.role || 'Facilitator';
-    if (siteInp) siteInp.value = found.site || (found.name && found.name.indexOf('CHO') >= 0 ? found.name : 'CHO Fixed CC Bandung');
+    if (siteInp) siteInp.value = found.site || (found.name && found.name.indexOf('CHO') >= 0 ? found.name : 'CHO Fixed CC Semarang');
     updateRoleDescHint();
     if (passInp) {
       passInp.value = found.password || ''; // Tampilkan kata sandi saat ini & dapat diedit manual
@@ -861,7 +867,7 @@
     var name = (document.getElementById('inpUserFullName') ? document.getElementById('inpUserFullName').value : '').trim();
     var role = (document.getElementById('inpUserRole') ? document.getElementById('inpUserRole').value : 'Facilitator').trim();
     var siteInp = document.getElementById('inpUserSite');
-    var site = (role === 'Inputer' && siteInp) ? siteInp.value : '';
+    var site = siteInp ? siteInp.value : 'CHO Fixed CC Semarang';
     var password = (document.getElementById('inpUserPassword') ? document.getElementById('inpUserPassword').value : '').trim();
 
     if (!username) {
@@ -5888,7 +5894,8 @@
       const taskFacilitator = item.picFacilitator || getFacilitatorForRequestor(item.requestor);
       const isMyTask = currentRole === 'Facilitator' && state.authUser && (
         (taskFacilitator && taskFacilitator.toLowerCase().includes((state.authUser.name || '').toLowerCase())) ||
-        ((state.authUser.name || '').toLowerCase().includes((taskFacilitator || '').toLowerCase()))
+        ((state.authUser.name || '').toLowerCase().includes((taskFacilitator || '').toLowerCase())) ||
+        (state.authUser.site && state.authUser.site !== 'Semua Unit' && item.requestor && item.requestor.toLowerCase().includes(state.authUser.site.toLowerCase()))
       );
 
       return '<tr class="hover:bg-slate-50/80 transition-colors' + (isMyTask ? ' bg-blue-50/30' : '') + '">' +
