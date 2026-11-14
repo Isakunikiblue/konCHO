@@ -8,6 +8,18 @@ Thumbs.db
 .user_uploaded/
 scratch/
 
+# Laravel
+/node_modules
+/public/build
+/public/hot
+/public/storage
+/storage/*.key
+/storage/pail
+/vendor
+.env
+.env.backup
+.env.production
+.phpunit.result.cache
+
 # Vercel
 .vercel
-

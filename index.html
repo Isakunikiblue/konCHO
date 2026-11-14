@@ -19,48 +19,61 @@
   :root {
     --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 
-    /* Theme: Dark (Default) */
-    --bg-app: #0b0f19;
-    --bg-card: #151d2f;
-    --bg-card-hover: #1c263c;
-    --bg-elevated: #1e293f;
-    --bg-input: #0f172a;
-    --border-color: #27354f;
-    --border-subtle: #1c263a;
+    /* =========================================================================
+       MODERN NAVY THEME (DARK / MIDNIGHT CANVAS - DEFAULT)
+       ========================================================================= */
+    --bg-app: #060e24; /* Deep Corporate Midnight Navy Canvas */
+    --bg-card: #0b1a3d; /* Sleek Deep Navy Card Container */
+    --bg-card-hover: #102454; /* Navy Hover State */
+    --bg-elevated: #0f224f; /* Elevated Navy Surface */
+    --bg-input: #081432; /* Deep Navy Form Inputs */
+    --border-color: #1a3264; /* Refined Navy Border */
+    --border-subtle: #12244c;
 
     --text-primary: #f8fafc;
     --text-secondary: #94a3b8;
     --text-muted: #64748b;
 
-    --primary-color: #6366f1;
-    --primary-hover: #4f46e5;
-    --primary-light: rgba(99, 102, 241, 0.16);
+    --primary-color: #0284c7; /* Electric Cyan-Sky Blue */
+    --primary-hover: #0369a1;
+    --primary-light: rgba(2, 132, 199, 0.16);
+    --primary-navy: #061345; /* Telkom Signature Deep Navy */
+    --primary-navy-accent: #1e3a8a; /* Royal Navy Accent */
 
-    /* Service Colors */
-    --mobile-color: #c084fc;
-    --mobile-bg: rgba(192, 132, 252, 0.16);
-    --mobile-border: rgba(192, 132, 252, 0.35);
+    /* Service Colors - Modern Vibrant Palette */
+    --mobile-color: #818cf8; /* Modern Violet-Navy */
+    --mobile-bg: rgba(129, 140, 248, 0.16);
+    --mobile-border: rgba(129, 140, 248, 0.35);
 
-    --fixed-color: #38bdf8;
+    --fixed-color: #38bdf8; /* Electric Cyan-Blue */
     --fixed-bg: rgba(56, 189, 248, 0.16);
     --fixed-border: rgba(56, 189, 248, 0.35);
+
+    --ecare-color: #2dd4bf; /* Teal-Mint */
+    --ecare-bg: rgba(45, 212, 191, 0.16);
+    --ecare-border: rgba(45, 212, 191, 0.35);
+
+    --priority-color: #fbbf24; /* Radiant Gold-Amber */
+    --priority-bg: rgba(251, 191, 36, 0.16);
+    --priority-border: rgba(251, 191, 36, 0.35);
 
     /* Status Colors */
     --status-open-color: #fbbf24;
     --status-open-bg: rgba(251, 191, 36, 0.14);
     --status-open-border: rgba(251, 191, 36, 0.35);
 
-    --status-prog-color: #60a5fa;
-    --status-prog-bg: rgba(96, 165, 250, 0.14);
-    --status-prog-border: rgba(96, 165, 250, 0.35);
+    --status-prog-color: #38bdf8;
+    --status-prog-bg: rgba(56, 189, 248, 0.14);
+    --status-prog-border: rgba(56, 189, 248, 0.35);
 
     --status-closed-color: #34d399;
     --status-closed-bg: rgba(52, 211, 153, 0.14);
     --status-closed-border: rgba(52, 211, 153, 0.35);
 
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.35), 0 2px 4px -2px rgba(0, 0, 0, 0.25);
-    --shadow-lg: 0 10px 20px -3px rgba(0, 0, 0, 0.5), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
+    --shadow-sm: 0 2px 4px 0 rgba(4, 10, 28, 0.4);
+    --shadow-md: 0 6px 14px -2px rgba(4, 10, 28, 0.5), 0 3px 6px -2px rgba(4, 10, 28, 0.3);
+    --shadow-lg: 0 16px 32px -4px rgba(4, 10, 28, 0.65), 0 8px 12px -3px rgba(4, 10, 28, 0.4);
+    --shadow-navy-glow: 0 0 20px rgba(56, 189, 248, 0.18);
 
     --radius-sm: 6px;
     --radius-md: 10px;
@@ -69,47 +82,60 @@
     --transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
   }
 
-  /* Light Theme */
+  /* =========================================================================
+     MODERN NAVY THEME (LIGHT - CRISP COOL SLATE NAVY)
+     ========================================================================= */
   [data-theme="light"] {
-    --bg-app: #f1f5f9;
-    --bg-card: #ffffff;
-    --bg-card-hover: #f8fafc;
-    --bg-elevated: #f1f5f9;
+    --bg-app: #f0f4f9; /* Slate Ice / Crisp Soft Navy Canvas */
+    --bg-card: #ffffff; /* Crisp Card */
+    --bg-card-hover: #f5f8fc;
+    --bg-elevated: #e6eef8;
     --bg-input: #ffffff;
-    --border-color: #e2e8f0;
-    --border-subtle: #cbd5e1;
+    --border-color: #cfddec; /* Clean cool navy border */
+    --border-subtle: #e2eaf4;
 
-    --text-primary: #0f172a;
-    --text-secondary: #475569;
-    --text-muted: #94a3b8;
+    --text-primary: #07153b; /* Deep Navy Primary Text */
+    --text-secondary: #334e77; /* Cool Navy Slate Text */
+    --text-muted: #627d98;
 
-    --primary-color: #4f46e5;
-    --primary-hover: #4338ca;
-    --primary-light: rgba(79, 70, 229, 0.12);
+    --primary-color: #0c4a9e; /* Elegant Telkom Navy Blue */
+    --primary-hover: #072f6b;
+    --primary-light: rgba(12, 74, 158, 0.12);
+    --primary-navy: #061345;
+    --primary-navy-accent: #1e3a8a;
 
-    --mobile-color: #9333ea;
-    --mobile-bg: rgba(147, 51, 234, 0.12);
-    --mobile-border: rgba(147, 51, 234, 0.28);
+    --mobile-color: #7c3aed;
+    --mobile-bg: rgba(124, 58, 237, 0.12);
+    --mobile-border: rgba(124, 58, 237, 0.28);
 
     --fixed-color: #0284c7;
     --fixed-bg: rgba(2, 132, 199, 0.12);
     --fixed-border: rgba(2, 132, 199, 0.28);
 
-    --status-open-color: #d97706;
-    --status-open-bg: rgba(217, 119, 6, 0.12);
-    --status-open-border: rgba(217, 119, 6, 0.28);
+    --ecare-color: #0d9488;
+    --ecare-bg: rgba(13, 148, 136, 0.12);
+    --ecare-border: rgba(13, 148, 136, 0.28);
 
-    --status-prog-color: #2563eb;
-    --status-prog-bg: rgba(37, 99, 235, 0.12);
-    --status-prog-border: rgba(37, 99, 235, 0.28);
+    --priority-color: #d97706;
+    --priority-bg: rgba(217, 119, 6, 0.12);
+    --priority-border: rgba(217, 119, 6, 0.28);
 
-    --status-closed-color: #059669;
-    --status-closed-bg: rgba(5, 150, 105, 0.12);
-    --status-closed-border: rgba(5, 150, 105, 0.28);
+    --status-open-color: #b45309;
+    --status-open-bg: rgba(180, 83, 9, 0.12);
+    --status-open-border: rgba(180, 83, 9, 0.28);
 
-    --shadow-sm: 0 1px 3px 0 rgba(0, 0, 0, 0.08);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.08);
-    --shadow-lg: 0 10px 20px -3px rgba(0, 0, 0, 0.12);
+    --status-prog-color: #1d4ed8;
+    --status-prog-bg: rgba(29, 78, 216, 0.12);
+    --status-prog-border: rgba(29, 78, 216, 0.28);
+
+    --status-closed-color: #047857;
+    --status-closed-bg: rgba(4, 120, 87, 0.12);
+    --status-closed-border: rgba(4, 120, 87, 0.28);
+
+    --shadow-sm: 0 1px 3px 0 rgba(7, 21, 59, 0.08);
+    --shadow-md: 0 4px 12px -1px rgba(7, 21, 59, 0.09);
+    --shadow-lg: 0 14px 28px -3px rgba(7, 21, 59, 0.14);
+    --shadow-navy-glow: 0 0 15px rgba(2, 132, 199, 0.12);
   }
 
   /* Reset & Base */
@@ -4857,6 +4883,125 @@
     box-shadow: 0 0 0 3px rgba(96, 165, 250, 0.25);
   }
 
+
+
+/* =========================================================================
+   MODERN NAVY THEME VISUAL ENHANCEMENTS
+   ========================================================================= */
+
+/* Top Header Modern Navy Gradient & Border Glow */
+.app-header {
+  background: linear-gradient(135deg, #06112c 0%, #081a42 50%, #0d2766 100%) !important;
+  border-bottom: 1px solid rgba(56, 189, 248, 0.2) !important;
+  box-shadow: 0 4px 20px -2px rgba(4, 10, 28, 0.5) !important;
+}
+[data-theme="light"] .app-header {
+  background: linear-gradient(135deg, #ffffff 0%, #f0f5fc 100%) !important;
+  border-bottom: 1px solid #d4e0ee !important;
+  box-shadow: 0 4px 16px -2px rgba(6, 19, 69, 0.08) !important;
+}
+
+/* Sidebar Modern Navy Gradient & Glass Border */
+.sidebar {
+  background: linear-gradient(180deg, #050d24 0%, #071538 100%) !important;
+  border-right: 1px solid rgba(56, 189, 248, 0.15) !important;
+}
+[data-theme="light"] .sidebar {
+  background: linear-gradient(180deg, #f8fafc 0%, #edf3fa 100%) !important;
+  border-right: 1px solid #d4e0ee !important;
+}
+
+.sidebar-btn.active {
+  background: linear-gradient(135deg, rgba(2, 132, 199, 0.22) 0%, rgba(30, 58, 138, 0.35) 100%) !important;
+  border: 1px solid rgba(56, 189, 248, 0.45) !important;
+  color: #38bdf8 !important;
+  box-shadow: 0 0 16px rgba(56, 189, 248, 0.2) !important;
+}
+[data-theme="light"] .sidebar-btn.active {
+  background: linear-gradient(135deg, rgba(12, 74, 158, 0.12) 0%, rgba(2, 132, 199, 0.18) 100%) !important;
+  border: 1px solid rgba(12, 74, 158, 0.35) !important;
+  color: #0c4a9e !important;
+  box-shadow: 0 2px 8px rgba(12, 74, 158, 0.12) !important;
+}
+
+/* User Avatar & Capsule In Top Header (Initials Only, No Crown) */
+.user-avatar-initials {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 9999px;
+  background: linear-gradient(135deg, #0284c7 0%, #1e3a8a 100%);
+  color: #ffffff;
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: 0.5px;
+  border: 1px solid rgba(56, 189, 248, 0.5);
+  box-shadow: 0 0 10px rgba(56, 189, 248, 0.25);
+}
+
+/* KPI Summary Cards Navy Refinement */
+.kpi-card {
+  background: linear-gradient(145deg, rgba(11, 26, 61, 0.85) 0%, rgba(7, 18, 44, 0.95) 100%);
+  backdrop-filter: blur(14px);
+  border: 1px solid rgba(56, 189, 248, 0.18);
+  box-shadow: 0 8px 24px -4px rgba(4, 10, 28, 0.45);
+  border-radius: 16px;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+.kpi-card:hover {
+  transform: translateY(-2px);
+  border-color: rgba(56, 189, 248, 0.4);
+  box-shadow: 0 14px 30px -4px rgba(4, 10, 28, 0.55), 0 0 20px rgba(56, 189, 248, 0.15);
+}
+[data-theme="light"] .kpi-card {
+  background: linear-gradient(145deg, #ffffff 0%, #f4f8fd 100%);
+  border: 1px solid #d4e0ee;
+  box-shadow: 0 4px 16px -2px rgba(6, 19, 69, 0.06);
+}
+[data-theme="light"] .kpi-card:hover {
+  border-color: #93c5fd;
+  box-shadow: 0 10px 24px -3px rgba(6, 19, 69, 0.12);
+}
+
+/* Calendar Day Cell & Selection */
+.calendar-day.selected {
+  border: 2px solid #38bdf8 !important;
+  background: rgba(2, 132, 199, 0.15) !important;
+  box-shadow: 0 0 18px rgba(56, 189, 248, 0.25) inset !important;
+}
+
+/* Modern Input Focus Rings */
+input:focus, select:focus, textarea:focus {
+  border-color: #38bdf8 !important;
+  box-shadow: 0 0 0 3px rgba(56, 189, 248, 0.25) !important;
+  outline: none !important;
+}
+
+/* Button Primary Navy Blue */
+.btn-primary {
+  background: linear-gradient(135deg, #0284c7 0%, #1e40af 100%) !important;
+  border: 1px solid rgba(56, 189, 248, 0.35) !important;
+  box-shadow: 0 4px 12px rgba(2, 132, 199, 0.35) !important;
+  color: #ffffff !important;
+}
+.btn-primary:hover {
+  background: linear-gradient(135deg, #0369a1 0%, #1d4ed8 100%) !important;
+  box-shadow: 0 6px 18px rgba(2, 132, 199, 0.5) !important;
+}
+
+/* Modern Glass Table in Tasks */
+.tasks-table th {
+  background: #09173a !important;
+  color: #94a3b8 !important;
+  border-bottom: 1px solid #1a3264 !important;
+}
+[data-theme="light"] .tasks-table th {
+  background: #e6eef8 !important;
+  color: #334e77 !important;
+  border-bottom: 1px solid #cfddec !important;
+}
 </style>
 
 
