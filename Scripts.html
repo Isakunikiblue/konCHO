@@ -5105,19 +5105,13 @@
       });
     }
 
-    let summaryAgendas = base && base.summary ? base.summary.agendas : 0;
-    let summaryIssues = base && base.summary ? base.summary.issues : 0;
-    let summaryQuickwins = base && base.summary ? base.summary.quickwins : 0;
-
-    if (!base) {
-      Object.keys(items).forEach(d => {
-        (items[d] || []).forEach(it => {
-          if (it.type === 'meeting') summaryAgendas++;
-          else if (it.type === 'quickwin') summaryQuickwins++;
-          else summaryIssues++;
-        });
-      });
-    }
+    // Hitung total seluruh agenda & inputan kasus CHO pada bulan ini
+    let summaryAgendas = 0;
+    Object.keys(items).forEach(d => {
+      summaryAgendas += (items[d] || []).length;
+    });
+    let summaryIssues = 0;
+    let summaryQuickwins = 0;
 
     return {
       key: key,
@@ -5419,12 +5413,25 @@
     const cycleBadgeEl = document.getElementById('calendar-cycle-badge');
     if (cycleBadgeEl) cycleBadgeEl.textContent = calData.badge;
 
+    // Hitung total inputan / agenda CHO pada bulan kalender yang aktif
+    let totalMonthAgenda = 0;
+    const activeCalUnit = normalizeUnitKey(state.tasksFilterUnit);
+    if (calData && calData.items) {
+      Object.keys(calData.items).forEach(d => {
+        let dItems = calData.items[d] || [];
+        if (activeCalUnit !== 'ALL') {
+          dItems = dItems.filter(it => normalizeUnitKey(it.unit) === 'ALL' || normalizeUnitKey(it.unit) === activeCalUnit);
+        }
+        totalMonthAgenda += dItems.length;
+      });
+    }
+
     const agSumEl = document.getElementById('summary-agenda-count');
+    if (agSumEl) agSumEl.textContent = totalMonthAgenda;
     const isSumEl = document.getElementById('summary-issue-count');
     const qwSumEl = document.getElementById('summary-quickwin-count');
-    if (agSumEl) agSumEl.textContent = calData.summary.agendas;
-    if (isSumEl) isSumEl.textContent = calData.summary.issues;
-    if (qwSumEl) qwSumEl.textContent = calData.summary.quickwins;
+    if (isSumEl) isSumEl.textContent = 0;
+    if (qwSumEl) qwSumEl.textContent = 0;
 
     let html = '';
 

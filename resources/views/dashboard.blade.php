@@ -233,7 +233,7 @@
            VIEW 1: konCHO CALENDAR DASHBOARD VIEW (#view-calendar)
            ===================================================================== -->
       <div id="view-calendar" class="transition-all duration-300 block mb-2">
-        <div class="max-w-[1680px] mx-auto flex flex-col gap-3 w-full">
+        <div class="w-full flex flex-col gap-3">
           
           <!-- FULL-WIDTH MAIN CALENDAR WORKSPACE -->
           <div class="flex flex-col gap-2.5 sm:gap-3 min-w-0 w-full">
@@ -336,24 +336,10 @@
               </div>
 
               <!-- Calendar Summary Footer -->
-              <div id="calendar-summary-footer" class="px-3.5 py-2.5 bg-slate-50/90 border-t border-slate-200 flex flex-wrap items-center justify-between text-xs text-slate-600 gap-2">
-                <div class="flex flex-wrap items-center gap-4">
-                  <div class="flex items-center gap-1.5 font-medium">
-                    <span class="material-symbols-outlined text-[16px] text-blue-600">event</span>
-                    <span><strong id="summary-agenda-count" class="text-slate-800">18</strong> Agenda & Sesi CHO</span>
-                  </div>
-                  <div class="flex items-center gap-1.5 font-medium">
-                    <span class="material-symbols-outlined text-[16px] text-rose-500">warning</span>
-                    <span><strong id="summary-issue-count" class="text-slate-800">4</strong> Isu Urgent / Blocker</span>
-                  </div>
-                  <div class="flex items-center gap-1.5 font-medium">
-                    <span class="material-symbols-outlined text-[16px] text-emerald-600">check_circle</span>
-                    <span><strong id="summary-quickwin-count" class="text-slate-800">9</strong> Solusi Cepat Terverifikasi</span>
-                  </div>
-                </div>
-                <div class="flex items-center gap-1.5 text-[11px] text-slate-500">
-                  <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                  <span>Sinkronisasi Google Sheet & konCHO Aktif</span>
+              <div id="calendar-summary-footer" class="px-4 py-2.5 bg-slate-50/90 border-t border-slate-200 flex items-center justify-between text-xs text-slate-600 gap-2">
+                <div class="flex items-center gap-2 font-medium">
+                  <span class="material-symbols-outlined text-[16px] text-blue-600">event</span>
+                  <span><strong id="summary-agenda-count" class="text-slate-800">0</strong> Agenda CHO</span>
                 </div>
               </div>
             </div>
@@ -492,7 +478,7 @@
            VIEW 2: TASKS MANAGEMENT & DATA TABLE (#view-tasks)
            ===================================================================== -->
       <div id="view-tasks" class="transition-all duration-300 hidden mb-6">
-        <div class="max-w-[1680px] mx-auto flex flex-col gap-6 w-full">
+        <div class="w-full flex flex-col gap-6">
           
           <!-- Breadcrumbs & Integration Actions -->
           <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -774,7 +760,7 @@
            VIEW 3: ACTIVITY FEED & AUDIT TRAIL (#view-activity)
            ===================================================================== -->
       <div id="view-activity" class="transition-all duration-300 hidden mb-6">
-        <div class="max-w-[1680px] mx-auto flex flex-col gap-6 w-full">
+        <div class="w-full flex flex-col gap-6">
           
           <!-- Breadcrumbs & Integration Actions -->
           <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">

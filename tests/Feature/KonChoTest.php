@@ -24,6 +24,9 @@ class KonChoTest extends TestCase
         $response->assertSee('CHO Fixed CC Semarang');
         $response->assertSee('CHO Fixed CC Bandung');
         $response->assertSee('Alur Routing Fasilitator');
+        $response->assertSee('Agenda CHO');
+        $response->assertDontSee('Agenda & Sesi CHO');
+        $response->assertDontSee('Sinkronisasi Google Sheet & konCHO Aktif');
         $response->assertSee('data-theme="dark"', false);
     }
 

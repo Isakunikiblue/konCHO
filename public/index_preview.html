@@ -16,6 +16,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
+
   :root {
     --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 
@@ -4520,12 +4521,12 @@
   .content-main, .main-content-area {
     margin-left: 72px !important;
     padding-top: 66px !important;
-    padding-left: 18px !important;
-    padding-right: 18px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
     padding-bottom: 16px !important;
     width: calc(100% - 72px) !important;
     min-height: 100vh !important;
-    background-color: #f3f5f9 !important;
+    background-color: var(--bg-app) !important;
     box-sizing: border-box !important;
   }
   @media (max-width: 768px) {
@@ -5005,6 +5006,26 @@ input:focus, select:focus, textarea:focus {
 </style>
 
 
+/* Calendar Summary Footer Modern Styling */
+#calendar-summary-footer {
+  background: var(--bg-card) !important;
+  border-top: 1px solid var(--border-color) !important;
+  color: var(--text-secondary) !important;
+}
+#calendar-summary-footer strong {
+  color: var(--text-primary) !important;
+}
+[data-theme="light"] #calendar-summary-footer {
+  background: #f8fafc !important;
+  border-top: 1px solid #e2e8f0 !important;
+  color: #475569 !important;
+}
+[data-theme="light"] #calendar-summary-footer strong {
+  color: #0f172a !important;
+}
+</style>
+
+
 
 
 
@@ -5295,7 +5316,7 @@ input:focus, select:focus, textarea:focus {
            VIEW 1: konCHO CALENDAR DASHBOARD VIEW (#view-calendar)
            ===================================================================== -->
       <div id="view-calendar" class="transition-all duration-300 block mb-2">
-        <div class="max-w-[1680px] mx-auto flex flex-col gap-3 w-full">
+        <div class="w-full flex flex-col gap-3">
           
           <!-- FULL-WIDTH MAIN CALENDAR WORKSPACE -->
           <div class="flex flex-col gap-2.5 sm:gap-3 min-w-0 w-full">
@@ -5398,24 +5419,10 @@ input:focus, select:focus, textarea:focus {
               </div>
 
               <!-- Calendar Summary Footer -->
-              <div id="calendar-summary-footer" class="px-3.5 py-2.5 bg-slate-50/90 border-t border-slate-200 flex flex-wrap items-center justify-between text-xs text-slate-600 gap-2">
-                <div class="flex flex-wrap items-center gap-4">
-                  <div class="flex items-center gap-1.5 font-medium">
-                    <span class="material-symbols-outlined text-[16px] text-blue-600">event</span>
-                    <span><strong id="summary-agenda-count" class="text-slate-800">18</strong> Agenda & Sesi CHO</span>
-                  </div>
-                  <div class="flex items-center gap-1.5 font-medium">
-                    <span class="material-symbols-outlined text-[16px] text-rose-500">warning</span>
-                    <span><strong id="summary-issue-count" class="text-slate-800">4</strong> Isu Urgent / Blocker</span>
-                  </div>
-                  <div class="flex items-center gap-1.5 font-medium">
-                    <span class="material-symbols-outlined text-[16px] text-emerald-600">check_circle</span>
-                    <span><strong id="summary-quickwin-count" class="text-slate-800">9</strong> Solusi Cepat Terverifikasi</span>
-                  </div>
-                </div>
-                <div class="flex items-center gap-1.5 text-[11px] text-slate-500">
-                  <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                  <span>Sinkronisasi Google Sheet & konCHO Aktif</span>
+              <div id="calendar-summary-footer" class="px-4 py-2.5 bg-slate-50/90 border-t border-slate-200 flex items-center justify-between text-xs text-slate-600 gap-2">
+                <div class="flex items-center gap-2 font-medium">
+                  <span class="material-symbols-outlined text-[16px] text-blue-600">event</span>
+                  <span><strong id="summary-agenda-count" class="text-slate-800">0</strong> Agenda CHO</span>
                 </div>
               </div>
             </div>
@@ -5554,7 +5561,7 @@ input:focus, select:focus, textarea:focus {
            VIEW 2: TASKS MANAGEMENT & DATA TABLE (#view-tasks)
            ===================================================================== -->
       <div id="view-tasks" class="transition-all duration-300 hidden mb-6">
-        <div class="max-w-[1680px] mx-auto flex flex-col gap-6 w-full">
+        <div class="w-full flex flex-col gap-6">
           
           <!-- Breadcrumbs & Integration Actions -->
           <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -5836,7 +5843,7 @@ input:focus, select:focus, textarea:focus {
            VIEW 3: ACTIVITY FEED & AUDIT TRAIL (#view-activity)
            ===================================================================== -->
       <div id="view-activity" class="transition-all duration-300 hidden mb-6">
-        <div class="max-w-[1680px] mx-auto flex flex-col gap-6 w-full">
+        <div class="w-full flex flex-col gap-6">
           
           <!-- Breadcrumbs & Integration Actions -->
           <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
@@ -7514,6 +7521,7 @@ input:focus, select:focus, textarea:focus {
 
   <!-- Include Client JavaScript -->
   <script>
+
 /**
  * =========================================================================
  * konCHO - Client Side JavaScript Controller
@@ -12620,19 +12628,13 @@ input:focus, select:focus, textarea:focus {
       });
     }
 
-    let summaryAgendas = base && base.summary ? base.summary.agendas : 0;
-    let summaryIssues = base && base.summary ? base.summary.issues : 0;
-    let summaryQuickwins = base && base.summary ? base.summary.quickwins : 0;
-
-    if (!base) {
-      Object.keys(items).forEach(d => {
-        (items[d] || []).forEach(it => {
-          if (it.type === 'meeting') summaryAgendas++;
-          else if (it.type === 'quickwin') summaryQuickwins++;
-          else summaryIssues++;
-        });
-      });
-    }
+    // Hitung total seluruh agenda & inputan kasus CHO pada bulan ini
+    let summaryAgendas = 0;
+    Object.keys(items).forEach(d => {
+      summaryAgendas += (items[d] || []).length;
+    });
+    let summaryIssues = 0;
+    let summaryQuickwins = 0;
 
     return {
       key: key,
@@ -12934,12 +12936,25 @@ input:focus, select:focus, textarea:focus {
     const cycleBadgeEl = document.getElementById('calendar-cycle-badge');
     if (cycleBadgeEl) cycleBadgeEl.textContent = calData.badge;
 
+    // Hitung total inputan / agenda CHO pada bulan kalender yang aktif
+    let totalMonthAgenda = 0;
+    const activeCalUnit = normalizeUnitKey(state.tasksFilterUnit);
+    if (calData && calData.items) {
+      Object.keys(calData.items).forEach(d => {
+        let dItems = calData.items[d] || [];
+        if (activeCalUnit !== 'ALL') {
+          dItems = dItems.filter(it => normalizeUnitKey(it.unit) === 'ALL' || normalizeUnitKey(it.unit) === activeCalUnit);
+        }
+        totalMonthAgenda += dItems.length;
+      });
+    }
+
     const agSumEl = document.getElementById('summary-agenda-count');
+    if (agSumEl) agSumEl.textContent = totalMonthAgenda;
     const isSumEl = document.getElementById('summary-issue-count');
     const qwSumEl = document.getElementById('summary-quickwin-count');
-    if (agSumEl) agSumEl.textContent = calData.summary.agendas;
-    if (isSumEl) isSumEl.textContent = calData.summary.issues;
-    if (qwSumEl) qwSumEl.textContent = calData.summary.quickwins;
+    if (isSumEl) isSumEl.textContent = 0;
+    if (qwSumEl) qwSumEl.textContent = 0;
 
     let html = '';
 
@@ -14141,6 +14156,7 @@ input:focus, select:focus, textarea:focus {
   document.addEventListener('DOMContentLoaded', init);
 
 })();
+
 </script>
 
 

@@ -4503,12 +4503,12 @@
   .content-main, .main-content-area {
     margin-left: 72px !important;
     padding-top: 66px !important;
-    padding-left: 18px !important;
-    padding-right: 18px !important;
+    padding-left: 10px !important;
+    padding-right: 10px !important;
     padding-bottom: 16px !important;
     width: calc(100% - 72px) !important;
     min-height: 100vh !important;
-    background-color: #f3f5f9 !important;
+    background-color: var(--bg-app) !important;
     box-sizing: border-box !important;
   }
   @media (max-width: 768px) {
@@ -4986,3 +4986,22 @@ input:focus, select:focus, textarea:focus {
   border-bottom: 1px solid #cfddec !important;
 }
 </style>
+
+
+/* Calendar Summary Footer Modern Styling */
+#calendar-summary-footer {
+  background: var(--bg-card) !important;
+  border-top: 1px solid var(--border-color) !important;
+  color: var(--text-secondary) !important;
+}
+#calendar-summary-footer strong {
+  color: var(--text-primary) !important;
+}
+[data-theme="light"] #calendar-summary-footer {
+  background: #f8fafc !important;
+  border-top: 1px solid #e2e8f0 !important;
+  color: #475569 !important;
+}
+[data-theme="light"] #calendar-summary-footer strong {
+  color: #0f172a !important;
+}
