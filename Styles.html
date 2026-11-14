@@ -5007,16 +5007,16 @@ input:focus, select:focus, textarea:focus {
 }
 
 /* =========================================================================
-   NEW CASE MODAL (WIDER 2-COLUMN NO-SCROLL LAYOUT & SELECT CHEVRONS)
+   NEW CASE MODAL (WIDER 980px 2-COLUMN NO-SCROLL LAYOUT & UNIFIED TYPOGRAPHY)
    ========================================================================= */
 #newDataModal .modal-dialog {
-  max-width: 860px !important;
-  width: 95% !important;
+  max-width: 980px !important;
+  width: 96% !important;
   max-height: 94vh !important;
 }
 
 #newDataModal .modal-body {
-  padding: 16px 24px !important;
+  padding: 18px 28px !important;
   max-height: calc(94vh - 120px) !important;
   overflow-y: auto !important;
 }
@@ -5024,7 +5024,7 @@ input:focus, select:focus, textarea:focus {
 #newDataModal .form-grid-2 {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: 10px 18px;
+  gap: 12px 20px;
 }
 
 @media (max-width: 640px) {
@@ -5033,22 +5033,88 @@ input:focus, select:focus, textarea:focus {
   }
 }
 
-#inputRequestor:disabled, 
-#inputRequestor[disabled], 
-#inputRequestor.input-locked {
+/* Unified Typography across all elements in #newDataModal */
+#newDataModal .modal-title {
+  font-size: 18px !important;
+  font-weight: 700 !important;
+}
+
+#newDataModal #newModalDatePill {
+  font-size: 12px !important;
+  font-weight: 600 !important;
+}
+
+#newDataModal .form-label {
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  color: #475569 !important;
+  margin-bottom: 5px !important;
+  display: block !important;
+  letter-spacing: 0.01em !important;
+}
+
+[data-theme="dark"] #newDataModal .form-label {
+  color: #94a3b8 !important;
+}
+
+#newDataModal .form-control,
+#newDataModal input[type="text"],
+#newDataModal input[type="date"],
+#newDataModal select,
+#newDataModal textarea {
+  font-size: 13px !important;
+  font-weight: 500 !important;
+  line-height: 1.4 !important;
+  font-family: inherit !important;
+  border-radius: 8px !important;
+}
+
+#newDataModal input::placeholder,
+#newDataModal textarea::placeholder {
+  font-size: 13px !important;
+  font-weight: 400 !important;
+  color: #94a3b8 !important;
+}
+
+#newDataModal #inputRequestor {
   background-color: #e2e8f0 !important;
   color: #475569 !important;
   border-color: #cbd5e1 !important;
   cursor: not-allowed !important;
+  font-size: 13px !important;
   font-weight: 600 !important;
 }
 
-[data-theme="dark"] #inputRequestor:disabled,
-[data-theme="dark"] #inputRequestor[disabled],
-[data-theme="dark"] #inputRequestor.input-locked {
+[data-theme="dark"] #newDataModal #inputRequestor {
   background-color: #1a2744 !important;
   color: #94a3b8 !important;
   border-color: #273b64 !important;
+}
+
+#newDataModal #inputUrgency,
+#newDataModal #inputStatus,
+#newDataModal #inputBulanTahun {
+  font-size: 13px !important;
+  font-weight: 500 !important;
+}
+
+#newDataModal .service-toggle-btn {
+  font-size: 12.5px !important;
+  font-weight: 600 !important;
+  padding: 8px 12px !important;
+  border-radius: 8px !important;
+}
+
+#newDataModal #newCasePptFile {
+  font-size: 12.5px !important;
+  padding: 5px 10px !important;
+  border-radius: 8px !important;
+}
+
+#newDataModal .modal-foot .btn-secondary,
+#newDataModal .modal-foot .btn-primary {
+  font-size: 13px !important;
+  font-weight: 600 !important;
 }
 
 /* Custom Select Dropdown Container with Chevron */
