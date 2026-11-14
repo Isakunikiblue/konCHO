@@ -16,8 +16,7 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   <style>
-
-  :root {
+:root {
     --font-sans: 'Plus Jakarta Sans', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
 
     /* =========================================================================
@@ -5003,7 +5002,7 @@ input:focus, select:focus, textarea:focus {
   color: #334e77 !important;
   border-bottom: 1px solid #cfddec !important;
 }
-</style>
+
 
 
 /* Calendar Summary Footer Modern Styling */
@@ -5024,6 +5023,7 @@ input:focus, select:focus, textarea:focus {
   color: #0f172a !important;
 }
 </style>
+
 
 
 
@@ -5329,7 +5329,7 @@ input:focus, select:focus, textarea:focus {
                   <button id="btn-month-year-trigger" type="button" aria-haspopup="true" aria-expanded="false"
                     class="h-9 px-3.5 bg-gradient-to-r from-white to-slate-50 hover:from-blue-50/70 hover:to-indigo-50/50 border border-slate-200/90 hover:border-blue-300 text-[#061345] text-xs sm:text-[13px] font-extrabold rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer">
                     <span class="material-symbols-outlined text-[18px] text-blue-600">calendar_month</span>
-                    <span id="calendar-month-label">Oktober 2026</span>
+                    <span id="calendar-month-label">November 2026</span>
                     <span id="month-picker-chevron" class="material-symbols-outlined text-[18px] text-slate-400 transition-transform duration-200">expand_more</span>
                   </button>
 
@@ -12503,12 +12503,14 @@ input:focus, select:focus, textarea:focus {
   const CAL_MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
   const CAL_DAYS_ID = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 
+  // Inisialisasi tanggal & bulan dinamis mengikuti bulan berjalan saat ini
+  const _nowInit = new Date();
   state.activeView = 'calendar';
-  state.selectedYear = 2026;
-  state.selectedMonthIndex = 9; // Oktober (0-based)
-  state.pickerBrowseYear = 2026;
-  state.selectedDate = 24;
-  state.selectedMonth = 'oktober-2026';
+  state.selectedYear = _nowInit.getFullYear();
+  state.selectedMonthIndex = _nowInit.getMonth(); // Otomatis bulan berjalan (misal: 10 = Nov, 11 = Des)
+  state.pickerBrowseYear = _nowInit.getFullYear();
+  state.selectedDate = _nowInit.getDate();
+  state.selectedMonth = getCalendarMonthKey(_nowInit.getFullYear(), _nowInit.getMonth());
   state.tasksFilterUnit = 'all';
   state.calendarStatusFilter = 'all';
   state.tasksFilterStatus = 'all';
@@ -14158,9 +14160,5 @@ input:focus, select:focus, textarea:focus {
 })();
 
 </script>
-
-
-
-
 </body>
 </html>

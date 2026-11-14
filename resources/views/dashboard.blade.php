@@ -246,7 +246,7 @@
                   <button id="btn-month-year-trigger" type="button" aria-haspopup="true" aria-expanded="false"
                     class="h-9 px-3.5 bg-gradient-to-r from-white to-slate-50 hover:from-blue-50/70 hover:to-indigo-50/50 border border-slate-200/90 hover:border-blue-300 text-[#061345] text-xs sm:text-[13px] font-extrabold rounded-xl shadow-xs transition-all flex items-center gap-2 cursor-pointer">
                     <span class="material-symbols-outlined text-[18px] text-blue-600">calendar_month</span>
-                    <span id="calendar-month-label">Oktober 2026</span>
+                    <span id="calendar-month-label">November 2026</span>
                     <span id="month-picker-chevron" class="material-symbols-outlined text-[18px] text-slate-400 transition-transform duration-200">expand_more</span>
                   </button>
 

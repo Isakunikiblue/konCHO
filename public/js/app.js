@@ -4980,12 +4980,14 @@
   const CAL_MONTHS_SHORT = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
   const CAL_DAYS_ID = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
 
+  // Inisialisasi tanggal & bulan dinamis mengikuti bulan berjalan saat ini
+  const _nowInit = new Date();
   state.activeView = 'calendar';
-  state.selectedYear = 2026;
-  state.selectedMonthIndex = 9; // Oktober (0-based)
-  state.pickerBrowseYear = 2026;
-  state.selectedDate = 24;
-  state.selectedMonth = 'oktober-2026';
+  state.selectedYear = _nowInit.getFullYear();
+  state.selectedMonthIndex = _nowInit.getMonth(); // Otomatis bulan berjalan (misal: 10 = Nov, 11 = Des)
+  state.pickerBrowseYear = _nowInit.getFullYear();
+  state.selectedDate = _nowInit.getDate();
+  state.selectedMonth = getCalendarMonthKey(_nowInit.getFullYear(), _nowInit.getMonth());
   state.tasksFilterUnit = 'all';
   state.calendarStatusFilter = 'all';
   state.tasksFilterStatus = 'all';
