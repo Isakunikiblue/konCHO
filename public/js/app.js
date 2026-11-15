@@ -4497,7 +4497,7 @@
       return;
     }
     if (!detail) {
-      showToast('Harap isi Issue Details (Description)!', 'error');
+      showToast('Harap isi Issue Details!', 'error');
       if (dom.inputDetail) dom.inputDetail.focus();
       return;
     }

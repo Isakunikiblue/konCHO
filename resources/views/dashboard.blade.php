@@ -1505,12 +1505,12 @@
               </div>
             </div>
 
-            <!-- Kolom Kiri: Progress & Quick Win -->
+            <!-- Kolom Kiri: Quick Win -->
             <div class="form-group">
               <label class="form-label" for="inputProgressQuickWin">
-                Progress & Quick Win (Temporary Solution)
+                Quick Win
               </label>
-              <input type="text" id="inputProgressQuickWin" class="form-control" placeholder="Silakan ketikkan disini..." style="height: 36px;">
+              <textarea id="inputProgressQuickWin" class="form-control" rows="2" placeholder="Silakan ketikkan disini..." style="height: 48px; min-height: 48px; resize: vertical; overflow-y: auto;"></textarea>
             </div>
 
             <!-- Kolom Kanan: Need Support -->
@@ -1518,15 +1518,15 @@
               <label class="form-label" for="inputNeedSupport">
                 Need Support
               </label>
-              <input type="text" id="inputNeedSupport" class="form-control" placeholder="Silakan ketikkan disini..." style="height: 36px;">
+              <textarea id="inputNeedSupport" class="form-control" rows="2" placeholder="Silakan ketikkan disini..." style="height: 48px; min-height: 48px; resize: vertical; overflow-y: auto;"></textarea>
             </div>
 
-            <!-- Kolom Span 2 (Lebar Penuh): Issue Details (Description) -->
+            <!-- Kolom Span 2 (Lebar Penuh): Issue Details -->
             <div class="form-group" style="grid-column: 1 / -1;">
               <label class="form-label" for="inputDetail">
-                Issue Details (Description) <span class="req-star">*</span>
+                Issue Details <span class="req-star">*</span>
               </label>
-              <textarea id="inputDetail" class="form-control" rows="2" placeholder="Silakan ketikkan disini..." style="height: 48px; min-height: 48px; resize: none;"></textarea>
+              <textarea id="inputDetail" class="form-control" rows="2" placeholder="Silakan ketikkan disini..." style="height: 48px; min-height: 48px; resize: vertical; overflow-y: auto;"></textarea>
             </div>
 
             <!-- Kolom Span 2 (Lebar Penuh): Lampiran Dokumen PDF (Paling Bawah - Langsung Terlihat Tanpa Scroll) -->

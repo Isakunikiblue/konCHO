@@ -5112,11 +5112,149 @@ input:focus, select:focus, textarea:focus {
   font-weight: 500 !important;
 }
 
-#newDataModal .service-toggle-btn {
+/* Unit Selection Buttons (Pilih Unit) - Modern, Distinct & Accessible */
+#newDataModal .modal-service-toggle .service-toggle-btn {
   font-size: 12px !important;
   font-weight: 600 !important;
+  padding: 7px 10px !important;
+  border-radius: 8px !important;
+  background: #f8fafc !important;
+  border: 1.5px solid #cbd5e1 !important;
+  color: #475569 !important;
+  cursor: pointer !important;
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  gap: 6px !important;
+}
+
+/* Hover States per Unit */
+#newDataModal .modal-service-toggle .service-toggle-btn#toggleMobile:hover {
+  background: #eff6ff !important;
+  border-color: #93c5fd !important;
+  color: #1d4ed8 !important;
+}
+#newDataModal .modal-service-toggle .service-toggle-btn#toggleFixed:hover {
+  background: #f0fdfa !important;
+  border-color: #99f6e4 !important;
+  color: #0f766e !important;
+}
+#newDataModal .modal-service-toggle .service-toggle-btn#toggleEcare:hover {
+  background: #f5f3ff !important;
+  border-color: #ddd6fe !important;
+  color: #6d28d9 !important;
+}
+#newDataModal .modal-service-toggle .service-toggle-btn#togglePriority:hover {
+  background: #fffbeb !important;
+  border-color: #fde68a !important;
+  color: #b45309 !important;
+}
+
+/* Distinct Vibrant Active State for Each Unit */
+#newDataModal .modal-service-toggle .service-toggle-btn#toggleMobile.active {
+  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%) !important;
+  color: #ffffff !important;
+  border-color: #1e40af !important;
+  box-shadow: 0 3px 12px rgba(37, 99, 235, 0.38) !important;
+  font-weight: 700 !important;
+}
+
+#newDataModal .modal-service-toggle .service-toggle-btn#toggleFixed.active {
+  background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%) !important;
+  color: #ffffff !important;
+  border-color: #115e59 !important;
+  box-shadow: 0 3px 12px rgba(13, 148, 136, 0.38) !important;
+  font-weight: 700 !important;
+}
+
+#newDataModal .modal-service-toggle .service-toggle-btn#toggleEcare.active {
+  background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 100%) !important;
+  color: #ffffff !important;
+  border-color: #5b21b6 !important;
+  box-shadow: 0 3px 12px rgba(124, 58, 237, 0.38) !important;
+  font-weight: 700 !important;
+}
+
+#newDataModal .modal-service-toggle .service-toggle-btn#togglePriority.active {
+  background: linear-gradient(135deg, #b45309 0%, #d97706 100%) !important;
+  color: #ffffff !important;
+  border-color: #92400e !important;
+  box-shadow: 0 3px 12px rgba(217, 119, 6, 0.38) !important;
+  font-weight: 700 !important;
+}
+
+/* Dark Mode Support for Unit Buttons */
+[data-theme="dark"] #newDataModal .modal-service-toggle .service-toggle-btn {
+  background: #1e293b !important;
+  border-color: #334155 !important;
+  color: #94a3b8 !important;
+}
+[data-theme="dark"] #newDataModal .modal-service-toggle .service-toggle-btn#toggleMobile:hover {
+  background: rgba(37, 99, 235, 0.15) !important;
+  border-color: #3b82f6 !important;
+  color: #93c5fd !important;
+}
+[data-theme="dark"] #newDataModal .modal-service-toggle .service-toggle-btn#toggleFixed:hover {
+  background: rgba(13, 148, 136, 0.15) !important;
+  border-color: #14b8a6 !important;
+  color: #5eead4 !important;
+}
+[data-theme="dark"] #newDataModal .modal-service-toggle .service-toggle-btn#toggleEcare:hover {
+  background: rgba(124, 58, 237, 0.15) !important;
+  border-color: #8b5cf6 !important;
+  color: #c4b5fd !important;
+}
+[data-theme="dark"] #newDataModal .modal-service-toggle .service-toggle-btn#togglePriority:hover {
+  background: rgba(217, 119, 6, 0.15) !important;
+  border-color: #f59e0b !important;
+  color: #fcd34d !important;
+}
+
+[data-theme="dark"] #newDataModal .modal-service-toggle .service-toggle-btn#toggleMobile.active {
+  background: linear-gradient(135deg, #1d4ed8 0%, #2563eb 100%) !important;
+  color: #ffffff !important;
+  border-color: #60a5fa !important;
+  box-shadow: 0 3px 12px rgba(37, 99, 235, 0.45) !important;
+}
+[data-theme="dark"] #newDataModal .modal-service-toggle .service-toggle-btn#toggleFixed.active {
+  background: linear-gradient(135deg, #0f766e 0%, #0d9488 100%) !important;
+  color: #ffffff !important;
+  border-color: #2dd4bf !important;
+  box-shadow: 0 3px 12px rgba(13, 148, 136, 0.45) !important;
+}
+[data-theme="dark"] #newDataModal .modal-service-toggle .service-toggle-btn#toggleEcare.active {
+  background: linear-gradient(135deg, #6d28d9 0%, #7c3aed 100%) !important;
+  color: #ffffff !important;
+  border-color: #a78bfa !important;
+  box-shadow: 0 3px 12px rgba(124, 58, 237, 0.45) !important;
+}
+[data-theme="dark"] #newDataModal .modal-service-toggle .service-toggle-btn#togglePriority.active {
+  background: linear-gradient(135deg, #b45309 0%, #d97706 100%) !important;
+  color: #ffffff !important;
+  border-color: #fbbf24 !important;
+  box-shadow: 0 3px 12px rgba(217, 119, 6, 0.45) !important;
+}
+
+/* Scrollable Textareas in #newDataModal */
+#newDataModal textarea.form-control {
+  overflow-y: auto !important;
+  resize: vertical !important;
+  line-height: 1.4 !important;
   padding: 6px 10px !important;
-  border-radius: 7px !important;
+}
+#newDataModal textarea.form-control::-webkit-scrollbar {
+  width: 6px;
+}
+#newDataModal textarea.form-control::-webkit-scrollbar-track {
+  background: transparent;
+}
+#newDataModal textarea.form-control::-webkit-scrollbar-thumb {
+  background: rgba(148, 163, 184, 0.5);
+  border-radius: 9999px;
+}
+#newDataModal textarea.form-control::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 116, 139, 0.8);
 }
 
 #newDataModal #newCasePptFile {
