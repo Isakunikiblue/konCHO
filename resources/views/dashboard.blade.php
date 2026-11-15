@@ -1003,59 +1003,61 @@
 
     <!-- 3. MODAL: FORM PENGISIAN IN PROGRESS -->
     <div class="modal-backdrop" id="modalInProgress">
-      <div class="modal-dialog">
+      <div class="modal-dialog" style="max-width: 580px;">
         <div class="modal-head">
           <div class="modal-title-wrap">
-            <div class="modal-kicker blue-kicker">
+            <div class="modal-kicker blue-kicker" style="font-size: 11px; font-weight: 700; letter-spacing: 0.5px;">
               <span class="kpi-dot dot-inprogress"></span> Form Pengisian In Progress
             </div>
-            <h2 class="modal-title" id="inProgressModalTitle">Proses Kasus: -</h2>
+            <h2 class="modal-title" id="inProgressModalTitle" style="font-size: 16px; font-weight: 700; color: #0f172a;">Pick up case</h2>
           </div>
           <button class="modal-close-btn" id="btnCloseInProgressModal" title="Tutup">✕</button>
         </div>
 
-        <div class="modal-body">
+        <div class="modal-body" style="padding: 18px 22px; display: flex; flex-direction: column; gap: 14px;">
           
           <!-- Info Ringkas Tiket -->
-          <div class="modal-info-box blue-info-box">
-            <div class="info-row">
-              <span class="info-badge" id="inProgressBadgeService">MOBILE</span>
-              <span class="info-id" id="inProgressTicketId">Kasus #1</span>
-              <span class="info-req">Requestor: <strong id="inProgressRequestor">-</strong></span>
+          <div class="modal-info-box blue-info-box" style="padding: 10px 14px; border-radius: 10px; background: rgba(59, 130, 246, 0.06); border: 1px solid rgba(59, 130, 246, 0.18);">
+            <div class="info-row" style="display: flex; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 4px;">
+              <span class="info-badge" id="inProgressBadgeService" style="font-size: 10.5px; font-weight: 700; padding: 2px 7px; border-radius: 4px;">MOBILE</span>
+              <span class="info-id" id="inProgressTicketId" style="font-size: 12px; font-weight: 600; color: #1e293b;">Kasus #1</span>
+              <span class="info-req" style="font-size: 12px; color: #64748b; margin-left: auto;">Requestor: <strong id="inProgressRequestor" style="color: #334155;">-</strong></span>
             </div>
-            <div class="info-issue" id="inProgressIssueText">-</div>
+            <div class="info-issue" id="inProgressIssueText" style="font-size: 13px; font-weight: 600; color: #0f172a; line-height: 1.4;">-</div>
           </div>
 
-          <!-- Form Inputs -->
-          <div class="form-group">
-            <label class="form-label" for="inProgressMessage">
-              Keterangan / Catatan Tindak Lanjut In Progress <span class="req-star">*</span>
-            </label>
-            <textarea id="inProgressMessage" class="form-control" rows="4" placeholder="Tuliskan catatan koordinasi teknis, langkah penanganan yang sedang berjalan, atau analisa kendala..."></textarea>
-            <span class="form-hint">Keterangan ini akan otomatis tersimpan ke sheet <strong>Log_Komunikasi</strong> dan database.</span>
-          </div>
+          <!-- Form Inputs: Follow Up To ditaruh di atas, baru PIC abu-abu, baru Keterangan In Progress -->
+          <div class="form-row-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <!-- Kolom 1: Follow Up To -->
+            <div class="form-group" style="display: flex; flex-direction: column; gap: 5px;">
+              <label class="form-label" for="inProgressFollowUp" style="font-size: 12.5px; font-weight: 600; color: #334155;">
+                Follow Up To
+              </label>
+              <input type="text" id="inProgressFollowUp" class="form-control" style="height: 38px; font-size: 13px;" placeholder="Contoh: Tim RO, Tim Splicing Lapangan...">
+            </div>
 
-          <div class="form-row-2">
-            <div class="form-group">
-              <label class="form-label" for="inProgressAuthor">
+            <!-- Kolom 2: PIC / Petugas Pelaksana (Abu-abu terkunci sesuai user login) -->
+            <div class="form-group" style="display: flex; flex-direction: column; gap: 5px;">
+              <label class="form-label" for="inProgressAuthor" style="font-size: 12.5px; font-weight: 600; color: #334155;">
                 PIC / Petugas Pelaksana <span class="req-star">*</span>
               </label>
-              <input type="text" id="inProgressAuthor" class="form-control" placeholder="Contoh: Dimas (RO) / NOC CHO">
+              <input type="text" id="inProgressAuthor" class="form-control" readonly disabled style="background-color: #f1f5f9; cursor: not-allowed; color: #475569; height: 38px; font-size: 13px; font-weight: 500;" placeholder="PIC Petugas">
             </div>
+          </div>
 
-            <div class="form-group">
-              <label class="form-label" for="inProgressFollowUp">
-                Follow Up To (Kolom I)
-              </label>
-              <input type="text" id="inProgressFollowUp" class="form-control" placeholder="Contoh: Tim RO, Tim Splicing Lapangan...">
-            </div>
+          <!-- Keterangan / Catatan Tindak Lanjut In Progress -->
+          <div class="form-group" style="display: flex; flex-direction: column; gap: 5px;">
+            <label class="form-label" for="inProgressMessage" style="font-size: 12.5px; font-weight: 600; color: #334155;">
+              Keterangan / Catatan Tindak Lanjut In Progress <span class="req-star">*</span>
+            </label>
+            <textarea id="inProgressMessage" class="form-control" rows="4" style="font-size: 13px; line-height: 1.5; resize: vertical;" placeholder="Tuliskan catatan koordinasi teknis, langkah penanganan yang sedang berjalan, atau analisa kendala..."></textarea>
           </div>
 
         </div>
 
-        <div class="modal-foot">
-          <button class="btn-secondary" id="btnCancelInProgress">Batal</button>
-          <button class="btn-primary btn-save-inprogress" id="btnSubmitInProgress">
+        <div class="modal-foot" style="padding: 14px 22px; display: flex; justify-content: flex-end; gap: 10px;">
+          <button class="btn-secondary" id="btnCancelInProgress" style="font-size: 13px; font-weight: 600; padding: 8px 16px;">Batal</button>
+          <button class="btn-primary btn-save-inprogress" id="btnSubmitInProgress" style="font-size: 13px; font-weight: 600; padding: 8px 18px; display: inline-flex; align-items: center; gap: 6px;">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
             <span>Simpan & Ubah ke In Progress</span>
           </button>

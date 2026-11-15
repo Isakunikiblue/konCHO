@@ -3186,7 +3186,7 @@
 
     state.currentActionTicket = ticket;
 
-    dom.inProgressModalTitle.textContent = isUpdateOnly ? 'Update Catatan In Progress' : 'Pickup Kasus & Ubah Status ke In Progress';
+    dom.inProgressModalTitle.textContent = isUpdateOnly ? 'Update Catatan In Progress' : 'Pick up case';
     dom.inProgressTicketId.textContent = 'Case #' + ticket.id;
     dom.inProgressBadgeService.textContent = ticket.serviceType;
     dom.inProgressBadgeService.className = 'info-badge ' + (ticket.serviceType === 'MOBILE' ? 'badge-srv mobile' : (ticket.serviceType === 'ECARE' ? 'badge-srv ecare' : (ticket.serviceType === 'PRIORITY' ? 'badge-srv priority' : 'badge-srv fixed')));
@@ -3194,7 +3194,10 @@
     dom.inProgressIssueText.textContent = ticket.totalCaseIsu || '-';
 
     dom.inProgressMessage.value = '';
-    dom.inProgressAuthor.value = getCurrentLoggedInUserName();
+    var loggedInUser = getCurrentLoggedInUserName();
+    dom.inProgressAuthor.value = loggedInUser;
+    dom.inProgressAuthor.readOnly = true;
+    dom.inProgressAuthor.disabled = true;
     dom.inProgressFollowUp.value = ticket.followUpTo && ticket.followUpTo !== '-' ? ticket.followUpTo : '';
 
     dom.modalInProgress.classList.add('active');
@@ -3214,7 +3217,7 @@
     if (!ticket) return;
 
     var message = dom.inProgressMessage.value.trim();
-    var author = dom.inProgressAuthor.value.trim();
+    var author = (dom.inProgressAuthor ? dom.inProgressAuthor.value.trim() : '') || getCurrentLoggedInUserName();
     var followUp = dom.inProgressFollowUp.value.trim();
 
     if (!message) {
