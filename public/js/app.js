@@ -2766,10 +2766,10 @@
       } else if (canUploadPpt) {
         html += '    <button type="button" class="btn-ppt-upload" onclick="openUploadPptModal(\'' + escapeHtml(item.id) + '\', \'' + item.serviceType + '\')" title="Upload File PPT ke Google Drive untuk kasus ini">';
         html += '      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>';
-        html += '      <span>+ Upload PPT</span>';
+        html += '      <span>+ Upload PDF</span>';
         html += '    </button>';
       } else {
-        html += '    <span class="ppt-empty-badge" title="Materi PPT belum diunggah">- Belum Ada PPT -</span>';
+        html += '    <span class="ppt-empty-badge" title="Materi PPT belum diunggah">- Belum Ada PDF -</span>';
       }
       html += '  </div>';
       html += '  <div class="case-row-title" style="font-size:16px; font-weight:800; color:var(--text-primary); margin-top:4px;">' + escapeHtml(item.totalCaseIsu || 'Isu Case CHO') + '</div>';
@@ -3032,10 +3032,10 @@
         if (canUploadPpt) {
           html += '            <button type="button" class="btn-ppt-upload" onclick="openUploadPptModal(\'' + escapeHtml(item.id) + '\', \'' + item.serviceType + '\')" title="Upload File PPT ke Google Drive untuk kasus ini">';
           html += '              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>';
-          html += '              <span>+ Upload PPT</span>';
+          html += '              <span>+ Upload PDF</span>';
           html += '            </button>';
         } else {
-          html += '            <span class="ppt-empty-badge" title="Belum ada file PPT diunggah">- Belum Ada PPT -</span>';
+          html += '            <span class="ppt-empty-badge" title="Belum ada file PPT diunggah">- Belum Ada PDF -</span>';
         }
       }
       html += '          </td>';
@@ -3687,7 +3687,7 @@
             }
           })
           .catch(function(err) {
-            console.error('Upload PPT error:', err);
+            console.error('Upload PDF error:', err);
             onUploadPptError('Koneksi upload gagal: ' + err.message, file, target);
           });
         } else {
@@ -4109,6 +4109,157 @@
    * RIWAYAT LOG KOMUNIKASI & TIMELINE DETAIL
    * =========================================================================
    */
+    /**
+   * Cek History Case Lengkap: Lifecycle Kasus dari Inputer, Fasilitator sampai Case Closed
+   */
+  window.openHistoryCaseModal = function(ticketId, serviceType) {
+    var ticket = (state.records || []).find(function(r) { 
+      return String(r.id) === String(ticketId) || String(r.ticketId) === String(ticketId); 
+    });
+    if (!ticket) {
+      showToast('Data kasus tidak ditemukan!', 'error');
+      return;
+    }
+
+    var titleEl = document.getElementById('historyModalTitle');
+    var contentEl = document.getElementById('historyModalContent');
+    var modalEl = document.getElementById('modalHistoryCase');
+    if (!modalEl || !contentEl) return;
+
+    var sType = ticket.serviceType || serviceType || 'MOBILE';
+    var uMeta = getServiceMeta(sType);
+    var uKey = normalizeUnitKey(sType);
+    var uIcon = uKey === 'MOBILE' ? '📱' : (uKey === 'FIXED' ? '🌐' : (uKey === 'ECARE' ? '💬' : '⭐'));
+    var sStatus = String(ticket.status || 'Open').trim();
+    var isClosed = sStatus.toLowerCase() === 'closed';
+    var isInProg = sStatus.toLowerCase() === 'inprogress';
+    
+    if (titleEl) {
+      titleEl.innerHTML = '<span class="text-blue-600 font-mono">#CHO-' + escapeHtml(ticket.id) + '</span> &bull; ' + escapeHtml(ticket.totalCaseIsu || ticket.caseTitle || 'Case');
+    }
+
+    var ppt = getCasePptAttachment(sType, ticket.id);
+    var pdfLink = (ppt && (ppt.fileUrl || ppt.url)) ? (ppt.fileUrl || ppt.url) : (ticket.filePpt || ticket.filePdf || '');
+    var pdfName = (ppt && (ppt.fileName || ppt.name)) ? (ppt.fileName || ppt.name) : 'Sample Case (PDF)';
+
+    var inputerName = ticket.inputBy || ticket.requestor || 'Inputer';
+    var inputDate = ticket.tanggalInput || ticket.tanggalAgenda || ticket.bulan || '-';
+    var caseTitle = ticket.totalCaseIsu || ticket.caseTitle || '-';
+    var detailText = ticket.issueDetails || ticket.detail || ticket.detailKendala || '-';
+    var urgencyText = ticket.urgency || 'Low';
+
+    var fasilitatorName = ticket.picFacilitator || getFacilitatorForRequestor(ticket.requestor) || '-';
+    var quickWinText = ticket.progress || ticket.quickWin || ticket.statusUpdate || '-';
+    var catatanFasilitator = ticket.catatanFasilitator || ticket.keteranganProgress || ticket.followUpTo || '-';
+    var needSupportText = ticket.needSupport || '-';
+    var lastUpdateText = ticket.terakhirUpdate || 'Baru Saja';
+
+    var closedBy = ticket.closedBy || (isClosed ? fasilitatorName : '-');
+    var closedNotes = ticket.keteranganClosed || ticket.solusi || (isClosed ? 'Kasus telah diselesaikan dan terverifikasi.' : 'Kasus masih dalam proses penanganan.');
+
+    var html = '';
+    html += '<div class="space-y-4">';
+
+    // Banner Ringkasan Kasus
+    html += '  <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex flex-wrap items-center justify-between gap-3">';
+    html += '    <div class="flex items-center gap-2.5">';
+    html += '      <span class="text-xl p-2 rounded-lg bg-white border border-slate-200 shadow-xs">' + uIcon + '</span>';
+    html += '      <div>';
+    html += '        <div class="text-xs font-bold text-slate-500 uppercase tracking-wide">Unit: ' + escapeHtml(uMeta.label || sType) + ' &bull; Periode: ' + escapeHtml(ticket.bulan || '-') + '</div>';
+    html += '        <div class="text-sm font-extrabold text-slate-900">' + escapeHtml(caseTitle) + '</div>';
+    html += '      </div>';
+    html += '    </div>';
+    html += '    <div>';
+    if (isClosed) {
+      html += '      <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">✅ Closed (Selesai)</span>';
+    } else if (isInProg) {
+      html += '      <span class="px-3 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-800 border border-orange-300">⚡ In Progress</span>';
+    } else {
+      html += '      <span class="px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-300">🔵 Open</span>';
+    }
+    html += '    </div>';
+    html += '  </div>';
+
+    // Timeline Vertikal 3 Tahap
+    html += '  <div class="relative pl-6 border-l-2 border-blue-200 space-y-5 ml-2 mt-2">';
+
+    // TAHAP 1: INPUTAN INPUTER
+    html += '    <div class="relative">';
+    html += '      <div class="absolute -left-[31px] top-1.5 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold shadow-xs">1</div>';
+    html += '      <div class="p-4 rounded-xl border border-blue-100 bg-blue-50/40 shadow-xs">';
+    html += '        <div class="flex items-center justify-between gap-2 border-b border-blue-100 pb-2 mb-2.5 flex-wrap">';
+    html += '          <div class="flex items-center gap-2">';
+    html += '            <span class="px-2 py-0.5 rounded text-[11px] font-extrabold bg-blue-600 text-white">INPUTAN INPUTER</span>';
+    html += '            <span class="text-xs font-bold text-slate-800">' + escapeHtml(inputerName) + '</span>';
+    html += '          </div>';
+    html += '          <span class="text-xs text-slate-500 font-medium">📅 Tanggal Input: <strong>' + escapeHtml(inputDate) + '</strong></span>';
+    html += '        </div>';
+    html += '        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">';
+    html += '          <div><span class="text-slate-500 block font-semibold mb-0.5">Judul Case Isu:</span><p class="font-bold text-slate-900 bg-white p-2 rounded-lg border border-slate-200">' + escapeHtml(caseTitle) + '</p></div>';
+    html += '          <div><span class="text-slate-500 block font-semibold mb-0.5">Urgency Case:</span><p class="font-bold text-slate-900 bg-white p-2 rounded-lg border border-slate-200">' + escapeHtml(urgencyText) + '</p></div>';
+    html += '          <div class="md:col-span-2"><span class="text-slate-500 block font-semibold mb-0.5">Detail Kendala:</span><p class="text-slate-800 bg-white p-2.5 rounded-lg border border-slate-200 whitespace-pre-line leading-relaxed">' + escapeHtml(detailText) + '</p></div>';
+    if (pdfLink) {
+      html += '          <div class="md:col-span-2"><span class="text-slate-500 block font-semibold mb-0.5">Sample Case (File PDF):</span><a href="' + escapeHtml(pdfLink) + '" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 font-bold rounded-lg border border-red-200 transition-colors"><span class="material-symbols-outlined text-[16px]">picture_as_pdf</span><span>' + escapeHtml(pdfName) + '</span></a></div>';
+    }
+    html += '        </div>';
+    html += '      </div>';
+    html += '    </div>';
+
+    // TAHAP 2: FOLLOW UP FASILITATOR
+    html += '    <div class="relative">';
+    html += '      <div class="absolute -left-[31px] top-1.5 w-6 h-6 rounded-full bg-purple-600 text-white flex items-center justify-center text-xs font-bold shadow-xs">2</div>';
+    html += '      <div class="p-4 rounded-xl border border-purple-100 bg-purple-50/40 shadow-xs">';
+    html += '        <div class="flex items-center justify-between gap-2 border-b border-purple-100 pb-2 mb-2.5 flex-wrap">';
+    html += '          <div class="flex items-center gap-2">';
+    html += '            <span class="px-2 py-0.5 rounded text-[11px] font-extrabold bg-purple-600 text-white">FOLLOW UP FASILITATOR</span>';
+    html += '            <span class="text-xs font-bold text-slate-800">PIC: ' + escapeHtml(fasilitatorName) + '</span>';
+    html += '          </div>';
+    html += '          <span class="text-xs text-slate-500 font-medium">🕒 Terakhir Update: <strong>' + escapeHtml(lastUpdateText) + '</strong></span>';
+    html += '        </div>';
+    html += '        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">';
+    html += '          <div><span class="text-slate-500 block font-semibold mb-0.5">Quick Win (Temporary Solution):</span><p class="text-slate-800 bg-white p-2 rounded-lg border border-slate-200 font-medium">' + escapeHtml(quickWinText) + '</p></div>';
+    html += '          <div><span class="text-slate-500 block font-semibold mb-0.5">Need Support:</span><p class="text-slate-800 bg-white p-2 rounded-lg border border-slate-200 font-medium">' + escapeHtml(needSupportText) + '</p></div>';
+    html += '          <div class="md:col-span-2"><span class="text-slate-500 block font-semibold mb-0.5">Catatan Tindak Lanjut oleh Fasilitator:</span><p class="text-slate-800 bg-white p-2.5 rounded-lg border border-slate-200 whitespace-pre-line leading-relaxed font-medium">' + escapeHtml(catatanFasilitator) + '</p></div>';
+    html += '        </div>';
+    html += '      </div>';
+    html += '    </div>';
+
+    // TAHAP 3: CASE CLOSED / STATUS AKHIR
+    html += '    <div class="relative">';
+    var stage3Bg = isClosed ? 'bg-emerald-600' : 'bg-slate-400';
+    html += '      <div class="absolute -left-[31px] top-1.5 w-6 h-6 rounded-full ' + stage3Bg + ' text-white flex items-center justify-center text-xs font-bold shadow-xs">3</div>';
+    html += '      <div class="p-4 rounded-xl border ' + (isClosed ? 'border-emerald-200 bg-emerald-50/40' : 'border-slate-200 bg-slate-50/60') + ' shadow-xs">';
+    html += '        <div class="flex items-center justify-between gap-2 border-b ' + (isClosed ? 'border-emerald-100' : 'border-slate-200') + ' pb-2 mb-2.5 flex-wrap">';
+    html += '          <div class="flex items-center gap-2">';
+    html += '            <span class="px-2 py-0.5 rounded text-[11px] font-extrabold ' + (isClosed ? 'bg-emerald-600 text-white' : 'bg-slate-600 text-white') + '">STATUS PENYELESAIAN</span>';
+    html += '            <span class="text-xs font-bold ' + (isClosed ? 'text-emerald-900' : 'text-slate-700') + '">' + (isClosed ? 'Case Closed' : 'Masih Berjalan (' + sStatus + ')') + '</span>';
+    html += '          </div>';
+    if (isClosed) {
+      html += '          <span class="text-xs text-slate-500 font-medium">Ditutup oleh: <strong>' + escapeHtml(closedBy) + '</strong></span>';
+    }
+    html += '        </div>';
+    html += '        <div class="text-xs">';
+    html += '          <span class="text-slate-500 block font-semibold mb-0.5">Keterangan Penyelesaian &amp; Solusi:</span>';
+    html += '          <p class="text-slate-800 bg-white p-2.5 rounded-lg border border-slate-200 leading-relaxed">' + escapeHtml(closedNotes) + '</p>';
+    html += '        </div>';
+    html += '      </div>';
+    html += '    </div>';
+
+    html += '  </div>'; // end timeline
+    html += '</div>';
+
+    contentEl.innerHTML = html;
+    modalEl.classList.add('active');
+
+    // Close handlers
+    var btnClose = document.getElementById('btnCloseHistoryModal');
+    var btnDismiss = document.getElementById('btnDismissHistoryModal');
+    var closeFn = function() { modalEl.classList.remove('active'); };
+    if (btnClose) btnClose.onclick = closeFn;
+    if (btnDismiss) btnDismiss.onclick = closeFn;
+    modalEl.onclick = function(e) { if (e.target === modalEl) closeFn(); };
+  };
+
   function openLogModal(ticketId) {
     var ticket = state.records.find(function(r) { return r.id === ticketId; });
     if (!ticket) return;
@@ -5862,18 +6013,18 @@
 
       const ppt = getCasePptAttachment(sType, item.id);
       const pptHref = ppt ? (ppt.fileUrl || ppt.url || '') : '';
-      const pptLabel = ppt ? (ppt.fileName || ppt.name || 'Lihat PPT') : 'Lihat PPT';
+      const pptLabel = ppt ? (ppt.fileName || ppt.name || 'Lihat PDF') : 'Lihat PDF';
       let pptCell = '';
       if (pptHref) {
         pptCell = '<div class="flex flex-col gap-1">' +
           '<a href="' + pptHref + '" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-2 py-1 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 rounded text-[11px] font-semibold truncate max-w-[130px]" title="' + escapeHtml(pptLabel) + '">' +
-          '  <span class="material-symbols-outlined text-[14px]">slideshow</span><span class="truncate">' + escapeHtml(pptLabel) + '</span>' +
+          '  <span class="material-symbols-outlined text-[14px]">picture_as_pdf</span><span class="truncate">' + escapeHtml(pptLabel) + '</span>' +
           '</a>' +
-          (currentRole === 'Administrator' ? '<button type="button" class="text-[10px] text-rose-600 hover:underline text-left" onclick="handleDeletePpt(\'' + item.id + '\', \'' + sType + '\')">Hapus PPT</button>' : '') +
+          (currentRole === 'Administrator' ? '<button type="button" class="text-[10px] text-rose-600 hover:underline text-left" onclick="handleDeletePpt(\'' + item.id + '\', \'' + sType + '\')">Hapus PDF</button>' : '') +
           '</div>';
       } else {
         if (currentRole === 'Administrator' || currentRole === 'Inputer') {
-          pptCell = '<button type="button" class="px-2 py-1 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded text-slate-700 font-semibold text-[11px] flex items-center gap-1" onclick="openUploadPptModal(\'' + item.id + '\', \'' + sType + '\')"><span class="material-symbols-outlined text-[13px]">upload</span><span>+ Upload PPT</span></button>';
+          pptCell = '<button type="button" class="px-2 py-1 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded text-slate-700 font-semibold text-[11px] flex items-center gap-1" onclick="openUploadPptModal(\'' + item.id + '\', \'' + sType + '\')"><span class="material-symbols-outlined text-[13px]">upload</span><span>+ Upload PDF</span></button>';
         } else {
           pptCell = '<span class="text-slate-400 text-[11px]">Tersedia di Calendar</span>';
         }
@@ -5958,7 +6109,14 @@
         '<td class="py-3 px-4"><div class="issue-details-text text-slate-600">' + escapeHtml(detailText) + '</div></td>' +
         '<td class="py-3 px-4">' + pptCell + '</td>' +
         '<td class="py-3 px-4">' + statusPill + '</td>' +
-        '<td class="py-3 px-4"><div class="flex items-center justify-between gap-1"><span class="text-slate-500 truncate max-w-[120px]">' + escapeHtml(noteText) + '</span><button type="button" class="w-6 h-6 rounded hover:bg-slate-200 flex items-center justify-center text-slate-500" title="Buka Detail" onclick="openDrawer(\'' + item.id + '\', \'' + sType + '\')"><span class="material-symbols-outlined text-[15px]">open_in_new</span></button></div></td>' +
+        '<td class="py-3 px-4"><span class="text-slate-700 font-medium text-xs">' + escapeHtml(item.progress || item.quickWin || item.statusUpdate || '-') + '</span></td>' +
+        '<td class="py-3 px-4"><span class="text-slate-600 text-xs">' + escapeHtml(item.catatanFasilitator || item.keteranganProgress || item.followUpTo || '-') + '</span></td>' +
+        '<td class="py-3 px-4 text-center">' +
+        '  <button type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-[#061345] text-xs font-bold rounded-lg border border-blue-200 shadow-xs transition-colors cursor-pointer shrink-0 whitespace-nowrap" title="Cek Riwayat History Case Lengkap" onclick="openHistoryCaseModal(\'' + item.id + '\', \'' + sType + '\')">' +
+        '    <span class="material-symbols-outlined text-[15px] text-blue-600">history</span>' +
+        '    <span>Cek History Case</span>' +
+        '  </button>' +
+        '</td>' +
         '</tr>';
     }).join('');
   }

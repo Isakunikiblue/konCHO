@@ -5931,21 +5931,10 @@ input:focus, select:focus, textarea:focus {
                 <span class="material-symbols-outlined text-[14px]">chevron_right</span>
                 <span class="text-slate-800 font-bold">List Isu CHO</span>
               </div>
-              <div class="flex items-center gap-3">
-                <h1 class="font-headline text-xl md:text-2xl font-extrabold text-[#061345] tracking-tight">Daftar Penanganan Isu</h1>
-              </div>
             </div>
 
             <!-- Quick Buttons -->
             <div class="flex items-center gap-2.5 flex-wrap">
-              <a id="btn-export-sheet" href="https://docs.google.com/spreadsheets/d/1bqispkT4gfY7GJ38ruVxqyuBk3ChdORDd2E5AiBYuDc/edit" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 shadow-xs transition-colors">
-                <span class="material-symbols-outlined text-[16px] text-emerald-600">table_chart</span>
-                <span>Buka Google Sheet</span>
-              </a>
-              <button id="btn-sync-now" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-blue-50 border border-blue-200 text-xs font-bold text-[#061345] hover:bg-blue-100 shadow-xs transition-colors" type="button">
-                <span class="material-symbols-outlined text-[16px]">sync</span>
-                <span id="sync-text">Sinkronkan Data</span>
-              </button>
               <button class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#061345] hover:bg-[#1e295a] text-white text-xs font-bold shadow-sm transition-all js-switch-calendar-btn" type="button">
                 <span class="material-symbols-outlined text-[16px]">calendar_month</span>
                 <span>Lihat di konCHO Calendar &rarr;</span>
@@ -5958,20 +5947,20 @@ input:focus, select:focus, textarea:focus {
           <!-- KPI METRIC CARDS GRID (5 CARDS: TOTAL CASE & 4 UNITS DENGAN BREAKDOWN OPEN, INPROGRESS, CLOSED) -->
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5 mb-5 items-stretch">
             <!-- Card 1: TOTAL Case -->
-            <div class="bg-white rounded-xl p-3.5 border border-slate-200/90 shadow-xs flex flex-col justify-between hover:shadow-sm transition-all cursor-pointer tasks-kpi-total" onclick="setTasksUnitFilter('all')" title="Klik untuk menampilkan semua unit">
+            <div class="bg-white rounded-xl p-4 border border-slate-200/90 shadow-xs flex flex-col justify-between hover:shadow-sm transition-all cursor-pointer tasks-kpi-total" onclick="setTasksUnitFilter('all')" title="Klik untuk menampilkan semua unit">
               <div class="flex items-start justify-between">
-                <span class="text-[10.5px] font-bold text-slate-500 uppercase tracking-wide">TOTAL CASE</span>
-                <div class="w-7 h-7 rounded-lg bg-blue-50 text-[#061345] flex items-center justify-center">
-                  <span class="material-symbols-outlined text-[16px]">dashboard</span>
+                <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">TOTAL CASE</span>
+                <div class="w-10 h-10 rounded-xl bg-blue-50 text-[#061345] flex items-center justify-center shadow-xs">
+                  <span class="material-symbols-outlined text-[20px]">dashboard</span>
                 </div>
               </div>
               <div class="mt-2.5">
                 <div class="text-2xl font-headline font-extrabold text-[#061345]" id="kpi-total-val">0</div>
                 <div class="text-[11px] text-slate-500 font-medium mt-0.5">Semua list isu CHO</div>
               </div>
-              <div class="mt-2.5 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[10.5px] text-slate-600">
+              <div class="mt-2.5 pt-2.5 border-t border-slate-100 flex items-center text-[10.5px] text-slate-600">
                 <span id="kpi-total-summary">Konsolidasi CHO</span>
-                <span class="font-bold text-[#061345]" id="kpi-coverage-val">100%</span>
+                <span class="hidden" id="kpi-coverage-val"></span>
               </div>
               <!-- Hidden compatibility hooks for test assertions -->
               <span id="kpi-open-val" class="hidden">0</span>
@@ -5986,13 +5975,13 @@ input:focus, select:focus, textarea:focus {
             </div>
 
             <!-- Card 2: CHO Mobile -->
-            <div class="bg-white rounded-xl p-3.5 border border-blue-200/80 shadow-xs flex flex-col justify-between hover:border-blue-300 hover:shadow-sm transition-all cursor-pointer bg-gradient-to-b from-blue-50/25 to-white tasks-kpi-mobile" onclick="setTasksUnitFilter('CHO MOBILE')" title="Klik untuk memfilter CHO Mobile">
+            <div class="bg-white rounded-xl p-4 border border-blue-200/80 shadow-xs flex flex-col justify-between hover:border-blue-300 hover:shadow-sm transition-all cursor-pointer bg-gradient-to-b from-blue-50/25 to-white tasks-kpi-mobile" onclick="setTasksUnitFilter('CHO MOBILE')" title="Klik untuk memfilter CHO Mobile">
               <div class="flex items-start justify-between">
                 <div class="flex items-center gap-1.5">
-                  <span class="w-2 h-2 rounded-full bg-blue-600"></span>
-                  <span class="text-[10.5px] font-bold text-blue-950 uppercase tracking-wide">CHO MOBILE</span>
+                  <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
+                  <span class="text-[11px] font-bold text-blue-950 uppercase tracking-wide">CHO MOBILE</span>
                 </div>
-                <div class="w-7 h-7 rounded-lg bg-blue-100/80 flex items-center justify-center text-sm shadow-xs">
+                <div class="w-10 h-10 rounded-xl bg-blue-100/80 flex items-center justify-center text-[20px] shadow-xs">
                   <span>📱</span>
                 </div>
               </div>
@@ -6007,13 +5996,13 @@ input:focus, select:focus, textarea:focus {
             </div>
 
             <!-- Card 3: CHO Fixed -->
-            <div class="bg-white rounded-xl p-3.5 border border-teal-200/80 shadow-xs flex flex-col justify-between hover:border-teal-300 hover:shadow-sm transition-all cursor-pointer bg-gradient-to-b from-teal-50/25 to-white tasks-kpi-fixed" onclick="setTasksUnitFilter('CHO FIXED')" title="Klik untuk memfilter CHO Fixed">
+            <div class="bg-white rounded-xl p-4 border border-teal-200/80 shadow-xs flex flex-col justify-between hover:border-teal-300 hover:shadow-sm transition-all cursor-pointer bg-gradient-to-b from-teal-50/25 to-white tasks-kpi-fixed" onclick="setTasksUnitFilter('CHO FIXED')" title="Klik untuk memfilter CHO Fixed">
               <div class="flex items-start justify-between">
                 <div class="flex items-center gap-1.5">
-                  <span class="w-2 h-2 rounded-full bg-teal-600"></span>
-                  <span class="text-[10.5px] font-bold text-teal-950 uppercase tracking-wide">CHO FIXED</span>
+                  <span class="w-2.5 h-2.5 rounded-full bg-teal-600"></span>
+                  <span class="text-[11px] font-bold text-teal-950 uppercase tracking-wide">CHO FIXED</span>
                 </div>
-                <div class="w-7 h-7 rounded-lg bg-teal-100/80 flex items-center justify-center text-sm shadow-xs">
+                <div class="w-10 h-10 rounded-xl bg-teal-100/80 flex items-center justify-center text-[20px] shadow-xs">
                   <span>🌐</span>
                 </div>
               </div>
@@ -6028,13 +6017,13 @@ input:focus, select:focus, textarea:focus {
             </div>
 
             <!-- Card 4: CHO eCare -->
-            <div class="bg-white rounded-xl p-3.5 border border-purple-200/80 shadow-xs flex flex-col justify-between hover:border-purple-300 hover:shadow-sm transition-all cursor-pointer bg-gradient-to-b from-purple-50/25 to-white tasks-kpi-ecare" onclick="setTasksUnitFilter('CHO ECARE')" title="Klik untuk memfilter CHO eCare">
+            <div class="bg-white rounded-xl p-4 border border-purple-200/80 shadow-xs flex flex-col justify-between hover:border-purple-300 hover:shadow-sm transition-all cursor-pointer bg-gradient-to-b from-purple-50/25 to-white tasks-kpi-ecare" onclick="setTasksUnitFilter('CHO ECARE')" title="Klik untuk memfilter CHO eCare">
               <div class="flex items-start justify-between">
                 <div class="flex items-center gap-1.5">
-                  <span class="w-2 h-2 rounded-full bg-purple-600"></span>
-                  <span class="text-[10.5px] font-bold text-purple-950 uppercase tracking-wide">CHO ECARE</span>
+                  <span class="w-2.5 h-2.5 rounded-full bg-purple-600"></span>
+                  <span class="text-[11px] font-bold text-purple-950 uppercase tracking-wide">CHO ECARE</span>
                 </div>
-                <div class="w-7 h-7 rounded-lg bg-purple-100/80 flex items-center justify-center text-sm shadow-xs">
+                <div class="w-10 h-10 rounded-xl bg-purple-100/80 flex items-center justify-center text-[20px] shadow-xs">
                   <span>💬</span>
                 </div>
               </div>
@@ -6049,13 +6038,13 @@ input:focus, select:focus, textarea:focus {
             </div>
 
             <!-- Card 5: CHO Priority -->
-            <div class="bg-white rounded-xl p-3.5 border border-amber-200/80 shadow-xs flex flex-col justify-between hover:border-amber-300 hover:shadow-sm transition-all cursor-pointer bg-gradient-to-b from-amber-50/25 to-white tasks-kpi-priority" onclick="setTasksUnitFilter('CHO PRIORITY')" title="Klik untuk memfilter CHO Priority">
+            <div class="bg-white rounded-xl p-4 border border-amber-200/80 shadow-xs flex flex-col justify-between hover:border-amber-300 hover:shadow-sm transition-all cursor-pointer bg-gradient-to-b from-amber-50/25 to-white tasks-kpi-priority" onclick="setTasksUnitFilter('CHO PRIORITY')" title="Klik untuk memfilter CHO Priority">
               <div class="flex items-start justify-between">
                 <div class="flex items-center gap-1.5">
-                  <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-                  <span class="text-[10.5px] font-bold text-amber-950 uppercase tracking-wide">CHO PRIORITY</span>
+                  <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                  <span class="text-[11px] font-bold text-amber-950 uppercase tracking-wide">CHO PRIORITY</span>
                 </div>
-                <div class="w-7 h-7 rounded-lg bg-amber-100/80 flex items-center justify-center text-sm shadow-xs">
+                <div class="w-10 h-10 rounded-xl bg-amber-100/80 flex items-center justify-center text-[20px] shadow-xs">
                   <span>⭐</span>
                 </div>
               </div>
@@ -6069,7 +6058,6 @@ input:focus, select:focus, textarea:focus {
               </div>
             </div>
           </div>
-
           <!-- FILTERS TOOLBAR -->
           <div class="bg-white rounded-xl p-3.5 border border-slate-200/90 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3">
             <!-- Left: Search & Unit Pills -->
@@ -6163,14 +6151,16 @@ input:focus, select:focus, textarea:focus {
                   <tr class="bg-slate-50/80 border-b border-slate-200 font-headline font-bold text-slate-600 uppercase text-[11px] tracking-wider">
                     <th class="py-3 px-4 w-12 text-center">NO</th>
                     <th class="py-3 px-4 w-28">PERIODE</th>
-                    <th class="py-3 px-4 min-w-[140px]">TANGGAL INPUT (INPUTER)</th>
-                    <th class="py-3 px-4 min-w-[160px]">TANGGAL AGENDA (KOLOM K)</th>
+                    <th class="py-3 px-4 min-w-[130px]">TANGGAL INPUT</th>
+                    <th class="py-3 px-4 min-w-[140px]">TANGGAL AGENDA</th>
                     <th class="py-3 px-4 w-28">UNIT</th>
-                    <th class="py-3 px-4 min-w-[220px]">MAIN ISSUE (KOLOM C)<span class="block text-[10px] font-normal text-slate-400">&mdash; klik untuk buka calendar</span></th>
-                    <th class="py-3 px-4 min-w-[320px]">DETAIL KENDALA (KOLOM D)</th>
-                    <th class="py-3 px-4 w-36">MATERI PPT (DRIVE)</th>
-                    <th class="py-3 px-4 w-32">STATUS (KOLOM H)</th>
-                    <th class="py-3 px-4 w-36">STATUS UPDATE (KOLOM J)</th>
+                    <th class="py-3 px-4 min-w-[200px]">Case</th>
+                    <th class="py-3 px-4 min-w-[280px]">DETAIL KENDALA</th>
+                    <th class="py-3 px-4 w-36">Sample Case</th>
+                    <th class="py-3 px-4 w-32">STATUS CASE</th>
+                    <th class="py-3 px-4 w-36">Quick Win</th>
+                    <th class="py-3 px-4 min-w-[220px]">Catatan tindak lanjut oleh Fasilitator</th>
+                    <th class="py-3 px-4 w-40 text-center">Aksi</th>
                   </tr>
                 </thead>
                 <tbody id="task-table-body" class="divide-y divide-slate-100">
@@ -6754,6 +6744,32 @@ input:focus, select:focus, textarea:focus {
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
             <span>Simpan Perubahan Tanggal</span>
           </button>
+        </div>
+      </div>
+    </div>
+
+        <!-- 7. MODAL: CEK HISTORY CASE LENGKAP -->
+    <div class="modal-backdrop" id="modalHistoryCase">
+      <div class="modal-dialog" style="max-width: 780px; width: 95%; max-height: 94vh;">
+        <div class="modal-head" style="padding: 14px 20px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;">
+          <div class="modal-title-wrap">
+            <div style="font-size: 11px; font-weight: 700; color: #2563eb; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 5px;">
+              <span class="material-symbols-outlined text-[15px]">history</span>
+              <span>Audit Trail &amp; Lifecycle Kasus</span>
+            </div>
+            <h2 class="modal-title" id="historyModalTitle" style="font-size: 17px; font-weight: 800; margin-top: 2px;">History Case: -</h2>
+          </div>
+          <button class="modal-close-btn" id="btnCloseHistoryModal" title="Tutup" style="font-size: 18px; cursor: pointer; background: transparent; border: none;">✕</button>
+        </div>
+
+        <div class="modal-body" style="padding: 18px 20px; max-height: calc(94vh - 120px); overflow-y: auto;">
+          <div id="historyModalContent">
+            <!-- Populated dynamically by openHistoryCaseModal() -->
+          </div>
+        </div>
+
+        <div class="modal-foot" style="padding: 12px 20px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end;">
+          <button class="btn-secondary" id="btnDismissHistoryModal" style="padding: 7px 18px; font-size: 12.5px; font-weight: 600; border-radius: 8px;">Tutup</button>
         </div>
       </div>
     </div>
@@ -10656,10 +10672,10 @@ input:focus, select:focus, textarea:focus {
       } else if (canUploadPpt) {
         html += '    <button type="button" class="btn-ppt-upload" onclick="openUploadPptModal(\'' + escapeHtml(item.id) + '\', \'' + item.serviceType + '\')" title="Upload File PPT ke Google Drive untuk kasus ini">';
         html += '      <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>';
-        html += '      <span>+ Upload PPT</span>';
+        html += '      <span>+ Upload PDF</span>';
         html += '    </button>';
       } else {
-        html += '    <span class="ppt-empty-badge" title="Materi PPT belum diunggah">- Belum Ada PPT -</span>';
+        html += '    <span class="ppt-empty-badge" title="Materi PPT belum diunggah">- Belum Ada PDF -</span>';
       }
       html += '  </div>';
       html += '  <div class="case-row-title" style="font-size:16px; font-weight:800; color:var(--text-primary); margin-top:4px;">' + escapeHtml(item.totalCaseIsu || 'Isu Case CHO') + '</div>';
@@ -10922,10 +10938,10 @@ input:focus, select:focus, textarea:focus {
         if (canUploadPpt) {
           html += '            <button type="button" class="btn-ppt-upload" onclick="openUploadPptModal(\'' + escapeHtml(item.id) + '\', \'' + item.serviceType + '\')" title="Upload File PPT ke Google Drive untuk kasus ini">';
           html += '              <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>';
-          html += '              <span>+ Upload PPT</span>';
+          html += '              <span>+ Upload PDF</span>';
           html += '            </button>';
         } else {
-          html += '            <span class="ppt-empty-badge" title="Belum ada file PPT diunggah">- Belum Ada PPT -</span>';
+          html += '            <span class="ppt-empty-badge" title="Belum ada file PPT diunggah">- Belum Ada PDF -</span>';
         }
       }
       html += '          </td>';
@@ -11577,7 +11593,7 @@ input:focus, select:focus, textarea:focus {
             }
           })
           .catch(function(err) {
-            console.error('Upload PPT error:', err);
+            console.error('Upload PDF error:', err);
             onUploadPptError('Koneksi upload gagal: ' + err.message, file, target);
           });
         } else {
@@ -11999,6 +12015,157 @@ input:focus, select:focus, textarea:focus {
    * RIWAYAT LOG KOMUNIKASI & TIMELINE DETAIL
    * =========================================================================
    */
+    /**
+   * Cek History Case Lengkap: Lifecycle Kasus dari Inputer, Fasilitator sampai Case Closed
+   */
+  window.openHistoryCaseModal = function(ticketId, serviceType) {
+    var ticket = (state.records || []).find(function(r) { 
+      return String(r.id) === String(ticketId) || String(r.ticketId) === String(ticketId); 
+    });
+    if (!ticket) {
+      showToast('Data kasus tidak ditemukan!', 'error');
+      return;
+    }
+
+    var titleEl = document.getElementById('historyModalTitle');
+    var contentEl = document.getElementById('historyModalContent');
+    var modalEl = document.getElementById('modalHistoryCase');
+    if (!modalEl || !contentEl) return;
+
+    var sType = ticket.serviceType || serviceType || 'MOBILE';
+    var uMeta = getServiceMeta(sType);
+    var uKey = normalizeUnitKey(sType);
+    var uIcon = uKey === 'MOBILE' ? '📱' : (uKey === 'FIXED' ? '🌐' : (uKey === 'ECARE' ? '💬' : '⭐'));
+    var sStatus = String(ticket.status || 'Open').trim();
+    var isClosed = sStatus.toLowerCase() === 'closed';
+    var isInProg = sStatus.toLowerCase() === 'inprogress';
+    
+    if (titleEl) {
+      titleEl.innerHTML = '<span class="text-blue-600 font-mono">#CHO-' + escapeHtml(ticket.id) + '</span> &bull; ' + escapeHtml(ticket.totalCaseIsu || ticket.caseTitle || 'Case');
+    }
+
+    var ppt = getCasePptAttachment(sType, ticket.id);
+    var pdfLink = (ppt && (ppt.fileUrl || ppt.url)) ? (ppt.fileUrl || ppt.url) : (ticket.filePpt || ticket.filePdf || '');
+    var pdfName = (ppt && (ppt.fileName || ppt.name)) ? (ppt.fileName || ppt.name) : 'Sample Case (PDF)';
+
+    var inputerName = ticket.inputBy || ticket.requestor || 'Inputer';
+    var inputDate = ticket.tanggalInput || ticket.tanggalAgenda || ticket.bulan || '-';
+    var caseTitle = ticket.totalCaseIsu || ticket.caseTitle || '-';
+    var detailText = ticket.issueDetails || ticket.detail || ticket.detailKendala || '-';
+    var urgencyText = ticket.urgency || 'Low';
+
+    var fasilitatorName = ticket.picFacilitator || getFacilitatorForRequestor(ticket.requestor) || '-';
+    var quickWinText = ticket.progress || ticket.quickWin || ticket.statusUpdate || '-';
+    var catatanFasilitator = ticket.catatanFasilitator || ticket.keteranganProgress || ticket.followUpTo || '-';
+    var needSupportText = ticket.needSupport || '-';
+    var lastUpdateText = ticket.terakhirUpdate || 'Baru Saja';
+
+    var closedBy = ticket.closedBy || (isClosed ? fasilitatorName : '-');
+    var closedNotes = ticket.keteranganClosed || ticket.solusi || (isClosed ? 'Kasus telah diselesaikan dan terverifikasi.' : 'Kasus masih dalam proses penanganan.');
+
+    var html = '';
+    html += '<div class="space-y-4">';
+
+    // Banner Ringkasan Kasus
+    html += '  <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex flex-wrap items-center justify-between gap-3">';
+    html += '    <div class="flex items-center gap-2.5">';
+    html += '      <span class="text-xl p-2 rounded-lg bg-white border border-slate-200 shadow-xs">' + uIcon + '</span>';
+    html += '      <div>';
+    html += '        <div class="text-xs font-bold text-slate-500 uppercase tracking-wide">Unit: ' + escapeHtml(uMeta.label || sType) + ' &bull; Periode: ' + escapeHtml(ticket.bulan || '-') + '</div>';
+    html += '        <div class="text-sm font-extrabold text-slate-900">' + escapeHtml(caseTitle) + '</div>';
+    html += '      </div>';
+    html += '    </div>';
+    html += '    <div>';
+    if (isClosed) {
+      html += '      <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">✅ Closed (Selesai)</span>';
+    } else if (isInProg) {
+      html += '      <span class="px-3 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-800 border border-orange-300">⚡ In Progress</span>';
+    } else {
+      html += '      <span class="px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-300">🔵 Open</span>';
+    }
+    html += '    </div>';
+    html += '  </div>';
+
+    // Timeline Vertikal 3 Tahap
+    html += '  <div class="relative pl-6 border-l-2 border-blue-200 space-y-5 ml-2 mt-2">';
+
+    // TAHAP 1: INPUTAN INPUTER
+    html += '    <div class="relative">';
+    html += '      <div class="absolute -left-[31px] top-1.5 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold shadow-xs">1</div>';
+    html += '      <div class="p-4 rounded-xl border border-blue-100 bg-blue-50/40 shadow-xs">';
+    html += '        <div class="flex items-center justify-between gap-2 border-b border-blue-100 pb-2 mb-2.5 flex-wrap">';
+    html += '          <div class="flex items-center gap-2">';
+    html += '            <span class="px-2 py-0.5 rounded text-[11px] font-extrabold bg-blue-600 text-white">INPUTAN INPUTER</span>';
+    html += '            <span class="text-xs font-bold text-slate-800">' + escapeHtml(inputerName) + '</span>';
+    html += '          </div>';
+    html += '          <span class="text-xs text-slate-500 font-medium">📅 Tanggal Input: <strong>' + escapeHtml(inputDate) + '</strong></span>';
+    html += '        </div>';
+    html += '        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">';
+    html += '          <div><span class="text-slate-500 block font-semibold mb-0.5">Judul Case Isu:</span><p class="font-bold text-slate-900 bg-white p-2 rounded-lg border border-slate-200">' + escapeHtml(caseTitle) + '</p></div>';
+    html += '          <div><span class="text-slate-500 block font-semibold mb-0.5">Urgency Case:</span><p class="font-bold text-slate-900 bg-white p-2 rounded-lg border border-slate-200">' + escapeHtml(urgencyText) + '</p></div>';
+    html += '          <div class="md:col-span-2"><span class="text-slate-500 block font-semibold mb-0.5">Detail Kendala:</span><p class="text-slate-800 bg-white p-2.5 rounded-lg border border-slate-200 whitespace-pre-line leading-relaxed">' + escapeHtml(detailText) + '</p></div>';
+    if (pdfLink) {
+      html += '          <div class="md:col-span-2"><span class="text-slate-500 block font-semibold mb-0.5">Sample Case (File PDF):</span><a href="' + escapeHtml(pdfLink) + '" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 font-bold rounded-lg border border-red-200 transition-colors"><span class="material-symbols-outlined text-[16px]">picture_as_pdf</span><span>' + escapeHtml(pdfName) + '</span></a></div>';
+    }
+    html += '        </div>';
+    html += '      </div>';
+    html += '    </div>';
+
+    // TAHAP 2: FOLLOW UP FASILITATOR
+    html += '    <div class="relative">';
+    html += '      <div class="absolute -left-[31px] top-1.5 w-6 h-6 rounded-full bg-purple-600 text-white flex items-center justify-center text-xs font-bold shadow-xs">2</div>';
+    html += '      <div class="p-4 rounded-xl border border-purple-100 bg-purple-50/40 shadow-xs">';
+    html += '        <div class="flex items-center justify-between gap-2 border-b border-purple-100 pb-2 mb-2.5 flex-wrap">';
+    html += '          <div class="flex items-center gap-2">';
+    html += '            <span class="px-2 py-0.5 rounded text-[11px] font-extrabold bg-purple-600 text-white">FOLLOW UP FASILITATOR</span>';
+    html += '            <span class="text-xs font-bold text-slate-800">PIC: ' + escapeHtml(fasilitatorName) + '</span>';
+    html += '          </div>';
+    html += '          <span class="text-xs text-slate-500 font-medium">🕒 Terakhir Update: <strong>' + escapeHtml(lastUpdateText) + '</strong></span>';
+    html += '        </div>';
+    html += '        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">';
+    html += '          <div><span class="text-slate-500 block font-semibold mb-0.5">Quick Win (Temporary Solution):</span><p class="text-slate-800 bg-white p-2 rounded-lg border border-slate-200 font-medium">' + escapeHtml(quickWinText) + '</p></div>';
+    html += '          <div><span class="text-slate-500 block font-semibold mb-0.5">Need Support:</span><p class="text-slate-800 bg-white p-2 rounded-lg border border-slate-200 font-medium">' + escapeHtml(needSupportText) + '</p></div>';
+    html += '          <div class="md:col-span-2"><span class="text-slate-500 block font-semibold mb-0.5">Catatan Tindak Lanjut oleh Fasilitator:</span><p class="text-slate-800 bg-white p-2.5 rounded-lg border border-slate-200 whitespace-pre-line leading-relaxed font-medium">' + escapeHtml(catatanFasilitator) + '</p></div>';
+    html += '        </div>';
+    html += '      </div>';
+    html += '    </div>';
+
+    // TAHAP 3: CASE CLOSED / STATUS AKHIR
+    html += '    <div class="relative">';
+    var stage3Bg = isClosed ? 'bg-emerald-600' : 'bg-slate-400';
+    html += '      <div class="absolute -left-[31px] top-1.5 w-6 h-6 rounded-full ' + stage3Bg + ' text-white flex items-center justify-center text-xs font-bold shadow-xs">3</div>';
+    html += '      <div class="p-4 rounded-xl border ' + (isClosed ? 'border-emerald-200 bg-emerald-50/40' : 'border-slate-200 bg-slate-50/60') + ' shadow-xs">';
+    html += '        <div class="flex items-center justify-between gap-2 border-b ' + (isClosed ? 'border-emerald-100' : 'border-slate-200') + ' pb-2 mb-2.5 flex-wrap">';
+    html += '          <div class="flex items-center gap-2">';
+    html += '            <span class="px-2 py-0.5 rounded text-[11px] font-extrabold ' + (isClosed ? 'bg-emerald-600 text-white' : 'bg-slate-600 text-white') + '">STATUS PENYELESAIAN</span>';
+    html += '            <span class="text-xs font-bold ' + (isClosed ? 'text-emerald-900' : 'text-slate-700') + '">' + (isClosed ? 'Case Closed' : 'Masih Berjalan (' + sStatus + ')') + '</span>';
+    html += '          </div>';
+    if (isClosed) {
+      html += '          <span class="text-xs text-slate-500 font-medium">Ditutup oleh: <strong>' + escapeHtml(closedBy) + '</strong></span>';
+    }
+    html += '        </div>';
+    html += '        <div class="text-xs">';
+    html += '          <span class="text-slate-500 block font-semibold mb-0.5">Keterangan Penyelesaian &amp; Solusi:</span>';
+    html += '          <p class="text-slate-800 bg-white p-2.5 rounded-lg border border-slate-200 leading-relaxed">' + escapeHtml(closedNotes) + '</p>';
+    html += '        </div>';
+    html += '      </div>';
+    html += '    </div>';
+
+    html += '  </div>'; // end timeline
+    html += '</div>';
+
+    contentEl.innerHTML = html;
+    modalEl.classList.add('active');
+
+    // Close handlers
+    var btnClose = document.getElementById('btnCloseHistoryModal');
+    var btnDismiss = document.getElementById('btnDismissHistoryModal');
+    var closeFn = function() { modalEl.classList.remove('active'); };
+    if (btnClose) btnClose.onclick = closeFn;
+    if (btnDismiss) btnDismiss.onclick = closeFn;
+    modalEl.onclick = function(e) { if (e.target === modalEl) closeFn(); };
+  };
+
   function openLogModal(ticketId) {
     var ticket = state.records.find(function(r) { return r.id === ticketId; });
     if (!ticket) return;
@@ -13752,18 +13919,18 @@ input:focus, select:focus, textarea:focus {
 
       const ppt = getCasePptAttachment(sType, item.id);
       const pptHref = ppt ? (ppt.fileUrl || ppt.url || '') : '';
-      const pptLabel = ppt ? (ppt.fileName || ppt.name || 'Lihat PPT') : 'Lihat PPT';
+      const pptLabel = ppt ? (ppt.fileName || ppt.name || 'Lihat PDF') : 'Lihat PDF';
       let pptCell = '';
       if (pptHref) {
         pptCell = '<div class="flex flex-col gap-1">' +
           '<a href="' + pptHref + '" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1 px-2 py-1 bg-red-50 hover:bg-red-100 text-red-700 border border-red-200 rounded text-[11px] font-semibold truncate max-w-[130px]" title="' + escapeHtml(pptLabel) + '">' +
-          '  <span class="material-symbols-outlined text-[14px]">slideshow</span><span class="truncate">' + escapeHtml(pptLabel) + '</span>' +
+          '  <span class="material-symbols-outlined text-[14px]">picture_as_pdf</span><span class="truncate">' + escapeHtml(pptLabel) + '</span>' +
           '</a>' +
-          (currentRole === 'Administrator' ? '<button type="button" class="text-[10px] text-rose-600 hover:underline text-left" onclick="handleDeletePpt(\'' + item.id + '\', \'' + sType + '\')">Hapus PPT</button>' : '') +
+          (currentRole === 'Administrator' ? '<button type="button" class="text-[10px] text-rose-600 hover:underline text-left" onclick="handleDeletePpt(\'' + item.id + '\', \'' + sType + '\')">Hapus PDF</button>' : '') +
           '</div>';
       } else {
         if (currentRole === 'Administrator' || currentRole === 'Inputer') {
-          pptCell = '<button type="button" class="px-2 py-1 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded text-slate-700 font-semibold text-[11px] flex items-center gap-1" onclick="openUploadPptModal(\'' + item.id + '\', \'' + sType + '\')"><span class="material-symbols-outlined text-[13px]">upload</span><span>+ Upload PPT</span></button>';
+          pptCell = '<button type="button" class="px-2 py-1 bg-slate-50 hover:bg-slate-100 border border-slate-200 rounded text-slate-700 font-semibold text-[11px] flex items-center gap-1" onclick="openUploadPptModal(\'' + item.id + '\', \'' + sType + '\')"><span class="material-symbols-outlined text-[13px]">upload</span><span>+ Upload PDF</span></button>';
         } else {
           pptCell = '<span class="text-slate-400 text-[11px]">Tersedia di Calendar</span>';
         }
@@ -13848,7 +14015,14 @@ input:focus, select:focus, textarea:focus {
         '<td class="py-3 px-4"><div class="issue-details-text text-slate-600">' + escapeHtml(detailText) + '</div></td>' +
         '<td class="py-3 px-4">' + pptCell + '</td>' +
         '<td class="py-3 px-4">' + statusPill + '</td>' +
-        '<td class="py-3 px-4"><div class="flex items-center justify-between gap-1"><span class="text-slate-500 truncate max-w-[120px]">' + escapeHtml(noteText) + '</span><button type="button" class="w-6 h-6 rounded hover:bg-slate-200 flex items-center justify-center text-slate-500" title="Buka Detail" onclick="openDrawer(\'' + item.id + '\', \'' + sType + '\')"><span class="material-symbols-outlined text-[15px]">open_in_new</span></button></div></td>' +
+        '<td class="py-3 px-4"><span class="text-slate-700 font-medium text-xs">' + escapeHtml(item.progress || item.quickWin || item.statusUpdate || '-') + '</span></td>' +
+        '<td class="py-3 px-4"><span class="text-slate-600 text-xs">' + escapeHtml(item.catatanFasilitator || item.keteranganProgress || item.followUpTo || '-') + '</span></td>' +
+        '<td class="py-3 px-4 text-center">' +
+        '  <button type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-[#061345] text-xs font-bold rounded-lg border border-blue-200 shadow-xs transition-colors cursor-pointer shrink-0 whitespace-nowrap" title="Cek Riwayat History Case Lengkap" onclick="openHistoryCaseModal(\'' + item.id + '\', \'' + sType + '\')">' +
+        '    <span class="material-symbols-outlined text-[15px] text-blue-600">history</span>' +
+        '    <span>Cek History Case</span>' +
+        '  </button>' +
+        '</td>' +
         '</tr>';
     }).join('');
   }

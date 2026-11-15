@@ -488,21 +488,10 @@
                 <span class="material-symbols-outlined text-[14px]">chevron_right</span>
                 <span class="text-slate-800 font-bold">List Isu CHO</span>
               </div>
-              <div class="flex items-center gap-3">
-                <h1 class="font-headline text-xl md:text-2xl font-extrabold text-[#061345] tracking-tight">Daftar Penanganan Isu</h1>
-              </div>
             </div>
 
             <!-- Quick Buttons -->
             <div class="flex items-center gap-2.5 flex-wrap">
-              <a id="btn-export-sheet" href="https://docs.google.com/spreadsheets/d/1bqispkT4gfY7GJ38ruVxqyuBk3ChdORDd2E5AiBYuDc/edit" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-white border border-slate-200 text-xs font-bold text-slate-700 hover:bg-slate-50 shadow-xs transition-colors">
-                <span class="material-symbols-outlined text-[16px] text-emerald-600">table_chart</span>
-                <span>Buka Google Sheet</span>
-              </a>
-              <button id="btn-sync-now" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-lg bg-blue-50 border border-blue-200 text-xs font-bold text-[#061345] hover:bg-blue-100 shadow-xs transition-colors" type="button">
-                <span class="material-symbols-outlined text-[16px]">sync</span>
-                <span id="sync-text">Sinkronkan Data</span>
-              </button>
               <button class="inline-flex items-center gap-1.5 px-4 py-2 rounded-lg bg-[#061345] hover:bg-[#1e295a] text-white text-xs font-bold shadow-sm transition-all js-switch-calendar-btn" type="button">
                 <span class="material-symbols-outlined text-[16px]">calendar_month</span>
                 <span>Lihat di konCHO Calendar &rarr;</span>
@@ -515,20 +504,20 @@
           <!-- KPI METRIC CARDS GRID (5 CARDS: TOTAL CASE & 4 UNITS DENGAN BREAKDOWN OPEN, INPROGRESS, CLOSED) -->
           <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5 mb-5 items-stretch">
             <!-- Card 1: TOTAL Case -->
-            <div class="bg-white rounded-xl p-3.5 border border-slate-200/90 shadow-xs flex flex-col justify-between hover:shadow-sm transition-all cursor-pointer tasks-kpi-total" onclick="setTasksUnitFilter('all')" title="Klik untuk menampilkan semua unit">
+            <div class="bg-white rounded-xl p-4 border border-slate-200/90 shadow-xs flex flex-col justify-between hover:shadow-sm transition-all cursor-pointer tasks-kpi-total" onclick="setTasksUnitFilter('all')" title="Klik untuk menampilkan semua unit">
               <div class="flex items-start justify-between">
-                <span class="text-[10.5px] font-bold text-slate-500 uppercase tracking-wide">TOTAL CASE</span>
-                <div class="w-7 h-7 rounded-lg bg-blue-50 text-[#061345] flex items-center justify-center">
-                  <span class="material-symbols-outlined text-[16px]">dashboard</span>
+                <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">TOTAL CASE</span>
+                <div class="w-10 h-10 rounded-xl bg-blue-50 text-[#061345] flex items-center justify-center shadow-xs">
+                  <span class="material-symbols-outlined text-[20px]">dashboard</span>
                 </div>
               </div>
               <div class="mt-2.5">
                 <div class="text-2xl font-headline font-extrabold text-[#061345]" id="kpi-total-val">0</div>
                 <div class="text-[11px] text-slate-500 font-medium mt-0.5">Semua list isu CHO</div>
               </div>
-              <div class="mt-2.5 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[10.5px] text-slate-600">
+              <div class="mt-2.5 pt-2.5 border-t border-slate-100 flex items-center text-[10.5px] text-slate-600">
                 <span id="kpi-total-summary">Konsolidasi CHO</span>
-                <span class="font-bold text-[#061345]" id="kpi-coverage-val">100%</span>
+                <span class="hidden" id="kpi-coverage-val"></span>
               </div>
               <!-- Hidden compatibility hooks for test assertions -->
               <span id="kpi-open-val" class="hidden">0</span>
@@ -543,13 +532,13 @@
             </div>
 
             <!-- Card 2: CHO Mobile -->
-            <div class="bg-white rounded-xl p-3.5 border border-blue-200/80 shadow-xs flex flex-col justify-between hover:border-blue-300 hover:shadow-sm transition-all cursor-pointer bg-gradient-to-b from-blue-50/25 to-white tasks-kpi-mobile" onclick="setTasksUnitFilter('CHO MOBILE')" title="Klik untuk memfilter CHO Mobile">
+            <div class="bg-white rounded-xl p-4 border border-blue-200/80 shadow-xs flex flex-col justify-between hover:border-blue-300 hover:shadow-sm transition-all cursor-pointer bg-gradient-to-b from-blue-50/25 to-white tasks-kpi-mobile" onclick="setTasksUnitFilter('CHO MOBILE')" title="Klik untuk memfilter CHO Mobile">
               <div class="flex items-start justify-between">
                 <div class="flex items-center gap-1.5">
-                  <span class="w-2 h-2 rounded-full bg-blue-600"></span>
-                  <span class="text-[10.5px] font-bold text-blue-950 uppercase tracking-wide">CHO MOBILE</span>
+                  <span class="w-2.5 h-2.5 rounded-full bg-blue-600"></span>
+                  <span class="text-[11px] font-bold text-blue-950 uppercase tracking-wide">CHO MOBILE</span>
                 </div>
-                <div class="w-7 h-7 rounded-lg bg-blue-100/80 flex items-center justify-center text-sm shadow-xs">
+                <div class="w-10 h-10 rounded-xl bg-blue-100/80 flex items-center justify-center text-[20px] shadow-xs">
                   <span>📱</span>
                 </div>
               </div>
@@ -564,13 +553,13 @@
             </div>
 
             <!-- Card 3: CHO Fixed -->
-            <div class="bg-white rounded-xl p-3.5 border border-teal-200/80 shadow-xs flex flex-col justify-between hover:border-teal-300 hover:shadow-sm transition-all cursor-pointer bg-gradient-to-b from-teal-50/25 to-white tasks-kpi-fixed" onclick="setTasksUnitFilter('CHO FIXED')" title="Klik untuk memfilter CHO Fixed">
+            <div class="bg-white rounded-xl p-4 border border-teal-200/80 shadow-xs flex flex-col justify-between hover:border-teal-300 hover:shadow-sm transition-all cursor-pointer bg-gradient-to-b from-teal-50/25 to-white tasks-kpi-fixed" onclick="setTasksUnitFilter('CHO FIXED')" title="Klik untuk memfilter CHO Fixed">
               <div class="flex items-start justify-between">
                 <div class="flex items-center gap-1.5">
-                  <span class="w-2 h-2 rounded-full bg-teal-600"></span>
-                  <span class="text-[10.5px] font-bold text-teal-950 uppercase tracking-wide">CHO FIXED</span>
+                  <span class="w-2.5 h-2.5 rounded-full bg-teal-600"></span>
+                  <span class="text-[11px] font-bold text-teal-950 uppercase tracking-wide">CHO FIXED</span>
                 </div>
-                <div class="w-7 h-7 rounded-lg bg-teal-100/80 flex items-center justify-center text-sm shadow-xs">
+                <div class="w-10 h-10 rounded-xl bg-teal-100/80 flex items-center justify-center text-[20px] shadow-xs">
                   <span>🌐</span>
                 </div>
               </div>
@@ -585,13 +574,13 @@
             </div>
 
             <!-- Card 4: CHO eCare -->
-            <div class="bg-white rounded-xl p-3.5 border border-purple-200/80 shadow-xs flex flex-col justify-between hover:border-purple-300 hover:shadow-sm transition-all cursor-pointer bg-gradient-to-b from-purple-50/25 to-white tasks-kpi-ecare" onclick="setTasksUnitFilter('CHO ECARE')" title="Klik untuk memfilter CHO eCare">
+            <div class="bg-white rounded-xl p-4 border border-purple-200/80 shadow-xs flex flex-col justify-between hover:border-purple-300 hover:shadow-sm transition-all cursor-pointer bg-gradient-to-b from-purple-50/25 to-white tasks-kpi-ecare" onclick="setTasksUnitFilter('CHO ECARE')" title="Klik untuk memfilter CHO eCare">
               <div class="flex items-start justify-between">
                 <div class="flex items-center gap-1.5">
-                  <span class="w-2 h-2 rounded-full bg-purple-600"></span>
-                  <span class="text-[10.5px] font-bold text-purple-950 uppercase tracking-wide">CHO ECARE</span>
+                  <span class="w-2.5 h-2.5 rounded-full bg-purple-600"></span>
+                  <span class="text-[11px] font-bold text-purple-950 uppercase tracking-wide">CHO ECARE</span>
                 </div>
-                <div class="w-7 h-7 rounded-lg bg-purple-100/80 flex items-center justify-center text-sm shadow-xs">
+                <div class="w-10 h-10 rounded-xl bg-purple-100/80 flex items-center justify-center text-[20px] shadow-xs">
                   <span>💬</span>
                 </div>
               </div>
@@ -606,13 +595,13 @@
             </div>
 
             <!-- Card 5: CHO Priority -->
-            <div class="bg-white rounded-xl p-3.5 border border-amber-200/80 shadow-xs flex flex-col justify-between hover:border-amber-300 hover:shadow-sm transition-all cursor-pointer bg-gradient-to-b from-amber-50/25 to-white tasks-kpi-priority" onclick="setTasksUnitFilter('CHO PRIORITY')" title="Klik untuk memfilter CHO Priority">
+            <div class="bg-white rounded-xl p-4 border border-amber-200/80 shadow-xs flex flex-col justify-between hover:border-amber-300 hover:shadow-sm transition-all cursor-pointer bg-gradient-to-b from-amber-50/25 to-white tasks-kpi-priority" onclick="setTasksUnitFilter('CHO PRIORITY')" title="Klik untuk memfilter CHO Priority">
               <div class="flex items-start justify-between">
                 <div class="flex items-center gap-1.5">
-                  <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-                  <span class="text-[10.5px] font-bold text-amber-950 uppercase tracking-wide">CHO PRIORITY</span>
+                  <span class="w-2.5 h-2.5 rounded-full bg-amber-500"></span>
+                  <span class="text-[11px] font-bold text-amber-950 uppercase tracking-wide">CHO PRIORITY</span>
                 </div>
-                <div class="w-7 h-7 rounded-lg bg-amber-100/80 flex items-center justify-center text-sm shadow-xs">
+                <div class="w-10 h-10 rounded-xl bg-amber-100/80 flex items-center justify-center text-[20px] shadow-xs">
                   <span>⭐</span>
                 </div>
               </div>
@@ -626,7 +615,6 @@
               </div>
             </div>
           </div>
-
           <!-- FILTERS TOOLBAR -->
           <div class="bg-white rounded-xl p-3.5 border border-slate-200/90 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-3">
             <!-- Left: Search & Unit Pills -->
@@ -720,14 +708,16 @@
                   <tr class="bg-slate-50/80 border-b border-slate-200 font-headline font-bold text-slate-600 uppercase text-[11px] tracking-wider">
                     <th class="py-3 px-4 w-12 text-center">NO</th>
                     <th class="py-3 px-4 w-28">PERIODE</th>
-                    <th class="py-3 px-4 min-w-[140px]">TANGGAL INPUT (INPUTER)</th>
-                    <th class="py-3 px-4 min-w-[160px]">TANGGAL AGENDA (KOLOM K)</th>
+                    <th class="py-3 px-4 min-w-[130px]">TANGGAL INPUT</th>
+                    <th class="py-3 px-4 min-w-[140px]">TANGGAL AGENDA</th>
                     <th class="py-3 px-4 w-28">UNIT</th>
-                    <th class="py-3 px-4 min-w-[220px]">MAIN ISSUE (KOLOM C)<span class="block text-[10px] font-normal text-slate-400">&mdash; klik untuk buka calendar</span></th>
-                    <th class="py-3 px-4 min-w-[320px]">DETAIL KENDALA (KOLOM D)</th>
-                    <th class="py-3 px-4 w-36">MATERI PPT (DRIVE)</th>
-                    <th class="py-3 px-4 w-32">STATUS (KOLOM H)</th>
-                    <th class="py-3 px-4 w-36">STATUS UPDATE (KOLOM J)</th>
+                    <th class="py-3 px-4 min-w-[200px]">Case</th>
+                    <th class="py-3 px-4 min-w-[280px]">DETAIL KENDALA</th>
+                    <th class="py-3 px-4 w-36">Sample Case</th>
+                    <th class="py-3 px-4 w-32">STATUS CASE</th>
+                    <th class="py-3 px-4 w-36">Quick Win</th>
+                    <th class="py-3 px-4 min-w-[220px]">Catatan tindak lanjut oleh Fasilitator</th>
+                    <th class="py-3 px-4 w-40 text-center">Aksi</th>
                   </tr>
                 </thead>
                 <tbody id="task-table-body" class="divide-y divide-slate-100">
@@ -1311,6 +1301,32 @@
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11l5 5v11a2 2 0 0 1-2 2z"/><polyline points="17 21 17 13 7 13 7 21"/><polyline points="7 3 7 8 15 8"/></svg>
             <span>Simpan Perubahan Tanggal</span>
           </button>
+        </div>
+      </div>
+    </div>
+
+        <!-- 7. MODAL: CEK HISTORY CASE LENGKAP -->
+    <div class="modal-backdrop" id="modalHistoryCase">
+      <div class="modal-dialog" style="max-width: 780px; width: 95%; max-height: 94vh;">
+        <div class="modal-head" style="padding: 14px 20px; border-bottom: 1px solid var(--border-color); display: flex; align-items: center; justify-content: space-between;">
+          <div class="modal-title-wrap">
+            <div style="font-size: 11px; font-weight: 700; color: #2563eb; text-transform: uppercase; letter-spacing: 0.5px; display: flex; align-items: center; gap: 5px;">
+              <span class="material-symbols-outlined text-[15px]">history</span>
+              <span>Audit Trail &amp; Lifecycle Kasus</span>
+            </div>
+            <h2 class="modal-title" id="historyModalTitle" style="font-size: 17px; font-weight: 800; margin-top: 2px;">History Case: -</h2>
+          </div>
+          <button class="modal-close-btn" id="btnCloseHistoryModal" title="Tutup" style="font-size: 18px; cursor: pointer; background: transparent; border: none;">✕</button>
+        </div>
+
+        <div class="modal-body" style="padding: 18px 20px; max-height: calc(94vh - 120px); overflow-y: auto;">
+          <div id="historyModalContent">
+            <!-- Populated dynamically by openHistoryCaseModal() -->
+          </div>
+        </div>
+
+        <div class="modal-foot" style="padding: 12px 20px; border-top: 1px solid var(--border-color); display: flex; justify-content: flex-end;">
+          <button class="btn-secondary" id="btnDismissHistoryModal" style="padding: 7px 18px; font-size: 12.5px; font-weight: 600; border-radius: 8px;">Tutup</button>
         </div>
       </div>
     </div>

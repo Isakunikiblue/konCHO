@@ -18,6 +18,7 @@ var STANDARD_CASE_HEADERS = [
   'Status',                                    // Kolom H (Open, InProgress, Closed)
   'Follow up to',                              // Kolom I
   'Status Update',                             // Kolom J
+  'Catatan tindak lanjut oleh Fasilitator',     // Kolom Tindak Lanjut Fasilitator
   'Tanggal_Agenda',                            // Kolom K (Tanggal Kalender YYYY-MM-DD)
   'Terakhir_Update',                           // Kolom L
   'File PPT',                                  // Kolom M (Google Drive Link)
@@ -659,6 +660,7 @@ function getSheetRecords(ss, sheetName, serviceType) {
   var lastUpdateIdx = findHeaderIndex(headers, ['terakhir_update', 'last_update', 'update_terakhir']);
   var pptIdx = findHeaderIndex(headers, ['file ppt', 'file_ppt', 'link_ppt', 'materi ppt', 'materi_ppt', 'lampiran ppt', 'ppt', 'materi']);
   var statusInfoIdx = findHeaderIndex(headers, ['status update', 'status_update', 'status informasi', 'status_informasi', 'update_status', 'ada_update', 'status_info', 'update info', 'keterangan update']);
+  var catatanFasilitatorIdx = findHeaderIndex(headers, ['catatan tindak lanjut oleh fasilitator', 'catatan tindak lanjut fasilitator', 'catatan_tindak_lanjut_fasilitator', 'catatan tindak lanjut', 'catatan fasilitator', 'tindak lanjut fasilitator']);
   if (statusInfoIdx < 0 && headers.length > 9) statusInfoIdx = 9; // Kolom J fallback (index 9)
 
   // Mulai baca data dari baris setelah headerRowIdx
@@ -1080,6 +1082,7 @@ function postCommunicationUpdate(payload) {
 
         var lastUpdateIdx = findHeaderIndex(headers, ['terakhir_update', 'last_update', 'update_terakhir']);
         var statusInfoIdx = findHeaderIndex(headers, ['status update', 'status_update', 'status informasi', 'status_informasi', 'update_status', 'ada_update', 'status_info', 'update info', 'keterangan update']);
+  var catatanFasilitatorIdx = findHeaderIndex(headers, ['catatan tindak lanjut oleh fasilitator', 'catatan tindak lanjut fasilitator', 'catatan_tindak_lanjut_fasilitator', 'catatan tindak lanjut', 'catatan fasilitator', 'tindak lanjut fasilitator']);
         if (statusInfoIdx < 0 && headers.length > 9) statusInfoIdx = 9; // Kolom J fallback
         
         var idValues = targetSheet.getRange(2, idIdx + 1, lastRow - 1, 1).getValues();
