@@ -486,15 +486,10 @@
               <div class="flex items-center gap-2 text-xs font-semibold text-slate-500 flex-wrap">
                 <span>KONCHO</span>
                 <span class="material-symbols-outlined text-[14px]">chevron_right</span>
-                <span class="text-slate-800 font-bold">Manajemen Tugas & List Isu CHO</span>
-                <span class="px-2 py-0.5 bg-blue-100 text-[#061345] rounded-md font-mono text-[10px] font-bold">Kolom C, D, H, J</span>
+                <span class="text-slate-800 font-bold">List Isu CHO</span>
               </div>
               <div class="flex items-center gap-3">
                 <h1 class="font-headline text-xl md:text-2xl font-extrabold text-[#061345] tracking-tight">Daftar Penanganan Isu</h1>
-                <span class="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-full text-[11px] font-semibold bg-emerald-50 text-emerald-700 border border-emerald-200">
-                  <span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span>
-                  Google Sheet Sinkronisasi Aktif
-                </span>
               </div>
             </div>
 
@@ -515,23 +510,10 @@
             </div>
           </div>
 
-          <!-- Information Banner -->
-          <div class="bg-gradient-to-r from-blue-50 via-indigo-50/50 to-white border border-blue-200/80 rounded-xl p-4 flex flex-col sm:flex-row sm:items-center justify-between gap-3 shadow-xs">
-            <div class="flex items-center gap-3">
-              <div class="w-8 h-8 rounded-lg bg-[#061345] text-[#86f2e4] flex items-center justify-center shrink-0">
-                <span class="material-symbols-outlined text-[18px]">info</span>
-              </div>
-              <p class="text-xs text-slate-700 leading-relaxed">
-                Semua agenda penanganan & penyelesaian isu dilakukan terpusat melalui menu <strong>Calendar</strong>. Klik salah satu judul isu di bawah untuk membuka detailnya langsung di kalender.
-              </p>
-            </div>
-            <button class="shrink-0 px-3.5 py-1.5 bg-[#061345] text-white text-xs font-bold rounded-lg hover:bg-[#1e295a] transition-colors js-switch-calendar-btn" type="button">
-              Buka Calendar
-            </button>
-          </div>
+
 
           <!-- KPI METRIC CARDS GRID (5 CARDS: TOTAL CASE & 4 UNITS DENGAN BREAKDOWN OPEN, INPROGRESS, CLOSED) -->
-          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5 mb-5">
+          <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-3.5 mb-5 items-stretch">
             <!-- Card 1: TOTAL Case -->
             <div class="bg-white rounded-xl p-3.5 border border-slate-200/90 shadow-xs flex flex-col justify-between hover:shadow-sm transition-all cursor-pointer tasks-kpi-total" onclick="setTasksUnitFilter('all')" title="Klik untuk menampilkan semua unit">
               <div class="flex items-start justify-between">
@@ -542,7 +524,7 @@
               </div>
               <div class="mt-2.5">
                 <div class="text-2xl font-headline font-extrabold text-[#061345]" id="kpi-total-val">0</div>
-                <div class="text-[11px] text-slate-500 font-medium mt-0.5">Semua Kasus Terdaftar</div>
+                <div class="text-[11px] text-slate-500 font-medium mt-0.5">Semua list isu CHO</div>
               </div>
               <div class="mt-2.5 pt-2.5 border-t border-slate-100 flex items-center justify-between text-[10.5px] text-slate-600">
                 <span id="kpi-total-summary">Konsolidasi CHO</span>
@@ -567,13 +549,12 @@
                   <span class="w-2 h-2 rounded-full bg-blue-600"></span>
                   <span class="text-[10.5px] font-bold text-blue-950 uppercase tracking-wide">CHO MOBILE</span>
                 </div>
-                <div class="w-7 h-7 rounded-lg bg-blue-100/80 text-blue-800 flex items-center justify-center">
-                  <span class="material-symbols-outlined text-[16px]">smartphone</span>
+                <div class="w-7 h-7 rounded-lg bg-blue-100/80 flex items-center justify-center text-sm shadow-xs">
+                  <span>📱</span>
                 </div>
               </div>
               <div class="mt-2.5">
                 <div class="text-2xl font-headline font-extrabold text-blue-700" id="kpi-mob-total">0</div>
-                <div class="text-[11px] text-blue-800 font-medium mt-0.5">Layanan Seluler</div>
               </div>
               <div class="mt-2.5 pt-2.5 border-t border-blue-100 flex items-center justify-between gap-1 text-[10px] font-bold">
                 <span class="px-1.5 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200" id="kpi-mob-open">0 Open</span>
@@ -589,13 +570,12 @@
                   <span class="w-2 h-2 rounded-full bg-teal-600"></span>
                   <span class="text-[10.5px] font-bold text-teal-950 uppercase tracking-wide">CHO FIXED</span>
                 </div>
-                <div class="w-7 h-7 rounded-lg bg-teal-100/80 text-teal-800 flex items-center justify-center">
-                  <span class="material-symbols-outlined text-[16px]">router</span>
+                <div class="w-7 h-7 rounded-lg bg-teal-100/80 flex items-center justify-center text-sm shadow-xs">
+                  <span>🌐</span>
                 </div>
               </div>
               <div class="mt-2.5">
                 <div class="text-2xl font-headline font-extrabold text-teal-700" id="kpi-fix-total">0</div>
-                <div class="text-[11px] text-teal-800 font-medium mt-0.5">IndiHome &amp; Fixed</div>
               </div>
               <div class="mt-2.5 pt-2.5 border-t border-teal-100 flex items-center justify-between gap-1 text-[10px] font-bold">
                 <span class="px-1.5 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200" id="kpi-fix-open">0 Open</span>
@@ -611,13 +591,12 @@
                   <span class="w-2 h-2 rounded-full bg-purple-600"></span>
                   <span class="text-[10.5px] font-bold text-purple-950 uppercase tracking-wide">CHO ECARE</span>
                 </div>
-                <div class="w-7 h-7 rounded-lg bg-purple-100/80 text-purple-800 flex items-center justify-center">
-                  <span class="material-symbols-outlined text-[16px]">support_agent</span>
+                <div class="w-7 h-7 rounded-lg bg-purple-100/80 flex items-center justify-center text-sm shadow-xs">
+                  <span>💬</span>
                 </div>
               </div>
               <div class="mt-2.5">
                 <div class="text-2xl font-headline font-extrabold text-purple-700" id="kpi-ecare-total">0</div>
-                <div class="text-[11px] text-purple-800 font-medium mt-0.5">Touchpoint eCare</div>
               </div>
               <div class="mt-2.5 pt-2.5 border-t border-purple-100 flex items-center justify-between gap-1 text-[10px] font-bold">
                 <span class="px-1.5 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200" id="kpi-ecare-open">0 Open</span>
@@ -626,20 +605,19 @@
               </div>
             </div>
 
-            <!-- Card 5: Priority -->
-            <div class="bg-white rounded-xl p-3.5 border border-amber-200/80 shadow-xs flex flex-col justify-between hover:border-amber-300 hover:shadow-sm transition-all cursor-pointer bg-gradient-to-b from-amber-50/25 to-white tasks-kpi-priority" onclick="setTasksUnitFilter('CHO PRIORITY')" title="Klik untuk memfilter Priority">
+            <!-- Card 5: CHO Priority -->
+            <div class="bg-white rounded-xl p-3.5 border border-amber-200/80 shadow-xs flex flex-col justify-between hover:border-amber-300 hover:shadow-sm transition-all cursor-pointer bg-gradient-to-b from-amber-50/25 to-white tasks-kpi-priority" onclick="setTasksUnitFilter('CHO PRIORITY')" title="Klik untuk memfilter CHO Priority">
               <div class="flex items-start justify-between">
                 <div class="flex items-center gap-1.5">
                   <span class="w-2 h-2 rounded-full bg-amber-500"></span>
-                  <span class="text-[10.5px] font-bold text-amber-950 uppercase tracking-wide">PRIORITY</span>
+                  <span class="text-[10.5px] font-bold text-amber-950 uppercase tracking-wide">CHO PRIORITY</span>
                 </div>
-                <div class="w-7 h-7 rounded-lg bg-amber-100/80 text-amber-800 flex items-center justify-center">
-                  <span class="material-symbols-outlined text-[16px]">star</span>
+                <div class="w-7 h-7 rounded-lg bg-amber-100/80 flex items-center justify-center text-sm shadow-xs">
+                  <span>⭐</span>
                 </div>
               </div>
               <div class="mt-2.5">
                 <div class="text-2xl font-headline font-extrabold text-amber-700" id="kpi-prio-total">0</div>
-                <div class="text-[11px] text-amber-800 font-medium mt-0.5">Kasus Prioritas</div>
               </div>
               <div class="mt-2.5 pt-2.5 border-t border-amber-100 flex items-center justify-between gap-1 text-[10px] font-bold">
                 <span class="px-1.5 py-0.5 rounded bg-rose-50 text-rose-700 border border-rose-200" id="kpi-prio-open">0 Open</span>
@@ -678,12 +656,34 @@
 
               <select id="select-period-filter" class="h-9 pl-3 pr-8 bg-slate-50 border border-slate-200 text-slate-700 text-xs font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-[#061345] cursor-pointer appearance-none">
                 <option value="all">Semua Periode</option>
-                <option value="Oktober 2026">Oktober 2026</option>
-                <option value="Agustus 2026">Agustus 2026</option>
-                <option value="Juli 2026">Juli 2026</option>
-                <option value="Tahun 2027">Tahun 2027</option>
-                <option value="Januari 2027">Januari 2027</option>
-                <option value="Desember 2027">Desember 2027</option>
+                <optgroup label="Tahun 2026">
+                  <option value="Januari 2026">Januari 2026</option>
+                  <option value="Februari 2026">Februari 2026</option>
+                  <option value="Maret 2026">Maret 2026</option>
+                  <option value="April 2026">April 2026</option>
+                  <option value="Mei 2026">Mei 2026</option>
+                  <option value="Juni 2026">Juni 2026</option>
+                  <option value="Juli 2026">Juli 2026</option>
+                  <option value="Agustus 2026">Agustus 2026</option>
+                  <option value="September 2026">September 2026</option>
+                  <option value="Oktober 2026">Oktober 2026</option>
+                  <option value="November 2026">November 2026</option>
+                  <option value="Desember 2026">Desember 2026</option>
+                </optgroup>
+                <optgroup label="Tahun 2027">
+                  <option value="Januari 2027">Januari 2027</option>
+                  <option value="Februari 2027">Februari 2027</option>
+                  <option value="Maret 2027">Maret 2027</option>
+                  <option value="April 2027">April 2027</option>
+                  <option value="Mei 2027">Mei 2027</option>
+                  <option value="Juni 2027">Juni 2027</option>
+                  <option value="Juli 2027">Juli 2027</option>
+                  <option value="Agustus 2027">Agustus 2027</option>
+                  <option value="September 2027">September 2027</option>
+                  <option value="Oktober 2027">Oktober 2027</option>
+                  <option value="November 2027">November 2027</option>
+                  <option value="Desember 2027">Desember 2027</option>
+                </optgroup>
               </select>
 
               <button id="btn-reset-filters" class="h-9 px-3 bg-slate-100 hover:bg-slate-200 text-slate-600 text-xs font-semibold rounded-lg flex items-center gap-1 transition-colors" type="button" title="Reset Semua Filter">
@@ -703,14 +703,12 @@
             <div class="p-4 border-b border-slate-200 flex flex-wrap items-center justify-between gap-3">
               <div class="flex items-center gap-2">
                 <span class="material-symbols-outlined text-[20px] text-slate-500">list_alt</span>
-                <h3 class="font-headline text-sm font-bold text-slate-800">Konsolidasi Daftar Isu Terbuka</h3>
+                <h3 class="font-headline text-sm font-bold text-slate-800">Daftar List Isu CHO</h3>
                 <span id="case-counter-badge" class="bg-blue-100 text-[#061345] text-xs font-bold px-2.5 py-0.5 rounded-full">
                   5 Ditampilkan
                 </span>
               </div>
               <div class="flex items-center gap-2 text-xs text-slate-500">
-                <span>Spreadsheet ID: <strong class="font-mono text-slate-700">1bqisqkt4qfY...</strong></span>
-                <span>&bull;</span>
                 <span>Terakhir diperbarui: <strong class="text-slate-700">Baru Saja</strong></span>
               </div>
             </div>

@@ -5287,7 +5287,9 @@
 
     state.activeView = viewName;
 
+    let targetViewEl = null;
     if (viewName === 'calendar') {
+      targetViewEl = vCalendar;
       if (vCalendar) vCalendar.classList.remove('hidden');
       if (navCalendar) navCalendar.className = activeClass;
       if (targetDate) {
@@ -5310,14 +5312,22 @@
         closeCalendarDayDrawer();
       }
     } else if (viewName === 'tasks') {
+      targetViewEl = vTasks;
       if (vTasks) vTasks.classList.remove('hidden');
       if (navTasks) navTasks.className = activeClass;
       renderTasksTable();
       updateTasksKpis();
     } else if (viewName === 'activity') {
+      targetViewEl = vActivity;
       if (vActivity) vActivity.classList.remove('hidden');
       if (navActivity) navActivity.className = activeClass;
       renderActivityFeed();
+    }
+
+    if (targetViewEl) {
+      targetViewEl.classList.remove('view-fade-slide');
+      void targetViewEl.offsetWidth; // trigger reflow for smooth animation
+      targetViewEl.classList.add('view-fade-slide');
     }
 
     window.scrollTo({ top: 0, behavior: 'smooth' });
