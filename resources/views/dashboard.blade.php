@@ -866,12 +866,12 @@
                 </div>
                 <div class="grid grid-cols-2 gap-3 text-xs">
                   <div>
-                    <span class="text-slate-500 text-[10px] uppercase font-bold">Tanggal Input (Inputer)</span>
+                    <span class="text-slate-500 text-xs uppercase font-bold">Tanggal Input</span>
                     <div id="drawer-tgl-input" class="font-semibold text-slate-800 mt-0.5">-</div>
                     <div id="drawer-inputer-name" class="text-[10.5px] text-slate-500">Oleh: -</div>
                   </div>
                   <div>
-                    <span class="text-slate-500 text-[10px] uppercase font-bold">Tanggal Agenda Saat Ini</span>
+                    <span class="text-slate-500 text-xs uppercase font-bold">Tanggal Agenda Saat Ini</span>
                     <div id="drawer-tgl-agenda" class="font-bold text-blue-700 mt-0.5">-</div>
                     <div id="drawer-reschedule-note" class="text-[10.5px] text-amber-700"></div>
                   </div>
@@ -883,7 +883,7 @@
               </div>
 
               <div>
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Detail Kendala (Kolom D)</span>
+                <span class="text-xs font-bold text-slate-500 uppercase tracking-wide">Detail Kendala</span>
                 <div id="drawer-issue-detail" class="mt-1 p-3.5 bg-slate-50 border border-slate-200 rounded-xl leading-relaxed whitespace-pre-line issue-details-text">
                   Memuat detail kendala...
                 </div>
@@ -891,27 +891,27 @@
 
               <div class="grid grid-cols-2 gap-3 p-3.5 bg-blue-50/50 border border-blue-100 rounded-xl">
                 <div>
-                  <span class="text-[10px] font-bold text-slate-500 uppercase">PIC / Petugas Pelaksana</span>
+                  <span class="text-xs font-bold text-slate-500 uppercase tracking-wide">PIC / Petugas Pelaksana</span>
                   <p id="drawer-pic" class="font-semibold text-slate-800 mt-0.5">-</p>
                 </div>
                 <div>
-                  <span class="text-[10px] font-bold text-slate-500 uppercase">Follow Up To (Kolom I)</span>
+                  <span class="text-xs font-bold text-slate-500 uppercase tracking-wide">Follow Up To</span>
                   <p id="drawer-follow-up" class="font-semibold text-slate-800 mt-0.5">-</p>
                 </div>
               </div>
 
               <div>
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Materi Presentasi PPT (Drive)</span>
+                <span class="text-xs font-bold text-slate-500 uppercase tracking-wide">sample case PDF</span>
                 <div id="drawer-ppt-container" class="mt-2 p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
                   <div class="flex items-center gap-2">
-                    <span class="material-symbols-outlined text-[20px] text-red-500">slideshow</span>
-                    <span id="drawer-ppt-name" class="font-medium text-slate-800">Belum ada file PPT</span>
+                    <span class="material-symbols-outlined text-[18px] text-red-500">picture_as_pdf</span>
+                    <span id="drawer-ppt-name" class="font-medium text-slate-800 text-xs">Belum ada file PDF</span>
                   </div>
                 </div>
               </div>
 
               <div>
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Catatan Solusi / Status Update (Kolom J)</span>
+                <span class="text-xs font-bold text-slate-500 uppercase tracking-wide">Quick Win</span>
                 <textarea id="drawer-note-input" rows="3" class="mt-1 w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#061345]" placeholder="Tuliskan catatan tindak lanjut penanganan..."></textarea>
                 <div class="mt-2 flex justify-end">
                   <button id="btn-drawer-save" class="px-4 py-2 bg-[#061345] hover:bg-[#1e295a] text-white font-bold rounded-lg transition-colors flex items-center gap-1.5" type="button">
@@ -922,7 +922,7 @@
               </div>
 
               <div>
-                <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wide">Riwayat Komunikasi & Audit Trail</span>
+                <span class="text-xs font-bold text-slate-500 uppercase tracking-wide">Riwayat follow up</span>
                 <div id="drawer-timeline-container" class="mt-2 flex flex-col gap-2 max-h-48 overflow-y-auto">
                 </div>
               </div>
@@ -937,6 +937,63 @@
                 Tutup
               </button>
             </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- SLIDE-OVER DRAWER FOR HISTORY CASE (RIWAYAT FOLLOW UP) -->
+      <div id="history-drawer" class="fixed inset-0 z-50 overflow-hidden drawer-closed" aria-labelledby="history-drawer-title" role="dialog" aria-modal="true">
+        <div id="history-drawer-backdrop" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity duration-300" onclick="closeHistoryDrawer()"></div>
+
+        <div class="fixed inset-y-0 right-0 max-w-full flex pl-10">
+          <div id="history-drawer-panel" class="w-screen max-w-xl bg-white shadow-2xl flex flex-col transform transition-transform duration-300">
+            
+            <!-- Drawer Header (Styled exactly like Detil Isu) -->
+            <div class="p-5 border-b border-slate-200 bg-slate-50 flex items-start justify-between">
+              <div class="flex flex-col gap-1 pr-4">
+                <div class="flex items-center gap-2 flex-wrap">
+                  <span id="history-drawer-unit-badge" class="px-2 py-0.5 rounded text-[11px] font-bold bg-blue-100 text-[#061345]">CHO MOBILE</span>
+                  <span id="history-drawer-period-badge" class="px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-200 text-slate-700">Oktober 2026</span>
+                  <span id="history-drawer-date-badge" class="px-2 py-0.5 rounded text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">-</span>
+                  <span id="history-drawer-status" class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800">Open</span>
+                </div>
+                <h2 id="history-drawer-issue-title" class="font-headline text-base font-bold text-slate-900 mt-1">History Case</h2>
+                <div id="history-drawer-subtitle" class="text-xs text-slate-500 font-medium">Memuat riwayat follow up...</div>
+              </div>
+              <button id="btn-close-history-drawer" class="w-8 h-8 rounded-lg bg-slate-200/80 hover:bg-slate-300 text-slate-600 flex items-center justify-center transition-colors cursor-pointer" type="button" onclick="closeHistoryDrawer()" title="Tutup">
+                <span class="material-symbols-outlined text-[18px]">close</span>
+              </button>
+            </div>
+
+            <!-- Drawer Body: Riwayat Follow Up Saja -->
+            <div class="p-6 flex-1 overflow-y-auto flex flex-col gap-4 text-xs text-slate-700">
+              
+              <div class="flex items-center justify-between pb-1 border-b border-slate-200">
+                <span class="text-xs font-bold text-slate-600 uppercase tracking-wide flex items-center gap-1.5">
+                  <span class="material-symbols-outlined text-[16px] text-blue-600">history</span>
+                  <span>Riwayat follow up</span>
+                </span>
+                <span id="history-drawer-count" class="text-[11px] font-bold text-slate-400"></span>
+              </div>
+
+              <!-- Container Riwayat Lifecycle & Komunikasi -->
+              <div id="history-drawer-timeline" class="flex flex-col gap-3.5">
+                <!-- Populated dynamically by openHistoryCaseModal() / openHistoryDrawer() -->
+              </div>
+
+            </div>
+
+            <!-- Drawer Footer (Styled exactly like Detil Isu) -->
+            <div class="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+              <button id="btn-history-drawer-copy" class="px-3 py-1.5 bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 font-semibold rounded-lg flex items-center gap-1 text-xs cursor-pointer" type="button">
+                <span class="material-symbols-outlined text-[15px]">content_copy</span>
+                <span>Salin Ringkasan</span>
+              </button>
+              <button id="btn-history-drawer-close-foot" class="px-4 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-lg transition-colors text-xs cursor-pointer" type="button" onclick="closeHistoryDrawer()">
+                Tutup
+              </button>
+            </div>
+
           </div>
         </div>
       </div>
@@ -1033,7 +1090,7 @@
               <label class="form-label" for="inProgressFollowUp" style="font-size: 12.5px; font-weight: 600; color: #334155;">
                 Follow Up To
               </label>
-              <input type="text" id="inProgressFollowUp" class="form-control" style="height: 38px; font-size: 13px;" placeholder="Contoh: Tim RO, Tim Splicing Lapangan...">
+              <input type="text" id="inProgressFollowUp" class="form-control" style="height: 38px; font-size: 13px;" placeholder="Contoh: Tim CCIS, HCCER, dst...">
             </div>
 
             <!-- Kolom 2: PIC / Petugas Pelaksana (Abu-abu terkunci sesuai user login) -->

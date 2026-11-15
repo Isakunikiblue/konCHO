@@ -4115,152 +4115,212 @@
     /**
    * Cek History Case Lengkap: Lifecycle Kasus dari Inputer, Fasilitator sampai Case Closed
    */
+    window.closeHistoryDrawer = function() {
+    var drawer = document.getElementById('history-drawer');
+    if (drawer) {
+      drawer.classList.remove('drawer-open');
+      drawer.classList.add('drawer-closed');
+    }
+  };
+
+  window.openHistoryDrawer = function(ticketId, serviceType) {
+    window.openHistoryCaseModal(ticketId, serviceType);
+  };
+
+  /**
+   * =========================================================================
+   * SLIDE-OVER DRAWER RIWAYAT FOLLOW UP (HISTORY CASE)
+   * Menampilkan riwayat kronologis penanganan kasus bergaya Detil Isu
+   * Mulai dari inputan inputer, tindak lanjut fasilitator, hingga case closed
+   * =========================================================================
+   */
   window.openHistoryCaseModal = function(ticketId, serviceType) {
-    var ticket = (state.records || []).find(function(r) { 
-      return String(r.id) === String(ticketId) || String(r.ticketId) === String(ticketId); 
-    });
+    var records = state.records || [];
+    var ticket = records.find(function(r) { 
+      return String(r.id) === String(ticketId) || 
+             String(r.ticketId) === String(ticketId) ||
+             String(r.id).replace(/^#/, '') === String(ticketId).replace(/^#/, ''); 
+    }) || (records.length > 0 ? records[0] : null);
+
     if (!ticket) {
-      showToast('Data kasus tidak ditemukan!', 'error');
+      if (typeof showToast === 'function') showToast('Data kasus tidak ditemukan!', 'error');
       return;
     }
 
-    var titleEl = document.getElementById('historyModalTitle');
-    var contentEl = document.getElementById('historyModalContent');
-    var modalEl = document.getElementById('modalHistoryCase');
-    if (!modalEl || !contentEl) return;
+    state.activeHistoryTicket = ticket;
+
+    var drawer = document.getElementById('history-drawer');
+    if (!drawer) return;
+
+    var titleEl = document.getElementById('history-drawer-issue-title');
+    var subtitleEl = document.getElementById('history-drawer-subtitle');
+    var unitBadge = document.getElementById('history-drawer-unit-badge');
+    var periodBadge = document.getElementById('history-drawer-period-badge');
+    var dateBadge = document.getElementById('history-drawer-date-badge');
+    var statusBadge = document.getElementById('history-drawer-status');
+    var timelineEl = document.getElementById('history-drawer-timeline');
+    var countEl = document.getElementById('history-drawer-count');
 
     var sType = ticket.serviceType || serviceType || 'MOBILE';
-    var uMeta = getServiceMeta(sType);
-    var uKey = normalizeUnitKey(sType);
-    var uIcon = uKey === 'MOBILE' ? '📱' : (uKey === 'FIXED' ? '🌐' : (uKey === 'ECARE' ? '💬' : '⭐'));
+    var uMeta = typeof getUnitMeta === 'function' ? getUnitMeta(sType) : { shortBadge: sType, badgeClass: 'bg-blue-100 text-blue-900' };
     var sStatus = String(ticket.status || 'Open').trim();
     var isClosed = sStatus.toLowerCase() === 'closed';
     var isInProg = sStatus.toLowerCase() === 'inprogress';
-    
-    if (titleEl) {
-      titleEl.innerHTML = '<span class="text-blue-600 font-mono">#CHO-' + escapeHtml(ticket.id) + '</span> &bull; ' + escapeHtml(ticket.totalCaseIsu || ticket.caseTitle || 'Case');
+
+    if (titleEl) titleEl.textContent = ticket.totalCaseIsu || ticket.caseTitle || 'Detail Isu';
+    if (subtitleEl) subtitleEl.textContent = 'Kasus #' + (ticket.id || ticket.ticketId || '-') + ' • Requestor: ' + (ticket.requestor || ticket.inputBy || 'Administrator Utama');
+    if (unitBadge) {
+      unitBadge.textContent = uMeta.shortBadge;
+      unitBadge.className = 'px-2 py-0.5 rounded text-[11px] font-bold ' + uMeta.badgeClass;
+    }
+    if (periodBadge) periodBadge.textContent = ticket.bulan || 'Oktober 2026';
+    if (dateBadge) {
+      var dStr = typeof formatShortIndoDate === 'function' ? formatShortIndoDate(ticket.tanggalAgenda || ticket.tanggal || ticket.terakhirUpdate) : (ticket.tanggalAgenda || ticket.tanggal || '-');
+      dateBadge.textContent = '📅 ' + dStr;
+    }
+    if (statusBadge) {
+      statusBadge.textContent = sStatus;
+      if (isClosed) {
+        statusBadge.className = 'px-2 py-0.5 rounded-full text-[11px] font-bold bg-emerald-100 text-emerald-800 border border-emerald-200';
+      } else if (isInProg) {
+        statusBadge.className = 'px-2 py-0.5 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800 border border-blue-200';
+      } else {
+        statusBadge.className = 'px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-200';
+      }
     }
 
-    var ppt = getCasePptAttachment(sType, ticket.id);
+    // Attach copy summary button
+    var copyBtn = document.getElementById('btn-history-drawer-copy');
+    if (copyBtn) {
+      copyBtn.onclick = function() {
+        if (typeof copyCaseSummary === 'function') copyCaseSummary(ticket.id);
+      };
+    }
+
+    // Attachment
+    var ppt = typeof getCasePptAttachment === 'function' ? getCasePptAttachment(sType, ticket.id) : null;
     var pdfLink = (ppt && (ppt.fileUrl || ppt.url)) ? (ppt.fileUrl || ppt.url) : (ticket.filePpt || ticket.filePdf || '');
     var pdfName = (ppt && (ppt.fileName || ppt.name)) ? (ppt.fileName || ppt.name) : 'Sample Case (PDF)';
 
-    var inputerName = ticket.inputBy || ticket.requestor || 'Inputer';
-    var inputDate = ticket.tanggalInput || ticket.tanggalAgenda || ticket.bulan || '-';
-    var caseTitle = ticket.totalCaseIsu || ticket.caseTitle || '-';
-    var detailText = ticket.issueDetails || ticket.detail || ticket.detailKendala || '-';
+    var inputerName = ticket.inputBy || ticket.requestor || 'Administrator Utama';
+    var inputDate = typeof formatShortIndoDate === 'function' ? formatShortIndoDate(ticket.tanggalInput || ticket.tanggal || ticket.bulan) : (ticket.tanggalInput || ticket.tanggal || '-');
+    var detailText = ticket.issueDetails || ticket.detail || ticket.detailKendala || 'Tidak ada catatan detail kendala.';
     var urgencyText = ticket.urgency || 'Low';
 
-    var fasilitatorName = ticket.picFacilitator || getFacilitatorForRequestor(ticket.requestor) || '-';
-    var quickWinText = ticket.progress || ticket.quickWin || ticket.statusUpdate || '-';
-    var catatanFasilitator = ticket.catatanFasilitator || ticket.keteranganProgress || ticket.followUpTo || '-';
-    var needSupportText = ticket.needSupport || '-';
-    var lastUpdateText = ticket.terakhirUpdate || 'Baru Saja';
+    var fasilitatorName = ticket.pic || ticket.picFacilitator || (typeof getFacilitatorForRequestor === 'function' ? getFacilitatorForRequestor(ticket.requestor) : 'Fasilitator CHO');
+    var followUpTo = ticket.followUpTo && ticket.followUpTo !== '-' ? ticket.followUpTo : 'Tim CCIS, HCCER, dst';
+    var quickWinText = ticket.progress && ticket.progress !== 'Belum Ada Update' ? ticket.progress : (ticket.quickWin || '-');
+    var catatanFasilitator = ticket.catatanFasilitator || ticket.keteranganProgress || '-';
+    var needSupportText = ticket.needSupport && ticket.needSupport !== '-' ? ticket.needSupport : '';
 
     var closedBy = ticket.closedBy || (isClosed ? fasilitatorName : '-');
-    var closedNotes = ticket.keteranganClosed || ticket.solusi || (isClosed ? 'Kasus telah diselesaikan dan terverifikasi.' : 'Kasus masih dalam proses penanganan.');
+    var closedNotes = ticket.keteranganClosed || ticket.solusi || (isClosed ? 'Kasus telah diselesaikan dan terverifikasi normal.' : '-');
 
+    // Build timeline cards
     var html = '';
-    html += '<div class="space-y-4">';
 
-    // Banner Ringkasan Kasus
-    html += '  <div class="p-3.5 rounded-xl border border-slate-200 bg-slate-50 flex flex-wrap items-center justify-between gap-3">';
-    html += '    <div class="flex items-center gap-2.5">';
-    html += '      <span class="text-xl p-2 rounded-lg bg-white border border-slate-200 shadow-xs">' + uIcon + '</span>';
-    html += '      <div>';
-    html += '        <div class="text-xs font-bold text-slate-500 uppercase tracking-wide">Unit: ' + escapeHtml(uMeta.label || sType) + ' &bull; Periode: ' + escapeHtml(ticket.bulan || '-') + '</div>';
-    html += '        <div class="text-sm font-extrabold text-slate-900">' + escapeHtml(caseTitle) + '</div>';
-    html += '      </div>';
+    // 1. Tahap Inputan Inputer
+    html += '<div class="p-4 bg-slate-50 border border-slate-200 rounded-xl flex flex-col gap-2.5">';
+    html += '  <div class="flex items-center justify-between">';
+    html += '    <div class="flex items-center gap-1.5 font-bold text-slate-800 text-xs">';
+    html += '      <span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>';
+    html += '      <span>1. Input Kasus (Inputer)</span>';
     html += '    </div>';
-    html += '    <div>';
-    if (isClosed) {
-      html += '      <span class="px-3 py-1 rounded-full text-xs font-bold bg-emerald-100 text-emerald-800 border border-emerald-300">✅ Closed (Selesai)</span>';
-    } else if (isInProg) {
-      html += '      <span class="px-3 py-1 rounded-full text-xs font-bold bg-orange-100 text-orange-800 border border-orange-300">⚡ In Progress</span>';
-    } else {
-      html += '      <span class="px-3 py-1 rounded-full text-xs font-bold bg-blue-100 text-blue-800 border border-blue-300">🔵 Open</span>';
-    }
-    html += '    </div>';
+    html += '    <span class="text-[11px] text-slate-500 font-medium">📅 ' + escapeHtml(inputDate) + '</span>';
     html += '  </div>';
-
-    // Timeline Vertikal 3 Tahap
-    html += '  <div class="relative pl-6 border-l-2 border-blue-200 space-y-5 ml-2 mt-2">';
-
-    // TAHAP 1: INPUTAN INPUTER
-    html += '    <div class="relative">';
-    html += '      <div class="absolute -left-[31px] top-1.5 w-6 h-6 rounded-full bg-blue-600 text-white flex items-center justify-center text-xs font-bold shadow-xs">1</div>';
-    html += '      <div class="p-4 rounded-xl border border-blue-100 bg-blue-50/40 shadow-xs">';
-    html += '        <div class="flex items-center justify-between gap-2 border-b border-blue-100 pb-2 mb-2.5 flex-wrap">';
-    html += '          <div class="flex items-center gap-2">';
-    html += '            <span class="px-2 py-0.5 rounded text-[11px] font-extrabold bg-blue-600 text-white">INPUTAN INPUTER</span>';
-    html += '            <span class="text-xs font-bold text-slate-800">' + escapeHtml(inputerName) + '</span>';
-    html += '          </div>';
-    html += '          <span class="text-xs text-slate-500 font-medium">📅 Tanggal Input: <strong>' + escapeHtml(inputDate) + '</strong></span>';
-    html += '        </div>';
-    html += '        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">';
-    html += '          <div><span class="text-slate-500 block font-semibold mb-0.5">Judul Case Isu:</span><p class="font-bold text-slate-900 bg-white p-2 rounded-lg border border-slate-200">' + escapeHtml(caseTitle) + '</p></div>';
-    html += '          <div><span class="text-slate-500 block font-semibold mb-0.5">Urgency Case:</span><p class="font-bold text-slate-900 bg-white p-2 rounded-lg border border-slate-200">' + escapeHtml(urgencyText) + '</p></div>';
-    html += '          <div class="md:col-span-2"><span class="text-slate-500 block font-semibold mb-0.5">Detail Kendala:</span><p class="text-slate-800 bg-white p-2.5 rounded-lg border border-slate-200 whitespace-pre-line leading-relaxed">' + escapeHtml(detailText) + '</p></div>';
+    html += '  <div class="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-slate-200/80">';
+    html += '    <div><span class="text-slate-500 text-[11px] font-semibold">Requestor:</span> <span class="font-bold text-slate-800">' + escapeHtml(inputerName) + '</span></div>';
+    html += '    <div><span class="text-slate-500 text-[11px] font-semibold">Urgency:</span> <span class="font-bold text-emerald-700">' + escapeHtml(urgencyText) + '</span></div>';
+    html += '  </div>';
+    html += '  <div class="text-xs pt-1">';
+    html += '    <span class="text-slate-500 text-[11px] font-semibold block mb-0.5">Detail Kendala:</span>';
+    html += '    <div class="p-2.5 bg-white border border-slate-200 rounded-lg text-slate-800 leading-relaxed whitespace-pre-line">' + escapeHtml(detailText) + '</div>';
+    html += '  </div>';
     if (pdfLink) {
-      html += '          <div class="md:col-span-2"><span class="text-slate-500 block font-semibold mb-0.5">Sample Case (File PDF):</span><a href="' + escapeHtml(pdfLink) + '" target="_blank" rel="noopener noreferrer" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 hover:bg-red-100 text-red-700 font-bold rounded-lg border border-red-200 transition-colors"><span class="material-symbols-outlined text-[16px]">picture_as_pdf</span><span>' + escapeHtml(pdfName) + '</span></a></div>';
+      html += '  <div class="pt-1">';
+      html += '    <span class="text-slate-500 text-[11px] font-semibold block mb-1">sample case PDF:</span>';
+      html += '    <a href="' + escapeHtml(pdfLink) + '" target="_blank" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-red-50 text-red-700 border border-red-200 rounded-lg font-bold text-xs hover:bg-red-100 transition-colors">';
+      html += '      <span class="material-symbols-outlined text-[16px]">picture_as_pdf</span>';
+      html += '      <span>' + escapeHtml(pdfName) + '</span>';
+      html += '    </a>';
+      html += '  </div>';
     }
-    html += '        </div>';
-    html += '      </div>';
-    html += '    </div>';
-
-    // TAHAP 2: FOLLOW UP FASILITATOR
-    html += '    <div class="relative">';
-    html += '      <div class="absolute -left-[31px] top-1.5 w-6 h-6 rounded-full bg-purple-600 text-white flex items-center justify-center text-xs font-bold shadow-xs">2</div>';
-    html += '      <div class="p-4 rounded-xl border border-purple-100 bg-purple-50/40 shadow-xs">';
-    html += '        <div class="flex items-center justify-between gap-2 border-b border-purple-100 pb-2 mb-2.5 flex-wrap">';
-    html += '          <div class="flex items-center gap-2">';
-    html += '            <span class="px-2 py-0.5 rounded text-[11px] font-extrabold bg-purple-600 text-white">FOLLOW UP FASILITATOR</span>';
-    html += '            <span class="text-xs font-bold text-slate-800">PIC: ' + escapeHtml(fasilitatorName) + '</span>';
-    html += '          </div>';
-    html += '          <span class="text-xs text-slate-500 font-medium">🕒 Terakhir Update: <strong>' + escapeHtml(lastUpdateText) + '</strong></span>';
-    html += '        </div>';
-    html += '        <div class="grid grid-cols-1 md:grid-cols-2 gap-3 text-xs">';
-    html += '          <div><span class="text-slate-500 block font-semibold mb-0.5">Quick Win (Temporary Solution):</span><p class="text-slate-800 bg-white p-2 rounded-lg border border-slate-200 font-medium">' + escapeHtml(quickWinText) + '</p></div>';
-    html += '          <div><span class="text-slate-500 block font-semibold mb-0.5">Need Support:</span><p class="text-slate-800 bg-white p-2 rounded-lg border border-slate-200 font-medium">' + escapeHtml(needSupportText) + '</p></div>';
-    html += '          <div class="md:col-span-2"><span class="text-slate-500 block font-semibold mb-0.5">Catatan Tindak Lanjut oleh Fasilitator:</span><p class="text-slate-800 bg-white p-2.5 rounded-lg border border-slate-200 whitespace-pre-line leading-relaxed font-medium">' + escapeHtml(catatanFasilitator) + '</p></div>';
-    html += '        </div>';
-    html += '      </div>';
-    html += '    </div>';
-
-    // TAHAP 3: CASE CLOSED / STATUS AKHIR
-    html += '    <div class="relative">';
-    var stage3Bg = isClosed ? 'bg-emerald-600' : 'bg-slate-400';
-    html += '      <div class="absolute -left-[31px] top-1.5 w-6 h-6 rounded-full ' + stage3Bg + ' text-white flex items-center justify-center text-xs font-bold shadow-xs">3</div>';
-    html += '      <div class="p-4 rounded-xl border ' + (isClosed ? 'border-emerald-200 bg-emerald-50/40' : 'border-slate-200 bg-slate-50/60') + ' shadow-xs">';
-    html += '        <div class="flex items-center justify-between gap-2 border-b ' + (isClosed ? 'border-emerald-100' : 'border-slate-200') + ' pb-2 mb-2.5 flex-wrap">';
-    html += '          <div class="flex items-center gap-2">';
-    html += '            <span class="px-2 py-0.5 rounded text-[11px] font-extrabold ' + (isClosed ? 'bg-emerald-600 text-white' : 'bg-slate-600 text-white') + '">STATUS PENYELESAIAN</span>';
-    html += '            <span class="text-xs font-bold ' + (isClosed ? 'text-emerald-900' : 'text-slate-700') + '">' + (isClosed ? 'Case Closed' : 'Masih Berjalan (' + sStatus + ')') + '</span>';
-    html += '          </div>';
-    if (isClosed) {
-      html += '          <span class="text-xs text-slate-500 font-medium">Ditutup oleh: <strong>' + escapeHtml(closedBy) + '</strong></span>';
-    }
-    html += '        </div>';
-    html += '        <div class="text-xs">';
-    html += '          <span class="text-slate-500 block font-semibold mb-0.5">Keterangan Penyelesaian &amp; Solusi:</span>';
-    html += '          <p class="text-slate-800 bg-white p-2.5 rounded-lg border border-slate-200 leading-relaxed">' + escapeHtml(closedNotes) + '</p>';
-    html += '        </div>';
-    html += '      </div>';
-    html += '    </div>';
-
-    html += '  </div>'; // end timeline
     html += '</div>';
 
-    contentEl.innerHTML = html;
-    modalEl.classList.add('active');
+    // 2. Tahap Follow Up Fasilitator (In Progress)
+    if (isInProg || isClosed || (quickWinText && quickWinText !== '-') || (catatanFasilitator && catatanFasilitator !== '-')) {
+      html += '<div class="p-4 bg-blue-50/60 border border-blue-200 rounded-xl flex flex-col gap-2.5">';
+      html += '  <div class="flex items-center justify-between">';
+      html += '    <div class="flex items-center gap-1.5 font-bold text-[#061345] text-xs">';
+      html += '      <span class="w-2.5 h-2.5 rounded-full bg-blue-600 animate-pulse"></span>';
+      html += '      <span>2. Follow Up Tindak Lanjut (Fasilitator)</span>';
+      html += '    </div>';
+      html += '    <span class="px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-blue-100 text-blue-800">In Progress</span>';
+      html += '  </div>';
+      html += '  <div class="grid grid-cols-2 gap-2 text-xs pt-1 border-t border-blue-200/80">';
+      html += '    <div><span class="text-slate-500 text-[11px] font-semibold">PIC Pelaksana:</span> <span class="font-bold text-slate-800">' + escapeHtml(fasilitatorName) + '</span></div>';
+      html += '    <div><span class="text-slate-500 text-[11px] font-semibold">Follow Up To:</span> <span class="font-bold text-blue-800">' + escapeHtml(followUpTo) + '</span></div>';
+      html += '  </div>';
+      if (quickWinText && quickWinText !== '-') {
+        html += '  <div class="text-xs pt-1">';
+        html += '    <span class="text-slate-500 text-[11px] font-semibold block mb-0.5">Quick Win:</span>';
+        html += '    <div class="p-2.5 bg-white border border-blue-200 rounded-lg text-slate-800 font-medium leading-relaxed whitespace-pre-line">' + escapeHtml(quickWinText) + '</div>';
+        html += '  </div>';
+      }
+      if (catatanFasilitator && catatanFasilitator !== '-') {
+        html += '  <div class="text-xs pt-1">';
+        html += '    <span class="text-slate-500 text-[11px] font-semibold block mb-0.5">Catatan Tindak Lanjut:</span>';
+        html += '    <div class="p-2.5 bg-white border border-blue-200 rounded-lg text-slate-800 leading-relaxed whitespace-pre-line">' + escapeHtml(catatanFasilitator) + '</div>';
+        html += '  </div>';
+      }
+      if (needSupportText) {
+        html += '  <div class="text-xs pt-1">';
+        html += '    <span class="text-slate-500 text-[11px] font-semibold block mb-0.5">Need Support:</span>';
+        html += '    <div class="p-2.5 bg-amber-50 border border-amber-200 rounded-lg text-amber-900 leading-relaxed whitespace-pre-line">' + escapeHtml(needSupportText) + '</div>';
+        html += '  </div>';
+      }
+      html += '</div>';
+    }
 
-    // Close handlers
-    var btnClose = document.getElementById('btnCloseHistoryModal');
-    var btnDismiss = document.getElementById('btnDismissHistoryModal');
-    var closeFn = function() { modalEl.classList.remove('active'); };
-    if (btnClose) btnClose.onclick = closeFn;
-    if (btnDismiss) btnDismiss.onclick = closeFn;
-    modalEl.onclick = function(e) { if (e.target === modalEl) closeFn(); };
+    // 3. Tahap Selesai (Closed)
+    if (isClosed) {
+      html += '<div class="p-4 bg-emerald-50/60 border border-emerald-200 rounded-xl flex flex-col gap-2.5">';
+      html += '  <div class="flex items-center justify-between">';
+      html += '    <div class="flex items-center gap-1.5 font-bold text-emerald-900 text-xs">';
+      html += '      <span class="w-2.5 h-2.5 rounded-full bg-emerald-600"></span>';
+      html += '      <span>3. Penyelesaian Kasus (Closed)</span>';
+      html += '    </div>';
+      html += '    <span class="px-2 py-0.5 rounded-full text-[10.5px] font-bold bg-emerald-100 text-emerald-800">Closed</span>';
+      html += '  </div>';
+      html += '  <div class="text-xs pt-1 border-t border-emerald-200/80">';
+      html += '    <span class="text-slate-500 text-[11px] font-semibold">Ditutup oleh:</span> <span class="font-bold text-slate-800">' + escapeHtml(closedBy) + '</span>';
+      html += '  </div>';
+      html += '  <div class="text-xs pt-1">';
+      html += '    <span class="text-slate-500 text-[11px] font-semibold block mb-0.5">Solusi Penyelesaian:</span>';
+      html += '    <div class="p-2.5 bg-white border border-emerald-200 rounded-lg text-slate-800 leading-relaxed whitespace-pre-line">' + escapeHtml(closedNotes) + '</div>';
+      html += '  </div>';
+      html += '</div>';
+    }
+
+    // 4. Log Komunikasi / Audit Trail
+    var ticketLogs = (state.logs || []).filter(function(l) { return String(l.ticketId) === String(ticket.id); });
+    if (ticketLogs.length > 0) {
+      html += '<div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex flex-col gap-2">';
+      html += '  <span class="text-xs font-bold text-slate-600 uppercase tracking-wide">Catatan Log Riwayat:</span>';
+      html += ticketLogs.map(function(tl) { 
+        return '<div class="p-2.5 bg-white border border-slate-200 rounded-lg text-xs">' +
+          '  <div class="flex items-center justify-between text-slate-500 font-semibold mb-0.5 text-[11px]"><span>' + escapeHtml(tl.author || 'PIC') + '</span><span>' + escapeHtml(tl.timestamp || '') + '</span></div>' +
+          '  <p class="text-slate-800 leading-relaxed">' + escapeHtml(tl.message || tl.keterangan || '-') + '</p>' +
+          '</div>';
+      }).join('');
+      html += '</div>';
+    }
+
+    if (timelineEl) timelineEl.innerHTML = html;
+    if (countEl) countEl.textContent = isClosed ? '3 Tahap Selesai' : (isInProg ? '2 Tahap Berjalan' : '1 Tahap (Open)');
+
+    drawer.classList.remove('drawer-closed');
+    drawer.classList.add('drawer-open');
   };
 
   function openLogModal(ticketId) {
@@ -6117,7 +6177,7 @@
         '<td class="py-3 px-4 text-center">' +
         '  <button type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-[#061345] text-xs font-bold rounded-lg border border-blue-200 shadow-xs transition-colors cursor-pointer shrink-0 whitespace-nowrap" title="Cek Riwayat History Case Lengkap" onclick="openHistoryCaseModal(\'' + item.id + '\', \'' + sType + '\')">' +
         '    <span class="material-symbols-outlined text-[15px] text-blue-600">history</span>' +
-        '    <span>Cek History Case</span>' +
+        '    <span>History Case</span>' +
         '  </button>' +
         '</td>' +
         '</tr>';
@@ -6404,7 +6464,7 @@
     }
 
     const ppt = getCasePptAttachment(ticket.serviceType, ticket.id);
-    if (pptName) pptName.textContent = ppt && (ppt.fileName || ppt.name) ? (ppt.fileName || ppt.name) : 'Belum ada file PPT';
+    if (pptName) pptName.textContent = ppt && (ppt.fileName || ppt.name) ? (ppt.fileName || ppt.name) : 'Belum ada file PDF';
 
     const timelineEl = document.getElementById('drawer-timeline-container');
     if (timelineEl) {
@@ -6791,6 +6851,8 @@
   window.openInProgressModal = openInProgressModal;
   window.openClosedModal = openClosedModal;
   window.activateView = activateView;
+  window.closeHistoryDrawer = window.closeHistoryDrawer;
+  window.openHistoryDrawer = window.openHistoryCaseModal;
   window.openDrawer = openDrawer;
   window.closeDrawer = closeDrawer;
   window.openCalendarDayDrawer = openCalendarDayDrawer;
