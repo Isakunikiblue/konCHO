@@ -1371,12 +1371,13 @@
     <!-- 6. MODAL: INPUT KASUS BARU -->
     <!-- 6. MODAL: INPUT KASUS BARU -->
     <!-- 6. MODAL: INPUT KASUS BARU -->
+    <!-- 6. MODAL: INPUT KASUS BARU -->
     <div class="modal-backdrop" id="newDataModal">
       <div class="modal-dialog">
         <div class="modal-head">
           <div class="modal-title-wrap">
             <h2 class="modal-title">Input Case</h2>
-            <div id="newModalDatePill" style="display:none; margin-top:4px; align-items:center; gap:5px; padding:2px 8px; border-radius:9999px; font-size:12px; font-weight:600; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe;"></div>
+            <div id="newModalDatePill" style="display:none; margin-top:3px; align-items:center; gap:5px; padding:2px 8px; border-radius:9999px; font-size:11.5px; font-weight:600; background:#eff6ff; color:#1d4ed8; border:1px solid #bfdbfe;"></div>
           </div>
           <button class="modal-close-btn" id="btnCloseModal" title="Tutup">✕</button>
         </div>
@@ -1384,9 +1385,9 @@
         <div class="modal-body">
           
           <!-- Toggle Tipe Layanan (Pilih Unit) -->
-          <div class="form-group" style="margin-bottom: 14px;">
+          <div class="form-group" style="margin-bottom: 10px;">
             <label class="form-label">Pilih Unit <span class="req-star">*</span></label>
-            <div class="modal-service-toggle" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px;">
+            <div class="modal-service-toggle" style="display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px;">
               <button type="button" class="service-toggle-btn active" id="toggleMobile">
                 📱 CHO Mobile
               </button>
@@ -1405,20 +1406,20 @@
           <!-- Form Grid 2 Kolom untuk Efisiensi Ruang & Bebas Scroll -->
           <div class="form-grid-2">
             <!-- Kolom Kiri: Tgl Input Case -->
-            <div class="form-group" style="margin-bottom: 10px;">
+            <div class="form-group">
               <label class="form-label" for="inputTanggalAgenda">
                 Tgl Input Case <span class="req-star">*</span>
               </label>
-              <input type="date" id="inputTanggalAgenda" class="form-control" style="height: 38px;">
+              <input type="date" id="inputTanggalAgenda" class="form-control" style="height: 36px;">
             </div>
 
-            <!-- Kolom Kanan: Bulan - Tahun -->
-            <div class="form-group" style="margin-bottom: 10px;">
+            <!-- Kolom Kanan: Bulan - Tahun (Dropdown chevron presisi di samping kanan kotak teks) -->
+            <div class="form-group">
               <label class="form-label" for="inputBulanTahun">
                 Bulan - Tahun <span class="req-star">*</span>
               </label>
-              <div class="select-dropdown-wrap">
-                <select id="inputBulanTahun" class="form-control" style="height: 38px;">
+              <div class="select-dropdown-wrap" style="align-self: flex-start; width: fit-content;">
+                <select id="inputBulanTahun" class="form-control" style="height: 36px;">
                   <optgroup label="Tahun 2026">
                     <option value="Januari 2026">Januari 2026</option>
                     <option value="Februari 2026">Februari 2026</option>
@@ -1455,28 +1456,28 @@
             </div>
 
             <!-- Kolom Kiri: Requestor (Kotak Abu-Abu, Disabled) -->
-            <div class="form-group" style="margin-bottom: 10px;">
+            <div class="form-group">
               <label class="form-label" for="inputRequestor">
                 Requestor <span class="req-star">*</span>
               </label>
-              <input type="text" id="inputRequestor" class="form-control" disabled readonly placeholder="Silakan ketikkan disini..." style="height: 38px;">
+              <input type="text" id="inputRequestor" class="form-control" disabled readonly placeholder="Silakan ketikkan disini..." style="height: 36px;">
             </div>
 
             <!-- Kolom Kanan: Case -->
-            <div class="form-group" style="margin-bottom: 10px;">
+            <div class="form-group">
               <label class="form-label" for="inputCaseIssue">
                 Case <span class="req-star">*</span>
               </label>
-              <input type="text" id="inputCaseIssue" class="form-control" placeholder="Silakan ketikkan disini..." style="height: 38px;">
+              <input type="text" id="inputCaseIssue" class="form-control" placeholder="Silakan ketikkan disini..." style="height: 36px;">
             </div>
 
-            <!-- Kolom Kiri: Status Awal -->
-            <div class="form-group" style="margin-bottom: 10px;">
+            <!-- Kolom Kiri: Status Awal (Dropdown chevron presisi di samping kanan kotak teks) -->
+            <div class="form-group">
               <label class="form-label" for="inputStatus">
                 Status Awal
               </label>
-              <div class="select-dropdown-wrap">
-                <select id="inputStatus" class="form-control" style="height: 38px;">
+              <div class="select-dropdown-wrap" style="align-self: flex-start; width: fit-content;">
+                <select id="inputStatus" class="form-control" style="height: 36px;">
                   <option value="Open" selected>Open</option>
                   <option value="InProgress">InProgress</option>
                   <option value="Closed">Closed</option>
@@ -1487,13 +1488,13 @@
               </div>
             </div>
 
-            <!-- Kolom Kanan: Urgency Case -->
-            <div class="form-group" style="margin-bottom: 10px;">
+            <!-- Kolom Kanan: Urgency Case (Dropdown chevron presisi di samping kanan kotak teks) -->
+            <div class="form-group">
               <label class="form-label" for="inputUrgency">
                 Urgency Case <span class="req-star">*</span>
               </label>
-              <div class="select-dropdown-wrap">
-                <select id="inputUrgency" class="form-control" style="height: 38px;">
+              <div class="select-dropdown-wrap" style="align-self: flex-start; width: fit-content;">
+                <select id="inputUrgency" class="form-control" style="height: 36px;">
                   <option value="Low" selected style="color:#16a34a;">🟢 Low (Rendah)</option>
                   <option value="Middle" style="color:#d97706;">🟡 Middle (Sedang)</option>
                   <option value="High" style="color:#dc2626;">🔴 High (Tinggi / Urgent)</option>
@@ -1505,41 +1506,41 @@
             </div>
 
             <!-- Kolom Kiri: Progress & Quick Win -->
-            <div class="form-group" style="margin-bottom: 10px;">
+            <div class="form-group">
               <label class="form-label" for="inputProgressQuickWin">
                 Progress & Quick Win (Temporary Solution)
               </label>
-              <input type="text" id="inputProgressQuickWin" class="form-control" placeholder="Silakan ketikkan disini..." style="height: 38px;">
+              <input type="text" id="inputProgressQuickWin" class="form-control" placeholder="Silakan ketikkan disini..." style="height: 36px;">
             </div>
 
             <!-- Kolom Kanan: Need Support -->
-            <div class="form-group" style="margin-bottom: 10px;">
+            <div class="form-group">
               <label class="form-label" for="inputNeedSupport">
                 Need Support
               </label>
-              <input type="text" id="inputNeedSupport" class="form-control" placeholder="Silakan ketikkan disini..." style="height: 38px;">
+              <input type="text" id="inputNeedSupport" class="form-control" placeholder="Silakan ketikkan disini..." style="height: 36px;">
             </div>
 
             <!-- Kolom Span 2 (Lebar Penuh): Issue Details (Description) -->
-            <div class="form-group" style="grid-column: 1 / -1; margin-bottom: 10px;">
+            <div class="form-group" style="grid-column: 1 / -1;">
               <label class="form-label" for="inputDetail">
                 Issue Details (Description) <span class="req-star">*</span>
               </label>
-              <textarea id="inputDetail" class="form-control" rows="2" placeholder="Silakan ketikkan disini..."></textarea>
+              <textarea id="inputDetail" class="form-control" rows="2" placeholder="Silakan ketikkan disini..." style="height: 48px; min-height: 48px; resize: none;"></textarea>
             </div>
 
-            <!-- Kolom Span 2 (Lebar Penuh): Lampiran Dokumen PDF (Paling Bawah) -->
-            <div class="form-group" style="grid-column: 1 / -1; margin-bottom: 4px;">
-              <label class="form-label" for="newCasePptFile">
+            <!-- Kolom Span 2 (Lebar Penuh): Lampiran Dokumen PDF (Paling Bawah - Langsung Terlihat Tanpa Scroll) -->
+            <div class="form-group" style="grid-column: 1 / -1;">
+              <label class="form-label" for="newCasePptFile" style="margin-bottom: 3px;">
                 Lampiran PDF (Opsional)
               </label>
-              <input type="file" id="newCasePptFile" class="form-control" accept=".pdf,application/pdf" style="height: 38px;">
+              <input type="file" id="newCasePptFile" class="form-control" accept=".pdf,application/pdf" style="height: 34px; padding: 4px 8px; font-size: 11.5px;">
             </div>
           </div>
 
         </div>
 
-        <div class="modal-foot" style="padding: 14px 28px;">
+        <div class="modal-foot">
           <button class="btn-secondary" id="btnCancelModal">Batal</button>
           <button class="btn-primary" id="btnSubmitNewReport">
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>
