@@ -4684,39 +4684,50 @@
     background: linear-gradient(135deg, rgba(236, 253, 245, 0.5) 0%, #ffffff 65%, rgba(248, 250, 252, 0.4) 100%) !important;
   }
 
-  /* Drawer Animations */
-  #issue-drawer {
-    z-index: 70 !important;
+    /* Slide-Over Drawers: Detil Isu (#issue-drawer) and History Case (#history-drawer) */
+  #issue-drawer,
+  #history-drawer {
+    z-index: 9999 !important;
     transition: opacity 0.3s ease, visibility 0.3s ease;
   }
-  #issue-drawer.drawer-open {
+  #issue-drawer.drawer-open,
+  #history-drawer.drawer-open {
     visibility: visible !important;
     opacity: 1 !important;
     pointer-events: auto !important;
+    display: block !important;
   }
-  #issue-drawer.drawer-closed {
+  #issue-drawer.drawer-closed,
+  #history-drawer.drawer-closed {
     visibility: hidden !important;
     opacity: 0 !important;
     pointer-events: none !important;
+    display: none !important;
   }
 
-  #drawer-panel {
-    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  #drawer-panel,
+  #history-drawer-panel {
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
   }
-  #issue-drawer.drawer-open #drawer-panel {
+  #issue-drawer.drawer-open #drawer-panel,
+  #history-drawer.drawer-open #history-drawer-panel {
     transform: translateX(0) !important;
   }
-  #issue-drawer.drawer-closed #drawer-panel {
+  #issue-drawer.drawer-closed #drawer-panel,
+  #history-drawer.drawer-closed #history-drawer-panel {
     transform: translateX(100%) !important;
   }
 
-  #drawer-backdrop {
-    transition: opacity 0.3s ease;
+  #drawer-backdrop,
+  #history-drawer-backdrop {
+    transition: opacity 0.3s ease !important;
   }
-  #issue-drawer.drawer-open #drawer-backdrop {
+  #issue-drawer.drawer-open #drawer-backdrop,
+  #history-drawer.drawer-open #history-drawer-backdrop {
     opacity: 1 !important;
   }
-  #issue-drawer.drawer-closed #drawer-backdrop {
+  #issue-drawer.drawer-closed #drawer-backdrop,
+  #history-drawer.drawer-closed #history-drawer-backdrop {
     opacity: 0 !important;
   }
 

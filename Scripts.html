@@ -4115,12 +4115,29 @@
     /**
    * Cek History Case Lengkap: Lifecycle Kasus dari Inputer, Fasilitator sampai Case Closed
    */
-    window.closeHistoryDrawer = function() {
+      window.closeHistoryDrawer = function() {
     var drawer = document.getElementById('history-drawer');
-    if (drawer) {
-      drawer.classList.remove('drawer-open');
-      drawer.classList.add('drawer-closed');
+    if (!drawer) return;
+    drawer.classList.remove('drawer-open');
+    drawer.classList.add('drawer-closed');
+    
+    var panel = document.getElementById('history-drawer-panel');
+    if (panel) {
+      panel.style.transform = 'translateX(100%)';
+      panel.style.webkitTransform = 'translateX(100%)';
     }
+    var backdrop = document.getElementById('history-drawer-backdrop');
+    if (backdrop) {
+      backdrop.style.opacity = '0';
+    }
+    setTimeout(function() {
+      if (drawer.classList.contains('drawer-closed')) {
+        drawer.style.display = 'none';
+        drawer.style.visibility = 'hidden';
+        drawer.style.opacity = '0';
+        drawer.style.pointerEvents = 'none';
+      }
+    }, 350);
   };
 
   window.openHistoryDrawer = function(ticketId, serviceType) {
@@ -4135,12 +4152,34 @@
    * =========================================================================
    */
   window.openHistoryCaseModal = function(ticketId, serviceType) {
+    if (ticketId && typeof ticketId === 'object') {
+      var targetEl = ticketId.target || ticketId;
+      var btnEl = targetEl && typeof targetEl.closest === 'function' ? targetEl.closest('.btn-history-case') : null;
+      if (btnEl) {
+        ticketId = btnEl.getAttribute('data-id');
+        serviceType = btnEl.getAttribute('data-service');
+      } else {
+        ticketId = null;
+      }
+    }
+
     var records = state.records || [];
-    var ticket = records.find(function(r) { 
-      return String(r.id) === String(ticketId) || 
-             String(r.ticketId) === String(ticketId) ||
-             String(r.id).replace(/^#/, '') === String(ticketId).replace(/^#/, ''); 
-    }) || (records.length > 0 ? records[0] : null);
+    var ticket = null;
+    if (ticketId != null && String(ticketId).trim() !== '') {
+      var cleanId = String(ticketId).trim();
+      var noHashId = cleanId.replace(/^#/, '');
+      ticket = records.find(function(r) { 
+        return String(r.id) === cleanId || 
+               String(r.ticketId) === cleanId ||
+               String(r.id).replace(/^#/, '') === noHashId ||
+               String(r.ticketId || '').replace(/^#/, '') === noHashId ||
+               (r.totalCaseIsu && String(r.totalCaseIsu) === cleanId); 
+      });
+    }
+
+    if (!ticket && records.length > 0) {
+      ticket = records[0];
+    }
 
     if (!ticket) {
       if (typeof showToast === 'function') showToast('Data kasus tidak ditemukan!', 'error');
@@ -4150,7 +4189,12 @@
     state.activeHistoryTicket = ticket;
 
     var drawer = document.getElementById('history-drawer');
-    if (!drawer) return;
+    if (!drawer) {
+      if (typeof openDrawer === 'function') {
+        openDrawer(ticket.id, ticket.serviceType);
+      }
+      return;
+    }
 
     var titleEl = document.getElementById('history-drawer-issue-title');
     var subtitleEl = document.getElementById('history-drawer-subtitle');
@@ -4319,8 +4363,24 @@
     if (timelineEl) timelineEl.innerHTML = html;
     if (countEl) countEl.textContent = isClosed ? '3 Tahap Selesai' : (isInProg ? '2 Tahap Berjalan' : '1 Tahap (Open)');
 
+    // Buka Drawer dengan paksa style agar 100% langsung muncul tanpa tertunda cache CSS
     drawer.classList.remove('drawer-closed');
     drawer.classList.add('drawer-open');
+    drawer.style.display = 'block';
+    drawer.style.visibility = 'visible';
+    drawer.style.opacity = '1';
+    drawer.style.pointerEvents = 'auto';
+
+    var panel = document.getElementById('history-drawer-panel');
+    if (panel) {
+      panel.style.transform = 'translateX(0)';
+      panel.style.webkitTransform = 'translateX(0)';
+    }
+    var backdrop = document.getElementById('history-drawer-backdrop');
+    if (backdrop) {
+      backdrop.style.opacity = '1';
+      backdrop.style.display = 'block';
+    }
   };
 
   function openLogModal(ticketId) {
@@ -6175,13 +6235,25 @@
         '<td class="py-3 px-4"><span class="text-slate-700 font-medium text-xs">' + escapeHtml(item.progress || item.quickWin || item.statusUpdate || '-') + '</span></td>' +
         '<td class="py-3 px-4"><span class="text-slate-600 text-xs">' + escapeHtml(item.catatanFasilitator || item.keteranganProgress || item.followUpTo || '-') + '</span></td>' +
         '<td class="py-3 px-4 text-center">' +
-        '  <button type="button" class="inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-[#061345] text-xs font-bold rounded-lg border border-blue-200 shadow-xs transition-colors cursor-pointer shrink-0 whitespace-nowrap" title="Cek Riwayat History Case Lengkap" onclick="openHistoryCaseModal(\'' + item.id + '\', \'' + sType + '\')">' +
+        '  <button type="button" class="btn-history-case inline-flex items-center gap-1.5 px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-[#061345] text-xs font-bold rounded-lg border border-blue-200 shadow-xs transition-colors cursor-pointer shrink-0 whitespace-nowrap" title="Cek Riwayat History Case Lengkap" data-id="' + escapeHtml(item.id) + '" data-service="' + escapeHtml(sType) + '" onclick="window.openHistoryCaseModal(\'' + escapeHtml(item.id) + '\', \'' + escapeHtml(sType) + '\')">' +
         '    <span class="material-symbols-outlined text-[15px] text-blue-600">history</span>' +
         '    <span>History Case</span>' +
         '  </button>' +
         '</td>' +
         '</tr>';
     }).join('');
+
+    tbody.querySelectorAll('.btn-history-case').forEach(function(btn) {
+      btn.onclick = function(e) {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        var tid = btn.getAttribute('data-id');
+        var srv = btn.getAttribute('data-service');
+        window.openHistoryCaseModal(tid, srv);
+      };
+    });
   }
 
   function setTasksUnitFilter(unitKey) {
