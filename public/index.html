@@ -3836,18 +3836,31 @@
 
   /* Drag & Drop Dropzone */
   .ppt-dropzone {
-    border: 2px dashed var(--border-color);
-    border-radius: var(--radius-md);
-    padding: 24px 16px;
+    border: 2px dashed #cbd5e1;
+    border-radius: 16px;
+    padding: 36px 24px;
     text-align: center;
-    background: var(--bg-elevated);
+    background: #f8fafc;
     cursor: pointer;
-    transition: var(--transition);
+    transition: all 0.2s ease;
     position: relative;
+    min-height: 200px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
   }
   .ppt-dropzone:hover, .ppt-dropzone.dragover {
-    border-color: #ea580c;
-    background: rgba(234, 88, 12, 0.05);
+    border-color: #3b82f6;
+    background: #f0f7ff;
+  }
+  [data-theme="dark"] .ppt-dropzone {
+    border-color: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.03);
+  }
+  [data-theme="dark"] .ppt-dropzone:hover, [data-theme="dark"] .ppt-dropzone.dragover {
+    border-color: #38bdf8;
+    background: rgba(56, 189, 248, 0.06);
   }
   .dropzone-icon {
     font-size: 38px;
@@ -4702,50 +4715,39 @@
     background: linear-gradient(135deg, rgba(236, 253, 245, 0.5) 0%, #ffffff 65%, rgba(248, 250, 252, 0.4) 100%) !important;
   }
 
-    /* Slide-Over Drawers: Detil Isu (#issue-drawer) and History Case (#history-drawer) */
-  #issue-drawer,
-  #history-drawer {
-    z-index: 9999 !important;
+  /* Drawer Animations */
+  #issue-drawer {
+    z-index: 70 !important;
     transition: opacity 0.3s ease, visibility 0.3s ease;
   }
-  #issue-drawer.drawer-open,
-  #history-drawer.drawer-open {
+  #issue-drawer.drawer-open {
     visibility: visible !important;
     opacity: 1 !important;
     pointer-events: auto !important;
-    display: block !important;
   }
-  #issue-drawer.drawer-closed,
-  #history-drawer.drawer-closed {
+  #issue-drawer.drawer-closed {
     visibility: hidden !important;
     opacity: 0 !important;
     pointer-events: none !important;
-    display: none !important;
   }
 
-  #drawer-panel,
-  #history-drawer-panel {
-    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
+  #drawer-panel {
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
   }
-  #issue-drawer.drawer-open #drawer-panel,
-  #history-drawer.drawer-open #history-drawer-panel {
+  #issue-drawer.drawer-open #drawer-panel {
     transform: translateX(0) !important;
   }
-  #issue-drawer.drawer-closed #drawer-panel,
-  #history-drawer.drawer-closed #history-drawer-panel {
+  #issue-drawer.drawer-closed #drawer-panel {
     transform: translateX(100%) !important;
   }
 
-  #drawer-backdrop,
-  #history-drawer-backdrop {
-    transition: opacity 0.3s ease !important;
+  #drawer-backdrop {
+    transition: opacity 0.3s ease;
   }
-  #issue-drawer.drawer-open #drawer-backdrop,
-  #history-drawer.drawer-open #history-drawer-backdrop {
+  #issue-drawer.drawer-open #drawer-backdrop {
     opacity: 1 !important;
   }
-  #issue-drawer.drawer-closed #drawer-backdrop,
-  #history-drawer.drawer-closed #history-drawer-backdrop {
+  #issue-drawer.drawer-closed #drawer-backdrop {
     opacity: 0 !important;
   }
 
@@ -5207,10 +5209,14 @@ input:focus, select:focus, textarea:focus {
   color: #475569 !important;
   cursor: pointer !important;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
-  display: flex !important;
+  display: flex;
   align-items: center !important;
   justify-content: center !important;
   gap: 6px !important;
+}
+
+#newDataModal .modal-service-toggle .service-toggle-btn.unit-hidden {
+  display: none !important;
 }
 
 /* Hover States per Unit */
@@ -12687,6 +12693,23 @@ input:focus, select:focus, textarea:focus {
     } catch(e) {}
   }
 
+  function hideUnitBtn(btn) {
+    if (!btn) return;
+    btn.style.setProperty('display', 'none', 'important');
+    btn.classList.add('unit-hidden');
+    btn.hidden = true;
+  }
+
+  function showUnitBtn(btn) {
+    if (!btn) return;
+    btn.style.setProperty('display', 'flex', 'important');
+    btn.style.alignItems = 'center';
+    btn.style.justifyContent = 'center';
+    btn.style.gap = '6px';
+    btn.classList.remove('unit-hidden');
+    btn.hidden = false;
+  }
+
   function openNewModal(dateContext) {
     if (state.authUser && (state.authUser.role === 'Facilitator' || state.authUser.role === 'Viewer')) {
       showToast('Akses ditolak: Peran ' + state.authUser.role + ' tidak berwenang menginput data kasus baru.', 'error');
@@ -12698,72 +12721,41 @@ input:focus, select:focus, textarea:focus {
 
     if (restrictedUnit) {
       // Sembunyikan opsi unit yang tidak sesuai, tampilkan hanya unit yang diizinkan untuk akun login
-      if (dom.toggleMobile) {
-        dom.toggleMobile.style.display = restrictedUnit === 'MOBILE' ? 'flex' : 'none';
-        if (restrictedUnit === 'MOBILE') {
-          dom.toggleMobile.style.alignItems = 'center';
-          dom.toggleMobile.style.justifyContent = 'center';
-          dom.toggleMobile.style.gap = '6px';
-        }
-      }
-      if (dom.toggleFixed) {
-        dom.toggleFixed.style.display = restrictedUnit === 'FIXED' ? 'flex' : 'none';
-        if (restrictedUnit === 'FIXED') {
-          dom.toggleFixed.style.alignItems = 'center';
-          dom.toggleFixed.style.justifyContent = 'center';
-          dom.toggleFixed.style.gap = '6px';
-        }
-      }
-      if (dom.toggleEcare) {
-        dom.toggleEcare.style.display = restrictedUnit === 'ECARE' ? 'flex' : 'none';
-        if (restrictedUnit === 'ECARE') {
-          dom.toggleEcare.style.alignItems = 'center';
-          dom.toggleEcare.style.justifyContent = 'center';
-          dom.toggleEcare.style.gap = '6px';
-        }
-      }
-      if (dom.togglePriority) {
-        dom.togglePriority.style.display = restrictedUnit === 'PRIORITY' ? 'flex' : 'none';
-        if (restrictedUnit === 'PRIORITY') {
-          dom.togglePriority.style.alignItems = 'center';
-          dom.togglePriority.style.justifyContent = 'center';
-          dom.togglePriority.style.gap = '6px';
-        }
+      if (restrictedUnit === 'MOBILE') {
+        showUnitBtn(dom.toggleMobile);
+        hideUnitBtn(dom.toggleFixed);
+        hideUnitBtn(dom.toggleEcare);
+        hideUnitBtn(dom.togglePriority);
+      } else if (restrictedUnit === 'FIXED') {
+        hideUnitBtn(dom.toggleMobile);
+        showUnitBtn(dom.toggleFixed);
+        hideUnitBtn(dom.toggleEcare);
+        hideUnitBtn(dom.togglePriority);
+      } else if (restrictedUnit === 'ECARE') {
+        hideUnitBtn(dom.toggleMobile);
+        hideUnitBtn(dom.toggleFixed);
+        showUnitBtn(dom.toggleEcare);
+        hideUnitBtn(dom.togglePriority);
+      } else if (restrictedUnit === 'PRIORITY') {
+        hideUnitBtn(dom.toggleMobile);
+        hideUnitBtn(dom.toggleFixed);
+        hideUnitBtn(dom.toggleEcare);
+        showUnitBtn(dom.togglePriority);
       }
 
       if (toggleContainer) {
-        toggleContainer.style.gridTemplateColumns = '1fr';
+        toggleContainer.style.setProperty('grid-template-columns', '1fr', 'important');
       }
       setNewModalService(restrictedUnit);
     } else {
       // Administrator: tampilkan semua 4 pilihan unit
-      if (dom.toggleMobile) {
-        dom.toggleMobile.style.display = 'flex';
-        dom.toggleMobile.style.alignItems = 'center';
-        dom.toggleMobile.style.justifyContent = 'center';
-        dom.toggleMobile.style.gap = '6px';
-      }
-      if (dom.toggleFixed) {
-        dom.toggleFixed.style.display = 'flex';
-        dom.toggleFixed.style.alignItems = 'center';
-        dom.toggleFixed.style.justifyContent = 'center';
-        dom.toggleFixed.style.gap = '6px';
-      }
-      if (dom.toggleEcare) {
-        dom.toggleEcare.style.display = 'flex';
-        dom.toggleEcare.style.alignItems = 'center';
-        dom.toggleEcare.style.justifyContent = 'center';
-        dom.toggleEcare.style.gap = '6px';
-      }
-      if (dom.togglePriority) {
-        dom.togglePriority.style.display = 'flex';
-        dom.togglePriority.style.alignItems = 'center';
-        dom.togglePriority.style.justifyContent = 'center';
-        dom.togglePriority.style.gap = '6px';
-      }
+      showUnitBtn(dom.toggleMobile);
+      showUnitBtn(dom.toggleFixed);
+      showUnitBtn(dom.toggleEcare);
+      showUnitBtn(dom.togglePriority);
 
       if (toggleContainer) {
-        toggleContainer.style.gridTemplateColumns = 'repeat(4, 1fr)';
+        toggleContainer.style.setProperty('grid-template-columns', 'repeat(4, 1fr)', 'important');
       }
 
       if (state.activeServiceScope === 'FIXED') {

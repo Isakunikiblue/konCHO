@@ -5202,10 +5202,14 @@ input:focus, select:focus, textarea:focus {
   color: #475569 !important;
   cursor: pointer !important;
   transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1) !important;
-  display: flex !important;
+  display: flex;
   align-items: center !important;
   justify-content: center !important;
   gap: 6px !important;
+}
+
+#newDataModal .modal-service-toggle .service-toggle-btn.unit-hidden {
+  display: none !important;
 }
 
 /* Hover States per Unit */

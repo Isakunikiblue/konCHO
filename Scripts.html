@@ -4741,6 +4741,23 @@
     } catch(e) {}
   }
 
+  function hideUnitBtn(btn) {
+    if (!btn) return;
+    btn.style.setProperty('display', 'none', 'important');
+    btn.classList.add('unit-hidden');
+    btn.hidden = true;
+  }
+
+  function showUnitBtn(btn) {
+    if (!btn) return;
+    btn.style.setProperty('display', 'flex', 'important');
+    btn.style.alignItems = 'center';
+    btn.style.justifyContent = 'center';
+    btn.style.gap = '6px';
+    btn.classList.remove('unit-hidden');
+    btn.hidden = false;
+  }
+
   function openNewModal(dateContext) {
     if (state.authUser && (state.authUser.role === 'Facilitator' || state.authUser.role === 'Viewer')) {
       showToast('Akses ditolak: Peran ' + state.authUser.role + ' tidak berwenang menginput data kasus baru.', 'error');
@@ -4752,72 +4769,41 @@
 
     if (restrictedUnit) {
       // Sembunyikan opsi unit yang tidak sesuai, tampilkan hanya unit yang diizinkan untuk akun login
-      if (dom.toggleMobile) {
-        dom.toggleMobile.style.display = restrictedUnit === 'MOBILE' ? 'flex' : 'none';
-        if (restrictedUnit === 'MOBILE') {
-          dom.toggleMobile.style.alignItems = 'center';
-          dom.toggleMobile.style.justifyContent = 'center';
-          dom.toggleMobile.style.gap = '6px';
-        }
-      }
-      if (dom.toggleFixed) {
-        dom.toggleFixed.style.display = restrictedUnit === 'FIXED' ? 'flex' : 'none';
-        if (restrictedUnit === 'FIXED') {
-          dom.toggleFixed.style.alignItems = 'center';
-          dom.toggleFixed.style.justifyContent = 'center';
-          dom.toggleFixed.style.gap = '6px';
-        }
-      }
-      if (dom.toggleEcare) {
-        dom.toggleEcare.style.display = restrictedUnit === 'ECARE' ? 'flex' : 'none';
-        if (restrictedUnit === 'ECARE') {
-          dom.toggleEcare.style.alignItems = 'center';
-          dom.toggleEcare.style.justifyContent = 'center';
-          dom.toggleEcare.style.gap = '6px';
-        }
-      }
-      if (dom.togglePriority) {
-        dom.togglePriority.style.display = restrictedUnit === 'PRIORITY' ? 'flex' : 'none';
-        if (restrictedUnit === 'PRIORITY') {
-          dom.togglePriority.style.alignItems = 'center';
-          dom.togglePriority.style.justifyContent = 'center';
-          dom.togglePriority.style.gap = '6px';
-        }
+      if (restrictedUnit === 'MOBILE') {
+        showUnitBtn(dom.toggleMobile);
+        hideUnitBtn(dom.toggleFixed);
+        hideUnitBtn(dom.toggleEcare);
+        hideUnitBtn(dom.togglePriority);
+      } else if (restrictedUnit === 'FIXED') {
+        hideUnitBtn(dom.toggleMobile);
+        showUnitBtn(dom.toggleFixed);
+        hideUnitBtn(dom.toggleEcare);
+        hideUnitBtn(dom.togglePriority);
+      } else if (restrictedUnit === 'ECARE') {
+        hideUnitBtn(dom.toggleMobile);
+        hideUnitBtn(dom.toggleFixed);
+        showUnitBtn(dom.toggleEcare);
+        hideUnitBtn(dom.togglePriority);
+      } else if (restrictedUnit === 'PRIORITY') {
+        hideUnitBtn(dom.toggleMobile);
+        hideUnitBtn(dom.toggleFixed);
+        hideUnitBtn(dom.toggleEcare);
+        showUnitBtn(dom.togglePriority);
       }
 
       if (toggleContainer) {
-        toggleContainer.style.gridTemplateColumns = '1fr';
+        toggleContainer.style.setProperty('grid-template-columns', '1fr', 'important');
       }
       setNewModalService(restrictedUnit);
     } else {
       // Administrator: tampilkan semua 4 pilihan unit
-      if (dom.toggleMobile) {
-        dom.toggleMobile.style.display = 'flex';
-        dom.toggleMobile.style.alignItems = 'center';
-        dom.toggleMobile.style.justifyContent = 'center';
-        dom.toggleMobile.style.gap = '6px';
-      }
-      if (dom.toggleFixed) {
-        dom.toggleFixed.style.display = 'flex';
-        dom.toggleFixed.style.alignItems = 'center';
-        dom.toggleFixed.style.justifyContent = 'center';
-        dom.toggleFixed.style.gap = '6px';
-      }
-      if (dom.toggleEcare) {
-        dom.toggleEcare.style.display = 'flex';
-        dom.toggleEcare.style.alignItems = 'center';
-        dom.toggleEcare.style.justifyContent = 'center';
-        dom.toggleEcare.style.gap = '6px';
-      }
-      if (dom.togglePriority) {
-        dom.togglePriority.style.display = 'flex';
-        dom.togglePriority.style.alignItems = 'center';
-        dom.togglePriority.style.justifyContent = 'center';
-        dom.togglePriority.style.gap = '6px';
-      }
+      showUnitBtn(dom.toggleMobile);
+      showUnitBtn(dom.toggleFixed);
+      showUnitBtn(dom.toggleEcare);
+      showUnitBtn(dom.togglePriority);
 
       if (toggleContainer) {
-        toggleContainer.style.gridTemplateColumns = 'repeat(4, 1fr)';
+        toggleContainer.style.setProperty('grid-template-columns', 'repeat(4, 1fr)', 'important');
       }
 
       if (state.activeServiceScope === 'FIXED') {
