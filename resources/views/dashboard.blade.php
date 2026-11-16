@@ -1186,77 +1186,70 @@
 
     <!-- 4b. MODAL UPLOAD FILE PPT KE GOOGLE DRIVE (KHUSUS ADMIN & INPUTER) -->
     <div class="modal-backdrop" id="modalUploadPpt">
-      <div class="modal-dialog" style="max-width: 520px;">
+      <div class="modal-dialog" style="max-width: 660px; width: 95%;">
         <div class="modal-head">
           <div class="modal-title-wrap">
-            <div class="modal-kicker">📁 Google Drive Storage</div>
-            <h2 class="modal-title" id="uploadPptModalTitle">Upload Dokumen Materi (PDF)</h2>
+            <h2 class="modal-title font-headline text-base font-bold text-slate-900" id="uploadPptModalTitle">Upload Sample Case</h2>
           </div>
           <button class="modal-close-btn" id="btnCloseUploadPptModal" title="Tutup">✕</button>
         </div>
 
         <div class="modal-body">
           <!-- Info Kasus Target -->
-          <div class="action-case-preview" style="margin-bottom: 14px;">
-            <div class="preview-header">
-              <span class="info-badge" id="uploadPptBadgeService">MOBILE</span>
-              <span class="preview-ticket-id" id="uploadPptTicketId">Case #1</span>
+          <div class="action-case-preview bg-slate-50 border border-slate-200/80 rounded-xl p-3 mb-3.5 flex flex-col gap-1.5">
+            <div class="preview-header flex items-center justify-between">
+              <span class="info-badge font-bold text-[10px] tracking-wider uppercase px-2 py-0.5 rounded-full" id="uploadPptBadgeService">MOBILE</span>
+              <span class="preview-ticket-id font-mono text-[11px] font-semibold text-slate-500" id="uploadPptTicketId">Case #1</span>
             </div>
-            <div class="preview-issue-text" id="uploadPptIssueText">-</div>
+            <div class="preview-issue-text text-xs font-semibold text-slate-800 line-clamp-2" id="uploadPptIssueText">-</div>
           </div>
 
-          <!-- Info Folder Google Drive Tujuan -->
-          <div class="drive-folder-info-card">
-            <div class="drive-info-icon">
-              <svg width="24" height="24" viewBox="0 0 87.3 78" fill="none"><path d="m6.6 66.85 3.85 6.65c.8 1.4 1.95 2.5 3.3 3.3l13.75-23.8h-27.5c0 1.55.4 3.1 1.2 4.5z" fill="#0066da"/><path d="m43.65 25-13.75-23.8c-1.35.8-2.5 1.9-3.3 3.3l-25.4 44c-.8 1.4-1.2 2.95-1.2 4.5h27.5z" fill="#00ac47"/><path d="m73.55 76.8c1.35-.8 2.5-1.9 3.3-3.3l1.6-2.75 7.65-13.25c.8-1.4 1.2-2.95 1.2-4.5h-27.502l5.852 11.5z" fill="#ea4335"/><path d="m43.65 25 13.75-23.8c-1.35-.8-2.9-1.2-4.5-1.2h-18.5c-1.6 0-3.15.45-4.5 1.2z" fill="#00832d"/><path d="m59.8 53h-32.3l-13.75 23.8c1.35.8 2.9 1.2 4.5 1.2h50.8c1.6 0 3.15-.45 4.5-1.2z" fill="#2684fc"/><path d="m73.4 26.5-12.7-22c-.8-1.4-1.95-2.5-3.3-3.3l-13.75 23.8 16.15 28h27.45c0-1.55-.4-3.1-1.2-4.5z" fill="#ffba00"/></svg>
-            </div>
-            <div class="drive-info-content">
-              <div class="drive-info-title">Google Drive Folder konCHO</div>
-              <div class="drive-info-desc">File akan disimpan otomatis ke folder Google Drive resmi:</div>
-              <a href="https://drive.google.com/drive/folders/1KHMMjAovxmRpyd0JTAehyoSgH2sWItMV?hl=ID" target="_blank" rel="noopener noreferrer" class="drive-folder-link">
-                <span>Buka Folder Drive konCHO</span>
-                <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M18 13v6a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V8a2 2 0 0 1 2-2h6"/><polyline points="15 3 21 3 21 9"/><line x1="10" y1="14" x2="21" y2="3"/></svg>
-              </a>
-            </div>
-          </div>
-
-          <!-- Drag and Drop Dropzone -->
-          <div class="ppt-dropzone" id="pptDropzone">
+          <!-- Drag and Drop Dropzone (Diperlebar, Diperbesar & Presisi) -->
+          <div class="ppt-dropzone" id="pptDropzone" style="border: 2px dashed #cbd5e1; border-radius: 16px; padding: 36px 24px; text-align: center; background: #f8fafc; cursor: pointer; transition: all 0.2s ease; position: relative;">
             <input type="file" id="pptFileInput" accept=".pdf,application/pdf" style="display:none;">
-            <div class="dropzone-content" id="dropzoneEmpty">
-              <div class="dropzone-icon">📄</div>
-              <div class="dropzone-main-text">Klik untuk pilih file PDF atau seret ke sini</div>
-              <div class="dropzone-sub-text">Format khusus dokumen <strong>.pdf</strong> (Maks. 25MB)</div>
-              <button type="button" class="btn-browse-file" id="btnBrowsePptFile">Pilih File dari Komputer/HP</button>
+            <div class="dropzone-content flex flex-col items-center justify-center" id="dropzoneEmpty">
+              <div class="w-14 h-14 rounded-2xl bg-rose-50 border border-rose-100 flex items-center justify-center mb-3 text-rose-500 shadow-2xs">
+                <span class="material-symbols-outlined text-[32px]">picture_as_pdf</span>
+              </div>
+              <div class="dropzone-main-text text-sm font-bold text-slate-800 mb-1">Klik untuk pilih file PDF atau seret ke sini</div>
+              <div class="dropzone-sub-text text-xs text-slate-500 mb-4">Format khusus dokumen <strong>.pdf</strong> (Maks. 25MB)</div>
+              <button type="button" class="btn-browse-file px-4 py-2 bg-white hover:bg-slate-50 border border-slate-300 hover:border-blue-500 text-slate-700 font-semibold text-xs rounded-lg transition-colors shadow-2xs flex items-center gap-2 cursor-pointer" id="btnBrowsePptFile">
+                <span class="material-symbols-outlined text-[16px] text-blue-600">file_upload</span>
+                <span>Pilih File dari Komputer/HP</span>
+              </button>
             </div>
-            <div class="dropzone-file-selected" id="dropzoneSelected" style="display:none;">
-              <div class="selected-file-card">
-                <span class="selected-file-icon">📊</span>
-                <div class="selected-file-meta">
-                  <div class="selected-file-name" id="selectedPptFileName">presentation.pptx</div>
-                  <div class="selected-file-size" id="selectedPptFileSize">0 KB</div>
+            <div class="dropzone-file-selected w-full" id="dropzoneSelected" style="display:none;">
+              <div class="selected-file-card flex items-center gap-3 p-3.5 bg-white border border-slate-200 rounded-xl shadow-2xs">
+                <div class="w-10 h-10 rounded-lg bg-rose-50 border border-rose-100 flex items-center justify-center shrink-0 text-rose-600">
+                  <span class="material-symbols-outlined text-[22px]">picture_as_pdf</span>
                 </div>
-                <button type="button" class="btn-remove-selected-file" id="btnRemovePptFile" title="Hapus file terpilih">✕</button>
+                <div class="selected-file-meta flex-1 min-w-0 text-left">
+                  <div class="selected-file-name text-xs font-bold text-slate-800 truncate" id="selectedPptFileName">sample_case.pdf</div>
+                  <div class="selected-file-size text-[11px] text-slate-500 mt-0.5" id="selectedPptFileSize">0 KB</div>
+                </div>
+                <button type="button" class="btn-remove-selected-file w-8 h-8 rounded-lg hover:bg-slate-100 flex items-center justify-center text-slate-400 hover:text-rose-600 transition-colors cursor-pointer" id="btnRemovePptFile" title="Hapus file terpilih">
+                  <span class="material-symbols-outlined text-[18px]">close</span>
+                </button>
               </div>
             </div>
           </div>
 
-          <!-- Existing PPT Link if already uploaded -->
-          <div id="existingPptContainer" style="display:none; margin-top:12px;">
-            <div style="font-size:11.5px; font-weight:700; color:var(--text-muted); margin-bottom:4px;">File PPT Saat Ini di Google Drive:</div>
-            <div class="existing-ppt-card" style="display:flex; align-items:center; justify-content:space-between; gap:8px;">
-              <div style="display:flex; align-items:center; gap:6px; overflow:hidden;">
-                <span style="font-size:16px;">📎</span>
-                <a href="#" target="_blank" rel="noopener noreferrer" id="existingPptLink" class="existing-ppt-link">Lihat File di Google Drive</a>
+          <!-- Existing PDF Link if already uploaded -->
+          <div id="existingPptContainer" style="display:none; margin-top:14px;">
+            <div style="font-size:11.5px; font-weight:700; color:var(--text-muted); margin-bottom:4px;">File PDF Saat Ini:</div>
+            <div class="existing-ppt-card flex items-center justify-between gap-2 p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-xs">
+              <div class="flex items-center gap-2 min-w-0">
+                <span class="material-symbols-outlined text-[18px] text-rose-500">picture_as_pdf</span>
+                <a href="#" target="_blank" rel="noopener noreferrer" id="existingPptLink" class="existing-ppt-link text-blue-600 hover:underline font-medium truncate">Lihat File PDF</a>
               </div>
-              <button type="button" id="btnModalDeletePpt" class="btn-ppt-delete" style="display:none;" title="Hapus File PPT ini">🗑️ Hapus PPT</button>
+              <button type="button" id="btnModalDeletePpt" class="btn-ppt-delete text-rose-600 hover:text-rose-700 font-medium px-2 py-1 rounded hover:bg-rose-50 text-[11px] transition-colors" style="display:none;" title="Hapus File PDF ini">🗑️ Hapus PDF</button>
             </div>
           </div>
 
           <!-- Upload Progress Bar -->
           <div class="upload-progress-container" id="uploadPptProgress" style="display:none; margin-top:14px;">
             <div class="upload-progress-header">
-              <span id="uploadPptStatusText">Mengunggah ke Google Drive...</span>
+              <span id="uploadPptStatusText">Mengunggah file PDF...</span>
               <span id="uploadPptPercent">0%</span>
             </div>
             <div class="upload-progress-track">
@@ -1270,7 +1263,7 @@
           <button type="button" class="btn-secondary" id="btnCancelUploadPpt">Batal</button>
           <button type="button" class="btn-primary" id="btnSubmitUploadPpt" disabled>
             <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
-            <span>Upload ke Google Drive</span>
+            <span>Upload</span>
           </button>
         </div>
       </div>

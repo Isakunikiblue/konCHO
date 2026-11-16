@@ -3582,7 +3582,7 @@
       if (dom.existingPptContainer) dom.existingPptContainer.style.display = 'block';
       if (dom.existingPptLink) {
         dom.existingPptLink.href = existingPpt.fileUrl;
-        dom.existingPptLink.textContent = existingPpt.fileName ? ('Buka: ' + existingPpt.fileName) : 'Buka File di Google Drive';
+        dom.existingPptLink.textContent = existingPpt.fileName ? ('Buka: ' + existingPpt.fileName) : 'Buka File PDF';
       }
       if (dom.btnModalDeletePpt) {
         dom.btnModalDeletePpt.style.display = (currentRole === 'Administrator') ? 'inline-flex' : 'none';
@@ -3599,7 +3599,7 @@
     if (dom.uploadPptProgress) dom.uploadPptProgress.style.display = 'none';
     if (dom.btnSubmitUploadPpt) {
       dom.btnSubmitUploadPpt.disabled = true;
-      dom.btnSubmitUploadPpt.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span>Upload ke Google Drive</span>';
+      dom.btnSubmitUploadPpt.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span>Upload</span>';
     }
 
     if (dom.modalUploadPpt) dom.modalUploadPpt.classList.add('active');
@@ -3664,7 +3664,7 @@
 
       if (dom.uploadPptBar) dom.uploadPptBar.style.width = '55%';
       if (dom.uploadPptPercent) dom.uploadPptPercent.textContent = '55%';
-      if (dom.uploadPptStatusText) dom.uploadPptStatusText.textContent = 'Mengunggah ke folder Google Drive...';
+      if (dom.uploadPptStatusText) dom.uploadPptStatusText.textContent = 'Mengunggah file PDF...';
 
       var payload = {
         action: 'uploadPptFile',
@@ -3723,7 +3723,7 @@
       showToast('Gagal membaca file dari perangkat.', 'error');
       if (dom.btnSubmitUploadPpt) {
         dom.btnSubmitUploadPpt.disabled = false;
-        dom.btnSubmitUploadPpt.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span>Upload ke Google Drive</span>';
+        dom.btnSubmitUploadPpt.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span>Upload</span>';
       }
     };
     reader.readAsDataURL(file);
@@ -3732,7 +3732,7 @@
   function onUploadPptSuccess(res, file, target, currentUserName) {
     if (dom.uploadPptBar) dom.uploadPptBar.style.width = '100%';
     if (dom.uploadPptPercent) dom.uploadPptPercent.textContent = '100%';
-    if (dom.uploadPptStatusText) dom.uploadPptStatusText.textContent = 'Selesai diunggah ke Google Drive!';
+    if (dom.uploadPptStatusText) dom.uploadPptStatusText.textContent = 'Selesai diunggah!';
 
     var fileUrl = (res && res.fileUrl) ? res.fileUrl : GOOGLE_DRIVE_FOLDER_URL;
     var key = target.serviceType + '_' + target.ticketId;
@@ -3761,7 +3761,7 @@
     console.warn('Upload PPT Error:', errMsg);
     if (dom.btnSubmitUploadPpt) {
       dom.btnSubmitUploadPpt.disabled = false;
-      dom.btnSubmitUploadPpt.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span>Upload ke Google Drive</span>';
+      dom.btnSubmitUploadPpt.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg><span>Upload</span>';
     }
     if (dom.uploadPptProgress) dom.uploadPptProgress.style.display = 'none';
 
