@@ -4755,9 +4755,17 @@
     opacity: 0 !important;
   }
 
-  /* Ensure Modals appear above Drawers */
+    /* Ensure Modals appear above Drawers */
   .modal-backdrop {
-    z-index: 250 !important;
+    z-index: 100000 !important;
+  }
+  .modal-backdrop.active {
+    display: flex !important;
+    z-index: 100000 !important;
+  }
+  .modal-dialog {
+    position: relative;
+    z-index: 100001 !important;
   }
 
 

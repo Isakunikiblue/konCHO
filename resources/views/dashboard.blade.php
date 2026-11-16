@@ -840,10 +840,10 @@
             <div class="p-5 border-b border-slate-200 bg-slate-50 flex items-start justify-between">
               <div class="flex flex-col gap-1 pr-4">
                 <div class="flex items-center gap-2 flex-wrap">
-                  <span id="drawer-unit-badge" class="px-2 py-0.5 rounded text-[10px] font-bold bg-blue-100 text-[#061345]">CHO MOBILE</span>
-                  <span id="drawer-period-badge" class="px-2 py-0.5 rounded text-[10px] font-semibold bg-slate-200 text-slate-700">Oktober 2026</span>
-                  <span id="drawer-date-badge" class="px-2 py-0.5 rounded text-[10px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">-</span>
-                  <span id="drawer-status" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800">Open</span>
+                  <span id="drawer-unit-badge" class="px-2 py-0.5 rounded text-[11px] font-bold bg-blue-100 text-[#061345]">CHO MOBILE</span>
+                  <span id="drawer-period-badge" class="px-2 py-0.5 rounded text-[11px] font-semibold bg-slate-200 text-slate-700">Oktober 2026</span>
+                  <span id="drawer-date-badge" class="px-2 py-0.5 rounded text-[11px] font-semibold bg-blue-50 text-blue-700 border border-blue-200">-</span>
+                  <span id="drawer-status" class="px-2 py-0.5 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800">Open</span>
                 </div>
                 <h2 id="drawer-issue-title" class="font-headline text-base font-bold text-slate-900 mt-1">Detail Tiket Isu</h2>
               </div>
@@ -861,19 +861,19 @@
               <!-- Jadwal Kalender & Riwayat Input / Reschedule -->
               <div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex flex-col gap-2">
                 <div class="flex items-center justify-between">
-                  <span class="text-[10px] font-bold text-slate-500 uppercase tracking-wide">Jadwal Kalender &amp; Riwayat Input</span>
+                  <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Jadwal Kalender &amp; Riwayat Input</span>
                   <span id="drawer-reschedule-badge"></span>
                 </div>
                 <div class="grid grid-cols-2 gap-3 text-xs">
                   <div>
                     <span class="text-slate-500 text-xs uppercase font-bold">Tanggal Input</span>
                     <div id="drawer-tgl-input" class="font-semibold text-slate-800 mt-0.5">-</div>
-                    <div id="drawer-inputer-name" class="text-[10.5px] text-slate-500">Oleh: -</div>
+                    <div id="drawer-inputer-name" class="text-[11px] text-slate-500 font-medium">Oleh: -</div>
                   </div>
                   <div>
                     <span class="text-slate-500 text-xs uppercase font-bold">Tanggal Agenda Saat Ini</span>
                     <div id="drawer-tgl-agenda" class="font-bold text-blue-700 mt-0.5">-</div>
-                    <div id="drawer-reschedule-note" class="text-[10.5px] text-amber-700"></div>
+                    <div id="drawer-reschedule-note" class="text-[11px] text-amber-700 font-medium"></div>
                   </div>
                 </div>
                 <div id="drawer-reschedule-history-container" class="mt-1 pt-1.5 border-t border-slate-200/80 text-[10.5px] text-slate-600 hidden">
@@ -883,7 +883,7 @@
               </div>
 
               <div>
-                <span class="text-xs font-bold text-slate-500 uppercase tracking-wide">Detail Kendala</span>
+                <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Detail Kendala</span>
                 <div id="drawer-issue-detail" class="mt-1 p-3.5 bg-slate-50 border border-slate-200 rounded-xl leading-relaxed whitespace-pre-line issue-details-text">
                   Memuat detail kendala...
                 </div>
@@ -891,17 +891,17 @@
 
               <div class="grid grid-cols-2 gap-3 p-3.5 bg-blue-50/50 border border-blue-100 rounded-xl">
                 <div>
-                  <span class="text-xs font-bold text-slate-500 uppercase tracking-wide">PIC / Petugas Pelaksana</span>
+                  <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">PIC / Petugas Pelaksana</span>
                   <p id="drawer-pic" class="font-semibold text-slate-800 mt-0.5">-</p>
                 </div>
                 <div>
-                  <span class="text-xs font-bold text-slate-500 uppercase tracking-wide">Follow Up To</span>
+                  <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Follow Up To</span>
                   <p id="drawer-follow-up" class="font-semibold text-slate-800 mt-0.5">-</p>
                 </div>
               </div>
 
               <div>
-                <span class="text-xs font-bold text-slate-500 uppercase tracking-wide">sample case PDF</span>
+                <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">sample case PDF</span>
                 <div id="drawer-ppt-container" class="mt-2 p-3 bg-slate-50 border border-slate-200 rounded-xl flex items-center justify-between">
                   <div class="flex items-center gap-2">
                     <span class="material-symbols-outlined text-[18px] text-red-500">picture_as_pdf</span>
@@ -911,7 +911,7 @@
               </div>
 
               <div>
-                <span class="text-xs font-bold text-slate-500 uppercase tracking-wide">Quick Win</span>
+                <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Quick Win</span>
                 <textarea id="drawer-note-input" rows="3" class="mt-1 w-full p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-800 focus:outline-none focus:ring-2 focus:ring-[#061345]" placeholder="Tuliskan catatan tindak lanjut penanganan..."></textarea>
                 <div class="mt-2 flex justify-end">
                   <button id="btn-drawer-save" class="px-4 py-2 bg-[#061345] hover:bg-[#1e295a] text-white font-bold rounded-lg transition-colors flex items-center gap-1.5" type="button">
@@ -922,7 +922,7 @@
               </div>
 
               <div>
-                <span class="text-xs font-bold text-slate-500 uppercase tracking-wide">Riwayat follow up</span>
+                <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Riwayat follow up</span>
                 <div id="drawer-timeline-container" class="mt-2 flex flex-col gap-2 max-h-48 overflow-y-auto">
                 </div>
               </div>
@@ -1074,40 +1074,40 @@
         <div class="modal-body" style="padding: 18px 22px; display: flex; flex-direction: column; gap: 14px;">
           
           <!-- Info Ringkas Tiket -->
-          <div class="modal-info-box blue-info-box" style="padding: 10px 14px; border-radius: 10px; background: rgba(59, 130, 246, 0.06); border: 1px solid rgba(59, 130, 246, 0.18);">
-            <div class="info-row" style="display: flex; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 4px;">
-              <span class="info-badge" id="inProgressBadgeService" style="font-size: 10.5px; font-weight: 700; padding: 2px 7px; border-radius: 4px;">MOBILE</span>
-              <span class="info-id" id="inProgressTicketId" style="font-size: 12px; font-weight: 600; color: #1e293b;">Kasus #1</span>
-              <span class="info-req" style="font-size: 12px; color: #64748b; margin-left: auto;">Requestor: <strong id="inProgressRequestor" style="color: #334155;">-</strong></span>
+          <div class="modal-info-box blue-info-box" style="padding: 12px 14px; border-radius: 10px; background: rgba(59, 130, 246, 0.06); border: 1px solid rgba(59, 130, 246, 0.18);">
+            <div class="info-row" style="display: flex; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 5px;">
+              <span class="info-badge" id="inProgressBadgeService" style="font-size: 11px; font-weight: 700; padding: 2.5px 8px; border-radius: 4px;">MOBILE</span>
+              <span class="info-id" id="inProgressTicketId" style="font-size: 12px; font-weight: 700; color: #1e293b;">Kasus #1</span>
+              <span class="info-req" style="font-size: 12px; color: #64748b; margin-left: auto;">Requestor: <strong id="inProgressRequestor" style="color: #1e293b; font-weight: 700;">-</strong></span>
             </div>
-            <div class="info-issue" id="inProgressIssueText" style="font-size: 13px; font-weight: 600; color: #0f172a; line-height: 1.4;">-</div>
+            <div class="info-issue" id="inProgressIssueText" style="font-size: 13px; font-weight: 700; color: #0f172a; line-height: 1.4;">-</div>
           </div>
 
           <!-- Form Inputs: Follow Up To ditaruh di atas, baru PIC abu-abu, baru Keterangan In Progress -->
           <div class="form-row-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
             <!-- Kolom 1: Follow Up To -->
             <div class="form-group" style="display: flex; flex-direction: column; gap: 5px;">
-              <label class="form-label" for="inProgressFollowUp" style="font-size: 12.5px; font-weight: 600; color: #334155;">
+              <label class="form-label" for="inProgressFollowUp" style="font-size: 12px; font-weight: 700; color: #334155;">
                 Follow Up To
               </label>
-              <input type="text" id="inProgressFollowUp" class="form-control" style="height: 38px; font-size: 13px;" placeholder="Contoh: Tim CCIS, HCCER, dst...">
+              <input type="text" id="inProgressFollowUp" class="form-control" style="height: 38px; font-size: 12.5px;" placeholder="Contoh: Tim CCIS, HCCER, dst...">
             </div>
 
             <!-- Kolom 2: PIC / Petugas Pelaksana (Abu-abu terkunci sesuai user login) -->
             <div class="form-group" style="display: flex; flex-direction: column; gap: 5px;">
-              <label class="form-label" for="inProgressAuthor" style="font-size: 12.5px; font-weight: 600; color: #334155;">
-                PIC / Petugas Pelaksana <span class="req-star">*</span>
+              <label class="form-label" for="inProgressAuthor" style="font-size: 12px; font-weight: 700; color: #334155;">
+                PIC / Petugas Pelaksana <span class="req-star" style="color: #ef4444;">*</span>
               </label>
-              <input type="text" id="inProgressAuthor" class="form-control" readonly disabled style="background-color: #f1f5f9; cursor: not-allowed; color: #475569; height: 38px; font-size: 13px; font-weight: 500;" placeholder="PIC Petugas">
+              <input type="text" id="inProgressAuthor" class="form-control" readonly disabled style="background-color: #f1f5f9; cursor: not-allowed; color: #475569; height: 38px; font-size: 12.5px; font-weight: 600;" placeholder="PIC Petugas">
             </div>
           </div>
 
           <!-- Keterangan / Catatan Tindak Lanjut In Progress -->
           <div class="form-group" style="display: flex; flex-direction: column; gap: 5px;">
-            <label class="form-label" for="inProgressMessage" style="font-size: 12.5px; font-weight: 600; color: #334155;">
-              Keterangan / Catatan Tindak Lanjut In Progress <span class="req-star">*</span>
+            <label class="form-label" for="inProgressMessage" style="font-size: 12px; font-weight: 700; color: #334155;">
+              Keterangan / Catatan Tindak Lanjut In Progress <span class="req-star" style="color: #ef4444;">*</span>
             </label>
-            <textarea id="inProgressMessage" class="form-control" rows="4" style="font-size: 13px; line-height: 1.5; resize: vertical;" placeholder="Tuliskan catatan koordinasi teknis, langkah penanganan yang sedang berjalan, atau analisa kendala..."></textarea>
+            <textarea id="inProgressMessage" class="form-control" rows="4" style="font-size: 12.5px; line-height: 1.5; resize: vertical;" placeholder="Tuliskan catatan koordinasi teknis, langkah penanganan yang sedang berjalan, atau analisa kendala..."></textarea>
           </div>
 
         </div>

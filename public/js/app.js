@@ -2134,7 +2134,17 @@
 
     // 7. Modal In Progress Events
     if (dom.btnCloseInProgressModal) dom.btnCloseInProgressModal.addEventListener('click', closeInProgressModal);
-    if (dom.btnCancelInProgress) dom.btnCancelInProgress.addEventListener('click', closeInProgressModal);
+        if (dom.btnCancelInProgress) dom.btnCancelInProgress.addEventListener('click', closeInProgressModal);
+    if (dom.modalInProgress) {
+      dom.modalInProgress.addEventListener('click', function(e) {
+        if (e.target === dom.modalInProgress) closeInProgressModal();
+      });
+    }
+    if (dom.modalClosed) {
+      dom.modalClosed.addEventListener('click', function(e) {
+        if (e.target === dom.modalClosed) closeClosedModal();
+      });
+    }
     if (dom.btnSubmitInProgress) dom.btnSubmitInProgress.addEventListener('click', handleSaveInProgress);
 
     // 8. Modal Closed Events
@@ -3186,7 +3196,12 @@
 
     state.currentActionTicket = ticket;
 
+        state.currentActionIsUpdate = !!isUpdateOnly;
     dom.inProgressModalTitle.textContent = isUpdateOnly ? 'Update Catatan In Progress' : 'Pick up case';
+    var submitBtnSpan = dom.btnSubmitInProgress ? dom.btnSubmitInProgress.querySelector('span') : null;
+    if (submitBtnSpan) {
+      submitBtnSpan.textContent = isUpdateOnly ? 'Simpan Catatan In Progress' : 'Simpan & Ubah ke In Progress';
+    }
     dom.inProgressTicketId.textContent = 'Case #' + ticket.id;
     dom.inProgressBadgeService.textContent = ticket.serviceType;
     dom.inProgressBadgeService.className = 'info-badge ' + (ticket.serviceType === 'MOBILE' ? 'badge-srv mobile' : (ticket.serviceType === 'ECARE' ? 'badge-srv ecare' : (ticket.serviceType === 'PRIORITY' ? 'badge-srv priority' : 'badge-srv fixed')));
@@ -3250,12 +3265,15 @@
       google.script.run
         .withSuccessHandler(function(res) {
           dom.btnSubmitInProgress.disabled = false;
-          dom.btnSubmitInProgress.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>Simpan & Ubah ke In Progress</span>';
+                    var isUpd = !!state.currentActionIsUpdate;
+          var btnLabel = isUpd ? 'Simpan Catatan In Progress' : 'Simpan & Ubah ke In Progress';
+          dom.btnSubmitInProgress.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>' + btnLabel + '</span>';
 
           if (res && res.success) {
             applyInProgressUpdateLocal(ticket, payload, res.log);
             closeInProgressModal();
-            showToast('Kasus #' + ticket.id + ' berhasil diubah ke In Progress!', 'success');
+                        var isUpdToast = !!state.currentActionIsUpdate;
+            showToast(isUpdToast ? ('Catatan progress kasus #' + ticket.id + ' berhasil diupdate!') : ('Kasus #' + ticket.id + ' berhasil diubah ke In Progress!'), 'success');
           } else {
             showToast('Gagal update: ' + (res ? res.error : 'Unknown'), 'error');
           }
@@ -3283,7 +3301,9 @@
 
       setTimeout(function() {
         dom.btnSubmitInProgress.disabled = false;
-        dom.btnSubmitInProgress.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>Simpan & Ubah ke In Progress</span>';
+                  var isUpd = !!state.currentActionIsUpdate;
+          var btnLabel = isUpd ? 'Simpan Catatan In Progress' : 'Simpan & Ubah ke In Progress';
+          dom.btnSubmitInProgress.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>' + btnLabel + '</span>';
 
         var simLog = {
           logId: 'LOG-SIM-' + Math.floor(1000 + Math.random() * 9000),
@@ -3297,7 +3317,8 @@
         };
         applyInProgressUpdateLocal(ticket, payload, simLog);
         closeInProgressModal();
-        showToast('Kasus #' + ticket.id + ' berhasil diubah ke In Progress!', 'success');
+                    var isUpdToast = !!state.currentActionIsUpdate;
+            showToast(isUpdToast ? ('Catatan progress kasus #' + ticket.id + ' berhasil diupdate!') : ('Kasus #' + ticket.id + ' berhasil diubah ke In Progress!'), 'success');
       }, 350);
     }
   }
