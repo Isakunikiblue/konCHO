@@ -3530,18 +3530,26 @@
 
   function getCasePptAttachment(serviceType, ticketId) {
     if (!state.pptAttachments) state.pptAttachments = getStoredPptAttachments();
-    var key = (serviceType || 'MOBILE') + '_' + ticketId;
+    var sType = serviceType || 'MOBILE';
+    var key = sType + '_' + ticketId;
     if (state.pptAttachments[key]) {
       return state.pptAttachments[key];
     }
-    var rec = state.records.find(function(r) {
-      return String(r.id) === String(ticketId) && r.serviceType === serviceType;
+    // Fallback: check case-insensitive or ending with ticketId
+    for (var k in state.pptAttachments) {
+      if (k.endsWith('_' + ticketId) || k === String(ticketId)) {
+        return state.pptAttachments[k];
+      }
+    }
+    // Fallback to record in state.records
+    var rec = (state.records || []).find(function(r) {
+      return String(r.id) === String(ticketId);
     });
-    if (rec && rec.filePpt) {
+    if (rec && (rec.filePpt || rec.attachmentUrl)) {
       return {
-        fileUrl: rec.filePpt,
-        fileName: 'Materi_Case_' + ticketId + '.pptx',
-        uploadedBy: 'User konCHO'
+        fileUrl: rec.filePpt || rec.attachmentUrl,
+        fileName: rec.fileName || ('Sample_Case_' + ticketId + '.pdf'),
+        uploadedBy: rec.uploadedBy || 'User konCHO'
       };
     }
     return null;
@@ -3565,7 +3573,8 @@
     state.uploadPptTarget = {
       ticketId: ticket.id,
       serviceType: ticket.serviceType,
-      record: ticket
+      record: ticket,
+      day: state.selectedDate || state.selectedDay
     };
     state.selectedPptFile = null;
 
@@ -3748,13 +3757,43 @@
 
     if (target.record) {
       target.record.filePpt = fileUrl;
+      target.record.fileName = file.name;
     }
+
+    // Update global state.records
+    if (Array.isArray(state.records)) {
+      state.records.forEach(function(r) {
+        if (r && String(r.id) === String(target.ticketId)) {
+          r.filePpt = fileUrl;
+          r.fileName = file.name;
+        }
+      });
+    }
+
+    // Update service pool records
+    var pool = (target.serviceType === 'MOBILE' ? state.mobileRecords : (target.serviceType === 'ECARE' ? state.ecareRecords : (target.serviceType === 'PRIORITY' ? state.priorityRecords : state.fixedRecords))) || [];
+    pool.forEach(function(r) {
+      if (r && String(r.id) === String(target.ticketId)) {
+        r.filePpt = fileUrl;
+        r.fileName = file.name;
+      }
+    });
 
     setTimeout(function() {
       closeUploadPptModal();
-      showToast('File presentasi "' + file.name + '" berhasil diunggah ke Google Drive!', 'success');
+      showToast('File PDF "' + file.name + '" berhasil diunggah!', 'success');
       renderCaseList();
-    }, 450);
+      if (typeof renderCalendarGrid === 'function') renderCalendarGrid();
+      const activeDay = (target && target.day) || state.selectedDate || state.selectedDay;
+      if (activeDay && typeof renderCalendarRightPanel === 'function') {
+        try {
+          renderCalendarRightPanel(activeDay);
+        } catch (e) {
+          console.error('Error re-rendering calendar right panel:', e);
+        }
+      }
+      if (typeof renderTasksTable === 'function') renderTasksTable();
+    }, 300);
   }
 
   function onUploadPptError(errMsg, file, target) {
@@ -3807,9 +3846,19 @@
       targetRec.filePpt = '';
     }
 
-    closeUploadPptModal();
-    showToast('Materi PPT berhasil dihapus!', 'success');
+        closeUploadPptModal();
+    showToast('File PDF berhasil dihapus!', 'success');
     renderCaseList();
+    if (typeof renderCalendarGrid === 'function') renderCalendarGrid();
+    const activeDay = state.selectedDate || state.selectedDay;
+    if (activeDay && typeof renderCalendarRightPanel === 'function') {
+      try {
+        renderCalendarRightPanel(activeDay);
+      } catch (e) {
+        console.error('Error re-rendering calendar right panel:', e);
+      }
+    }
+    if (typeof renderTasksTable === 'function') renderTasksTable();
 
     // 3. Sinkronisasi penghapusan ke Google Apps Script / Sheet & Trash Drive
     var payload = {
@@ -6054,67 +6103,9 @@
       }
     }
 
-    // Sinkronisasi Lampiran PDF per masing-masing kasus di tanggal ini (Multi-case dynamic rendering)
-    const deckContainer = document.getElementById('presentation-deck-container');
-    if (deckContainer) {
-      const candidateList = issues.length > 0 ? issues : (dayItems.filter(it => it.ticketId));
-      if (candidateList.length > 0) {
-        deckContainer.innerHTML = candidateList.map(cItem => {
-          const cSvc = cItem.serviceType || normalizeUnitKey(cItem.unit) || 'MOBILE';
-          const cMeta = getUnitMeta(cSvc);
-          const pInfo = getCasePptAttachment(cSvc, cItem.ticketId);
-          const hasP = !!(pInfo && (pInfo.fileUrl || pInfo.url));
-          const tLabel = cItem.ticket || ('#' + cItem.ticketId);
-
-          let itemHtml = '<div class="p-3 bg-slate-50/90 border border-slate-200/90 rounded-xl flex flex-col gap-2">';
-          itemHtml += '  <div class="flex items-center justify-between gap-2">';
-          itemHtml += '    <div class="flex items-center gap-1.5 min-w-0">';
-          itemHtml += '      <span class="px-1.5 py-0.5 rounded text-[9px] font-bold ' + cMeta.pillClass + '">' + cMeta.label + '</span>';
-          itemHtml += '      <span class="text-[11px] font-mono font-bold text-slate-700">' + tLabel + '</span>';
-          itemHtml += '    </div>';
-          itemHtml += '    <span class="text-[11px] text-slate-500 truncate max-w-[170px]" title="' + escapeHtml(cItem.title || cItem.text || (cItem.record && (cItem.record.issueDetails || cItem.record.detail)) || "-") + '">' + escapeHtml(cItem.title || cItem.text || (cItem.record && (cItem.record.issueDetails || cItem.record.detail)) || "-") + '</span>';
-          itemHtml += '  </div>';
-
-          if (hasP) {
-            itemHtml += '  <div class="bg-white border border-slate-200 rounded-lg p-2.5 flex items-center justify-between gap-2 shadow-2xs">';
-            itemHtml += '    <div class="flex items-center gap-2 min-w-0">';
-            itemHtml += '      <div class="w-7 h-7 rounded-md bg-rose-50 border border-rose-100 flex items-center justify-center shrink-0 text-rose-600 font-bold text-[10px]">PDF</div>';
-            itemHtml += '      <div class="flex flex-col min-w-0">';
-            itemHtml += '        <span class="text-xs font-bold text-slate-800 truncate" title="' + escapeHtml(pInfo.fileName || 'Lampiran.pdf') + '">' + escapeHtml(pInfo.fileName || 'Lampiran.pdf') + '</span>';
-            itemHtml += '        <span class="text-[10px] text-slate-400">Diupload oleh ' + escapeHtml(pInfo.uploadedBy || 'Tim CHO') + '</span>';
-            itemHtml += '      </div>';
-            itemHtml += '    </div>';
-            itemHtml += '    <div class="flex items-center gap-1 shrink-0">';
-            itemHtml += '      <a href="' + (pInfo.fileUrl || pInfo.url) + '" target="_blank" rel="noopener noreferrer" class="px-2 py-1 text-[11px] font-bold text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 rounded flex items-center gap-0.5" title="Lihat PDF"><span class="material-symbols-outlined text-[13px]">visibility</span><span>Lihat</span></a>';
-            if (canUploadRole) {
-              itemHtml += '      <button type="button" class="px-2 py-1 text-[11px] font-bold text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded flex items-center gap-0.5 cursor-pointer" onclick="openUploadPptModal(\'' + cItem.ticketId + '\', \'' + cSvc + '\')" title="Ganti PDF"><span class="material-symbols-outlined text-[13px]">edit</span><span>Ganti</span></button>';
-            }
-            if (isAdminRole) {
-              itemHtml += '      <button type="button" class="w-6 h-6 text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded flex items-center justify-center cursor-pointer" onclick="handleDeletePpt(\'' + cItem.ticketId + '\', \'' + cSvc + '\')" title="Hapus PDF"><span class="material-symbols-outlined text-[14px]">delete</span></button>';
-            }
-            itemHtml += '    </div>';
-            itemHtml += '  </div>';
-          } else if (canUploadRole && cItem.ticketId) {
-            itemHtml += '  <div class="border-2 border-dashed border-slate-200 hover:border-blue-400 rounded-lg p-2.5 text-center cursor-pointer transition-colors bg-white hover:bg-blue-50/40" onclick="openUploadPptModal(\'' + cItem.ticketId + '\', \'' + cSvc + '\')">';
-            itemHtml += '    <div class="flex items-center justify-center gap-1.5 text-xs font-semibold text-slate-700">';
-            itemHtml += '      <span class="material-symbols-outlined text-[16px] text-rose-500">cloud_upload</span>';
-            itemHtml += '      <span>Upload PDF untuk ' + tLabel + '</span>';
-            itemHtml += '    </div>';
-            itemHtml += '  </div>';
-          } else {
-            itemHtml += '  <div class="text-[11px] text-slate-400 italic">Belum ada lampiran PDF untuk kasus ini</div>';
-          }
-
-          itemHtml += '</div>';
-          return itemHtml;
-        }).join('');
-      } else {
-        deckContainer.innerHTML = '<div class="text-xs text-slate-400 text-center py-3">Tidak ada kasus di tanggal ini</div>';
-      }
-    }
-
     if (cardPresentasi) {
-      cardPresentasi.classList.toggle('hidden', !hasAnyContent);
+      cardPresentasi.style.display = 'none';
+      cardPresentasi.classList.add('hidden');
     }
 
     const quickContainer = document.getElementById('quickwins-container');
