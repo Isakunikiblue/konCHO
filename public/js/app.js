@@ -6057,7 +6057,7 @@
     if (pptCardEl) {
       if (foundPpt && (foundPpt.fileUrl || foundPpt.url)) {
         pptCardEl.classList.remove('hidden');
-        if (pptNameEl) pptNameEl.textContent = foundPpt.fileName || foundPpt.name || 'Materi_Presentasi.pptx';
+        if (pptNameEl) pptNameEl.textContent = foundPpt.fileName || foundPpt.name || 'Lampiran_Dokumen.pdf';
         if (pptMetaEl) pptMetaEl.textContent = 'Diupload oleh ' + (foundPpt.uploadedBy || 'Tim CHO');
         if (btnDownloadDeck) btnDownloadDeck.href = foundPpt.fileUrl || foundPpt.url;
         if (btnDeleteDeck) {

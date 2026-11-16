@@ -431,16 +431,15 @@
                   <div id="card-dokumen-presentasi" class="bg-white rounded-xl p-3.5 shadow-xs border border-slate-200/90 flex flex-col gap-2.5">
                     <div class="flex items-center justify-between">
                       <h3 class="font-headline text-xs font-bold text-slate-900 uppercase tracking-wide flex items-center gap-1.5">
-                        <span class="material-symbols-outlined text-[16px] text-indigo-600">description</span>
-                        <span>Dokumen Presentasi</span>
+                        <span class="material-symbols-outlined text-[16px] text-indigo-600">picture_as_pdf</span>
+                        <span>Lampiran PDF</span>
                       </h3>
-                      <span class="text-[10px] font-medium text-emerald-600 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">Tersinkronisasi</span>
                     </div>
 
                     <div id="presentation-deck-container" class="flex flex-col gap-2.5">
                       <div id="calendar-ppt-dropzone" class="border-2 border-dashed border-slate-200 hover:border-blue-400 rounded-xl p-3.5 text-center cursor-pointer transition-colors bg-slate-50/50">
                         <span class="material-symbols-outlined text-[26px] text-slate-400">cloud_upload</span>
-                        <p class="text-xs font-semibold text-slate-700 mt-1">Tarik &amp; lepas file PPT / PDF ke sini</p>
+                        <p class="text-xs font-semibold text-slate-700 mt-1">Tarik &amp; lepas file PDF</p>
                         <p class="text-[11px] text-slate-400">atau <span class="text-blue-600 font-semibold underline">Pilih dari Komputer</span> (Maks. 50 MB)</p>
                       </div>
 
@@ -451,7 +450,7 @@
                           </div>
                           <div class="flex flex-col min-w-0">
                             <span id="presentation-deck-name" class="text-xs font-bold text-slate-800 truncate">-</span>
-                            <span id="presentation-deck-meta" class="text-[10px] text-slate-500">Belum ada materi PPT</span>
+                            <span id="presentation-deck-meta" class="text-[10px] text-slate-500">Belum ada lampiran PDF</span>
                           </div>
                         </div>
                         <div class="flex items-center gap-1 shrink-0">
@@ -928,12 +927,12 @@
               </div>
             </div>
 
-            <div class="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
-              <button id="btn-drawer-copy-text" class="px-3 py-1.5 bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 font-semibold rounded-lg flex items-center gap-1" type="button">
-                <span class="material-symbols-outlined text-[15px]">content_copy</span>
+            <div class="p-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+              <button id="btn-drawer-copy-text" class="px-2.5 py-1.5 bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 font-semibold rounded-lg flex items-center gap-1.5 text-[11px] cursor-pointer shadow-2xs transition-colors" type="button">
+                <span class="material-symbols-outlined text-[14px] text-slate-500">content_copy</span>
                 <span>Salin Ringkasan</span>
               </button>
-              <button id="btn-drawer-close-foot" class="px-4 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-lg transition-colors" type="button">
+              <button id="btn-drawer-close-foot" class="px-3.5 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-lg transition-colors text-[11px] cursor-pointer" type="button">
                 Tutup
               </button>
             </div>
@@ -984,12 +983,12 @@
             </div>
 
             <!-- Drawer Footer (Styled exactly like Detil Isu) -->
-            <div class="p-4 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
-              <button id="btn-history-drawer-copy" class="px-3 py-1.5 bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 font-semibold rounded-lg flex items-center gap-1 text-xs cursor-pointer" type="button">
-                <span class="material-symbols-outlined text-[15px]">content_copy</span>
+            <div class="p-3 bg-slate-50 border-t border-slate-200 flex items-center justify-between">
+              <button id="btn-history-drawer-copy" class="px-2.5 py-1.5 bg-white border border-slate-200 text-slate-700 hover:bg-slate-100 font-semibold rounded-lg flex items-center gap-1.5 text-[11px] cursor-pointer shadow-2xs transition-colors" type="button">
+                <span class="material-symbols-outlined text-[14px] text-slate-500">content_copy</span>
                 <span>Salin Ringkasan</span>
               </button>
-              <button id="btn-history-drawer-close-foot" class="px-4 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-bold rounded-lg transition-colors text-xs cursor-pointer" type="button" onclick="closeHistoryDrawer()">
+              <button id="btn-history-drawer-close-foot" class="px-3.5 py-1.5 bg-slate-200 hover:bg-slate-300 text-slate-700 font-semibold rounded-lg transition-colors text-[11px] cursor-pointer" type="button" onclick="closeHistoryDrawer()">
                 Tutup
               </button>
             </div>
