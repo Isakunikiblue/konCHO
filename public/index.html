@@ -7945,7 +7945,6 @@ input:focus, select:focus, textarea:focus {
 
   <!-- Include Client JavaScript -->
   <script>
-
 /**
  * =========================================================================
  * konCHO - Client Side JavaScript Controller
@@ -8169,6 +8168,7 @@ input:focus, select:focus, textarea:focus {
           state.authUser.name = matchedAcc.name || matchedAcc.username;
           state.authUser.username = matchedAcc.username;
           state.authUser.role = matchedAcc.role || 'Inputer';
+          state.authUser.site = matchedAcc.site || '';
           try {
             localStorage.setItem('koncho_auth_user', JSON.stringify(state.authUser));
           } catch(err) {}
@@ -8885,6 +8885,7 @@ input:focus, select:focus, textarea:focus {
           state.authUser.site = site;
           try { localStorage.setItem('koncho_auth_user', JSON.stringify(state.authUser)); } catch(err){}
           applyRolePermissions();
+    if (typeof checkFacilitatorNotifications === 'function') checkFacilitatorNotifications();
         }
       }
     } else {
@@ -12624,19 +12625,156 @@ input:focus, select:focus, textarea:focus {
     return dd + ' ' + (shortMonths[p.monthIndex] || '') + ' ' + p.year;
   }
 
+  function getUserRestrictedUnit(user) {
+    if (!user) return null;
+    var role = (user.role || '').toLowerCase();
+    if (role === 'administrator' || role === 'admin') {
+      return null;
+    }
+    var uName = (user.username || '').toLowerCase();
+    var site = (user.site || '').toLowerCase();
+    var name = (user.name || '').toLowerCase();
+    var combined = uName + ' ' + site + ' ' + name;
+
+    if (combined.includes('fixed')) {
+      return 'FIXED';
+    } else if (combined.includes('mobile')) {
+      return 'MOBILE';
+    } else if (combined.includes('ecare') || combined.includes('e-care') || combined.includes('e care')) {
+      return 'ECARE';
+    } else if (combined.includes('priority') || combined.includes('prio')) {
+      return 'PRIORITY';
+    }
+    return null;
+  }
+
+  function addFacilitatorNotification(ticketId, facilitator, unitLabel, issueText) {
+    try {
+      var raw = localStorage.getItem('koncho_facilitator_notifications') || '[]';
+      var notifs = JSON.parse(raw);
+      notifs.unshift({
+        id: ticketId,
+        facilitator: facilitator,
+        unit: unitLabel,
+        title: issueText,
+        time: new Date().toISOString(),
+        read: false
+      });
+      if (notifs.length > 30) notifs = notifs.slice(0, 30);
+      localStorage.setItem('koncho_facilitator_notifications', JSON.stringify(notifs));
+    } catch(e) {}
+  }
+
+  function checkFacilitatorNotifications() {
+    if (!state.authUser) return;
+    var userRole = (state.authUser.role || '').toLowerCase();
+    var userName = (state.authUser.name || state.authUser.username || '').toLowerCase();
+    if (userRole !== 'facilitator' && userRole !== 'administrator') return;
+
+    try {
+      var raw = localStorage.getItem('koncho_facilitator_notifications') || '[]';
+      var notifs = JSON.parse(raw);
+      var unread = notifs.filter(function(n) {
+        return !n.read && (userRole === 'administrator' || userName.includes(n.facilitator.toLowerCase()));
+      });
+      if (unread.length > 0) {
+        setTimeout(function() {
+          showToast('🔔 Anda memiliki ' + unread.length + ' tugas kasus baru yang ditugaskan kepada Fasilitator: ' + (userRole === 'administrator' ? 'Tim CHO' : state.authUser.name) + '!', 'info');
+        }, 1200);
+        unread.forEach(function(n) { n.read = true; });
+        localStorage.setItem('koncho_facilitator_notifications', JSON.stringify(notifs));
+      }
+    } catch(e) {}
+  }
+
   function openNewModal(dateContext) {
     if (state.authUser && (state.authUser.role === 'Facilitator' || state.authUser.role === 'Viewer')) {
       showToast('Akses ditolak: Peran ' + state.authUser.role + ' tidak berwenang menginput data kasus baru.', 'error');
       return;
     }
-    if (state.activeServiceScope === 'FIXED') {
-      setNewModalService('FIXED');
-    } else if (state.activeServiceScope === 'ECARE') {
-      setNewModalService('ECARE');
-    } else if (state.activeServiceScope === 'PRIORITY') {
-      setNewModalService('PRIORITY');
+
+    var restrictedUnit = getUserRestrictedUnit(state.authUser);
+    var toggleContainer = document.querySelector('#newDataModal .modal-service-toggle');
+
+    if (restrictedUnit) {
+      // Sembunyikan opsi unit yang tidak sesuai, tampilkan hanya unit yang diizinkan untuk akun login
+      if (dom.toggleMobile) {
+        dom.toggleMobile.style.display = restrictedUnit === 'MOBILE' ? 'flex' : 'none';
+        if (restrictedUnit === 'MOBILE') {
+          dom.toggleMobile.style.alignItems = 'center';
+          dom.toggleMobile.style.justifyContent = 'center';
+          dom.toggleMobile.style.gap = '6px';
+        }
+      }
+      if (dom.toggleFixed) {
+        dom.toggleFixed.style.display = restrictedUnit === 'FIXED' ? 'flex' : 'none';
+        if (restrictedUnit === 'FIXED') {
+          dom.toggleFixed.style.alignItems = 'center';
+          dom.toggleFixed.style.justifyContent = 'center';
+          dom.toggleFixed.style.gap = '6px';
+        }
+      }
+      if (dom.toggleEcare) {
+        dom.toggleEcare.style.display = restrictedUnit === 'ECARE' ? 'flex' : 'none';
+        if (restrictedUnit === 'ECARE') {
+          dom.toggleEcare.style.alignItems = 'center';
+          dom.toggleEcare.style.justifyContent = 'center';
+          dom.toggleEcare.style.gap = '6px';
+        }
+      }
+      if (dom.togglePriority) {
+        dom.togglePriority.style.display = restrictedUnit === 'PRIORITY' ? 'flex' : 'none';
+        if (restrictedUnit === 'PRIORITY') {
+          dom.togglePriority.style.alignItems = 'center';
+          dom.togglePriority.style.justifyContent = 'center';
+          dom.togglePriority.style.gap = '6px';
+        }
+      }
+
+      if (toggleContainer) {
+        toggleContainer.style.gridTemplateColumns = '1fr';
+      }
+      setNewModalService(restrictedUnit);
     } else {
-      setNewModalService('MOBILE');
+      // Administrator: tampilkan semua 4 pilihan unit
+      if (dom.toggleMobile) {
+        dom.toggleMobile.style.display = 'flex';
+        dom.toggleMobile.style.alignItems = 'center';
+        dom.toggleMobile.style.justifyContent = 'center';
+        dom.toggleMobile.style.gap = '6px';
+      }
+      if (dom.toggleFixed) {
+        dom.toggleFixed.style.display = 'flex';
+        dom.toggleFixed.style.alignItems = 'center';
+        dom.toggleFixed.style.justifyContent = 'center';
+        dom.toggleFixed.style.gap = '6px';
+      }
+      if (dom.toggleEcare) {
+        dom.toggleEcare.style.display = 'flex';
+        dom.toggleEcare.style.alignItems = 'center';
+        dom.toggleEcare.style.justifyContent = 'center';
+        dom.toggleEcare.style.gap = '6px';
+      }
+      if (dom.togglePriority) {
+        dom.togglePriority.style.display = 'flex';
+        dom.togglePriority.style.alignItems = 'center';
+        dom.togglePriority.style.justifyContent = 'center';
+        dom.togglePriority.style.gap = '6px';
+      }
+
+      if (toggleContainer) {
+        toggleContainer.style.gridTemplateColumns = 'repeat(4, 1fr)';
+      }
+
+      if (state.activeServiceScope === 'FIXED') {
+        setNewModalService('FIXED');
+      } else if (state.activeServiceScope === 'ECARE') {
+        setNewModalService('ECARE');
+      } else if (state.activeServiceScope === 'PRIORITY') {
+        setNewModalService('PRIORITY');
+      } else {
+        setNewModalService('MOBILE');
+      }
     }
 
     // Jika dibuka dari tanggal kalender (atau sedang di view kalender), sinkronkan Tanggal Agenda & Bulan - Tahun
@@ -12725,6 +12863,10 @@ input:focus, select:focus, textarea:focus {
   }
 
   function setNewModalService(srv) {
+    var restrictedUnit = getUserRestrictedUnit(state.authUser);
+    if (restrictedUnit && srv !== restrictedUnit) {
+      srv = restrictedUnit;
+    }
     selectedNewService = srv;
     if (dom.toggleMobile) dom.toggleMobile.classList.toggle('active', srv === 'MOBILE');
     if (dom.toggleFixed) dom.toggleFixed.classList.toggle('active', srv === 'FIXED');
@@ -12807,8 +12949,9 @@ input:focus, select:focus, textarea:focus {
     }
 
     // Validasi upload format khusus PDF jika user memilih file
-    if (dom.newCasePptFile && dom.newCasePptFile.files && dom.newCasePptFile.files.length > 0) {
-      var fileExt = dom.newCasePptFile.files[0].name.split('.').pop().toLowerCase();
+    var attachedPdfFile = (dom.newCasePptFile && dom.newCasePptFile.files && dom.newCasePptFile.files.length > 0) ? dom.newCasePptFile.files[0] : null;
+    if (attachedPdfFile) {
+      var fileExt = attachedPdfFile.name.split('.').pop().toLowerCase();
       if (fileExt !== 'pdf') {
         showToast('Format file lampiran harus PDF (.pdf)!', 'error');
         return;
@@ -12821,6 +12964,141 @@ input:focus, select:focus, textarea:focus {
     var targetSheetName = selectedNewService === 'MOBILE' ? 'Mobile' : (selectedNewService === 'ECARE' ? 'eCare' : (selectedNewService === 'PRIORITY' ? 'Priority' : 'Fixed'));
     var targetUnitLabel = selectedNewService === 'MOBILE' ? 'CHO Mobile' : (selectedNewService === 'ECARE' ? 'CHO eCare' : (selectedNewService === 'PRIORITY' ? 'CHO Priority' : 'CHO Fixed'));
 
+    // Buat Ticket ID baru unik format konCHO: CHO-M/F/E/P-YYYYMMDD-XXXX
+    var prefix = selectedNewService === 'FIXED' ? 'CHO-F' : (selectedNewService === 'ECARE' ? 'CHO-E' : (selectedNewService === 'PRIORITY' ? 'CHO-P' : 'CHO-M'));
+    var dateCode = (targetIsoDate || '').replace(/-/g, '') || (pickedParts.year + String(pickedParts.monthIndex + 1).padStart(2, '0') + String(pickedParts.day).padStart(2, '0'));
+    var rndCode = Math.floor(1000 + Math.random() * 9000);
+    var newTicketId = prefix + '-' + dateCode + '-' + rndCode;
+
+    var newRecord = {
+      id: newTicketId,
+      ticketId: newTicketId,
+      serviceType: selectedNewService,
+      bulan: bulan,
+      totalCaseIsu: issue,
+      caseIssue: issue,
+      caseTitle: issue,
+      requestor: req,
+      inputBy: currentInputUser,
+      status: st,
+      urgency: urgency,
+      picFacilitator: assignedFacilitator,
+      followUpTo: follow,
+      tanggal: targetIsoDate,
+      tanggalInput: targetIsoDate,
+      tanggalAgenda: targetIsoDate,
+      nama: nama,
+      nomorLayanan: nomor,
+      detail: detail,
+      issueDetails: detail,
+      progress: progressQW,
+      progressQuickWin: progressQW,
+      needSupport: needSupport,
+      pic: req,
+      terakhirUpdate: targetIsoDate,
+      statusInformasi: st === 'Open' ? 'Belum Ada Update' : 'Ada Update Baru'
+    };
+
+    // Rekam lampiran PDF bila diunggah
+    if (attachedPdfFile) {
+      try {
+        var attachKey = selectedNewService + '_' + newTicketId;
+        var fakeUrl = URL.createObjectURL(attachedPdfFile);
+        if (!state.pptAttachments) state.pptAttachments = getStoredPptAttachments();
+        state.pptAttachments[attachKey] = {
+          fileUrl: fakeUrl,
+          fileName: attachedPdfFile.name,
+          uploadedBy: currentInputUser,
+          uploadedAt: new Date().toISOString()
+        };
+        saveStoredPptAttachments(state.pptAttachments);
+        newRecord.filePpt = fakeUrl;
+        newRecord.fileName = attachedPdfFile.name;
+      } catch(e) {
+        console.warn('Gagal membaca PDF lokal:', e);
+      }
+    }
+
+    // Rekam log awal di state.logs
+    if (!Array.isArray(state.logs)) state.logs = [];
+    state.logs.unshift({
+      logId: 'LOG-' + dateCode + '-' + rndCode,
+      ticketId: newTicketId,
+      serviceType: selectedNewService,
+      user: currentInputUser,
+      message: 'Laporan baru dibuat untuk Unit ' + targetUnitLabel + ' (Requestor: ' + req + ') ditugaskan ke Fasilitator: ' + assignedFacilitator,
+      status: st,
+      followUpTo: follow,
+      tanggal: new Date().toISOString()
+    });
+
+    // 1. Masukkan ke state.records & pool masing-masing unit
+    if (!Array.isArray(state.records)) state.records = [];
+    state.records.unshift(newRecord);
+
+    if (selectedNewService === 'MOBILE') {
+      if (!state.mobileRecords) state.mobileRecords = [];
+      state.mobileRecords.unshift(newRecord);
+    } else if (selectedNewService === 'FIXED') {
+      if (!state.fixedRecords) state.fixedRecords = [];
+      state.fixedRecords.unshift(newRecord);
+    } else if (selectedNewService === 'ECARE') {
+      if (!state.ecareRecords) state.ecareRecords = [];
+      state.ecareRecords.unshift(newRecord);
+    } else if (selectedNewService === 'PRIORITY') {
+      if (!state.priorityRecords) state.priorityRecords = [];
+      state.priorityRecords.unshift(newRecord);
+    }
+
+    // 2. Navigasikan Kalender ke bulan & tanggal kasus baru agar seketika tampil di Grid
+    if (typeof setCalendarMonthYear === 'function' && savedCalCtx) {
+      setCalendarMonthYear(savedCalCtx.year, savedCalCtx.monthIndex, savedCalCtx.day);
+    } else {
+      state.selectedYear = savedCalCtx.year;
+      state.selectedMonthIndex = savedCalCtx.monthIndex;
+      state.selectedDate = savedCalCtx.day;
+    }
+
+    // 3. Pastikan filter Tasks tidak menyembunyikan kasus baru
+    state.tasksFilterPeriod = 'all';
+    var periodFilterEl = document.getElementById('select-period-filter');
+    if (periodFilterEl) periodFilterEl.value = 'all';
+
+    var taskSearchEl = document.getElementById('task-search-input');
+    if (taskSearchEl && state.searchQuery) {
+      state.searchQuery = '';
+      taskSearchEl.value = '';
+    }
+
+    // 4. Tutup modal & bersihkan formulir seketika
+    closeNewModal();
+    resetNewForm();
+
+    // 5. Render seluruh tampilan seketika (Grid Kalender, Drawer/Panel Kanan, Tabel Tasks, KPI)
+    if (typeof renderCalendarGrid === 'function') renderCalendarGrid();
+    if (typeof renderCalendarRightPanel === 'function') renderCalendarRightPanel(savedCalCtx.day);
+    if (typeof openCalendarDayDrawer === 'function' && state.activeView === 'calendar') openCalendarDayDrawer();
+    if (typeof renderTasksTable === 'function') renderTasksTable();
+    if (typeof updateTasksKpis === 'function') updateTasksKpis();
+    if (typeof updateKpiCounters === 'function') updateKpiCounters();
+    if (typeof renderActivityFeed === 'function') renderActivityFeed();
+    if (typeof renderCaseList === 'function') renderCaseList();
+
+    // 6. Notifikasi seketika kepada pengguna & Fasilitator yang dituju
+    showToast('✨ Kasus #' + newTicketId + ' berhasil dibuat! Ditugaskan ke Fasilitator: ' + assignedFacilitator, 'success');
+
+    // Rekam notifikasi di antrean notifikasi fasilitator
+    addFacilitatorNotification(newTicketId, assignedFacilitator, targetUnitLabel, issue);
+
+    // Jika akun yang sedang login adalah Fasilitator terkait, berikan notifikasi khusus
+    var authName = (state.authUser && (state.authUser.name || state.authUser.username) || '').toLowerCase();
+    if (authName.includes(assignedFacilitator.toLowerCase())) {
+      setTimeout(function() {
+        showToast('🔔 Notifikasi Fasilitator: Kasus #' + newTicketId + ' ditugaskan kepada Anda!', 'info');
+      }, 700);
+    }
+
+    // 7. Sinkronisasi latar belakang ke Google Apps Script / Spreadsheet
     var payload = {
       serviceType: selectedNewService,
       bulan: bulan,
@@ -12852,87 +13130,34 @@ input:focus, select:focus, textarea:focus {
       }
     };
 
-    dom.btnSubmitNewReport.disabled = true;
-    dom.btnSubmitNewReport.innerHTML = '<span>Menyimpan ke Sheet ' + targetSheetName + '...</span>';
-
     if (state.isGasEnvironment) {
       google.script.run
         .withSuccessHandler(function(res) {
-          dom.btnSubmitNewReport.disabled = false;
-          dom.btnSubmitNewReport.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>Simpan ke Database</span>';
-
           if (res && res.success) {
-            closeNewModal();
-            resetNewForm();
-            showToast(res.message, 'success');
-            loadApplicationData(false);
-          } else {
-            showToast('Gagal menyimpan: ' + (res ? res.error : 'Unknown'), 'error');
+            if (res.ticketId && res.ticketId !== newTicketId) {
+              newRecord.id = res.ticketId;
+              newRecord.ticketId = res.ticketId;
+              if (typeof renderCalendarGrid === 'function') renderCalendarGrid();
+              if (typeof renderCalendarRightPanel === 'function') renderCalendarRightPanel(savedCalCtx.day);
+              if (typeof renderTasksTable === 'function') renderTasksTable();
+            }
           }
         })
         .withFailureHandler(function(err) {
-          dom.btnSubmitNewReport.disabled = false;
-          dom.btnSubmitNewReport.innerHTML = '<span>Simpan ke Database</span>';
-          showToast('Error Apps Script: ' + err.message, 'error');
+          console.warn('Apps Script error:', err);
         })
         .submitNewData(payload);
-    } else {
-      // Sync ke Google Apps Script Web App via POST jika URL tersedia (Vercel / GitHub)
-      if (state.gasApiUrl) {
-        try {
-          fetch(state.gasApiUrl, {
-            method: 'POST',
-            mode: 'no-cors',
-            headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-            body: JSON.stringify({ action: 'submitNewData', data: payload })
-          });
-        } catch (e) {
-          console.warn('Sync POST error:', e);
-        }
+    } else if (state.gasApiUrl) {
+      try {
+        fetch(state.gasApiUrl, {
+          method: 'POST',
+          mode: 'no-cors',
+          headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+          body: JSON.stringify({ action: 'submitNewData', data: payload })
+        });
+      } catch (e) {
+        console.warn('Sync POST error:', e);
       }
-
-      setTimeout(function() {
-        dom.btnSubmitNewReport.disabled = false;
-        dom.btnSubmitNewReport.innerHTML = '<svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg><span>Simpan ke Database</span>';
-
-        var newId = String(state.records.length + 1);
-        var simRecord = {
-          id: newId,
-          serviceType: selectedNewService,
-          bulan: bulan,
-          totalCaseIsu: issue,
-          requestor: req,
-          inputBy: currentInputUser,
-          status: st,
-          urgency: urgency,
-          picFacilitator: assignedFacilitator,
-          followUpTo: follow,
-          tanggal: targetIsoDate,
-          nama: nama,
-          nomorLayanan: nomor,
-          detail: detail,
-          issueDetails: detail,
-          progress: progressQW,
-          needSupport: needSupport,
-          pic: req,
-          terakhirUpdate: targetIsoDate,
-          statusInformasi: st === 'Open' ? 'Belum Ada Update' : 'Ada Update Baru'
-        };
-
-        state.records.unshift(simRecord);
-        closeNewModal();
-        resetNewForm();
-        updateKpiCounters();
-        renderCaseList();
-        if (typeof renderCalendarGrid === 'function') renderCalendarGrid();
-        if (typeof renderTasksTable === 'function') renderTasksTable();
-        if (typeof updateTasksKpis === 'function') updateTasksKpis();
-        if (typeof renderActivityFeed === 'function') renderActivityFeed();
-        if (savedCalCtx && typeof renderCalendarRightPanel === 'function') {
-          renderCalendarRightPanel(savedCalCtx.day);
-        }
-        showToast('Kasus #' + newId + ' berhasil ditambahkan ke ' + targetUnitLabel + '!', 'success');
-      }, 350);
     }
   }
 
@@ -14919,7 +15144,12 @@ input:focus, select:focus, textarea:focus {
   };
 
   // Expose global helpers
+  window.state = state;
+  window.dom = dom;
   window.openNewModal = openNewModal;
+  window.getUserRestrictedUnit = getUserRestrictedUnit;
+  window.handleSubmitNewReport = handleSubmitNewReport;
+  window.checkFacilitatorNotifications = checkFacilitatorNotifications;
   window.openInProgressModal = openInProgressModal;
   window.openClosedModal = openClosedModal;
   window.activateView = activateView;
@@ -14941,9 +15171,7 @@ input:focus, select:focus, textarea:focus {
 
 })();
 
-
-
-  /**
+/**
    * Export Tabel Tasks (Daftar List Isu CHO) ke file Excel (.xlsx / .csv)
    */
   function exportTasksTableToExcel() {
@@ -15047,7 +15275,6 @@ input:focus, select:focus, textarea:focus {
     }
   }
   window.exportTasksTableToExcel = exportTasksTableToExcel;
-
 </script>
 </body>
 </html>
