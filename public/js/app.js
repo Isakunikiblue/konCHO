@@ -5839,7 +5839,11 @@
     const hasDetails = !!(calData.details && calData.details[day]);
 
     if (hasDetails || dayItems.length > 0) {
-      renderCalendarRightPanel(day);
+      try {
+        renderCalendarRightPanel(day);
+      } catch (err) {
+        console.error('Error rendering calendar panel:', err);
+      }
       openCalendarDayDrawer();
     } else {
       closeCalendarDayDrawer();
@@ -5964,6 +5968,8 @@
 
     const currentRole = (state.authUser && state.authUser.role) ? state.authUser.role : 'Administrator';
     const canPickup = currentRole !== 'Inputer' && currentRole !== 'Viewer';
+    const canUploadRole = currentRole === 'Administrator' || currentRole === 'Inputer';
+    const isAdminRole = currentRole === 'Administrator';
 
     const issueContainer = document.getElementById('issue-cards-container');
     if (issueContainer) {
@@ -6049,8 +6055,6 @@
     }
 
     // Sinkronisasi Lampiran PDF per masing-masing kasus di tanggal ini (Multi-case dynamic rendering)
-    const canUploadRole = currentRole === 'Administrator' || currentRole === 'Inputer';
-    const isAdminRole = currentRole === 'Administrator';
     const deckContainer = document.getElementById('presentation-deck-container');
     if (deckContainer) {
       const candidateList = issues.length > 0 ? issues : (dayItems.filter(it => it.ticketId));
@@ -6068,7 +6072,7 @@
           itemHtml += '      <span class="px-1.5 py-0.5 rounded text-[9px] font-bold ' + cMeta.pillClass + '">' + cMeta.label + '</span>';
           itemHtml += '      <span class="text-[11px] font-mono font-bold text-slate-700">' + tLabel + '</span>';
           itemHtml += '    </div>';
-          itemHtml += '    <span class="text-[11px] text-slate-500 truncate max-w-[170px]" title="' + escapeHtml(cItem.title) + '">' + escapeHtml(cItem.title) + '</span>';
+          itemHtml += '    <span class="text-[11px] text-slate-500 truncate max-w-[170px]" title="' + escapeHtml(cItem.title || cItem.text || (cItem.record && (cItem.record.issueDetails || cItem.record.detail)) || "-") + '">' + escapeHtml(cItem.title || cItem.text || (cItem.record && (cItem.record.issueDetails || cItem.record.detail)) || "-") + '</span>';
           itemHtml += '  </div>';
 
           if (hasP) {
@@ -6168,6 +6172,8 @@
 
     const currentRole = (state.authUser && state.authUser.role) ? state.authUser.role : 'Administrator';
     const canPickup = currentRole !== 'Inputer' && currentRole !== 'Viewer';
+    const canUploadRole = currentRole === 'Administrator' || currentRole === 'Inputer';
+    const isAdminRole = currentRole === 'Administrator';
 
     tbody.innerHTML = visible.map((item, idx) => {
       const sType = item.serviceType || 'MOBILE';
