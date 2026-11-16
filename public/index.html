@@ -5422,6 +5422,9 @@ input:focus, select:focus, textarea:focus {
 
   <!-- Tailwind CSS via CDN -->
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <!-- SheetJS for Excel Export -->
+  <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
   <script id="tailwind-config">
     tailwind.config = {
       darkMode: "class",
@@ -6157,8 +6160,12 @@ input:focus, select:focus, textarea:focus {
                   5 Ditampilkan
                 </span>
               </div>
-              <div class="flex items-center gap-2 text-xs text-slate-500">
+              <div class="flex items-center gap-3 text-xs text-slate-500">
                 <span>Terakhir diperbarui: <strong class="text-slate-700">Baru Saja</strong></span>
+                <button id="btn-export-excel-tasks" type="button" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-lg shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer" onclick="exportTasksTableToExcel()" title="Download Daftar List Isu CHO ke Excel (.xlsx)">
+                  <span class="material-symbols-outlined text-[16px]">file_download</span>
+                  <span>Download Excel</span>
+                </button>
               </div>
             </div>
 
@@ -13971,6 +13978,38 @@ input:focus, select:focus, textarea:focus {
           const urgBadge = getUrgencyBadgeHtml(urg);
           const facName = (liveRec && liveRec.picFacilitator) || iss.picFacilitator || getFacilitatorForRequestor((liveRec && (liveRec.requestor || liveRec.pic)) || iss.requestor || iss.pic);
 
+          // PDF attachment section spesifik per masing-masing inputan case
+          const casePdf = getCasePptAttachment(sType, iss.ticketId);
+          const hasCasePdf = !!(casePdf && (casePdf.fileUrl || casePdf.url));
+          let pdfSectionHtml = '';
+          if (hasCasePdf) {
+            const pName = casePdf.fileName || casePdf.name || 'Lampiran_Sample_Case.pdf';
+            const pUrl = casePdf.fileUrl || casePdf.url;
+            pdfSectionHtml = '<div class="p-2 bg-white/95 border border-slate-200/90 rounded-xl flex items-center justify-between gap-2 shadow-2xs">' +
+              '  <div class="flex items-center gap-2 min-w-0">' +
+              '    <div class="w-7 h-7 rounded-lg bg-rose-50 border border-rose-100 flex items-center justify-center shrink-0 text-rose-600">' +
+              '      <span class="material-symbols-outlined text-[16px]">picture_as_pdf</span>' +
+              '    </div>' +
+              '    <div class="truncate">' +
+              '      <div class="text-xs font-bold text-slate-800 truncate" title="' + escapeHtml(pName) + '">' + escapeHtml(pName) + '</div>' +
+              '      <div class="text-[10px] text-slate-400">PDF Sample Case (' + (iss.ticket || ('Case #' + iss.ticketId)) + ')</div>' +
+              '    </div>' +
+              '  </div>' +
+              '  <div class="flex items-center gap-1 shrink-0">' +
+              '    <a href="' + pUrl + '" target="_blank" rel="noopener noreferrer" class="px-2 py-1 text-[11px] font-bold text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 rounded-lg flex items-center gap-0.5 transition-colors" title="Buka PDF">' +
+              '      <span class="material-symbols-outlined text-[13px]">visibility</span><span>Lihat</span>' +
+              '    </a>' +
+              (canUploadRole ? '    <button type="button" class="px-2 py-1 text-[11px] font-bold text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded-lg flex items-center gap-0.5 transition-colors cursor-pointer" onclick="openUploadPptModal(\'' + iss.ticketId + '\', \'' + sType + '\')" title="Ganti File PDF"><span class="material-symbols-outlined text-[13px]">edit</span><span>Ganti</span></button>' : '') +
+              (isAdminRole ? '    <button type="button" class="w-6 h-6 text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded flex items-center justify-center transition-colors cursor-pointer" onclick="handleDeletePpt(\'' + iss.ticketId + '\', \'' + sType + '\')" title="Hapus PDF"><span class="material-symbols-outlined text-[14px]">delete</span></button>' : '') +
+              '  </div>' +
+              '</div>';
+          } else if (canUploadRole && iss.ticketId) {
+            pdfSectionHtml = '<button type="button" class="w-full py-1.5 px-3 border border-dashed border-slate-300 hover:border-blue-400 bg-white/70 hover:bg-white rounded-xl text-slate-600 hover:text-blue-700 text-xs font-semibold flex items-center justify-center gap-1.5 transition-all shadow-2xs cursor-pointer group" onclick="openUploadPptModal(\'' + iss.ticketId + '\', \'' + sType + '\')" title="Upload PDF khusus untuk ' + (iss.ticket || ('Case #' + iss.ticketId)) + '">' +
+              '  <span class="material-symbols-outlined text-[16px] text-rose-500 group-hover:scale-110 transition-transform">upload_file</span>' +
+              '  <span>Upload PDF (' + (iss.ticket || ('Case #' + iss.ticketId)) + ')</span>' +
+              '</button>';
+          }
+
           return '<div class="p-3 sm:p-3.5 ' + cardToneClass + ' border rounded-xl flex flex-col gap-2.5 hover:border-slate-300 shadow-xs transition-all">' +
           '  <div class="flex items-center justify-between flex-wrap gap-1">' +
           '    <div class="flex items-center gap-1.5 flex-wrap"><span class="px-2.5 py-0.5 rounded text-[10px] font-extrabold border ' + liveSm.cardBadgeClass + '">' + liveBadgeText + '</span>' + urgBadge + '</div>' +
@@ -13981,6 +14020,7 @@ input:focus, select:focus, textarea:focus {
           '    <span class="truncate" title="Requestor">Requestor: <strong class="text-slate-700">' + escapeHtml((liveRec && (liveRec.requestor || liveRec.pic)) || iss.pic) + '</strong></span>' +
           '    <span class="text-blue-700 font-semibold flex items-center gap-0.5" title="Fasilitator Ditugaskan"><span class="material-symbols-outlined text-[13px]">assignment_ind</span><span>' + escapeHtml(facName) + '</span></span>' +
           '  </div>' +
+          pdfSectionHtml +
           '  <div class="flex flex-wrap items-center gap-2">' + pickupBtnHtml + rescheduleBtnHtml +
           '    <button type="button" class="' + (pickupBtnHtml ? 'px-3.5 py-2.5' : 'flex-1 py-2 px-3.5') + ' rounded-xl text-xs font-bold border ' + iss.actionClass + ' hover:opacity-90 transition-opacity cursor-pointer" onclick="openDrawer(\'' + (iss.ticketId || 1) + '\', \'' + sType + '\')">' + iss.actionText + '</button>' +
           '  </div>' +
@@ -13991,67 +14031,69 @@ input:focus, select:focus, textarea:focus {
       }
     }
 
-    // Sinkronisasi kartu Dokumen Presentasi secara dinamis sesuai data aktual (tanpa teks dummy statis)
+    // Sinkronisasi Lampiran PDF per masing-masing kasus di tanggal ini (Multi-case dynamic rendering)
     const canUploadRole = currentRole === 'Administrator' || currentRole === 'Inputer';
     const isAdminRole = currentRole === 'Administrator';
-    const targetTicketForPpt = issues.find(i => i.ticketId) || dayItems.find(it => it.ticketId) || null;
-    const dropzoneEl = document.getElementById('calendar-ppt-dropzone');
-    const pptCardEl = document.getElementById('calendar-ppt-file-card');
-    const pptNameEl = document.getElementById('presentation-deck-name');
-    const pptMetaEl = document.getElementById('presentation-deck-meta');
-    const btnDownloadDeck = document.getElementById('btn-download-deck');
-    const btnDeleteDeck = document.getElementById('btn-delete-deck');
+    const deckContainer = document.getElementById('presentation-deck-container');
+    if (deckContainer) {
+      const candidateList = issues.length > 0 ? issues : (dayItems.filter(it => it.ticketId));
+      if (candidateList.length > 0) {
+        deckContainer.innerHTML = candidateList.map(cItem => {
+          const cSvc = cItem.serviceType || normalizeUnitKey(cItem.unit) || 'MOBILE';
+          const cMeta = getUnitMeta(cSvc);
+          const pInfo = getCasePptAttachment(cSvc, cItem.ticketId);
+          const hasP = !!(pInfo && (pInfo.fileUrl || pInfo.url));
+          const tLabel = cItem.ticket || ('#' + cItem.ticketId);
 
-    let foundPpt = null;
-    let foundPptTicket = targetTicketForPpt;
-    const candidateItems = issues.length > 0 ? issues : dayItems;
-    for (let idxP = 0; idxP < candidateItems.length; idxP++) {
-      const cItem = candidateItems[idxP];
-      if (!cItem || !cItem.ticketId) continue;
-      const cSvc = cItem.serviceType || normalizeUnitKey(cItem.unit) || 'MOBILE';
-      const pInfo = getCasePptAttachment(cSvc, cItem.ticketId);
-      if (pInfo && (pInfo.fileUrl || pInfo.url)) {
-        foundPpt = pInfo;
-        foundPptTicket = { ticketId: cItem.ticketId, serviceType: cSvc };
-        break;
-      }
-    }
+          let itemHtml = '<div class="p-3 bg-slate-50/90 border border-slate-200/90 rounded-xl flex flex-col gap-2">';
+          itemHtml += '  <div class="flex items-center justify-between gap-2">';
+          itemHtml += '    <div class="flex items-center gap-1.5 min-w-0">';
+          itemHtml += '      <span class="px-1.5 py-0.5 rounded text-[9px] font-bold ' + cMeta.pillClass + '">' + cMeta.label + '</span>';
+          itemHtml += '      <span class="text-[11px] font-mono font-bold text-slate-700">' + tLabel + '</span>';
+          itemHtml += '    </div>';
+          itemHtml += '    <span class="text-[11px] text-slate-500 truncate max-w-[170px]" title="' + escapeHtml(cItem.title) + '">' + escapeHtml(cItem.title) + '</span>';
+          itemHtml += '  </div>';
 
-    if (dropzoneEl) {
-      if (canUploadRole && targetTicketForPpt && targetTicketForPpt.ticketId) {
-        const dzSvc = targetTicketForPpt.serviceType || normalizeUnitKey(targetTicketForPpt.unit) || 'MOBILE';
-        dropzoneEl.classList.remove('hidden');
-        dropzoneEl.onclick = function() {
-          if (window.openUploadPptModal) openUploadPptModal(targetTicketForPpt.ticketId, dzSvc);
-        };
-      } else {
-        dropzoneEl.classList.add('hidden');
-        dropzoneEl.onclick = null;
-      }
-    }
-
-    if (pptCardEl) {
-      if (foundPpt && (foundPpt.fileUrl || foundPpt.url)) {
-        pptCardEl.classList.remove('hidden');
-        if (pptNameEl) pptNameEl.textContent = foundPpt.fileName || foundPpt.name || 'Lampiran_Dokumen.pdf';
-        if (pptMetaEl) pptMetaEl.textContent = 'Diupload oleh ' + (foundPpt.uploadedBy || 'Tim CHO');
-        if (btnDownloadDeck) btnDownloadDeck.href = foundPpt.fileUrl || foundPpt.url;
-        if (btnDeleteDeck) {
-          btnDeleteDeck.classList.toggle('hidden', !isAdminRole);
-          btnDeleteDeck.onclick = function() {
-            if (window.handleDeletePpt && foundPptTicket) {
-              handleDeletePpt(foundPptTicket.ticketId, foundPptTicket.serviceType || 'MOBILE');
+          if (hasP) {
+            itemHtml += '  <div class="bg-white border border-slate-200 rounded-lg p-2.5 flex items-center justify-between gap-2 shadow-2xs">';
+            itemHtml += '    <div class="flex items-center gap-2 min-w-0">';
+            itemHtml += '      <div class="w-7 h-7 rounded-md bg-rose-50 border border-rose-100 flex items-center justify-center shrink-0 text-rose-600 font-bold text-[10px]">PDF</div>';
+            itemHtml += '      <div class="flex flex-col min-w-0">';
+            itemHtml += '        <span class="text-xs font-bold text-slate-800 truncate" title="' + escapeHtml(pInfo.fileName || 'Lampiran.pdf') + '">' + escapeHtml(pInfo.fileName || 'Lampiran.pdf') + '</span>';
+            itemHtml += '        <span class="text-[10px] text-slate-400">Diupload oleh ' + escapeHtml(pInfo.uploadedBy || 'Tim CHO') + '</span>';
+            itemHtml += '      </div>';
+            itemHtml += '    </div>';
+            itemHtml += '    <div class="flex items-center gap-1 shrink-0">';
+            itemHtml += '      <a href="' + (pInfo.fileUrl || pInfo.url) + '" target="_blank" rel="noopener noreferrer" class="px-2 py-1 text-[11px] font-bold text-blue-600 hover:text-blue-700 bg-blue-50 hover:bg-blue-100 rounded flex items-center gap-0.5" title="Lihat PDF"><span class="material-symbols-outlined text-[13px]">visibility</span><span>Lihat</span></a>';
+            if (canUploadRole) {
+              itemHtml += '      <button type="button" class="px-2 py-1 text-[11px] font-bold text-slate-600 hover:text-slate-800 bg-slate-100 hover:bg-slate-200 rounded flex items-center gap-0.5 cursor-pointer" onclick="openUploadPptModal(\'' + cItem.ticketId + '\', \'' + cSvc + '\')" title="Ganti PDF"><span class="material-symbols-outlined text-[13px]">edit</span><span>Ganti</span></button>';
             }
-          };
-        }
+            if (isAdminRole) {
+              itemHtml += '      <button type="button" class="w-6 h-6 text-rose-600 hover:text-rose-700 hover:bg-rose-50 rounded flex items-center justify-center cursor-pointer" onclick="handleDeletePpt(\'' + cItem.ticketId + '\', \'' + cSvc + '\')" title="Hapus PDF"><span class="material-symbols-outlined text-[14px]">delete</span></button>';
+            }
+            itemHtml += '    </div>';
+            itemHtml += '  </div>';
+          } else if (canUploadRole && cItem.ticketId) {
+            itemHtml += '  <div class="border-2 border-dashed border-slate-200 hover:border-blue-400 rounded-lg p-2.5 text-center cursor-pointer transition-colors bg-white hover:bg-blue-50/40" onclick="openUploadPptModal(\'' + cItem.ticketId + '\', \'' + cSvc + '\')">';
+            itemHtml += '    <div class="flex items-center justify-center gap-1.5 text-xs font-semibold text-slate-700">';
+            itemHtml += '      <span class="material-symbols-outlined text-[16px] text-rose-500">cloud_upload</span>';
+            itemHtml += '      <span>Upload PDF untuk ' + tLabel + '</span>';
+            itemHtml += '    </div>';
+            itemHtml += '  </div>';
+          } else {
+            itemHtml += '  <div class="text-[11px] text-slate-400 italic">Belum ada lampiran PDF untuk kasus ini</div>';
+          }
+
+          itemHtml += '</div>';
+          return itemHtml;
+        }).join('');
       } else {
-        pptCardEl.classList.add('hidden');
+        deckContainer.innerHTML = '<div class="text-xs text-slate-400 text-center py-3">Tidak ada kasus di tanggal ini</div>';
       }
     }
 
     if (cardPresentasi) {
-      const showPresentasiCard = hasAnyContent && ((canUploadRole && !!(targetTicketForPpt && targetTicketForPpt.ticketId)) || !!foundPpt);
-      cardPresentasi.classList.toggle('hidden', !showPresentasiCard);
+      cardPresentasi.classList.toggle('hidden', !hasAnyContent);
     }
 
     const quickContainer = document.getElementById('quickwins-container');
@@ -14937,6 +14979,113 @@ input:focus, select:focus, textarea:focus {
   document.addEventListener('DOMContentLoaded', init);
 
 })();
+
+
+
+  /**
+   * Export Tabel Tasks (Daftar List Isu CHO) ke file Excel (.xlsx / .csv)
+   */
+  function exportTasksTableToExcel() {
+    const records = state.records || [];
+    if (!records || records.length === 0) {
+      showToast('Tidak ada data kasus untuk diexport.', 'warning');
+      return;
+    }
+
+    let visible = [...records];
+    const activeTaskUnit = normalizeUnitKey(state.tasksFilterUnit);
+    if (activeTaskUnit !== 'ALL') {
+      visible = visible.filter(r => normalizeUnitKey(r.serviceType) === activeTaskUnit);
+    }
+    if (state.tasksFilterStatus && state.tasksFilterStatus !== 'all') {
+      visible = visible.filter(r => (r.status || '').toLowerCase().replace(/\s+/g, '') === state.tasksFilterStatus.toLowerCase().replace(/\s+/g, ''));
+    }
+    if (state.tasksFilterPeriod && state.tasksFilterPeriod !== 'all') {
+      visible = visible.filter(r => (r.bulan || '').includes(state.tasksFilterPeriod));
+    }
+    if (state.searchQuery) {
+      const q = state.searchQuery.toLowerCase();
+      visible = visible.filter(r => 
+        (r.totalCaseIsu || '').toLowerCase().includes(q) ||
+        (r.issueDetails || '').toLowerCase().includes(q) ||
+        (r.detail || '').toLowerCase().includes(q) ||
+        (r.requestor || '').toLowerCase().includes(q) ||
+        (r.pic || '').toLowerCase().includes(q)
+      );
+    }
+
+    if (visible.length === 0) {
+      showToast('Tidak ada data yang sesuai filter untuk diexport.', 'warning');
+      return;
+    }
+
+    const rows = visible.map((item, idx) => {
+      const sType = item.serviceType || 'MOBILE';
+      const uMeta = getUnitMeta(sType);
+      const ppt = getCasePptAttachment(sType, item.id);
+      const pptUrl = ppt ? (ppt.fileUrl || ppt.url || ppt.fileName || 'Ada PDF') : '-';
+      const taskFacilitator = item.picFacilitator || getFacilitatorForRequestor(item.requestor);
+      const rawInputDate = item.tanggalInput || item.tanggal || item.terakhirUpdate || '';
+      const inputDateDisplay = formatShortIndoDate(rawInputDate);
+      const inputerName = item.inputBy || item.requestor || '-';
+      const rawAgendaDate = item.tanggalAgenda || item.tanggal || item.terakhirUpdate || '';
+      const agendaDateDisplay = formatShortIndoDate(rawAgendaDate);
+
+      return {
+        'NO': idx + 1,
+        'PERIODE': item.bulan || 'Oktober 2026',
+        'TANGGAL INPUT': inputDateDisplay + ' (Oleh: ' + inputerName + ')',
+        'TANGGAL AGENDA': agendaDateDisplay,
+        'UNIT': uMeta.label || sType,
+        'CASE': item.totalCaseIsu || item.caseTitle || item.mainIssue || '-',
+        'DETAIL KENDALA': item.issueDetails || item.detail || '-',
+        'SAMPLE CASE (PDF)': pptUrl,
+        'STATUS CASE': item.status || 'Open',
+        'QUICK WIN': item.progress || item.quickWin || item.statusUpdate || '-',
+        'CATATAN TINDAK LANJUT FASILITATOR': (item.catatanFasilitator || item.keteranganProgress || item.followUpTo || '-') + (taskFacilitator ? ' (Fasilitator: ' + taskFacilitator + ')' : '')
+      };
+    });
+
+    const now = new Date();
+    const dateStr = now.getFullYear() + '-' + String(now.getMonth() + 1).padStart(2, '0') + '-' + String(now.getDate()).padStart(2, '0');
+    const filename = 'Daftar_List_Isu_CHO_' + dateStr + '.xlsx';
+
+    if (typeof XLSX !== 'undefined') {
+      const ws = XLSX.utils.json_to_sheet(rows);
+      ws['!cols'] = [
+        { wch: 6 },
+        { wch: 16 },
+        { wch: 25 },
+        { wch: 18 },
+        { wch: 16 },
+        { wch: 32 },
+        { wch: 40 },
+        { wch: 35 },
+        { wch: 16 },
+        { wch: 30 },
+        { wch: 35 }
+      ];
+      const wb = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(wb, ws, "List Isu CHO");
+      XLSX.writeFile(wb, filename);
+      showToast('Berhasil mendownload Excel: ' + filename, 'success');
+    } else {
+      const headers = Object.keys(rows[0]);
+      let csv = headers.map(h => '"' + h.replace(/"/g, '""') + '"').join(',') + '\r\n';
+      rows.forEach(r => {
+        csv += headers.map(h => '"' + String(r[h] || '').replace(/"/g, '""') + '"').join(',') + '\r\n';
+      });
+      const blob = new Blob(["\uFEFF" + csv], { type: 'text/csv;charset=utf-8;' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = filename.replace('.xlsx', '.csv');
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+      showToast('Berhasil mendownload file Excel (CSV)', 'success');
+    }
+  }
+  window.exportTasksTableToExcel = exportTasksTableToExcel;
 
 </script>
 </body>

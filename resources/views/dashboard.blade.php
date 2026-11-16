@@ -695,8 +695,12 @@
                   5 Ditampilkan
                 </span>
               </div>
-              <div class="flex items-center gap-2 text-xs text-slate-500">
+              <div class="flex items-center gap-3 text-xs text-slate-500">
                 <span>Terakhir diperbarui: <strong class="text-slate-700">Baru Saja</strong></span>
+                <button id="btn-export-excel-tasks" type="button" class="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs rounded-lg shadow-xs flex items-center gap-1.5 transition-colors cursor-pointer" onclick="exportTasksTableToExcel()" title="Download Daftar List Isu CHO ke Excel (.xlsx)">
+                  <span class="material-symbols-outlined text-[16px]">file_download</span>
+                  <span>Download Excel</span>
+                </button>
               </div>
             </div>
 
