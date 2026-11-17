@@ -674,7 +674,7 @@
                     <th class="py-3 px-4 w-28">PERIODE</th>
                     <th class="py-3 px-4 min-w-[130px]">TANGGAL INPUT</th>
                     <th class="py-3 px-4 min-w-[140px]">TANGGAL AGENDA</th>
-                    <th class="py-3 px-4 w-28">UNIT</th>
+                    <th class="py-3 px-4 min-w-[145px] text-center">UNIT</th>
                     <th class="py-3 px-4 min-w-[200px]">Case</th>
                     <th class="py-3 px-4 min-w-[280px]">DETAIL KENDALA</th>
                     <th class="py-3 px-4 w-36">Sample Case</th>

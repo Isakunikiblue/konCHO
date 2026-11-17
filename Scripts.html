@@ -5975,6 +5975,48 @@
     };
   }
 
+  function getUnitDisplayLabel(item) {
+    // 1. Jika user yang sedang login adalah akun Inputer:
+    // Selalu tampilkan nama unit sesuai user login / site asal (misal: CHO Fixed CC Bandung)
+    if (state.authUser && state.authUser.role && state.authUser.role.toLowerCase() === 'inputer') {
+      var userSite = state.authUser.site || '';
+      if (!userSite && state.authUser.name && state.authUser.name.indexOf('CHO') >= 0) {
+        userSite = state.authUser.name;
+      }
+      if (!userSite) {
+        var cleanU = (state.authUser.username || state.authUser.name || '').replace(/^@+/, '').trim().toLowerCase();
+        var accounts = typeof getStoredUserAccounts === 'function' ? getStoredUserAccounts() : [];
+        var matched = accounts.find(function(a) {
+          return (a.username || '').replace(/^@+/, '').trim().toLowerCase() === cleanU;
+        });
+        if (matched && matched.site) userSite = matched.site;
+        else if (matched && matched.name && matched.name.indexOf('CHO') >= 0) userSite = matched.name;
+      }
+      if (userSite) return userSite;
+    }
+
+    // 2. Jika user adalah Administrator atau Facilitator, tampilkan unit spesifik dari requestor/inputer item
+    if (item) {
+      var req = String(item.requestor || item.inputBy || '').trim();
+      if (req && req.toUpperCase().indexOf('CHO') >= 0) {
+        return req;
+      }
+      var reqNorm = req.toLowerCase();
+      if (reqNorm.includes('fixed') && reqNorm.includes('bandung')) return 'CHO Fixed CC Bandung';
+      if (reqNorm.includes('fixed') && reqNorm.includes('semarang')) return 'CHO Fixed CC Semarang';
+      if (reqNorm.includes('mobile') && reqNorm.includes('bandung')) return 'CHO Mobile CC Bandung';
+      if (reqNorm.includes('mobile') && reqNorm.includes('semarang')) return 'CHO Mobile CC Semarang';
+      if (reqNorm.includes('ecare') || reqNorm.includes('e care') || reqNorm.includes('e-care')) return 'CHO eCare';
+      if (reqNorm.includes('priority') && reqNorm.includes('semarang')) return 'CHO Priority Semarang';
+      if (reqNorm.includes('priority') && reqNorm.includes('bandung')) return 'CHO Priority Bandung';
+    }
+
+    // 3. Fallback ke label unit standar
+    var sType = (item && item.serviceType) ? item.serviceType : 'MOBILE';
+    var uMeta = typeof getUnitMeta === 'function' ? getUnitMeta(sType) : { label: 'CHO Mobile' };
+    return uMeta.label || sType;
+  }
+
   function getCalendarStatusMeta(statusVal) {
     const s = String(statusVal || 'open').toLowerCase().replace(/\s+/g, '');
     if (s === 'closed') {
@@ -6421,7 +6463,8 @@
     tbody.innerHTML = visible.map((item, idx) => {
       const sType = item.serviceType || 'MOBILE';
       const uMeta = getUnitMeta(sType);
-      const unitBadge = '<span class="px-2 py-0.5 rounded text-[10px] font-bold ' + uMeta.badgeClass + '">' + uMeta.shortBadge + '</span>';
+      const unitDisplay = getUnitDisplayLabel(item);
+      const unitBadge = '<span class="px-2.5 py-1 rounded text-[10.5px] font-bold whitespace-nowrap inline-flex items-center justify-center ' + uMeta.badgeClass + '">' + escapeHtml(unitDisplay) + '</span>';
 
       const rawStatus = (item.status || 'Open').toLowerCase().replace(/\s+/g, '');
       let statusPill = '';
@@ -6518,7 +6561,7 @@
         ubahTanggalBtn +
         '  </div>' +
         '</td>' +
-        '<td class="py-3 px-4">' + unitBadge + '</td>' +
+        '<td class="py-3 px-4 text-center whitespace-nowrap">' + unitBadge + '</td>' +
         '<td class="py-3 px-4">' +
         '  <div class="flex flex-col gap-1">' +
         '    <a href="#" class="font-bold text-slate-900 hover:text-blue-600 transition-colors leading-snug" onclick="openDrawer(\'' + item.id + '\', \'' + sType + '\'); return false;">' + escapeHtml(mainIssueText) + '</a>' +
@@ -6766,7 +6809,7 @@
     const uMeta = getUnitMeta(ticket.serviceType);
     if (titleEl) titleEl.textContent = ticket.totalCaseIsu || ticket.caseTitle || 'Isu CHO';
     if (unitBadge) {
-      unitBadge.textContent = uMeta.shortBadge;
+      unitBadge.textContent = getUnitDisplayLabel(ticket);
       unitBadge.className = 'px-2 py-0.5 rounded text-[10px] font-bold ' + uMeta.badgeClass;
     }
     if (periodBadge) periodBadge.textContent = ticket.bulan || 'Oktober 2026';
@@ -7347,7 +7390,7 @@
         'PERIODE': item.bulan || 'Oktober 2026',
         'TANGGAL INPUT': inputDateDisplay + ' (Oleh: ' + inputerName + ')',
         'TANGGAL AGENDA': agendaDateDisplay,
-        'UNIT': uMeta.label || sType,
+        'UNIT': getUnitDisplayLabel(item),
         'CASE': item.totalCaseIsu || item.caseTitle || item.mainIssue || '-',
         'DETAIL KENDALA': item.issueDetails || item.detail || '-',
         'SAMPLE CASE (PDF)': pptUrl,
