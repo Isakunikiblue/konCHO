@@ -885,9 +885,9 @@
                 </div>
               </div>
 
-              <div>
+              <div class="flex-1 flex flex-col">
                 <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Riwayat follow up</span>
-                <div id="drawer-timeline-container" class="mt-2 flex flex-col gap-2 max-h-48 overflow-y-auto">
+                <div id="drawer-timeline-container" class="mt-2 flex flex-col gap-2 min-h-[240px] max-h-[520px] overflow-y-auto">
                 </div>
               </div>
             </div>
@@ -906,7 +906,7 @@
       </div>
 
       <!-- SLIDE-OVER DRAWER FOR HISTORY CASE (RIWAYAT FOLLOW UP) -->
-      <div id="history-drawer" class="fixed inset-0 z-50 overflow-hidden drawer-closed" aria-labelledby="history-drawer-title" role="dialog" aria-modal="true">
+      <div id="history-drawer" class="fixed inset-0 z-50 overflow-hidden drawer-closed" style="display: none;" aria-labelledby="history-drawer-title" role="dialog" aria-modal="true">
         <div id="history-drawer-backdrop" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity duration-300" onclick="closeHistoryDrawer()"></div>
 
         <div class="fixed inset-y-0 right-0 max-w-full flex pl-10">
@@ -941,7 +941,7 @@
               </div>
 
               <!-- Container Riwayat Lifecycle & Komunikasi -->
-              <div id="history-drawer-timeline" class="flex flex-col gap-3.5">
+              <div id="history-drawer-timeline" class="flex flex-col gap-3.5 min-h-[260px] max-h-[550px] overflow-y-auto">
                 <!-- Populated dynamically by openHistoryCaseModal() / openHistoryDrawer() -->
               </div>
 
@@ -1161,12 +1161,14 @@
 
         <div class="modal-body">
           <!-- Info Kasus Target -->
-          <div class="action-case-preview bg-slate-50 border border-slate-200/80 rounded-xl p-3 mb-3.5 flex flex-col gap-1.5">
-            <div class="preview-header flex items-center justify-between">
-              <span class="info-badge font-bold text-[10px] tracking-wider uppercase px-2 py-0.5 rounded-full" id="uploadPptBadgeService">MOBILE</span>
-              <span class="preview-ticket-id font-mono text-[11px] font-semibold text-slate-500" id="uploadPptTicketId">Case #1</span>
+          <div class="action-case-preview" style="display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; border-radius: 12px; background: #f8fafc; border: 1px solid #e2e8f0; margin-bottom: 14px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span id="uploadPptBadgeService" style="display: inline-flex; align-items: center; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 6px; letter-spacing: 0.3px;">CHO FIXED</span>
+                <span id="uploadPptTicketId" style="font-family: monospace; font-size: 11.5px; font-weight: 600; color: #64748b;">Case #1</span>
+              </div>
             </div>
-            <div class="preview-issue-text text-xs font-semibold text-slate-800 line-clamp-2" id="uploadPptIssueText">-</div>
+            <div id="uploadPptIssueText" style="font-size: 12.5px; font-weight: 600; color: #1e293b; line-height: 1.4;">-</div>
           </div>
 
           <!-- Drag and Drop Dropzone (Diperlebar, Diperbesar & Presisi) -->

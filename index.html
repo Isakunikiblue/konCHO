@@ -4720,34 +4720,55 @@
     z-index: 70 !important;
     transition: opacity 0.3s ease, visibility 0.3s ease;
   }
-  #issue-drawer.drawer-open {
+  #issue-drawer,
+  #history-drawer {
+    z-index: 9999 !important;
+    transition: opacity 0.3s ease, visibility 0.3s ease;
+  }
+
+  #issue-drawer.drawer-open,
+  #history-drawer.drawer-open {
     visibility: visible !important;
     opacity: 1 !important;
     pointer-events: auto !important;
+    display: block !important;
   }
-  #issue-drawer.drawer-closed {
+
+  #issue-drawer.drawer-closed,
+  #history-drawer.drawer-closed {
     visibility: hidden !important;
     opacity: 0 !important;
     pointer-events: none !important;
+    display: none !important;
   }
 
-  #drawer-panel {
-    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+  #drawer-panel,
+  #history-drawer-panel {
+    transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1) !important;
   }
-  #issue-drawer.drawer-open #drawer-panel {
+
+  #issue-drawer.drawer-open #drawer-panel,
+  #history-drawer.drawer-open #history-drawer-panel {
     transform: translateX(0) !important;
   }
-  #issue-drawer.drawer-closed #drawer-panel {
+
+  #issue-drawer.drawer-closed #drawer-panel,
+  #history-drawer.drawer-closed #history-drawer-panel {
     transform: translateX(100%) !important;
   }
 
-  #drawer-backdrop {
-    transition: opacity 0.3s ease;
+  #drawer-backdrop,
+  #history-drawer-backdrop {
+    transition: opacity 0.3s ease !important;
   }
-  #issue-drawer.drawer-open #drawer-backdrop {
+
+  #issue-drawer.drawer-open #drawer-backdrop,
+  #history-drawer.drawer-open #history-drawer-backdrop {
     opacity: 1 !important;
   }
-  #issue-drawer.drawer-closed #drawer-backdrop {
+
+  #issue-drawer.drawer-closed #drawer-backdrop,
+  #history-drawer.drawer-closed #history-drawer-backdrop {
     opacity: 0 !important;
   }
 
@@ -6356,9 +6377,9 @@ input:focus, select:focus, textarea:focus {
                 </div>
               </div>
 
-              <div>
+              <div class="flex-1 flex flex-col">
                 <span class="text-[11px] font-bold text-slate-500 uppercase tracking-wide">Riwayat follow up</span>
-                <div id="drawer-timeline-container" class="mt-2 flex flex-col gap-2 max-h-48 overflow-y-auto">
+                <div id="drawer-timeline-container" class="mt-2 flex flex-col gap-2 min-h-[240px] max-h-[520px] overflow-y-auto">
                 </div>
               </div>
             </div>
@@ -6377,7 +6398,7 @@ input:focus, select:focus, textarea:focus {
       </div>
 
       <!-- SLIDE-OVER DRAWER FOR HISTORY CASE (RIWAYAT FOLLOW UP) -->
-      <div id="history-drawer" class="fixed inset-0 z-50 overflow-hidden drawer-closed" aria-labelledby="history-drawer-title" role="dialog" aria-modal="true">
+      <div id="history-drawer" class="fixed inset-0 z-50 overflow-hidden drawer-closed" style="display: none;" aria-labelledby="history-drawer-title" role="dialog" aria-modal="true">
         <div id="history-drawer-backdrop" class="fixed inset-0 bg-slate-900/60 backdrop-blur-xs transition-opacity duration-300" onclick="closeHistoryDrawer()"></div>
 
         <div class="fixed inset-y-0 right-0 max-w-full flex pl-10">
@@ -6412,7 +6433,7 @@ input:focus, select:focus, textarea:focus {
               </div>
 
               <!-- Container Riwayat Lifecycle & Komunikasi -->
-              <div id="history-drawer-timeline" class="flex flex-col gap-3.5">
+              <div id="history-drawer-timeline" class="flex flex-col gap-3.5 min-h-[260px] max-h-[550px] overflow-y-auto">
                 <!-- Populated dynamically by openHistoryCaseModal() / openHistoryDrawer() -->
               </div>
 
@@ -6632,12 +6653,14 @@ input:focus, select:focus, textarea:focus {
 
         <div class="modal-body">
           <!-- Info Kasus Target -->
-          <div class="action-case-preview bg-slate-50 border border-slate-200/80 rounded-xl p-3 mb-3.5 flex flex-col gap-1.5">
-            <div class="preview-header flex items-center justify-between">
-              <span class="info-badge font-bold text-[10px] tracking-wider uppercase px-2 py-0.5 rounded-full" id="uploadPptBadgeService">MOBILE</span>
-              <span class="preview-ticket-id font-mono text-[11px] font-semibold text-slate-500" id="uploadPptTicketId">Case #1</span>
+          <div class="action-case-preview" style="display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; border-radius: 12px; background: #f8fafc; border: 1px solid #e2e8f0; margin-bottom: 14px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%;">
+              <div style="display: flex; align-items: center; gap: 8px;">
+                <span id="uploadPptBadgeService" style="display: inline-flex; align-items: center; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 6px; letter-spacing: 0.3px;">CHO FIXED</span>
+                <span id="uploadPptTicketId" style="font-family: monospace; font-size: 11.5px; font-weight: 600; color: #64748b;">Case #1</span>
+              </div>
             </div>
-            <div class="preview-issue-text text-xs font-semibold text-slate-800 line-clamp-2" id="uploadPptIssueText">-</div>
+            <div id="uploadPptIssueText" style="font-size: 12.5px; font-weight: 600; color: #1e293b; line-height: 1.4;">-</div>
           </div>
 
           <!-- Drag and Drop Dropzone (Diperlebar, Diperbesar & Presisi) -->
@@ -9125,6 +9148,23 @@ input:focus, select:focus, textarea:focus {
     
     applyRolePermissions();
 
+    // Pastikan seluruh side-over drawer tertutup saat login ke dashboard
+    if (typeof closeHistoryDrawer === 'function') closeHistoryDrawer();
+    else if (typeof window.closeHistoryDrawer === 'function') window.closeHistoryDrawer();
+    if (typeof closeDrawer === 'function') closeDrawer();
+    else if (typeof window.closeDrawer === 'function') window.closeDrawer();
+    if (typeof closeCalendarDayDrawer === 'function') closeCalendarDayDrawer();
+
+    var hDrawer = document.getElementById('history-drawer');
+    if (hDrawer) {
+      hDrawer.classList.remove('drawer-open');
+      hDrawer.classList.add('drawer-closed');
+      hDrawer.style.display = 'none';
+      hDrawer.style.visibility = 'hidden';
+      hDrawer.style.opacity = '0';
+      hDrawer.style.pointerEvents = 'none';
+    }
+
     if (loginEl) loginEl.style.display = 'none';
     if (appEl) {
       appEl.style.display = 'flex';
@@ -9761,6 +9801,16 @@ input:focus, select:focus, textarea:focus {
   function init() {
     applyTheme(state.theme);
     initAuth();
+    // Pastikan side-over drawer tersembunyi pada saat inisialisasi awal
+    var initHDrawer = document.getElementById('history-drawer');
+    if (initHDrawer) {
+      initHDrawer.classList.remove('drawer-open');
+      initHDrawer.classList.add('drawer-closed');
+      initHDrawer.style.display = 'none';
+      initHDrawer.style.visibility = 'hidden';
+      initHDrawer.style.opacity = '0';
+      initHDrawer.style.pointerEvents = 'none';
+    }
     // Muat cache lokal terlebih dahulu agar seketika muncul tanpa delay
     var cached = getStoredSharedRecords();
     if (cached && cached.length > 0) {
@@ -10077,6 +10127,18 @@ input:focus, select:focus, textarea:focus {
       dom.pptFileInput.addEventListener('change', function(e) {
         if (e.target.files && e.target.files[0]) {
           handlePptFileSelect(e.target.files[0]);
+        }
+      });
+    }
+    if (dom.newCasePptFile) {
+      dom.newCasePptFile.addEventListener('change', function(e) {
+        var f = (e.target.files && e.target.files[0]) ? e.target.files[0] : null;
+        if (!f) return;
+        var ext = (f.name || '').split('.').pop().toLowerCase();
+        var isPdf = ext === 'pdf' || (f.type && f.type === 'application/pdf');
+        if (!isPdf) {
+          showToast('⚠️ Format file tidak didukung! Mohon pilih file lampiran berformat PDF (.pdf).', 'error');
+          this.value = '';
         }
       });
     }
@@ -11629,8 +11691,33 @@ input:focus, select:focus, textarea:focus {
 
     if (dom.uploadPptTicketId) dom.uploadPptTicketId.textContent = 'Case #' + ticket.id;
     if (dom.uploadPptBadgeService) {
-      dom.uploadPptBadgeService.textContent = ticket.serviceType;
-      dom.uploadPptBadgeService.className = 'info-badge ' + (ticket.serviceType === 'MOBILE' ? 'badge-srv mobile' : (ticket.serviceType === 'ECARE' ? 'badge-srv ecare' : (ticket.serviceType === 'PRIORITY' ? 'badge-srv priority' : 'badge-srv fixed')));
+      var sType = String(ticket.serviceType || 'FIXED').toUpperCase();
+      var srvLabel = 'CHO Fixed';
+      if (sType === 'MOBILE') srvLabel = 'CHO Mobile';
+      else if (sType === 'FIXED') srvLabel = 'CHO Fixed';
+      else if (sType === 'ECARE') srvLabel = 'CHO eCare';
+      else if (sType === 'PRIORITY') srvLabel = 'CHO Priority';
+      else srvLabel = 'CHO ' + sType;
+
+      dom.uploadPptBadgeService.textContent = srvLabel;
+      dom.uploadPptBadgeService.className = 'info-badge font-bold text-[11px] tracking-wide uppercase px-2.5 py-1 rounded-md';
+      if (sType === 'MOBILE') {
+        dom.uploadPptBadgeService.style.background = '#dbeafe';
+        dom.uploadPptBadgeService.style.color = '#1e40af';
+        dom.uploadPptBadgeService.style.border = '1px solid #bfdbfe';
+      } else if (sType === 'FIXED') {
+        dom.uploadPptBadgeService.style.background = '#dcfce7';
+        dom.uploadPptBadgeService.style.color = '#15803d';
+        dom.uploadPptBadgeService.style.border = '1px solid #bbf7d0';
+      } else if (sType === 'ECARE') {
+        dom.uploadPptBadgeService.style.background = '#f3e8ff';
+        dom.uploadPptBadgeService.style.color = '#7e22ce';
+        dom.uploadPptBadgeService.style.border = '1px solid #e9d5ff';
+      } else {
+        dom.uploadPptBadgeService.style.background = '#fef3c7';
+        dom.uploadPptBadgeService.style.color = '#b45309';
+        dom.uploadPptBadgeService.style.border = '1px solid #fde68a';
+      }
     }
     if (dom.uploadPptIssueText) dom.uploadPptIssueText.textContent = ticket.totalCaseIsu || ticket.mainIssue || '-';
 
@@ -11673,14 +11760,24 @@ input:focus, select:focus, textarea:focus {
 
   function handlePptFileSelect(file) {
     if (!file) return;
-    var ext = file.name.split('.').pop().toLowerCase();
-    var allowed = ['pdf'];
-    if (allowed.indexOf(ext) < 0) {
-      showToast('Format file tidak didukung! Format khusus dokumen PDF (.pdf).', 'error');
+    var ext = (file.name || '').split('.').pop().toLowerCase();
+    var isPdf = ext === 'pdf' || (file.type && file.type === 'application/pdf');
+    if (!isPdf) {
+      showToast('⚠️ Format file tidak didukung! Mohon pilih atau unggah file dengan format PDF (.pdf).', 'error');
+      state.selectedPptFile = null;
+      if (dom.pptFileInput) dom.pptFileInput.value = '';
+      if (dom.dropzoneEmpty) dom.dropzoneEmpty.style.display = 'block';
+      if (dom.dropzoneSelected) dom.dropzoneSelected.style.display = 'none';
+      if (dom.btnSubmitUploadPpt) dom.btnSubmitUploadPpt.disabled = true;
       return;
     }
     if (file.size > 26214400) { // 25MB
-      showToast('Ukuran file terlalu besar! Maksimal 25MB.', 'error');
+      showToast('⚠️ Ukuran file terlalu besar! Maksimal 25MB.', 'error');
+      state.selectedPptFile = null;
+      if (dom.pptFileInput) dom.pptFileInput.value = '';
+      if (dom.dropzoneEmpty) dom.dropzoneEmpty.style.display = 'block';
+      if (dom.dropzoneSelected) dom.dropzoneSelected.style.display = 'none';
+      if (dom.btnSubmitUploadPpt) dom.btnSubmitUploadPpt.disabled = true;
       return;
     }
 
@@ -15280,6 +15377,6 @@ input:focus, select:focus, textarea:focus {
     }
   }
   window.exportTasksTableToExcel = exportTasksTableToExcel;
-  </script>
+</script>
 </body>
 </html>

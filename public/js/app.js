@@ -1175,6 +1175,23 @@
     
     applyRolePermissions();
 
+    // Pastikan seluruh side-over drawer tertutup saat login ke dashboard
+    if (typeof closeHistoryDrawer === 'function') closeHistoryDrawer();
+    else if (typeof window.closeHistoryDrawer === 'function') window.closeHistoryDrawer();
+    if (typeof closeDrawer === 'function') closeDrawer();
+    else if (typeof window.closeDrawer === 'function') window.closeDrawer();
+    if (typeof closeCalendarDayDrawer === 'function') closeCalendarDayDrawer();
+
+    var hDrawer = document.getElementById('history-drawer');
+    if (hDrawer) {
+      hDrawer.classList.remove('drawer-open');
+      hDrawer.classList.add('drawer-closed');
+      hDrawer.style.display = 'none';
+      hDrawer.style.visibility = 'hidden';
+      hDrawer.style.opacity = '0';
+      hDrawer.style.pointerEvents = 'none';
+    }
+
     if (loginEl) loginEl.style.display = 'none';
     if (appEl) {
       appEl.style.display = 'flex';
@@ -1811,6 +1828,16 @@
   function init() {
     applyTheme(state.theme);
     initAuth();
+    // Pastikan side-over drawer tersembunyi pada saat inisialisasi awal
+    var initHDrawer = document.getElementById('history-drawer');
+    if (initHDrawer) {
+      initHDrawer.classList.remove('drawer-open');
+      initHDrawer.classList.add('drawer-closed');
+      initHDrawer.style.display = 'none';
+      initHDrawer.style.visibility = 'hidden';
+      initHDrawer.style.opacity = '0';
+      initHDrawer.style.pointerEvents = 'none';
+    }
     // Muat cache lokal terlebih dahulu agar seketika muncul tanpa delay
     var cached = getStoredSharedRecords();
     if (cached && cached.length > 0) {
@@ -2127,6 +2154,18 @@
       dom.pptFileInput.addEventListener('change', function(e) {
         if (e.target.files && e.target.files[0]) {
           handlePptFileSelect(e.target.files[0]);
+        }
+      });
+    }
+    if (dom.newCasePptFile) {
+      dom.newCasePptFile.addEventListener('change', function(e) {
+        var f = (e.target.files && e.target.files[0]) ? e.target.files[0] : null;
+        if (!f) return;
+        var ext = (f.name || '').split('.').pop().toLowerCase();
+        var isPdf = ext === 'pdf' || (f.type && f.type === 'application/pdf');
+        if (!isPdf) {
+          showToast('⚠️ Format file tidak didukung! Mohon pilih file lampiran berformat PDF (.pdf).', 'error');
+          this.value = '';
         }
       });
     }
@@ -3679,8 +3718,33 @@
 
     if (dom.uploadPptTicketId) dom.uploadPptTicketId.textContent = 'Case #' + ticket.id;
     if (dom.uploadPptBadgeService) {
-      dom.uploadPptBadgeService.textContent = ticket.serviceType;
-      dom.uploadPptBadgeService.className = 'info-badge ' + (ticket.serviceType === 'MOBILE' ? 'badge-srv mobile' : (ticket.serviceType === 'ECARE' ? 'badge-srv ecare' : (ticket.serviceType === 'PRIORITY' ? 'badge-srv priority' : 'badge-srv fixed')));
+      var sType = String(ticket.serviceType || 'FIXED').toUpperCase();
+      var srvLabel = 'CHO Fixed';
+      if (sType === 'MOBILE') srvLabel = 'CHO Mobile';
+      else if (sType === 'FIXED') srvLabel = 'CHO Fixed';
+      else if (sType === 'ECARE') srvLabel = 'CHO eCare';
+      else if (sType === 'PRIORITY') srvLabel = 'CHO Priority';
+      else srvLabel = 'CHO ' + sType;
+
+      dom.uploadPptBadgeService.textContent = srvLabel;
+      dom.uploadPptBadgeService.className = 'info-badge font-bold text-[11px] tracking-wide uppercase px-2.5 py-1 rounded-md';
+      if (sType === 'MOBILE') {
+        dom.uploadPptBadgeService.style.background = '#dbeafe';
+        dom.uploadPptBadgeService.style.color = '#1e40af';
+        dom.uploadPptBadgeService.style.border = '1px solid #bfdbfe';
+      } else if (sType === 'FIXED') {
+        dom.uploadPptBadgeService.style.background = '#dcfce7';
+        dom.uploadPptBadgeService.style.color = '#15803d';
+        dom.uploadPptBadgeService.style.border = '1px solid #bbf7d0';
+      } else if (sType === 'ECARE') {
+        dom.uploadPptBadgeService.style.background = '#f3e8ff';
+        dom.uploadPptBadgeService.style.color = '#7e22ce';
+        dom.uploadPptBadgeService.style.border = '1px solid #e9d5ff';
+      } else {
+        dom.uploadPptBadgeService.style.background = '#fef3c7';
+        dom.uploadPptBadgeService.style.color = '#b45309';
+        dom.uploadPptBadgeService.style.border = '1px solid #fde68a';
+      }
     }
     if (dom.uploadPptIssueText) dom.uploadPptIssueText.textContent = ticket.totalCaseIsu || ticket.mainIssue || '-';
 
@@ -3723,14 +3787,24 @@
 
   function handlePptFileSelect(file) {
     if (!file) return;
-    var ext = file.name.split('.').pop().toLowerCase();
-    var allowed = ['pdf'];
-    if (allowed.indexOf(ext) < 0) {
-      showToast('Format file tidak didukung! Format khusus dokumen PDF (.pdf).', 'error');
+    var ext = (file.name || '').split('.').pop().toLowerCase();
+    var isPdf = ext === 'pdf' || (file.type && file.type === 'application/pdf');
+    if (!isPdf) {
+      showToast('⚠️ Format file tidak didukung! Mohon pilih atau unggah file dengan format PDF (.pdf).', 'error');
+      state.selectedPptFile = null;
+      if (dom.pptFileInput) dom.pptFileInput.value = '';
+      if (dom.dropzoneEmpty) dom.dropzoneEmpty.style.display = 'block';
+      if (dom.dropzoneSelected) dom.dropzoneSelected.style.display = 'none';
+      if (dom.btnSubmitUploadPpt) dom.btnSubmitUploadPpt.disabled = true;
       return;
     }
     if (file.size > 26214400) { // 25MB
-      showToast('Ukuran file terlalu besar! Maksimal 25MB.', 'error');
+      showToast('⚠️ Ukuran file terlalu besar! Maksimal 25MB.', 'error');
+      state.selectedPptFile = null;
+      if (dom.pptFileInput) dom.pptFileInput.value = '';
+      if (dom.dropzoneEmpty) dom.dropzoneEmpty.style.display = 'block';
+      if (dom.dropzoneSelected) dom.dropzoneSelected.style.display = 'none';
+      if (dom.btnSubmitUploadPpt) dom.btnSubmitUploadPpt.disabled = true;
       return;
     }
 
