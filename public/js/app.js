@@ -246,139 +246,18 @@
       createdAt: '2026-10-01'
     },
     {
-      username: '23255592',
-      name: 'Moch Fajar Sahuri',
-      role: 'Administrator',
-      password: 'koncho123',
-      createdAt: '2026-10-15'
-    },
-    {
-      username: '96137',
-      name: 'Reza Trianto',
-      role: 'Facilitator',
-      password: 'koncho@26',
-      createdAt: '2026-10-18'
-    },
-    {
-      username: '19233208',
-      name: 'EVA AROMA FITRIAWAN',
-      role: 'Administrator',
-      password: 'koncho123',
-      createdAt: '2026-10-20'
-    },
-    {
-      username: '23255029',
-      name: 'Putri Wahyu Febriani',
-      role: 'Inputer',
-      site: 'CHO Mobile CC Bandung',
-      password: 'koncho123',
-      createdAt: '2026-10-22'
-    },
-    {
-      username: '23255561',
-      name: 'MARTA DEWI RAKHMANITA',
-      role: 'Inputer',
-      site: 'CHO Fixed CC Semarang',
-      password: 'koncho123',
-      createdAt: '2026-10-25'
-    },
-    // Site Requestor Accounts
-    {
-      username: 'cho_fixed_bdg',
-      name: 'CHO Fixed CC Bandung',
-      site: 'CHO Fixed CC Bandung',
-      role: 'Inputer',
-      password: 'koncho123',
-      createdAt: '2026-11-13'
-    },
-    {
-      username: 'cho_fixed_smg',
-      name: 'CHO Fixed CC Semarang',
-      site: 'CHO Fixed CC Semarang',
-      role: 'Inputer',
-      password: 'koncho123',
-      createdAt: '2026-11-13'
-    },
-    {
-      username: 'cho_mobile_bdg',
-      name: 'CHO Mobile CC Bandung',
-      site: 'CHO Mobile CC Bandung',
-      role: 'Inputer',
-      password: 'koncho123',
-      createdAt: '2026-11-13'
-    },
-    {
-      username: 'cho_mobile_smg',
-      name: 'CHO Mobile CC Semarang',
-      site: 'CHO Mobile CC Semarang',
-      role: 'Inputer',
-      password: 'koncho123',
-      createdAt: '2026-11-13'
-    },
-    {
-      username: 'cho_ecare',
-      name: 'CHO E Care',
-      site: 'CHO E Care',
-      role: 'Inputer',
-      password: 'koncho123',
-      createdAt: '2026-11-13'
-    },
-    {
-      username: 'cho_priority_smg',
-      name: 'CHO Priority Semarang',
-      site: 'CHO Priority Semarang',
-      role: 'Inputer',
-      password: 'koncho123',
-      createdAt: '2026-11-13'
-    },
-    {
-      username: 'cho_priority_bdg',
-      name: 'CHO Priority Bandung',
-      site: 'CHO Priority Bandung',
-      role: 'Inputer',
-      password: 'koncho123',
-      createdAt: '2026-11-13'
-    },
-    // Facilitator Accounts
-    {
-      username: 'galih',
+      username: '123galih',
       name: 'Galih',
-      site: 'CHO Fixed CC Bandung',
       role: 'Facilitator',
       password: 'koncho123',
-      createdAt: '2026-11-13'
+      createdAt: '2026-11-16'
     },
     {
-      username: 'reza',
+      username: '234reza',
       name: 'Reza',
-      site: 'CHO Fixed CC Semarang',
       role: 'Facilitator',
       password: 'koncho123',
-      createdAt: '2026-11-13'
-    },
-    {
-      username: 'ajun',
-      name: 'Ajun',
-      site: 'CHO E Care',
-      role: 'Facilitator',
-      password: 'koncho123',
-      createdAt: '2026-11-13'
-    },
-    {
-      username: 'yurina',
-      name: 'Yurina',
-      site: 'CHO Priority Semarang',
-      role: 'Facilitator',
-      password: 'koncho123',
-      createdAt: '2026-11-13'
-    },
-    {
-      username: 'kenny',
-      name: 'Kenny',
-      site: 'CHO Priority Bandung',
-      role: 'Facilitator',
-      password: 'koncho123',
-      createdAt: '2026-11-13'
+      createdAt: '2026-11-16'
     }
   ];
 
@@ -591,12 +470,6 @@
 
   function getStoredUserAccounts() {
     var accounts = [];
-    var deleted = [];
-    try {
-      deleted = JSON.parse(localStorage.getItem('koncho_deleted_users') || '[]');
-      if (!Array.isArray(deleted)) deleted = [];
-    } catch(e) { deleted = []; }
-
     try {
       var raw = localStorage.getItem('koncho_user_accounts');
       if (raw) {
@@ -607,32 +480,17 @@
       }
     } catch (e) {}
 
-    // Bersihkan akun yang pernah dihapus
-    if (deleted.length > 0) {
-      accounts = accounts.filter(function(a) {
-        var u = (a.username || '').replace(/^@+/, '').trim().toLowerCase();
-        return deleted.indexOf(u) === -1;
-      });
-    }
-
-    // Merge akun default yang belum tercatat agar tidak hilang
-    DEFAULT_USER_ACCOUNTS.forEach(function(def) {
-      var defU = def.username.toLowerCase();
-      if (deleted.indexOf(defU) !== -1) return;
-      var exists = accounts.some(function(a) {
-        return (a.username || '').replace(/^@+/, '').trim().toLowerCase() === defU;
-      });
-      if (!exists) {
-        accounts.push(def);
-      }
-    });
-
     // Bersihkan leading @ jika ada
     accounts.forEach(function(u) {
       if (u.username) u.username = u.username.replace(/^@+/, '').trim();
     });
 
-    saveStoredUserAccounts(accounts);
+    // Jika belum pernah tersinkron dari Google Sheet sama sekali (offline sebelum respon pertama)
+    if (accounts.length === 0) {
+      accounts = DEFAULT_USER_ACCOUNTS.map(function(u) { return Object.assign({}, u); });
+      saveStoredUserAccounts(accounts);
+    }
+
     return accounts;
   }
 
@@ -1073,55 +931,52 @@
   // Sinkronisasi data pengguna dari Google Sheet ke localStorage
   function syncStoredUsersFromSheet(remoteUsers) {
     if (!remoteUsers || !Array.isArray(remoteUsers) || remoteUsers.length === 0) return;
-    var localUsers = getStoredUserAccounts();
-    var hasChanges = false;
 
-    remoteUsers.forEach(function(rem) {
-      if (!rem || !rem.username) return;
-      var cleanRemU = rem.username.replace(/^@+/, '').trim().toLowerCase();
-      var idx = localUsers.findIndex(function(loc) {
-        return (loc.username || '').replace(/^@+/, '').trim().toLowerCase() === cleanRemU;
-      });
-
-      if (idx !== -1) {
-        if (
-          localUsers[idx].name !== rem.name ||
-          localUsers[idx].role !== rem.role ||
-          (rem.password && localUsers[idx].password !== rem.password)
-        ) {
-          localUsers[idx].name = rem.name || localUsers[idx].name;
-          localUsers[idx].role = rem.role || localUsers[idx].role;
-          if (rem.password) localUsers[idx].password = rem.password;
-          hasChanges = true;
-        }
-      } else {
-        localUsers.push({
-          username: rem.username.replace(/^@+/, '').trim(),
-          name: rem.name || rem.username,
-          role: rem.role || 'Inputer',
-          password: rem.password || '',
-          createdAt: new Date().toISOString().split('T')[0]
-        });
-        hasChanges = true;
+    // Google Sheet sheet 'Users' adalah SUMBER KEBENARAN TUNGGAL (Single Source of Truth)
+    var cleanRemoteUsers = remoteUsers.map(function(rem) {
+      var cleanU = (rem.username || '').replace(/^@+/, '').trim();
+      var siteVal = rem.site || '';
+      if (!siteVal) {
+        var norm = (rem.name || cleanU).toLowerCase();
+        if (norm.includes('fixed') && norm.includes('bandung')) siteVal = 'CHO Fixed CC Bandung';
+        else if (norm.includes('fixed') && norm.includes('semarang')) siteVal = 'CHO Fixed CC Semarang';
+        else if (norm.includes('mobile') && norm.includes('bandung')) siteVal = 'CHO Mobile CC Bandung';
+        else if (norm.includes('mobile') && norm.includes('semarang')) siteVal = 'CHO Mobile CC Semarang';
+        else if (norm.includes('ecare')) siteVal = 'CHO eCare';
+        else if (norm.includes('priority')) siteVal = 'CHO Priority';
+        else if (rem.name && rem.name.indexOf('CHO') >= 0) siteVal = rem.name;
       }
+      return {
+        username: cleanU,
+        name: rem.name || cleanU,
+        role: rem.role || 'Inputer',
+        site: siteVal,
+        password: rem.password || '',
+        updatedAt: rem.updatedAt || new Date().toISOString()
+      };
     });
 
-    if (hasChanges) {
-      saveStoredUserAccounts(localUsers);
-      renderUserMgmtList();
+    // Simpan daftar akun pengguna persis seperti yang ada di Google Sheet Users
+    saveStoredUserAccounts(cleanRemoteUsers);
+    if (typeof renderUserMgmtList === 'function') renderUserMgmtList();
 
-      if (state.authUser) {
-        var cleanMyU = (state.authUser.username || state.authUser.name || '').replace(/^@+/, '').trim().toLowerCase();
-        var myAcc = localUsers.find(function(a) {
-          return (a.username || '').replace(/^@+/, '').trim().toLowerCase() === cleanMyU;
-        });
-        if (myAcc) {
-          state.authUser.name = myAcc.name;
-          state.authUser.role = myAcc.role;
-          state.authUser.username = myAcc.username;
-          try { localStorage.setItem('koncho_auth_user', JSON.stringify(state.authUser)); } catch(e){}
-          applyRolePermissions();
-        }
+    // Verifikasi sesi pengguna yang sedang login
+    if (state.authUser) {
+      var curU = (state.authUser.username || '').replace(/^@+/, '').trim().toLowerCase();
+      var myAcc = cleanRemoteUsers.find(function(a) {
+        return (a.username || '').replace(/^@+/, '').trim().toLowerCase() === curU;
+      });
+      if (myAcc) {
+        state.authUser.name = myAcc.name;
+        state.authUser.role = myAcc.role;
+        state.authUser.username = myAcc.username;
+        if (myAcc.site) state.authUser.site = myAcc.site;
+        try { localStorage.setItem('koncho_auth_user', JSON.stringify(state.authUser)); } catch(e){}
+        applyRolePermissions();
+      } else {
+        // Akun ini telah dihapus dari Google Sheet Users!
+        showToast('Akun Anda telah dinonaktifkan atau dihapus dari Google Sheet Users. Silakan login kembali.', 'warning');
+        handleLogout();
       }
     }
   }
@@ -1360,32 +1215,43 @@
     }
 
     var cleanUsername = rawUsername.replace(/^@+/, '').trim().toLowerCase();
-    var accounts = getStoredUserAccounts();
-    var found = accounts.find(function(a) {
-      return (a.username || '').replace(/^@+/, '').trim().toLowerCase() === cleanUsername;
-    });
-
-    if (!found) {
-      showToast('Nama Pengguna (Username) "@' + cleanUsername + '" tidak terdaftar! Periksa kembali username Anda.', 'error');
-      if (userInp) userInp.focus();
-      return;
-    }
-
-    if (found.password && found.password !== password) {
-      showToast('Kata sandi salah untuk pengguna: @' + found.username, 'error');
-      if (passInp) passInp.focus();
-      return;
-    }
-
-    var role = found.role || 'Inputer';
-    var fullName = found.name || found.username;
 
     if (btnSubmit) {
-      btnSubmit.innerHTML = '<span>Memverifikasi Akses...</span>';
+      btnSubmit.innerHTML = '<span>Memverifikasi Akses ke Google Sheet...</span>';
       btnSubmit.style.opacity = '0.7';
+      btnSubmit.disabled = true;
     }
 
-    setTimeout(function() {
+    function doVerifyAndLogin(accountsList) {
+      var found = accountsList.find(function(a) {
+        return (a.username || '').replace(/^@+/, '').trim().toLowerCase() === cleanUsername;
+      });
+
+      if (!found) {
+        showToast('Nama Pengguna (Username) "@' + cleanUsername + '" tidak terdaftar di Google Sheet Users!', 'error');
+        if (btnSubmit) {
+          btnSubmit.innerHTML = '<span>Sign In</span> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
+          btnSubmit.style.opacity = '1';
+          btnSubmit.disabled = false;
+        }
+        if (userInp) userInp.focus();
+        return;
+      }
+
+      if (found.password && String(found.password).trim() !== password) {
+        showToast('Kata sandi salah untuk pengguna: @' + found.username, 'error');
+        if (btnSubmit) {
+          btnSubmit.innerHTML = '<span>Sign In</span> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
+          btnSubmit.style.opacity = '1';
+          btnSubmit.disabled = false;
+        }
+        if (passInp) passInp.focus();
+        return;
+      }
+
+      var role = found.role || 'Inputer';
+      var fullName = found.name || found.username;
+
       state.authUser = {
         name: fullName,
         username: found.username,
@@ -1413,8 +1279,33 @@
       if (btnSubmit) {
         btnSubmit.innerHTML = '<span>Sign In</span> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
         btnSubmit.style.opacity = '1';
+        btnSubmit.disabled = false;
       }
-    }, 350);
+    }
+
+    // Selalu ambil data pengguna teranyar dari Google Apps Script agar password & akun 100% sinkron
+    if (state.gasApiUrl) {
+      fetch(state.gasApiUrl + '?action=getInitialData&_t=' + Date.now(), { method: 'GET', redirect: 'follow' })
+        .then(function(r) { return r.json(); })
+        .then(function(res) {
+          if (res && res.users && Array.isArray(res.users)) {
+            syncStoredUsersFromSheet(res.users);
+          }
+          if (res && res.success) {
+            processLoadedData(res, false);
+          }
+          var freshAccounts = getStoredUserAccounts();
+          doVerifyAndLogin(freshAccounts);
+        })
+        .catch(function(err) {
+          console.warn('Login online check fallback to local:', err);
+          var cachedAccounts = getStoredUserAccounts();
+          doVerifyAndLogin(cachedAccounts);
+        });
+    } else {
+      var localAccounts = getStoredUserAccounts();
+      doVerifyAndLogin(localAccounts);
+    }
   }
 
   // =========================================================================
@@ -2458,12 +2349,7 @@
       .then(function(r) { return r.json(); })
       .then(function(res) {
         if (res && res.success) {
-          var mob = (res.mobileRecords || []).map(function(r) { r.serviceType = 'MOBILE'; return r; });
-          var fix = (res.fixedRecords || []).map(function(r) { r.serviceType = 'FIXED'; return r; });
-          var ecare = (res.ecareRecords || []).map(function(r) { r.serviceType = 'ECARE'; return r; });
-          var prio = (res.priorityRecords || []).map(function(r) { r.serviceType = 'PRIORITY'; return r; });
-          var allLive = mob.concat(fix).concat(ecare).concat(prio);
-          mergeLiveRecords(allLive);
+          processLoadedData(res, false);
         }
       })
       .catch(function(e) {});
@@ -2562,23 +2448,19 @@
       saveStoredFacilitatorRouting(data.facilitatorRouting);
     }
 
-    // Merge cerdas dengan state.records yang ada agar inputan lokal terbaru tidak tertimpa/hilang
-    var recordMap = new Map();
-    // 1. Masukkan tiket lokal yang sudah ada terlebih dahulu
-    if (Array.isArray(state.records)) {
-      state.records.forEach(function(r) {
-        if (r && r.id) recordMap.set(String(r.id), r);
+    // Google Spreadsheet adalah SUMBER KEBENARAN TUNGGAL (Single Source of Truth)
+    // Jika data di Google Sheet dihapus, maka data di aplikasi konCHO HARUS ikut terhapus!
+    if (!isSimulation) {
+      var liveIds = new Set(allIncoming.map(function(r) { return String(r.id); }));
+      var now = Date.now();
+      // Pertahankan HANYA tiket lokal baru yang baru saja diinput pengguna < 20 detik lalu (jika GAS belum selesai append)
+      var recentPendingLocal = (state.records || []).filter(function(r) {
+        return r && r.id && !liveIds.has(String(r.id)) && r._localCreatedAt && (now - r._localCreatedAt < 20000);
       });
+      state.records = recentPendingLocal.concat(allIncoming);
+    } else {
+      state.records = allIncoming;
     }
-    // 2. Gabungkan/perbarui dengan data incoming dari live spreadsheet
-    allIncoming.forEach(function(r) {
-      if (r && r.id) {
-        var existing = recordMap.get(String(r.id));
-        recordMap.set(String(r.id), existing ? Object.assign({}, existing, r) : r);
-      }
-    });
-
-    state.records = Array.from(recordMap.values());
 
     // Urutkan tiket: yang terbaru di atas
     state.records.sort(function(a, b) {
@@ -2600,7 +2482,7 @@
     updateKpiCounters();
     renderCaseList();
 
-    // KRUSIAL: Render Kalender dan Tasks Table seketika agar data langsung tampil di layar pengguna!
+    // Render Kalender dan Tasks Table seketika agar data langsung ter-update di layar pengguna!
     if (typeof renderCalendarGrid === 'function') renderCalendarGrid();
     if (typeof renderTasksTable === 'function') renderTasksTable();
     if (typeof updateTasksKpis === 'function') updateTasksKpis();
@@ -2610,7 +2492,7 @@
     if (typeof renderActivityFeed === 'function') renderActivityFeed();
 
     // Sinkronisasi data pengguna dari Google Sheet (Sheet Users)
-    if (data.users && Array.isArray(data.users) && data.users.length > 0) {
+    if (data.users && Array.isArray(data.users)) {
       syncStoredUsersFromSheet(data.users);
     }
   }
@@ -5264,7 +5146,8 @@
       needSupport: needSupport,
       pic: req,
       terakhirUpdate: targetIsoDate,
-      statusInformasi: st === 'Open' ? 'Belum Ada Update' : 'Ada Update Baru'
+      statusInformasi: st === 'Open' ? 'Belum Ada Update' : 'Ada Update Baru',
+      _localCreatedAt: Date.now()
     };
 
     // Rekam lampiran PDF bila diunggah
@@ -5520,314 +5403,13 @@
       ecareHeaders: ['ID_Tiket', 'Bulan - Tahun', 'Case Isu yang Masuk', 'Issue Details (Description)', 'Progress & Quick Win (Temporary Solution)', 'Need Support', 'Requestor', 'Status', 'Follow up to', 'Status Update', 'Tanggal_Agenda', 'Terakhir_Update', 'File PPT', 'Input_By', 'PIC_Facilitator', 'Keterangan_Progress', 'Keterangan_Closed', 'Closed_By'],
       priorityHeaders: ['ID_Tiket', 'Bulan - Tahun', 'Case Isu yang Masuk', 'Issue Details (Description)', 'Progress & Quick Win (Temporary Solution)', 'Need Support', 'Requestor', 'Status', 'Follow up to', 'Status Update', 'Tanggal_Agenda', 'Terakhir_Update', 'File PPT', 'Input_By', 'PIC_Facilitator', 'Keterangan_Progress', 'Keterangan_Closed', 'Closed_By'],
       priorityRecords: [],
-      mobileRecords: [
-        {
-          id: 'CHO-M-20261114-6719',
-          ticketId: 'CHO-M-20261114-6719',
-          serviceType: 'MOBILE',
-          bulan: 'Oktober 2026',
-          tanggal: '2026-10-15 00:00:00',
-          tanggalAgenda: '2026-10-15 00:00:00',
-          tanggalInput: '2026-10-15 00:00:00',
-          totalCaseIsu: 'sdsds',
-          caseTitle: 'sdsds',
-          issueDetails: 'tessss',
-          requestor: 'Administrator Utama',
-          inputBy: 'Administrator Utama',
-          status: 'InProgress',
-          urgency: 'Low',
-          progress: 'dwsds',
-          pic: 'Galih',
-          picFacilitator: 'Galih',
-          terakhirUpdate: '2026-10-15 00:00:00'
-        },
-        {
-          id: 'CHO-M-20261116-8746',
-          ticketId: 'CHO-M-20261116-8746',
-          serviceType: 'MOBILE',
-          bulan: 'Oktober 2026',
-          tanggal: '2026-10-15 00:00:00',
-          tanggalAgenda: '2026-10-15 00:00:00',
-          tanggalInput: '2026-10-15 00:00:00',
-          totalCaseIsu: 'okelah',
-          caseTitle: 'okelah',
-          issueDetails: 'okelah',
-          requestor: 'Administrator Utama',
-          inputBy: 'Administrator Utama',
-          status: 'Open',
-          urgency: 'Low',
-          progress: '',
-          pic: 'Galih',
-          picFacilitator: 'Galih',
-          terakhirUpdate: '2026-10-15 00:00:00'
-        },
-        {
-          id: 'CHO-M-20261116-2091',
-          ticketId: 'CHO-M-20261116-2091',
-          serviceType: 'MOBILE',
-          bulan: 'Oktober 2026',
-          tanggal: '2026-10-16 00:00:00',
-          tanggalAgenda: '2026-10-16 00:00:00',
-          tanggalInput: '2026-10-16 00:00:00',
-          totalCaseIsu: 'tes case 16 nov',
-          caseTitle: 'tes case 16 nov',
-          issueDetails: 'tes case 16 nov',
-          requestor: 'Administrator Utama',
-          inputBy: 'Administrator Utama',
-          status: 'Open',
-          urgency: 'Low',
-          progress: '',
-          pic: 'Galih',
-          picFacilitator: 'Galih',
-          terakhirUpdate: '2026-10-16 00:00:00'
-        },
-        {
-          id: '1',
-          totalCaseIsu: 'Kendala charge MU pada paket bundling',
-          requestor: 'Dimas (B2B Care)',
-          status: 'InProgress',
-          followUpTo: 'Tim Radio Optimization (RO)',
-          bulan: 'Oktober 2026',
-          tanggal: '2026-10-15T08:30:00Z',
-          nama: 'PT Solusi Finansial (Corporate)',
-          nomorLayanan: '081288992211',
-          kategori: 'Bundling MU',
-          issueDetails: 'Pelanggan sudah aktivasi paket bundling namun masih dikenakan MU, baik aktivasi dari channel digipos atau HVC.',
-          detail: 'Pelanggan sudah aktivasi paket bundling namun masih dikenakan MU, baik aktivasi dari channel digipos atau HVC.\n\nNeed Support:\n• Perbaikan sistem untuk pelanggan dengan paket bundling tidak dikenakan charge MU',
-          progress: 'Remove MU berdasarkan KMI2230926841 dan pengajuan adjustment',
-          pic: 'Tim Mobile',
-          terakhirUpdate: '2026-10-15T10:00:00Z',
-          statusInformasi: 'Ada Update Baru'
-        },
-        {
-          id: '2',
-          totalCaseIsu: 'SMOOA – Tidak diperpanjang otomatis. Add Remove member berkendala.',
-          requestor: 'Call Center 188',
-          status: 'Open',
-          followUpTo: 'IT Core Pool',
-          bulan: 'Oktober 2026',
-          tanggal: '2026-10-13T09:15:00Z',
-          nama: 'Siti Rahma',
-          nomorLayanan: '082155443322',
-          kategori: 'SMOOA Auto Renew',
-          issueDetails: 'Kuota SMOOA tidak diperpanjang otomatis dan kendala add/remove member via DSC.',
-          detail: 'Kuota SMOOA tidak diperpanjang otomatis dan kendala add/remove SMOOATotal Volume tiket keluhan SMOOA dari tanggal 1 – 13 Oktober 2026, total volume keluhan tercatat 335 tiket. Tiket open didominasi keluhan Kuota Otomatis Tidak Diperpanjang dengan total keluhan 76 tiket dan 19 tiket masih open di pool IT. Keluhan yang lain adalah Tidak bisa menambahkan/menghapus member sebanyak 29 tiket.\n\nNeed Support:\n• Optimalisasi proses fixing secara masalah seluruh MSISDN yang terimpact kuota tidak diperpanjang otomatis.\n• Perbaikan tools DSC agar dapat add/remove member via DSC',
-          progress: 'Eskalasi ke IT',
-          pic: 'Tim Mobile',
-          terakhirUpdate: '2026-10-13T09:15:00Z',
-          statusInformasi: 'Belum Ada Update'
-        },
-        {
-          id: '3',
-          totalCaseIsu: 'Kendala akses log notifikasi Selena',
-          requestor: 'Helpdesk Selena',
-          status: 'Open',
-          followUpTo: 'Tim Backend Selena',
-          bulan: 'Oktober 2026',
-          tanggal: '2026-10-12T11:20:00Z',
-          nama: '-',
-          nomorLayanan: '081377889900',
-          kategori: 'Selena Log',
-          issueDetails: 'Log aktivasi paket/ transfer pulsa prepaid tidak dapat dilakukan saat pengecekan notifikasi sistem.',
-          detail: 'Log aktivasi paket/ transfer pulsa prepaid tidak dapat dilakukan saat pengecekan notifikasi sistem.\n\nNeed Support:\n• Approval pengajuan keyword selena app_nois',
-          progress: 'Escalate to IT untuk mendapatkan log aktivasi/transfer pulsa',
-          pic: 'Tim Mobile',
-          terakhirUpdate: '2026-10-12T11:20:00Z',
-          statusInformasi: 'Belum Ada Update'
-        },
-        {
-          id: '4',
-          totalCaseIsu: 'Double Aktivasi Paket RoaMAX',
-          requestor: 'GraPARI Online',
-          status: 'Open',
-          followUpTo: 'Billing Roaming',
-          bulan: 'Oktober 2026',
-          tanggal: '2026-10-10T14:45:00Z',
-          nama: 'Ahmad Fauzi',
-          nomorLayanan: '081122334455',
-          kategori: 'RoaMAX',
-          issueDetails: 'Pelanggan melakukan aktivasi Paket RoaMAX namun menerima notifikasi gagal, lalu aktivasi ulang sehingga terjadi double aktivasi.',
-          detail: 'Pelanggan melakukan aktivasi Paket RoaMAX namun menerima notifikasi Maaf request Anda tidak bisa kami proses, kemudian melakukan aktivasi ulang dan menyebabkan double aktivasi. Sample: https://prnt.sc/OnC_JQ7q8lp3\n\nNeed Support:\n• Auto refund/adjustment jika terjadi double aktivasi paket yang sama dalam range 60 menit',
-          progress: 'Remove paket dan pengajuan adjustment mengacu source KM1216012510',
-          pic: 'Tim Mobile',
-          terakhirUpdate: '2026-10-10T14:45:00Z',
-          statusInformasi: 'Belum Ada Update'
-        }      ],
-      fixedRecords: [
-        {
-          id: 'CHO-F-20261117-8942',
-          ticketId: 'CHO-F-20261117-8942',
-          serviceType: 'FIXED',
-          bulan: 'Oktober 2026',
-          tanggal: '2026-10-18 00:00:00',
-          tanggalAgenda: '2026-10-18 00:00:00',
-          tanggalInput: '2026-10-18 00:00:00',
-          totalCaseIsu: 'test Case',
-          caseTitle: 'test Case',
-          issueDetails: 'test Case',
-          requestor: 'CHO Fixed CC Semarang',
-          inputBy: 'CHO Fixed CC Semarang',
-          status: 'Open',
-          urgency: 'High',
-          progress: '',
-          pic: 'Reza',
-          picFacilitator: 'Reza',
-          terakhirUpdate: '2026-10-18 00:00:00'
-        },
-        {
-          id: 'CHO-F-20261115-8592',
-          ticketId: 'CHO-F-20261115-8592',
-          serviceType: 'FIXED',
-          bulan: 'Oktober 2026',
-          tanggal: '2026-10-21 00:00:00',
-          tanggalAgenda: '2026-10-21 00:00:00',
-          tanggalInput: '2026-10-21 00:00:00',
-          totalCaseIsu: 'test keempat case',
-          caseTitle: 'test keempat case',
-          issueDetails: 'test keempat case',
-          requestor: 'Administrator Utama',
-          inputBy: 'Administrator Utama',
-          status: 'Open',
-          urgency: 'Low',
-          progress: '',
-          pic: 'Galih',
-          picFacilitator: 'Galih',
-          terakhirUpdate: '2026-10-21 00:00:00'
-        },
-        {
-          id: 'CHO-F-20261116-1867',
-          ticketId: 'CHO-F-20261116-1867',
-          serviceType: 'FIXED',
-          bulan: 'November 2026',
-          tanggal: '2026-11-16 00:00:00',
-          tanggalAgenda: '2026-11-16 00:00:00',
-          tanggalInput: '2026-11-16 00:00:00',
-          totalCaseIsu: 'Order tidak complete',
-          caseTitle: 'Order tidak complete',
-          issueDetails: 'Order tidak complete',
-          requestor: 'CHO Fixed CC Bandung',
-          inputBy: 'CHO Fixed CC Bandung',
-          status: 'Open',
-          urgency: 'Low',
-          progress: 'Esc ke IT',
-          pic: 'Galih',
-          picFacilitator: 'Galih',
-          terakhirUpdate: '2026-11-16 00:00:00'
-        },
-        {
-          id: 'CHO-F-20261116-8911',
-          ticketId: 'CHO-F-20261116-8911',
-          serviceType: 'FIXED',
-          bulan: 'November 2026',
-          tanggal: '2026-11-16 00:00:00',
-          tanggalAgenda: '2026-11-16 00:00:00',
-          tanggalInput: '2026-11-16 00:00:00',
-          totalCaseIsu: 'SMOOA tidak diperpanjang',
-          caseTitle: 'SMOOA tidak diperpanjang',
-          issueDetails: 'SMOOA tidak diperpanjang',
-          requestor: 'CHO Fixed CC Bandung',
-          inputBy: 'CHO Fixed CC Bandung',
-          status: 'Open',
-          urgency: 'Low',
-          pic: 'Galih',
-          picFacilitator: 'Galih',
-          terakhirUpdate: '2026-11-16 00:00:00'
-        },
-        {
-          id: 'CHO-F-20261116-2484',
-          ticketId: 'CHO-F-20261116-2484',
-          serviceType: 'FIXED',
-          bulan: 'November 2026',
-          tanggal: '2026-11-16 00:00:00',
-          tanggalAgenda: '2026-11-16 00:00:00',
-          tanggalInput: '2026-11-16 00:00:00',
-          totalCaseIsu: 'Benefit tidak didapatkan',
-          caseTitle: 'Benefit tidak didapatkan',
-          issueDetails: 'Benefit tidak didapatkan',
-          requestor: 'CHO Fixed CC Semarang',
-          inputBy: 'CHO Fixed CC Semarang',
-          status: 'Open',
-          urgency: 'Low',
-          pic: 'Reza',
-          picFacilitator: 'Reza',
-          terakhirUpdate: '2026-11-16 00:00:00'
-        },
-        {
-          id: 'CHO-F-20261117-8218',
-          ticketId: 'CHO-F-20261117-8218',
-          serviceType: 'FIXED',
-          bulan: 'November 2026',
-          tanggal: '2026-11-17 00:00:00',
-          tanggalAgenda: '2026-11-17 00:00:00',
-          tanggalInput: '2026-11-17 00:00:00',
-          totalCaseIsu: 'tes case menggunakan user input bdg',
-          caseTitle: 'tes case menggunakan user input bdg',
-          issueDetails: 'issue details tes case menggunakan user input bdg',
-          requestor: 'CHO Fixed CC Bandung',
-          inputBy: 'CHO Fixed CC Bandung',
-          status: 'Open',
-          urgency: 'Low',
-          progress: 'quick win tes case menggunakan user input bdg',
-          pic: 'Galih',
-          picFacilitator: 'Galih',
-          terakhirUpdate: '2026-11-17 00:00:00'
-        },
-        {
-          id: '1',
-          totalCaseIsu: 'Perhitungan Paket PDD (Juli 2026)',
-          requestor: 'Customer Care',
-          status: 'Open',
-          followUpTo: 'Tim Billing & IT',
-          bulan: 'Juli 2026',
-          tanggal: '2026-07-23T10:00:00Z',
-          nama: 'Pelanggan IndiHome',
-          nomorLayanan: '122556677889',
-          kategori: 'Perhitungan Paket PDD',
-          issueDetails: 'Perhitungan paket PDD bulan Juli 2026 memerlukan rekonsiliasi.',
-          detail: 'Perhitungan paket PDD bulan Juli 2026 memerlukan rekonsiliasi.',
-          pic: 'Tim Billing',
-          terakhirUpdate: '2026-07-23T17:00:00Z',
-          statusInformasi: 'Belum Ada Update'
-        },
-        {
-          id: '2',
-          totalCaseIsu: 'Biaya IndiHome Smart (Agustus 2026)',
-          requestor: 'Customer Care',
-          status: 'Open',
-          followUpTo: 'Tim Billing & IT',
-          bulan: 'Agustus 2026',
-          tanggal: '2026-08-20T08:00:00Z',
-          nama: 'Pelanggan IndiHome Smart',
-          nomorLayanan: '122998877665',
-          kategori: 'Biaya IndiHome Smart',
-          issueDetails: 'Penyesuaian tagihan biaya IndiHome Smart periode Agustus 2026.',
-          detail: 'Penyesuaian tagihan biaya IndiHome Smart periode Agustus 2026.',
-          pic: 'Tim Billing',
-          terakhirUpdate: '2026-08-20T20:30:00Z',
-          statusInformasi: 'Belum Ada Update'
-        }
-      ],
-      logs: [
-        {
-          logId: 'LOG-20261015-001',
-          ticketId: '1',
-          serviceType: 'MOBILE',
-          author: 'Dimas (RO)',
-          message: 'Telah dikoordinasikan dengan tim Billing & Core System terkait penyesuaian charging engine. Tim RO sedang melakukan optimasi parameter.',
-          statusTerkait: 'InProgress',
-          followUpTo: 'Tim Radio Optimization (RO)',
-          timestamp: '2026-10-15T10:00:00Z'
-        }
-      ]
+      ecareRecords: [],
+      fixedRecords: [],
+      mobileRecords: [],
+      users: DEFAULT_USER_ACCOUNTS
     };
   }
 
-  
-  /* =========================================================================
-     GOOGLE STITCH TEAMS CALENDAR, TASKS & ACTIVITY CONTROLLERS
-     ========================================================================= */
-
-  // Calendar default dataset
   const DEFAULT_CALENDAR_DATA = {
     'november-2026': {
       title: "November 2026",
@@ -5836,17 +5418,8 @@
       totalDays: 30,
       prevMonthSpill: [26, 27, 28, 29, 30, 31],
       nextMonthSpill: [1, 2, 3, 4, 5, 6],
-      summary: { agendas: 4, issues: 4, quickwins: 1 },
-      items: {
-        16: [
-          { type: 'issue', unit: 'fixed', text: 'Order tidak complete', ticketId: 'CHO-F-20261116-1867', serviceType: 'FIXED', urgency: 'Low', picFacilitator: 'Galih' },
-          { type: 'issue', unit: 'fixed', text: 'SMOOA tidak diperpanjang', ticketId: 'CHO-F-20261116-8911', serviceType: 'FIXED', urgency: 'Low', picFacilitator: 'Galih' },
-          { type: 'issue', unit: 'fixed', text: 'Benefit tidak didapatkan', ticketId: 'CHO-F-20261116-2484', serviceType: 'FIXED', urgency: 'Low', picFacilitator: 'Reza' }
-        ],
-        17: [
-          { type: 'issue', unit: 'fixed', text: 'tes case menggunakan user input bdg', ticketId: 'CHO-F-20261117-8218', serviceType: 'FIXED', urgency: 'Low', picFacilitator: 'Galih' }
-        ]
-      },
+      summary: { agendas: 0, issues: 0, quickwins: 0 },
+      items: {},
       details: {}
     },
     'oktober-2026': {
@@ -5856,128 +5429,9 @@
       totalDays: 31,
       prevMonthSpill: [28, 29, 30],
       nextMonthSpill: [1],
-      summary: { agendas: 18, issues: 4, quickwins: 9 },
-      items: {
-        1: [{ type: 'meeting', unit: 'mobile', text: 'Sync Billing Digipos' }],
-        3: [{ type: 'meeting', unit: 'mobile', text: 'SMOOA Fix Pool IT' }],
-        6: [{ type: 'meeting', unit: 'fixed', text: 'Eskalasi RoaMAX' }],
-        8: [{ type: 'meeting', unit: 'mobile', text: 'Log Selena Akses' }],
-        10: [{ type: 'meeting', unit: 'fixed', text: 'Audit Paket PDD' }],
-        13: [{ type: 'issue', unit: 'fixed', text: 'Status ONT Fixed' }],
-        15: [
-          { type: 'issue', unit: 'mobile', text: 'sdsds', ticketId: 'CHO-M-20261114-6719', serviceType: 'MOBILE', urgency: 'Low', picFacilitator: 'Galih' },
-          { type: 'issue', unit: 'mobile', text: 'okelah', ticketId: 'CHO-M-20261116-8746', serviceType: 'MOBILE', urgency: 'Low', picFacilitator: 'Galih' },
-          { type: 'issue', unit: 'mobile', text: 'Charge MU Bundling' },
-          { type: 'meeting', unit: 'billing', text: 'Evaluasi Digipos' }
-        ],
-        16: [
-          { type: 'issue', unit: 'mobile', text: 'tes case 16 nov', ticketId: 'CHO-M-20261116-2091', serviceType: 'MOBILE', urgency: 'Low', picFacilitator: 'Galih' }
-        ],
-        17: [{ type: 'meeting', unit: 'mobile', text: 'Update Spreadsheet' }],
-        18: [
-          { type: 'issue', unit: 'fixed', text: 'test Case', ticketId: 'CHO-F-20261117-8942', serviceType: 'FIXED', urgency: 'High', picFacilitator: 'Reza' }
-        ],
-        20: [{ type: 'issue', unit: 'mobile', text: 'Validasi HVC Digipos' }],
-        21: [
-          { type: 'issue', unit: 'fixed', text: 'test keempat case', ticketId: 'CHO-F-20261115-8592', serviceType: 'FIXED', urgency: 'Low', picFacilitator: 'Galih' }
-        ],
-        22: [{ type: 'meeting', unit: 'fixed', text: 'Eskalasi Kolom J' }],
-        24: [
-          { type: 'issue', unit: 'mobile', text: 'Charge MU Bundling', urgent: true, ticketId: '1' },
-          { type: 'meeting', unit: 'mobile', text: 'Review Isu Kendala Charge MU' },
-          { type: 'meeting', unit: 'fixed', text: 'Investigasi SMOOA & Selena' }
-        ],
-        27: [{ type: 'meeting', unit: 'fixed', text: 'Double RoaMAX Fix' }],
-        29: [{ type: 'issue', unit: 'fixed', text: 'Perhitungan PDD', ticketId: '5' }],
-        31: [{ type: 'quickwin', unit: 'all', text: 'Rekap Bulanan CHO' }]
-      },
-      details: {
-        24: {
-          dateStr: "Kamis, 24 Oktober 2026",
-          agendaCount: 3,
-          agendas: [
-            {
-              time: "09:00 - 10:30 WIB",
-              unit: "CHO Mobile",
-              unitClass: "bg-blue-50 text-blue-700 border-blue-200",
-              title: "Review Isu Kendala Charge MU & Paket Bundling",
-              host: "Tim Billing IT / CHO Mobile",
-              roomText: "Sync Room CHO",
-              isWarRoom: false
-            },
-            {
-              time: "13:30 - 14:30 WIB",
-              unit: "CHO Fixed",
-              unitClass: "bg-teal-50 text-teal-700 border-teal-200",
-              title: "Investigasi SMOOA Kuota & Akses Notifikasi Selena",
-              host: "Administrator Utama",
-              roomText: "War Room Operasional",
-              isWarRoom: true
-            }
-          ],
-          issues: [
-            {
-              badge: "URGENT / BLOCKER",
-              badgeClass: "bg-rose-100 text-rose-700 border-rose-200",
-              unit: "CHO Mobile",
-              ticket: "#CHO-890",
-              title: "Kendala charge MU pada paket bundling: Pelanggan sudah aktivasi bundling namun masih terpotong pulsa/MU dari digipos.",
-              pic: "Billing IT / Rian S.",
-              actionText: "Mitigasi Aktif",
-              actionClass: "bg-rose-50 text-rose-700 border-rose-200",
-              ticketId: '1',
-              serviceType: 'MOBILE'
-            },
-            {
-              badge: "DALAM INVESTIGASI",
-              badgeClass: "bg-amber-100 text-amber-800 border-amber-200",
-              unit: "CHO Mobile",
-              ticket: "#SMO-335",
-              title: "SMOOA – Tidak auto-renew & penambahan nomor member gagal pada klaster regional tertentu.",
-              pic: "Tim SMOOA / Maya D.",
-              actionText: "Verifikasi Log",
-              actionClass: "bg-amber-50 text-amber-800 border-amber-200",
-              ticketId: '2',
-              serviceType: 'MOBILE'
-            },
-            {
-              badge: "OPEN / REVIEW",
-              badgeClass: "bg-blue-100 text-blue-800 border-blue-200",
-              unit: "CHO Fixed",
-              ticket: "#FIX-112",
-              title: "Double Aktivasi Paket RoaMAX & Perhitungan Paket PDD: Sinkronisasi biling ONT Fixed.",
-              pic: "CHO Fixed Lead",
-              actionText: "Eskalasi Kolom J",
-              actionClass: "bg-blue-50 text-blue-800 border-blue-200",
-              ticketId: '4',
-              serviceType: 'MOBILE'
-            }
-          ],
-          quickwins: [
-            {
-              title: "Verifikasi charging bypass via digipos sandbox (CHO Mobile)",
-              status: "Selesai",
-              statusClass: "bg-emerald-100 text-emerald-800",
-              pic: "Oleh Tim Billing",
-              done: true
-            },
-            {
-              title: "Eskalasi tiket SMOOA ke pool IT & update status Kolom J",
-              status: "80%",
-              statusClass: "bg-blue-100 text-blue-800",
-              pic: "Estimasi 15 mnt",
-              done: false
-            },
-            {
-              title: "Sinkronisasi Master Spreadsheet Google Sheet (ID: 1bqisqkt4qfY...)",
-              status: "Antrean",
-              statusClass: "bg-slate-100 text-slate-700",
-              pic: "Auto-Sync 1 Jam",
-              done: false
-            }
-          ]
-        }
-      }
+      summary: { agendas: 0, issues: 0, quickwins: 0 },
+      items: {},
+      details: {}
     }
   };
 
