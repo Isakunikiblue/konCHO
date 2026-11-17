@@ -4203,7 +4203,7 @@
       ticketId: ticket.id,
       serviceType: ticket.serviceType,
       author: actor,
-      timestamp: new Date().toLocaleTimeString(),
+      timestamp: new Date().toISOString(),
       message: logMsg,
       newStatus: ticket.status
     };
@@ -4527,7 +4527,7 @@
                  .replace(/ditugaskan kepada Fasilitator/gi, 'diteruskan kepada Fasilitator')
                  .replace(/ditugaskan/gi, 'diteruskan');
         var author = tl.author || tl.user || 'PIC';
-        var timeStr = tl.timestamp || (tl.tanggal ? (typeof formatDisplayTime === 'function' ? formatDisplayTime(tl.tanggal) : tl.tanggal) : '');
+        var timeStr = typeof formatLogTimestamp === 'function' ? formatLogTimestamp(tl.timestamp || tl.tanggal) : (tl.timestamp || tl.tanggal || '');
         return '<div class="p-2.5 bg-white border border-slate-200 rounded-lg text-xs">' +
           '  <div class="flex items-center justify-between text-slate-500 font-semibold mb-0.5 text-[11px]"><span>' + escapeHtml(author) + '</span><span>' + escapeHtml(timeStr) + '</span></div>' +
           '  <p class="text-slate-800 leading-relaxed">' + escapeHtml(msg) + '</p>' +
@@ -4618,7 +4618,7 @@
                .replace(/ditugaskan kepada Fasilitator/gi, 'diteruskan kepada Fasilitator')
                .replace(/ditugaskan/gi, 'diteruskan');
       var author = l.author || l.user || 'CHO Staff';
-      var timeStr = formatDisplayTime(l.timestamp || l.tanggal);
+      var timeStr = typeof formatLogTimestamp === 'function' ? formatLogTimestamp(l.timestamp || l.tanggal) : formatDisplayTime(l.timestamp || l.tanggal);
 
       html += '<div class="log-timeline-item">';
       html += '<div class="log-item-header">';
@@ -5373,23 +5373,60 @@
       .replace(/'/g, '&#039;');
   }
 
-  function formatDisplayTime(dateString) {
-    if (!dateString) return '-';
-    var d = new Date(dateString);
-    if (isNaN(d.getTime())) return String(dateString);
+  function formatLogTimestamp(dateInput) {
+    if (!dateInput) return '-';
+    var str = String(dateInput).trim();
+    if (!str) return '-';
 
-    var now = new Date();
-    var isToday = d.toDateString() === now.toDateString();
+    var isPm = /\bPM\b/i.test(str);
+    var isAm = /\bAM\b/i.test(str);
 
-    var hours = String(d.getHours()).padStart(2, '0');
-    var mins = String(d.getMinutes()).padStart(2, '0');
-
-    if (isToday) {
-      return hours + ':' + mins + ' WIB (Hari ini)';
+    var d = null;
+    // Format "YYYY-MM-DD HH:mm:ss" -> ubah ke "YYYY-MM-DDTHH:mm:ss" agar konsisten di seluruh browser
+    var isoCandidate = str.replace(/(\d{4}-\d{2}-\d{2})\s+(\d{2}:\d{2}:\d{2})/, '$1T$2');
+    var parsed = new Date(isoCandidate);
+    if (!isNaN(parsed.getTime())) {
+      d = parsed;
+    } else {
+      var d2 = new Date(str);
+      if (!isNaN(d2.getTime())) d = d2;
     }
 
-    var months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
-    return d.getDate() + ' ' + months[d.getMonth()] + ', ' + hours + ':' + mins + ' WIB';
+    if (d) {
+      var y = d.getFullYear();
+      var day = String(d.getDate()).padStart(2, '0');
+      var hh = String(d.getHours()).padStart(2, '0');
+      var mm = String(d.getMinutes()).padStart(2, '0');
+      var ss = String(d.getSeconds()).padStart(2, '0');
+
+      var months = ['Jan', 'Feb', 'Mar', 'Apr', 'Mei', 'Jun', 'Jul', 'Agu', 'Sep', 'Okt', 'Nov', 'Des'];
+      var mName = months[d.getMonth()] || String(d.getMonth() + 1).padStart(2, '0');
+
+      // Standar 24-jam tanpa format AM/PM (WIB)
+      return day + ' ' + mName + ' ' + y + ', ' + hh + ':' + mm + ':' + ss + ' WIB';
+    }
+
+    // Jika string hanya memuat jam dengan AM/PM (misal: "02:41:02 PM")
+    if (isAm || isPm) {
+      var timeMatch = str.match(/(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?/i);
+      if (timeMatch) {
+        var h = parseInt(timeMatch[1], 10);
+        var min = timeMatch[2];
+        var sec = timeMatch[3] || '00';
+        var meridiem = (timeMatch[4] || (isPm ? 'PM' : 'AM')).toUpperCase();
+        if (meridiem === 'PM' && h < 12) h += 12;
+        if (meridiem === 'AM' && h === 12) h = 0;
+        var h24 = String(h).padStart(2, '0');
+        return h24 + ':' + min + ':' + sec + ' WIB';
+      }
+    }
+
+    return str.replace(/\s*(AM|PM)\b/gi, '').trim() + ' WIB';
+  }
+
+  function formatDisplayTime(dateString) {
+    if (!dateString) return '-';
+    return formatLogTimestamp(dateString);
   }
 
   /**
@@ -6781,7 +6818,7 @@
                    .replace(/ditugaskan kepada Fasilitator/gi, 'diteruskan kepada Fasilitator')
                    .replace(/ditugaskan/gi, 'diteruskan');
           const author = tl.author || tl.user || 'PIC';
-          const timeStr = tl.timestamp || (tl.tanggal ? (typeof formatDisplayTime === 'function' ? formatDisplayTime(tl.tanggal) : tl.tanggal) : '');
+          const timeStr = typeof formatLogTimestamp === 'function' ? formatLogTimestamp(tl.timestamp || tl.tanggal) : (tl.timestamp || tl.tanggal || '');
           return '<div class="p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px]">' +
             '  <div class="flex items-center justify-between text-slate-500 font-semibold mb-0.5"><span>' + escapeHtml(author) + '</span><span>' + escapeHtml(timeStr) + '</span></div>' +
             '  <p class="text-slate-800 leading-relaxed">' + escapeHtml(msg) + '</p>' +
