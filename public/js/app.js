@@ -2096,6 +2096,7 @@
     // 2. Refresh Button
     if (dom.btnRefresh) {
       dom.btnRefresh.addEventListener('click', function() {
+        showToast('Menyinkronkan data terbaru...', 'info');
         loadApplicationData(true);
       });
     }
@@ -2398,10 +2399,15 @@
         var dateB = new Date(b.terakhirUpdate || b.tanggalAgenda || b.tanggal || 0).getTime();
         return dateB - dateA;
       });
+      state.mobileRecords = state.records.filter(function(r) { return r.serviceType === 'MOBILE'; });
+      state.fixedRecords = state.records.filter(function(r) { return r.serviceType === 'FIXED'; });
+      state.ecareRecords = state.records.filter(function(r) { return r.serviceType === 'ECARE'; });
+      state.priorityRecords = state.records.filter(function(r) { return r.serviceType === 'PRIORITY'; });
+
       saveSharedRecords(state.records);
       if (typeof renderCalendarGrid === 'function') renderCalendarGrid();
-      if (typeof renderCalendarRightPanel === 'function' && state.selectedDate) {
-        renderCalendarRightPanel(state.selectedDate);
+      if (typeof renderCalendarRightPanel === 'function' && (state.selectedDate || state.selectedDay)) {
+        renderCalendarRightPanel(state.selectedDate || state.selectedDay);
       }
       if (typeof renderTasksTable === 'function') renderTasksTable();
       if (typeof updateTasksKpis === 'function') updateTasksKpis();
@@ -2443,7 +2449,7 @@
     _gasSyncTimer = setInterval(function() {
       if (document.hidden) return;
       silentlySyncFromCloud();
-    }, 12000);
+    }, 6000);
   }
 
   function silentlySyncFromCloud() {
@@ -2545,30 +2551,63 @@
     var ecare = (data.ecareRecords || []).map(function(r) { r.serviceType = 'ECARE'; return r; });
     var prio = (data.priorityRecords || []).map(function(r) { r.serviceType = 'PRIORITY'; return r; });
 
-    var all = mob.concat(fix).concat(ecare).concat(prio);
+    var allIncoming = mob.concat(fix).concat(ecare).concat(prio);
 
     // Hubungkan catatan in progress dan closed terbaru dari log komunikasi
-    all.forEach(function(ticket) {
+    allIncoming.forEach(function(ticket) {
       enrichTicketWithLogs(ticket, state.logs);
     });
 
     if (data.facilitatorRouting && Array.isArray(data.facilitatorRouting) && data.facilitatorRouting.length > 0) {
       saveStoredFacilitatorRouting(data.facilitatorRouting);
     }
-    state.records = all;
-    saveSharedRecords(state.records);
+
+    // Merge cerdas dengan state.records yang ada agar inputan lokal terbaru tidak tertimpa/hilang
+    var recordMap = new Map();
+    // 1. Masukkan tiket lokal yang sudah ada terlebih dahulu
+    if (Array.isArray(state.records)) {
+      state.records.forEach(function(r) {
+        if (r && r.id) recordMap.set(String(r.id), r);
+      });
+    }
+    // 2. Gabungkan/perbarui dengan data incoming dari live spreadsheet
+    allIncoming.forEach(function(r) {
+      if (r && r.id) {
+        var existing = recordMap.get(String(r.id));
+        recordMap.set(String(r.id), existing ? Object.assign({}, existing, r) : r);
+      }
+    });
+
+    state.records = Array.from(recordMap.values());
 
     // Urutkan tiket: yang terbaru di atas
     state.records.sort(function(a, b) {
-      var dateA = new Date(a.terakhirUpdate || a.tanggal || 0).getTime();
-      var dateB = new Date(b.terakhirUpdate || b.tanggal || 0).getTime();
+      var dateA = new Date(a.terakhirUpdate || a.tanggalAgenda || a.tanggal || 0).getTime();
+      var dateB = new Date(b.terakhirUpdate || b.tanggalAgenda || b.tanggal || 0).getTime();
       return dateB - dateA;
     });
+
+    // Perbarui state pool per unit
+    state.mobileRecords = state.records.filter(function(r) { return r.serviceType === 'MOBILE'; });
+    state.fixedRecords = state.records.filter(function(r) { return r.serviceType === 'FIXED'; });
+    state.ecareRecords = state.records.filter(function(r) { return r.serviceType === 'ECARE'; });
+    state.priorityRecords = state.records.filter(function(r) { return r.serviceType === 'PRIORITY'; });
+
+    saveSharedRecords(state.records);
 
     populateMonthDropdown();
     updateScopeLabel();
     updateKpiCounters();
     renderCaseList();
+
+    // KRUSIAL: Render Kalender dan Tasks Table seketika agar data langsung tampil di layar pengguna!
+    if (typeof renderCalendarGrid === 'function') renderCalendarGrid();
+    if (typeof renderTasksTable === 'function') renderTasksTable();
+    if (typeof updateTasksKpis === 'function') updateTasksKpis();
+    if (typeof renderCalendarRightPanel === 'function' && (state.selectedDate || state.selectedDay)) {
+      renderCalendarRightPanel(state.selectedDate || state.selectedDay);
+    }
+    if (typeof renderActivityFeed === 'function') renderActivityFeed();
 
     // Sinkronisasi data pengguna dari Google Sheet (Sheet Users)
     if (data.users && Array.isArray(data.users) && data.users.length > 0) {
@@ -5390,6 +5429,9 @@
           headers: { 'Content-Type': 'text/plain;charset=utf-8' },
           body: JSON.stringify({ action: 'submitNewData', data: payload })
         });
+        // Sinkronkan ulang data dari cloud secara bertahap untuk memastikan konsistensi antar-browser
+        setTimeout(function() { silentlySyncFromCloud(); }, 1200);
+        setTimeout(function() { silentlySyncFromCloud(); }, 3500);
       } catch (e) {
         console.warn('Sync POST error:', e);
       }
@@ -5480,6 +5522,66 @@
       priorityRecords: [],
       mobileRecords: [
         {
+          id: 'CHO-M-20261114-6719',
+          ticketId: 'CHO-M-20261114-6719',
+          serviceType: 'MOBILE',
+          bulan: 'Oktober 2026',
+          tanggal: '2026-10-15 00:00:00',
+          tanggalAgenda: '2026-10-15 00:00:00',
+          tanggalInput: '2026-10-15 00:00:00',
+          totalCaseIsu: 'sdsds',
+          caseTitle: 'sdsds',
+          issueDetails: 'tessss',
+          requestor: 'Administrator Utama',
+          inputBy: 'Administrator Utama',
+          status: 'InProgress',
+          urgency: 'Low',
+          progress: 'dwsds',
+          pic: 'Galih',
+          picFacilitator: 'Galih',
+          terakhirUpdate: '2026-10-15 00:00:00'
+        },
+        {
+          id: 'CHO-M-20261116-8746',
+          ticketId: 'CHO-M-20261116-8746',
+          serviceType: 'MOBILE',
+          bulan: 'Oktober 2026',
+          tanggal: '2026-10-15 00:00:00',
+          tanggalAgenda: '2026-10-15 00:00:00',
+          tanggalInput: '2026-10-15 00:00:00',
+          totalCaseIsu: 'okelah',
+          caseTitle: 'okelah',
+          issueDetails: 'okelah',
+          requestor: 'Administrator Utama',
+          inputBy: 'Administrator Utama',
+          status: 'Open',
+          urgency: 'Low',
+          progress: '',
+          pic: 'Galih',
+          picFacilitator: 'Galih',
+          terakhirUpdate: '2026-10-15 00:00:00'
+        },
+        {
+          id: 'CHO-M-20261116-2091',
+          ticketId: 'CHO-M-20261116-2091',
+          serviceType: 'MOBILE',
+          bulan: 'Oktober 2026',
+          tanggal: '2026-10-16 00:00:00',
+          tanggalAgenda: '2026-10-16 00:00:00',
+          tanggalInput: '2026-10-16 00:00:00',
+          totalCaseIsu: 'tes case 16 nov',
+          caseTitle: 'tes case 16 nov',
+          issueDetails: 'tes case 16 nov',
+          requestor: 'Administrator Utama',
+          inputBy: 'Administrator Utama',
+          status: 'Open',
+          urgency: 'Low',
+          progress: '',
+          pic: 'Galih',
+          picFacilitator: 'Galih',
+          terakhirUpdate: '2026-10-16 00:00:00'
+        },
+        {
           id: '1',
           totalCaseIsu: 'Kendala charge MU pada paket bundling',
           requestor: 'Dimas (B2B Care)',
@@ -5552,6 +5654,46 @@
           statusInformasi: 'Belum Ada Update'
         }      ],
       fixedRecords: [
+        {
+          id: 'CHO-F-20261117-8942',
+          ticketId: 'CHO-F-20261117-8942',
+          serviceType: 'FIXED',
+          bulan: 'Oktober 2026',
+          tanggal: '2026-10-18 00:00:00',
+          tanggalAgenda: '2026-10-18 00:00:00',
+          tanggalInput: '2026-10-18 00:00:00',
+          totalCaseIsu: 'test Case',
+          caseTitle: 'test Case',
+          issueDetails: 'test Case',
+          requestor: 'CHO Fixed CC Semarang',
+          inputBy: 'CHO Fixed CC Semarang',
+          status: 'Open',
+          urgency: 'High',
+          progress: '',
+          pic: 'Reza',
+          picFacilitator: 'Reza',
+          terakhirUpdate: '2026-10-18 00:00:00'
+        },
+        {
+          id: 'CHO-F-20261115-8592',
+          ticketId: 'CHO-F-20261115-8592',
+          serviceType: 'FIXED',
+          bulan: 'Oktober 2026',
+          tanggal: '2026-10-21 00:00:00',
+          tanggalAgenda: '2026-10-21 00:00:00',
+          tanggalInput: '2026-10-21 00:00:00',
+          totalCaseIsu: 'test keempat case',
+          caseTitle: 'test keempat case',
+          issueDetails: 'test keempat case',
+          requestor: 'Administrator Utama',
+          inputBy: 'Administrator Utama',
+          status: 'Open',
+          urgency: 'Low',
+          progress: '',
+          pic: 'Galih',
+          picFacilitator: 'Galih',
+          terakhirUpdate: '2026-10-21 00:00:00'
+        },
         {
           id: 'CHO-F-20261116-1867',
           ticketId: 'CHO-F-20261116-1867',
@@ -5722,9 +5864,23 @@
         8: [{ type: 'meeting', unit: 'mobile', text: 'Log Selena Akses' }],
         10: [{ type: 'meeting', unit: 'fixed', text: 'Audit Paket PDD' }],
         13: [{ type: 'issue', unit: 'fixed', text: 'Status ONT Fixed' }],
-        15: [{ type: 'issue', unit: 'mobile', text: 'Charge MU Bundling' }, { type: 'meeting', unit: 'billing', text: 'Evaluasi Digipos' }],
+        15: [
+          { type: 'issue', unit: 'mobile', text: 'sdsds', ticketId: 'CHO-M-20261114-6719', serviceType: 'MOBILE', urgency: 'Low', picFacilitator: 'Galih' },
+          { type: 'issue', unit: 'mobile', text: 'okelah', ticketId: 'CHO-M-20261116-8746', serviceType: 'MOBILE', urgency: 'Low', picFacilitator: 'Galih' },
+          { type: 'issue', unit: 'mobile', text: 'Charge MU Bundling' },
+          { type: 'meeting', unit: 'billing', text: 'Evaluasi Digipos' }
+        ],
+        16: [
+          { type: 'issue', unit: 'mobile', text: 'tes case 16 nov', ticketId: 'CHO-M-20261116-2091', serviceType: 'MOBILE', urgency: 'Low', picFacilitator: 'Galih' }
+        ],
         17: [{ type: 'meeting', unit: 'mobile', text: 'Update Spreadsheet' }],
+        18: [
+          { type: 'issue', unit: 'fixed', text: 'test Case', ticketId: 'CHO-F-20261117-8942', serviceType: 'FIXED', urgency: 'High', picFacilitator: 'Reza' }
+        ],
         20: [{ type: 'issue', unit: 'mobile', text: 'Validasi HVC Digipos' }],
+        21: [
+          { type: 'issue', unit: 'fixed', text: 'test keempat case', ticketId: 'CHO-F-20261115-8592', serviceType: 'FIXED', urgency: 'Low', picFacilitator: 'Galih' }
+        ],
         22: [{ type: 'meeting', unit: 'fixed', text: 'Eskalasi Kolom J' }],
         24: [
           { type: 'issue', unit: 'mobile', text: 'Charge MU Bundling', urgent: true, ticketId: '1' },
@@ -6231,26 +6387,7 @@
   }
 
   function getUnitDisplayLabel(item) {
-    // 1. Jika user yang sedang login adalah akun Inputer:
-    // Selalu tampilkan nama unit sesuai user login / site asal (misal: CHO Fixed CC Bandung)
-    if (state.authUser && state.authUser.role && state.authUser.role.toLowerCase() === 'inputer') {
-      var userSite = state.authUser.site || '';
-      if (!userSite && state.authUser.name && state.authUser.name.indexOf('CHO') >= 0) {
-        userSite = state.authUser.name;
-      }
-      if (!userSite) {
-        var cleanU = (state.authUser.username || state.authUser.name || '').replace(/^@+/, '').trim().toLowerCase();
-        var accounts = typeof getStoredUserAccounts === 'function' ? getStoredUserAccounts() : [];
-        var matched = accounts.find(function(a) {
-          return (a.username || '').replace(/^@+/, '').trim().toLowerCase() === cleanU;
-        });
-        if (matched && matched.site) userSite = matched.site;
-        else if (matched && matched.name && matched.name.indexOf('CHO') >= 0) userSite = matched.name;
-      }
-      if (userSite) return userSite;
-    }
-
-    // 2. Jika user adalah Administrator atau Facilitator, tampilkan unit spesifik dari requestor/inputer item
+    // 1. Tampilkan unit spesifik asal inputan berdasarkan Requestor / InputBy pada item tiket
     if (item) {
       var req = String(item.requestor || item.inputBy || '').trim();
       if (req && req.toUpperCase().indexOf('CHO') >= 0) {
@@ -6264,12 +6401,19 @@
       if (reqNorm.includes('ecare') || reqNorm.includes('e care') || reqNorm.includes('e-care')) return 'CHO eCare';
       if (reqNorm.includes('priority') && reqNorm.includes('semarang')) return 'CHO Priority Semarang';
       if (reqNorm.includes('priority') && reqNorm.includes('bandung')) return 'CHO Priority Bandung';
+      if (reqNorm.includes('fixed')) return 'CHO Fixed';
+      if (reqNorm.includes('mobile')) return 'CHO Mobile';
     }
 
-    // 3. Fallback ke label unit standar
+    // 2. Jika item dibuat oleh user yang sedang login dan belum memiliki requestor spesifik
+    if (state.authUser && state.authUser.site) {
+      return state.authUser.site;
+    }
+
+    // 3. Fallback default sesuai jenis serviceType
     var sType = (item && item.serviceType) ? item.serviceType : 'MOBILE';
     var uMeta = typeof getUnitMeta === 'function' ? getUnitMeta(sType) : { label: 'CHO Mobile' };
-    return uMeta.label || sType;
+    return (uMeta && uMeta.label) ? uMeta.label : (sType === 'FIXED' ? 'CHO Fixed' : (sType === 'ECARE' ? 'CHO eCare' : (sType === 'PRIORITY' ? 'CHO Priority' : 'CHO Mobile')));
   }
 
   function getCalendarStatusMeta(statusVal) {
