@@ -350,20 +350,17 @@
           <div id="calendar-day-drawer" class="fixed inset-0 overflow-hidden calendar-drawer-closed" role="dialog" aria-modal="true" aria-labelledby="panel-selected-date">
             <div id="calendar-drawer-backdrop" class="fixed inset-0 bg-slate-900/45 backdrop-blur-[2px] cursor-pointer"></div>
 
-            <div class="fixed inset-y-0 right-0 max-w-full flex pl-8 sm:pl-12 pointer-events-none">
-              <div id="right-detail-panel" class="pointer-events-auto w-screen max-w-[420px] bg-slate-50 shadow-2xl border-l border-slate-200 flex flex-col h-full">
+            <div class="fixed inset-y-0 right-0 max-w-full flex pl-6 sm:pl-10 pointer-events-none">
+              <div id="right-detail-panel" class="pointer-events-auto w-screen max-w-[485px] sm:max-w-[490px] bg-slate-50 shadow-2xl border-l border-slate-200 flex flex-col h-full">
                 
                 <!-- Drawer Sticky Header -->
                 <div class="bg-white p-4 border-b border-slate-200/90 flex flex-col gap-3 shrink-0 shadow-xs">
-                  <div class="flex items-start justify-between gap-2">
-                    <div class="min-w-0">
-                      <div class="flex items-center gap-2 flex-wrap">
+                  <div class="flex items-start justify-between gap-2.5">
+                    <div class="min-w-0 flex-1">
+                      <div class="flex items-center gap-2 flex-wrap mb-0.5">
                         <span class="text-[10px] font-bold text-slate-400 uppercase tracking-wider">Agenda &amp; Isu Tanggal</span>
-                        <span id="panel-agenda-badge" class="bg-blue-100 text-[#061345] text-[10px] font-bold px-2 py-0.5 rounded-full">
-                          2 Agenda
-                        </span>
                       </div>
-                      <h2 class="font-headline text-base sm:text-lg font-extrabold text-[#061345] tracking-tight mt-0.5 truncate" id="panel-selected-date">Sabtu, 24 Oktober 2026</h2>
+                      <h2 class="font-headline text-[14.5px] sm:text-[15.5px] font-extrabold text-[#061345] tracking-tight leading-snug" id="panel-selected-date">Sabtu, 24 Oktober 2026</h2>
                     </div>
                     <div class="flex items-center gap-2">
                       <button id="btn-drawer-add-case-same-day" type="button" class="py-1.5 px-3 rounded-lg bg-[#061345] hover:bg-[#1e295a] text-white text-[11px] font-bold shadow-xs flex items-center gap-1.5 transition-all cursor-pointer" title="Input Kasus Baru di Tanggal Ini">
