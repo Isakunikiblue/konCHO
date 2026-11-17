@@ -5548,6 +5548,17 @@ input:focus, select:focus, textarea:focus {
           </div>
         </div>
 
+        <!-- Alert Notifikasi Sesi Berakhir (Auto Logout 15 Menit) -->
+        <div id="loginIdleAlert" style="display: none; margin-bottom: 18px; padding: 12px 14px; border-radius: 12px; background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.4); color: #b45309; font-size: 12px; line-height: 1.45;">
+          <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; margin-bottom: 3px;">
+            <span style="font-size: 15px;">⚠️</span>
+            <span style="font-size: 12.5px; color: #92400e;">Sesi Berakhir Otomatis (15 Menit)</span>
+          </div>
+          <div style="font-size: 11.5px; color: #78350f;">
+            Anda telah logout secara otomatis karena tidak ada aktivitas selama 15 menit. Silakan masukkan kredensial Anda untuk login kembali.
+          </div>
+        </div>
+
         <!-- Form Login -->
         <form id="loginForm" class="login-form">
           <div class="form-group">
@@ -6530,13 +6541,15 @@ input:focus, select:focus, textarea:focus {
         <div class="modal-body" style="padding: 18px 22px; display: flex; flex-direction: column; gap: 14px;">
           
           <!-- Info Ringkas Tiket -->
-          <div class="modal-info-box blue-info-box" style="padding: 12px 14px; border-radius: 10px; background: rgba(59, 130, 246, 0.06); border: 1px solid rgba(59, 130, 246, 0.18);">
-            <div class="info-row" style="display: flex; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 5px;">
-              <span class="info-badge" id="inProgressBadgeService" style="font-size: 11px; font-weight: 700; padding: 2.5px 8px; border-radius: 4px;">MOBILE</span>
-              <span class="info-id" id="inProgressTicketId" style="font-size: 12px; font-weight: 700; color: #1e293b;">Kasus #1</span>
-              <span class="info-req" style="font-size: 12px; color: #64748b; margin-left: auto;">Requestor: <strong id="inProgressRequestor" style="color: #1e293b; font-weight: 700;">-</strong></span>
+          <div class="modal-info-box blue-info-box" style="display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; border-radius: 12px; background: rgba(59, 130, 246, 0.06); border: 1px solid rgba(59, 130, 246, 0.2); margin-bottom: 6px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%;">
+              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <span id="inProgressBadgeService" style="display: inline-flex; align-items: center; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 6px; letter-spacing: 0.3px;">CHO FIXED</span>
+                <span id="inProgressTicketId" style="font-family: monospace; font-size: 12px; font-weight: 700; color: #1e293b;">Case #1</span>
+              </div>
+              <span class="info-req" style="font-size: 11.5px; color: #64748b;">Requestor: <strong id="inProgressRequestor" style="color: #0f172a; font-weight: 700;">-</strong></span>
             </div>
-            <div class="info-issue" id="inProgressIssueText" style="font-size: 13px; font-weight: 700; color: #0f172a; line-height: 1.4;">-</div>
+            <div id="inProgressIssueText" style="font-size: 12.5px; font-weight: 600; color: #1e293b; line-height: 1.4;">-</div>
           </div>
 
           <!-- Form Inputs: Follow Up To ditaruh di atas, baru PIC abu-abu, baru Keterangan In Progress -->
@@ -6594,13 +6607,15 @@ input:focus, select:focus, textarea:focus {
         <div class="modal-body">
           
           <!-- Info Ringkas Tiket -->
-          <div class="modal-info-box green-info-box">
-            <div class="info-row">
-              <span class="info-badge" id="closedBadgeService">MOBILE</span>
-              <span class="info-id" id="closedTicketId">Kasus #1</span>
-              <span class="info-req">Requestor: <strong id="closedRequestor">-</strong></span>
+          <div class="modal-info-box green-info-box" style="display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; border-radius: 12px; background: rgba(16, 185, 129, 0.06); border: 1px solid rgba(16, 185, 129, 0.2); margin-bottom: 6px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%;">
+              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <span id="closedBadgeService" style="display: inline-flex; align-items: center; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 6px; letter-spacing: 0.3px;">CHO FIXED</span>
+                <span id="closedTicketId" style="font-family: monospace; font-size: 12px; font-weight: 700; color: #1e293b;">Kasus #1</span>
+              </div>
+              <span class="info-req" style="font-size: 11.5px; color: #64748b;">Requestor: <strong id="closedRequestor" style="color: #0f172a; font-weight: 700;">-</strong></span>
             </div>
-            <div class="info-issue" id="closedIssueText">-</div>
+            <div id="closedIssueText" style="font-size: 12.5px; font-weight: 600; color: #1e293b; line-height: 1.4;">-</div>
           </div>
 
           <!-- Form Inputs -->
@@ -9182,10 +9197,12 @@ input:focus, select:focus, textarea:focus {
     var passInp = document.getElementById('loginPassword');
     if (userInp) userInp.value = '';
     if (passInp) passInp.value = '';
+    checkIdleLogoutNotification();
   }
 
   function handleLoginSubmit(e) {
     if (e && e.preventDefault) e.preventDefault();
+    hideLoginIdleNotification();
     var userInp = document.getElementById('loginUsername');
     var passInp = document.getElementById('loginPassword');
     var btnSubmit = document.getElementById('btnLoginSubmit');
@@ -9328,6 +9345,31 @@ input:focus, select:focus, textarea:focus {
     }, 10000); // Evaluasi setiap 10 detik
   }
 
+  function showLoginIdleNotification() {
+    var alertEl = document.getElementById('loginIdleAlert');
+    if (alertEl) {
+      alertEl.style.display = 'block';
+    }
+  }
+
+  function hideLoginIdleNotification() {
+    try {
+      sessionStorage.removeItem('koncho_idle_logged_out');
+    } catch(e) {}
+    var alertEl = document.getElementById('loginIdleAlert');
+    if (alertEl) {
+      alertEl.style.display = 'none';
+    }
+  }
+
+  function checkIdleLogoutNotification() {
+    try {
+      if (sessionStorage.getItem('koncho_idle_logged_out') === '1') {
+        showLoginIdleNotification();
+      }
+    } catch(e) {}
+  }
+
   function performIdleAutoLogout() {
     // 1. Tutup seluruh modal jika ada yang sedang terbuka
     var activeModals = document.querySelectorAll('.modal-backdrop.active');
@@ -9335,17 +9377,21 @@ input:focus, select:focus, textarea:focus {
       m.classList.remove('active');
     });
 
-    // 2. Hapus sesi otentikasi
+    // 2. Tandai auto-logout 15 menit & hapus sesi otentikasi
     try {
       localStorage.removeItem('koncho_auth_user');
+      sessionStorage.setItem('koncho_idle_logged_out', '1');
     } catch(e) {}
     state.authUser = null;
 
     // 3. Tampilkan layar login
     showLoginScreen();
 
-    // 4. Berikan notifikasi toast informatif
-    showToast('Sesi Anda telah berakhir secara otomatis karena tidak ada aktivitas selama 15 menit. Silakan login kembali.', 'warning');
+    // 4. Tampilkan banner notifikasi 15 menit pada halaman login
+    showLoginIdleNotification();
+
+    // 5. Berikan notifikasi toast informatif
+    showToast('⚠️ Sesi Anda telah berakhir secara otomatis karena tidak ada aktivitas selama 15 menit. Silakan login kembali.', 'warning');
   }
 
   // =========================================================================
@@ -9761,6 +9807,7 @@ input:focus, select:focus, textarea:focus {
   }
 
   function handleLogout() {
+    hideLoginIdleNotification();
     localStorage.removeItem('koncho_auth_user');
     state.authUser = null;
     showLoginScreen();
@@ -9831,6 +9878,11 @@ input:focus, select:focus, textarea:focus {
     // 0. Otentikasi & Login Event Listeners
     var loginForm = document.getElementById('loginForm');
     if (loginForm) loginForm.addEventListener('submit', handleLoginSubmit);
+
+    var userInp = document.getElementById('loginUsername');
+    if (userInp) userInp.addEventListener('input', hideLoginIdleNotification);
+    var passInp = document.getElementById('loginPassword');
+    if (passInp) passInp.addEventListener('input', hideLoginIdleNotification);
 
     // Lamp Animation Interactive Toggle (Pull Cord & Lamp Head)
     var lampContainer = document.getElementById('lampContainer');
@@ -11313,9 +11365,36 @@ input:focus, select:focus, textarea:focus {
     if (submitBtnSpan) {
       submitBtnSpan.textContent = isUpdateOnly ? 'Simpan Catatan In Progress' : 'Simpan & Ubah ke In Progress';
     }
+    var sType = String(ticket.serviceType || 'FIXED').toUpperCase();
+    var srvLabel = 'CHO Fixed';
+    if (sType === 'MOBILE') srvLabel = 'CHO Mobile';
+    else if (sType === 'FIXED') srvLabel = 'CHO Fixed';
+    else if (sType === 'ECARE') srvLabel = 'CHO eCare';
+    else if (sType === 'PRIORITY') srvLabel = 'CHO Priority';
+    else srvLabel = 'CHO ' + sType;
+
     dom.inProgressTicketId.textContent = 'Case #' + ticket.id;
-    dom.inProgressBadgeService.textContent = ticket.serviceType;
-    dom.inProgressBadgeService.className = 'info-badge ' + (ticket.serviceType === 'MOBILE' ? 'badge-srv mobile' : (ticket.serviceType === 'ECARE' ? 'badge-srv ecare' : (ticket.serviceType === 'PRIORITY' ? 'badge-srv priority' : 'badge-srv fixed')));
+    if (dom.inProgressBadgeService) {
+      dom.inProgressBadgeService.textContent = srvLabel;
+      dom.inProgressBadgeService.className = 'info-badge font-bold text-[11px] tracking-wide uppercase px-2.5 py-1 rounded-md';
+      if (sType === 'MOBILE') {
+        dom.inProgressBadgeService.style.background = '#dbeafe';
+        dom.inProgressBadgeService.style.color = '#1e40af';
+        dom.inProgressBadgeService.style.border = '1px solid #bfdbfe';
+      } else if (sType === 'FIXED') {
+        dom.inProgressBadgeService.style.background = '#dcfce7';
+        dom.inProgressBadgeService.style.color = '#15803d';
+        dom.inProgressBadgeService.style.border = '1px solid #bbf7d0';
+      } else if (sType === 'ECARE') {
+        dom.inProgressBadgeService.style.background = '#f3e8ff';
+        dom.inProgressBadgeService.style.color = '#7e22ce';
+        dom.inProgressBadgeService.style.border = '1px solid #e9d5ff';
+      } else {
+        dom.inProgressBadgeService.style.background = '#fef3c7';
+        dom.inProgressBadgeService.style.color = '#b45309';
+        dom.inProgressBadgeService.style.border = '1px solid #fde68a';
+      }
+    }
     dom.inProgressRequestor.textContent = ticket.requestor || '-';
     dom.inProgressIssueText.textContent = ticket.totalCaseIsu || '-';
 
@@ -11477,9 +11556,36 @@ input:focus, select:focus, textarea:focus {
     state.currentActionTicket = ticket;
 
     dom.closedModalTitle.textContent = 'Selesaikan Kasus (Closed)';
+    var sType = String(ticket.serviceType || 'FIXED').toUpperCase();
+    var srvLabel = 'CHO Fixed';
+    if (sType === 'MOBILE') srvLabel = 'CHO Mobile';
+    else if (sType === 'FIXED') srvLabel = 'CHO Fixed';
+    else if (sType === 'ECARE') srvLabel = 'CHO eCare';
+    else if (sType === 'PRIORITY') srvLabel = 'CHO Priority';
+    else srvLabel = 'CHO ' + sType;
+
     dom.closedTicketId.textContent = 'Kasus #' + ticket.id;
-    dom.closedBadgeService.textContent = ticket.serviceType;
-    dom.closedBadgeService.className = 'info-badge ' + (ticket.serviceType === 'MOBILE' ? 'badge-srv mobile' : (ticket.serviceType === 'ECARE' ? 'badge-srv ecare' : (ticket.serviceType === 'PRIORITY' ? 'badge-srv priority' : 'badge-srv fixed')));
+    if (dom.closedBadgeService) {
+      dom.closedBadgeService.textContent = srvLabel;
+      dom.closedBadgeService.className = 'info-badge font-bold text-[11px] tracking-wide uppercase px-2.5 py-1 rounded-md';
+      if (sType === 'MOBILE') {
+        dom.closedBadgeService.style.background = '#dbeafe';
+        dom.closedBadgeService.style.color = '#1e40af';
+        dom.closedBadgeService.style.border = '1px solid #bfdbfe';
+      } else if (sType === 'FIXED') {
+        dom.closedBadgeService.style.background = '#dcfce7';
+        dom.closedBadgeService.style.color = '#15803d';
+        dom.closedBadgeService.style.border = '1px solid #bbf7d0';
+      } else if (sType === 'ECARE') {
+        dom.closedBadgeService.style.background = '#f3e8ff';
+        dom.closedBadgeService.style.color = '#7e22ce';
+        dom.closedBadgeService.style.border = '1px solid #e9d5ff';
+      } else {
+        dom.closedBadgeService.style.background = '#fef3c7';
+        dom.closedBadgeService.style.color = '#b45309';
+        dom.closedBadgeService.style.border = '1px solid #fde68a';
+      }
+    }
     dom.closedRequestor.textContent = ticket.requestor || '-';
     dom.closedIssueText.textContent = ticket.totalCaseIsu || '-';
 

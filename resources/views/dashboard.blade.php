@@ -56,6 +56,17 @@
           </div>
         </div>
 
+        <!-- Alert Notifikasi Sesi Berakhir (Auto Logout 15 Menit) -->
+        <div id="loginIdleAlert" style="display: none; margin-bottom: 18px; padding: 12px 14px; border-radius: 12px; background: rgba(245, 158, 11, 0.12); border: 1px solid rgba(245, 158, 11, 0.4); color: #b45309; font-size: 12px; line-height: 1.45;">
+          <div style="display: flex; align-items: center; gap: 8px; font-weight: 700; margin-bottom: 3px;">
+            <span style="font-size: 15px;">⚠️</span>
+            <span style="font-size: 12.5px; color: #92400e;">Sesi Berakhir Otomatis (15 Menit)</span>
+          </div>
+          <div style="font-size: 11.5px; color: #78350f;">
+            Anda telah logout secara otomatis karena tidak ada aktivitas selama 15 menit. Silakan masukkan kredensial Anda untuk login kembali.
+          </div>
+        </div>
+
         <!-- Form Login -->
         <form id="loginForm" class="login-form">
           <div class="form-group">
@@ -1038,13 +1049,15 @@
         <div class="modal-body" style="padding: 18px 22px; display: flex; flex-direction: column; gap: 14px;">
           
           <!-- Info Ringkas Tiket -->
-          <div class="modal-info-box blue-info-box" style="padding: 12px 14px; border-radius: 10px; background: rgba(59, 130, 246, 0.06); border: 1px solid rgba(59, 130, 246, 0.18);">
-            <div class="info-row" style="display: flex; align-items: center; gap: 8px; font-size: 12px; margin-bottom: 5px;">
-              <span class="info-badge" id="inProgressBadgeService" style="font-size: 11px; font-weight: 700; padding: 2.5px 8px; border-radius: 4px;">MOBILE</span>
-              <span class="info-id" id="inProgressTicketId" style="font-size: 12px; font-weight: 700; color: #1e293b;">Kasus #1</span>
-              <span class="info-req" style="font-size: 12px; color: #64748b; margin-left: auto;">Requestor: <strong id="inProgressRequestor" style="color: #1e293b; font-weight: 700;">-</strong></span>
+          <div class="modal-info-box blue-info-box" style="display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; border-radius: 12px; background: rgba(59, 130, 246, 0.06); border: 1px solid rgba(59, 130, 246, 0.2); margin-bottom: 6px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%;">
+              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <span id="inProgressBadgeService" style="display: inline-flex; align-items: center; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 6px; letter-spacing: 0.3px;">CHO FIXED</span>
+                <span id="inProgressTicketId" style="font-family: monospace; font-size: 12px; font-weight: 700; color: #1e293b;">Case #1</span>
+              </div>
+              <span class="info-req" style="font-size: 11.5px; color: #64748b;">Requestor: <strong id="inProgressRequestor" style="color: #0f172a; font-weight: 700;">-</strong></span>
             </div>
-            <div class="info-issue" id="inProgressIssueText" style="font-size: 13px; font-weight: 700; color: #0f172a; line-height: 1.4;">-</div>
+            <div id="inProgressIssueText" style="font-size: 12.5px; font-weight: 600; color: #1e293b; line-height: 1.4;">-</div>
           </div>
 
           <!-- Form Inputs: Follow Up To ditaruh di atas, baru PIC abu-abu, baru Keterangan In Progress -->
@@ -1102,13 +1115,15 @@
         <div class="modal-body">
           
           <!-- Info Ringkas Tiket -->
-          <div class="modal-info-box green-info-box">
-            <div class="info-row">
-              <span class="info-badge" id="closedBadgeService">MOBILE</span>
-              <span class="info-id" id="closedTicketId">Kasus #1</span>
-              <span class="info-req">Requestor: <strong id="closedRequestor">-</strong></span>
+          <div class="modal-info-box green-info-box" style="display: flex; flex-direction: column; gap: 8px; padding: 12px 14px; border-radius: 12px; background: rgba(16, 185, 129, 0.06); border: 1px solid rgba(16, 185, 129, 0.2); margin-bottom: 6px;">
+            <div style="display: flex; align-items: center; justify-content: space-between; gap: 10px; width: 100%;">
+              <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+                <span id="closedBadgeService" style="display: inline-flex; align-items: center; font-size: 11px; font-weight: 700; padding: 3px 10px; border-radius: 6px; letter-spacing: 0.3px;">CHO FIXED</span>
+                <span id="closedTicketId" style="font-family: monospace; font-size: 12px; font-weight: 700; color: #1e293b;">Kasus #1</span>
+              </div>
+              <span class="info-req" style="font-size: 11.5px; color: #64748b;">Requestor: <strong id="closedRequestor" style="color: #0f172a; font-weight: 700;">-</strong></span>
             </div>
-            <div class="info-issue" id="closedIssueText">-</div>
+            <div id="closedIssueText" style="font-size: 12.5px; font-weight: 600; color: #1e293b; line-height: 1.4;">-</div>
           </div>
 
           <!-- Form Inputs -->
