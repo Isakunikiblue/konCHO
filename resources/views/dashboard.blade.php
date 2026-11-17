@@ -941,7 +941,7 @@
               </div>
 
               <!-- Container Riwayat Lifecycle & Komunikasi -->
-              <div id="history-drawer-timeline" class="flex flex-col gap-3.5 min-h-[260px] max-h-[550px] overflow-y-auto">
+              <div id="history-drawer-timeline" class="flex-1 flex flex-col gap-3.5 min-h-[300px]">
                 <!-- Populated dynamically by openHistoryCaseModal() / openHistoryDrawer() -->
               </div>
 
