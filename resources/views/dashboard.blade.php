@@ -1787,7 +1787,7 @@
                   <th style="width: 45px; text-align: center;">No</th>
                   <th>Site / Unit Requestor</th>
                   <th>Layanan Sheet</th>
-                  <th style="width: 260px;">Fasilitator yang Ditugaskan (PIC Handling)</th>
+                  <th style="width: 260px;">Fasilitator yang Diteruskan (PIC Handling)</th>
                 </tr>
               </thead>
               <tbody id="routingTableBody">

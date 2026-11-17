@@ -7258,7 +7258,7 @@ input:focus, select:focus, textarea:focus {
                   <th style="width: 45px; text-align: center;">No</th>
                   <th>Site / Unit Requestor</th>
                   <th>Layanan Sheet</th>
-                  <th style="width: 260px;">Fasilitator yang Ditugaskan (PIC Handling)</th>
+                  <th style="width: 260px;">Fasilitator yang Diteruskan (PIC Handling)</th>
                 </tr>
               </thead>
               <tbody id="routingTableBody">
@@ -9243,6 +9243,27 @@ input:focus, select:focus, textarea:focus {
     }
     if (btnDownloadHead) {
       btnDownloadHead.style.display = isAdministrator ? 'inline-flex' : 'none';
+    }
+
+    // 7. Kontrol Tombol Simpan Catatan di Quick Win Drawer (Hanya Facilitator & Administrator)
+    var btnDrawerSave = document.getElementById('btn-drawer-save');
+    var isInputerOrViewer = (role.toLowerCase() === 'inputer' || role.toLowerCase() === 'viewer');
+    if (btnDrawerSave) {
+      if (isInputerOrViewer) {
+        btnDrawerSave.style.setProperty('display', 'none', 'important');
+        btnDrawerSave.classList.add('hidden');
+        btnDrawerSave.hidden = true;
+        if (btnDrawerSave.parentElement) {
+          btnDrawerSave.parentElement.style.setProperty('display', 'none', 'important');
+        }
+      } else {
+        btnDrawerSave.style.removeProperty('display');
+        btnDrawerSave.classList.remove('hidden');
+        btnDrawerSave.hidden = false;
+        if (btnDrawerSave.parentElement) {
+          btnDrawerSave.parentElement.style.removeProperty('display');
+        }
+      }
     }
   }
 
@@ -12376,9 +12397,15 @@ input:focus, select:focus, textarea:focus {
       html += '<div class="p-3.5 bg-slate-50 border border-slate-200 rounded-xl flex flex-col gap-2">';
       html += '  <span class="text-xs font-bold text-slate-600 uppercase tracking-wide">Catatan Log Riwayat:</span>';
       html += ticketLogs.map(function(tl) { 
+        var msg = tl.message || tl.keterangan || '-';
+        msg = msg.replace(/ditugaskan ke Fasilitator/gi, 'diteruskan ke Fasilitator')
+                 .replace(/ditugaskan kepada Fasilitator/gi, 'diteruskan kepada Fasilitator')
+                 .replace(/ditugaskan/gi, 'diteruskan');
+        var author = tl.author || tl.user || 'PIC';
+        var timeStr = tl.timestamp || (tl.tanggal ? (typeof formatDisplayTime === 'function' ? formatDisplayTime(tl.tanggal) : tl.tanggal) : '');
         return '<div class="p-2.5 bg-white border border-slate-200 rounded-lg text-xs">' +
-          '  <div class="flex items-center justify-between text-slate-500 font-semibold mb-0.5 text-[11px]"><span>' + escapeHtml(tl.author || 'PIC') + '</span><span>' + escapeHtml(tl.timestamp || '') + '</span></div>' +
-          '  <p class="text-slate-800 leading-relaxed">' + escapeHtml(tl.message || tl.keterangan || '-') + '</p>' +
+          '  <div class="flex items-center justify-between text-slate-500 font-semibold mb-0.5 text-[11px]"><span>' + escapeHtml(author) + '</span><span>' + escapeHtml(timeStr) + '</span></div>' +
+          '  <p class="text-slate-800 leading-relaxed">' + escapeHtml(msg) + '</p>' +
           '</div>';
       }).join('');
       html += '</div>';
@@ -12461,12 +12488,19 @@ input:focus, select:focus, textarea:focus {
         badgeHtml += '<span class="info-badge" style="color:var(--fixed-color);">Follow Up: ' + escapeHtml(l.followUpTo) + '</span>';
       }
 
+      var msg = l.message || l.keterangan || '-';
+      msg = msg.replace(/ditugaskan ke Fasilitator/gi, 'diteruskan ke Fasilitator')
+               .replace(/ditugaskan kepada Fasilitator/gi, 'diteruskan kepada Fasilitator')
+               .replace(/ditugaskan/gi, 'diteruskan');
+      var author = l.author || l.user || 'CHO Staff';
+      var timeStr = formatDisplayTime(l.timestamp || l.tanggal);
+
       html += '<div class="log-timeline-item">';
       html += '<div class="log-item-header">';
-      html += '<span class="log-item-author">👤 ' + escapeHtml(l.author || 'CHO Staff') + '</span>';
-      html += '<span class="log-item-time">' + formatDisplayTime(l.timestamp) + '</span>';
+      html += '<span class="log-item-author">👤 ' + escapeHtml(author) + '</span>';
+      html += '<span class="log-item-time">' + timeStr + '</span>';
       html += '</div>';
-      html += '<div class="log-item-msg">' + escapeHtml(l.message) + '</div>';
+      html += '<div class="log-item-msg">' + escapeHtml(msg) + '</div>';
       if (badgeHtml) {
         html += '<div class="log-item-badges">' + badgeHtml + '</div>';
       }
@@ -12685,7 +12719,7 @@ input:focus, select:focus, textarea:focus {
       });
       if (unread.length > 0) {
         setTimeout(function() {
-          showToast('🔔 Anda memiliki ' + unread.length + ' tugas kasus baru yang ditugaskan kepada Fasilitator: ' + (userRole === 'administrator' ? 'Tim CHO' : state.authUser.name) + '!', 'info');
+          showToast('🔔 Anda memiliki ' + unread.length + ' tugas kasus baru yang diteruskan kepada Fasilitator: ' + (userRole === 'administrator' ? 'Tim CHO' : state.authUser.name) + '!', 'info');
         }, 1200);
         unread.forEach(function(n) { n.read = true; });
         localStorage.setItem('koncho_facilitator_notifications', JSON.stringify(notifs));
@@ -13013,15 +13047,19 @@ input:focus, select:focus, textarea:focus {
 
     // Rekam log awal di state.logs
     if (!Array.isArray(state.logs)) state.logs = [];
+    var nowIso = new Date().toISOString();
+    var nowDisplay = typeof formatDisplayTime === 'function' ? formatDisplayTime(nowIso) : nowIso;
     state.logs.unshift({
       logId: 'LOG-' + dateCode + '-' + rndCode,
       ticketId: newTicketId,
       serviceType: selectedNewService,
       user: currentInputUser,
-      message: 'Laporan baru dibuat untuk Unit ' + targetUnitLabel + ' (Requestor: ' + req + ') ditugaskan ke Fasilitator: ' + assignedFacilitator,
+      author: currentInputUser,
+      message: 'Laporan baru dibuat untuk Unit ' + targetUnitLabel + ' (Requestor: ' + req + ') diteruskan ke Fasilitator: ' + assignedFacilitator,
       status: st,
       followUpTo: follow,
-      tanggal: new Date().toISOString()
+      tanggal: nowIso,
+      timestamp: nowDisplay
     });
 
     // 1. Masukkan ke state.records & pool masing-masing unit
@@ -13077,7 +13115,7 @@ input:focus, select:focus, textarea:focus {
     if (typeof renderCaseList === 'function') renderCaseList();
 
     // 6. Notifikasi seketika kepada pengguna & Fasilitator yang dituju
-    showToast('✨ Kasus #' + newTicketId + ' berhasil dibuat! Ditugaskan ke Fasilitator: ' + assignedFacilitator, 'success');
+    showToast('✨ Kasus #' + newTicketId + ' berhasil dibuat! Diteruskan ke Fasilitator: ' + assignedFacilitator, 'success');
 
     // Rekam notifikasi di antrean notifikasi fasilitator
     addFacilitatorNotification(newTicketId, assignedFacilitator, targetUnitLabel, issue);
@@ -13086,7 +13124,7 @@ input:focus, select:focus, textarea:focus {
     var authName = (state.authUser && (state.authUser.name || state.authUser.username) || '').toLowerCase();
     if (authName.includes(assignedFacilitator.toLowerCase())) {
       setTimeout(function() {
-        showToast('🔔 Notifikasi Fasilitator: Kasus #' + newTicketId + ' ditugaskan kepada Anda!', 'info');
+        showToast('🔔 Notifikasi Fasilitator: Kasus #' + newTicketId + ' diteruskan kepada Anda!', 'info');
       }, 700);
     }
 
@@ -14254,7 +14292,7 @@ input:focus, select:focus, textarea:focus {
           '  <p class="text-xs font-semibold text-slate-800 leading-relaxed">' + escapeHtml(iss.title) + '</p>' +
           '  <div class="flex items-center justify-between text-[11px] text-slate-500 pt-1 border-t border-slate-200/60 flex-wrap gap-1">' +
           '    <span class="truncate" title="Requestor">Requestor: <strong class="text-slate-700">' + escapeHtml((liveRec && (liveRec.requestor || liveRec.pic)) || iss.pic) + '</strong></span>' +
-          '    <span class="text-blue-700 font-semibold flex items-center gap-0.5" title="Fasilitator Ditugaskan"><span class="material-symbols-outlined text-[13px]">assignment_ind</span><span>' + escapeHtml(facName) + '</span></span>' +
+          '    <span class="text-blue-700 font-semibold flex items-center gap-0.5" title="Diteruskan ke Fasilitator: ' + escapeHtml(facName) + '"><span class="material-symbols-outlined text-[13px]">assignment_ind</span><span>' + escapeHtml(facName) + '</span></span>' +
           '  </div>' +
           pdfSectionHtml +
           '  <div class="flex flex-wrap items-center gap-2">' + pickupBtnHtml + rescheduleBtnHtml +
@@ -14723,6 +14761,37 @@ input:focus, select:focus, textarea:focus {
     if (fuEl) fuEl.textContent = ticket.followUpTo || '-';
     if (noteInput) noteInput.value = ticket.progress && ticket.progress !== 'Belum Ada Update' ? ticket.progress : '';
 
+    const currentRole = (state.authUser && state.authUser.role) ? state.authUser.role : 'Administrator';
+    const isInputerOrViewer = (currentRole.toLowerCase() === 'inputer' || currentRole.toLowerCase() === 'viewer');
+    const btnDrawerSave = document.getElementById('btn-drawer-save');
+    if (btnDrawerSave) {
+      if (isInputerOrViewer) {
+        btnDrawerSave.style.setProperty('display', 'none', 'important');
+        btnDrawerSave.classList.add('hidden');
+        btnDrawerSave.hidden = true;
+        if (btnDrawerSave.parentElement) {
+          btnDrawerSave.parentElement.style.setProperty('display', 'none', 'important');
+        }
+      } else {
+        btnDrawerSave.style.removeProperty('display');
+        btnDrawerSave.classList.remove('hidden');
+        btnDrawerSave.hidden = false;
+        if (btnDrawerSave.parentElement) {
+          btnDrawerSave.parentElement.style.removeProperty('display');
+        }
+      }
+    }
+    if (noteInput) {
+      noteInput.readOnly = isInputerOrViewer;
+      if (isInputerOrViewer) {
+        noteInput.classList.add('bg-slate-100', 'cursor-not-allowed');
+        noteInput.title = 'Quick Win hanya dapat diperbarui oleh Fasilitator & Administrator';
+      } else {
+        noteInput.classList.remove('bg-slate-100', 'cursor-not-allowed');
+        noteInput.title = '';
+      }
+    }
+
     const pickupActionsEl = document.getElementById('drawer-pickup-actions');
     if (pickupActionsEl) {
       const currentRole = (state.authUser && state.authUser.role) ? state.authUser.role : 'Administrator';
@@ -14759,12 +14828,18 @@ input:focus, select:focus, textarea:focus {
     if (timelineEl) {
       const ticketLogs = (state.logs || []).filter(l => String(l.ticketId) === String(ticket.id));
       if (ticketLogs.length > 0) {
-        timelineEl.innerHTML = ticketLogs.map(tl => 
-          '<div class="p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px]">' +
-          '  <div class="flex items-center justify-between text-slate-500 font-semibold mb-0.5"><span>' + escapeHtml(tl.author || 'PIC') + '</span><span>' + escapeHtml(tl.timestamp || '') + '</span></div>' +
-          '  <p class="text-slate-800">' + escapeHtml(tl.message || tl.keterangan || '-') + '</p>' +
-          '</div>'
-        ).join('');
+        timelineEl.innerHTML = ticketLogs.map(tl => {
+          let msg = tl.message || tl.keterangan || '-';
+          msg = msg.replace(/ditugaskan ke Fasilitator/gi, 'diteruskan ke Fasilitator')
+                   .replace(/ditugaskan kepada Fasilitator/gi, 'diteruskan kepada Fasilitator')
+                   .replace(/ditugaskan/gi, 'diteruskan');
+          const author = tl.author || tl.user || 'PIC';
+          const timeStr = tl.timestamp || (tl.tanggal ? (typeof formatDisplayTime === 'function' ? formatDisplayTime(tl.tanggal) : tl.tanggal) : '');
+          return '<div class="p-2.5 bg-slate-50 border border-slate-200 rounded-lg text-[11px]">' +
+            '  <div class="flex items-center justify-between text-slate-500 font-semibold mb-0.5"><span>' + escapeHtml(author) + '</span><span>' + escapeHtml(timeStr) + '</span></div>' +
+            '  <p class="text-slate-800 leading-relaxed">' + escapeHtml(msg) + '</p>' +
+            '</div>';
+        }).join('');
       } else {
         timelineEl.innerHTML = '<p class="text-slate-400 py-1 text-center">Belum ada riwayat koordinasi untuk tiket ini.</p>';
       }
@@ -15106,6 +15181,11 @@ input:focus, select:focus, textarea:focus {
     const btnDrawerSave = document.getElementById('btn-drawer-save');
     if (btnDrawerSave) {
       btnDrawerSave.addEventListener('click', () => {
+        const currentRole = (state.authUser && state.authUser.role) ? state.authUser.role : 'Administrator';
+        if (currentRole.toLowerCase() === 'inputer' || currentRole.toLowerCase() === 'viewer') {
+          showToast('Akun Inputer tidak memiliki akses untuk memperbarui Quick Win!', 'warning');
+          return;
+        }
         const note = document.getElementById('drawer-note-input').value.trim();
         if (state.activeDrawerTicket) {
           state.activeDrawerTicket.progress = note;
