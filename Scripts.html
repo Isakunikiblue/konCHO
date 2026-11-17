@@ -1405,7 +1405,11 @@
       showToast('Selamat Datang di konCHO! Masuk sebagai ' + role + ' (' + fullName + ')', 'success');
       showDashboardApp();
       renderCaseList();
+      if (typeof renderCalendarGrid === 'function') renderCalendarGrid();
+      if (typeof renderTasksTable === 'function') renderTasksTable();
+      if (typeof updateTasksKpis === 'function') updateTasksKpis();
       resetIdleTimer();
+      silentlySyncFromCloud();
 
       if (btnSubmit) {
         btnSubmit.innerHTML = '<span>Sign In</span> <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>';
@@ -1917,9 +1921,17 @@
   function init() {
     applyTheme(state.theme);
     initAuth();
+    // Muat cache lokal terlebih dahulu agar seketika muncul tanpa delay
+    var cached = getStoredSharedRecords();
+    if (cached && cached.length > 0) {
+      state.records = cached;
+      if (typeof renderCalendarGrid === 'function') renderCalendarGrid();
+      if (typeof renderTasksTable === 'function') renderTasksTable();
+    }
     bindEvents();
     initIdleAutoLogout();
     loadApplicationData();
+    startBackgroundCloudSync();
   }
 
   /**
@@ -2319,6 +2331,149 @@
     dom.activeScopeLabel.textContent = 'Unit: ' + srvText + ' • Periode: ' + monthText;
   }
 
+  // =========================================================================
+  // SISTEM SINKRONISASI REAL-TIME: CROSS-TAB, PERSISTENCE CACHE & AUTO-SYNC
+  // Memastikan inputan dari user manapun (Bandung, Semarang, Mobile, Fixed, eCare, Priority)
+  // langsung terlihat oleh seluruh user (Inputer, Fasilitator, Viewer, Admin) tanpa perlu refresh
+  // =========================================================================
+  const konchoSyncChannel = (typeof BroadcastChannel !== 'undefined') ? new BroadcastChannel('koncho_app_sync') : null;
+
+  function saveSharedRecords(records) {
+    try {
+      if (Array.isArray(records) && records.length > 0) {
+        localStorage.setItem('koncho_shared_records', JSON.stringify(records));
+        localStorage.setItem('koncho_shared_records_ts', Date.now().toString());
+      }
+    } catch(e) {}
+  }
+
+  function getStoredSharedRecords() {
+    try {
+      var raw = localStorage.getItem('koncho_shared_records');
+      if (raw) {
+        var parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length > 0) return parsed;
+      }
+    } catch(e) {}
+    return [];
+  }
+
+  function broadcastRecordUpdate(actionType, recordData) {
+    saveSharedRecords(state.records);
+    if (konchoSyncChannel) {
+      try {
+        konchoSyncChannel.postMessage({
+          type: actionType,
+          record: recordData,
+          records: state.records,
+          timestamp: Date.now()
+        });
+      } catch(e) {}
+    }
+  }
+
+  function mergeLiveRecords(incomingRecords) {
+    if (!Array.isArray(incomingRecords) || incomingRecords.length === 0) return;
+    if (!Array.isArray(state.records)) state.records = [];
+
+    var changed = false;
+    incomingRecords.forEach(function(rec) {
+      if (!rec || !rec.id) return;
+      var idx = state.records.findIndex(function(r) { return String(r.id) === String(rec.id); });
+      if (idx >= 0) {
+        var curr = state.records[idx];
+        var diff = curr.status !== rec.status || curr.progress !== rec.progress || curr.tanggalAgenda !== rec.tanggalAgenda;
+        if (diff) {
+          state.records[idx] = Object.assign({}, curr, rec);
+          changed = true;
+        }
+      } else {
+        state.records.unshift(rec);
+        changed = true;
+      }
+    });
+
+    if (changed) {
+      state.records.sort(function(a, b) {
+        var dateA = new Date(a.terakhirUpdate || a.tanggalAgenda || a.tanggal || 0).getTime();
+        var dateB = new Date(b.terakhirUpdate || b.tanggalAgenda || b.tanggal || 0).getTime();
+        return dateB - dateA;
+      });
+      saveSharedRecords(state.records);
+      if (typeof renderCalendarGrid === 'function') renderCalendarGrid();
+      if (typeof renderCalendarRightPanel === 'function' && state.selectedDate) {
+        renderCalendarRightPanel(state.selectedDate);
+      }
+      if (typeof renderTasksTable === 'function') renderTasksTable();
+      if (typeof updateTasksKpis === 'function') updateTasksKpis();
+      if (typeof updateKpiCounters === 'function') updateKpiCounters();
+      if (typeof renderActivityFeed === 'function') renderActivityFeed();
+      if (typeof renderCaseList === 'function') renderCaseList();
+    }
+  }
+
+  // Cross-Tab Listener: Tab lain seketika menangkap inputan kasus baru dari tab berbeda
+  if (konchoSyncChannel) {
+    konchoSyncChannel.onmessage = function(event) {
+      if (!event || !event.data) return;
+      var d = event.data;
+      if (d.records && Array.isArray(d.records) && d.records.length > 0) {
+        mergeLiveRecords(d.records);
+      } else if (d.record && d.record.id) {
+        mergeLiveRecords([d.record]);
+      }
+    };
+  }
+
+  // Fallback storage listener (window terpisah / mode berbeda)
+  window.addEventListener('storage', function(e) {
+    if (e.key === 'koncho_shared_records' && e.newValue) {
+      try {
+        var updated = JSON.parse(e.newValue);
+        if (Array.isArray(updated) && updated.length > 0) {
+          mergeLiveRecords(updated);
+        }
+      } catch(err) {}
+    }
+  });
+
+  // Background Cloud Sync dengan Google Apps Script (berjalan tiap 12 detik)
+  var _gasSyncTimer = null;
+  function startBackgroundCloudSync() {
+    if (_gasSyncTimer) clearInterval(_gasSyncTimer);
+    _gasSyncTimer = setInterval(function() {
+      if (document.hidden) return;
+      silentlySyncFromCloud();
+    }, 12000);
+  }
+
+  function silentlySyncFromCloud() {
+    if (!state.gasApiUrl) return;
+    fetch(state.gasApiUrl + '?action=getInitialData&_t=' + Date.now(), { method: 'GET', redirect: 'follow' })
+      .then(function(r) { return r.json(); })
+      .then(function(res) {
+        if (res && res.success) {
+          var mob = (res.mobileRecords || []).map(function(r) { r.serviceType = 'MOBILE'; return r; });
+          var fix = (res.fixedRecords || []).map(function(r) { r.serviceType = 'FIXED'; return r; });
+          var ecare = (res.ecareRecords || []).map(function(r) { r.serviceType = 'ECARE'; return r; });
+          var prio = (res.priorityRecords || []).map(function(r) { r.serviceType = 'PRIORITY'; return r; });
+          var allLive = mob.concat(fix).concat(ecare).concat(prio);
+          mergeLiveRecords(allLive);
+        }
+      })
+      .catch(function(e) {});
+  }
+
+  // Sinkronisasi otomatis saat user kembali ke tab/window
+  window.addEventListener('focus', function() {
+    silentlySyncFromCloud();
+  });
+  document.addEventListener('visibilitychange', function() {
+    if (!document.hidden) {
+      silentlySyncFromCloud();
+    }
+  });
+
   /**
    * Load Data dari Backend Google Apps Script (Langsung atau via Live REST API di Vercel)
    */
@@ -2402,6 +2557,7 @@
       saveStoredFacilitatorRouting(data.facilitatorRouting);
     }
     state.records = all;
+    saveSharedRecords(state.records);
 
     // Urutkan tiket: yang terbaru di atas
     state.records.sort(function(a, b) {
@@ -5113,6 +5269,8 @@
     // 1. Masukkan ke state.records & pool masing-masing unit
     if (!Array.isArray(state.records)) state.records = [];
     state.records.unshift(newRecord);
+    saveSharedRecords(state.records);
+    broadcastRecordUpdate('NEW_RECORD', newRecord);
 
     if (selectedNewService === 'MOBILE') {
       if (!state.mobileRecords) state.mobileRecords = [];
@@ -5396,6 +5554,84 @@
         }      ],
       fixedRecords: [
         {
+          id: 'CHO-F-20261116-1867',
+          ticketId: 'CHO-F-20261116-1867',
+          serviceType: 'FIXED',
+          bulan: 'November 2026',
+          tanggal: '2026-11-16 00:00:00',
+          tanggalAgenda: '2026-11-16 00:00:00',
+          tanggalInput: '2026-11-16 00:00:00',
+          totalCaseIsu: 'Order tidak complete',
+          caseTitle: 'Order tidak complete',
+          issueDetails: 'Order tidak complete',
+          requestor: 'CHO Fixed CC Bandung',
+          inputBy: 'CHO Fixed CC Bandung',
+          status: 'Open',
+          urgency: 'Low',
+          progress: 'Esc ke IT',
+          pic: 'Galih',
+          picFacilitator: 'Galih',
+          terakhirUpdate: '2026-11-16 00:00:00'
+        },
+        {
+          id: 'CHO-F-20261116-8911',
+          ticketId: 'CHO-F-20261116-8911',
+          serviceType: 'FIXED',
+          bulan: 'November 2026',
+          tanggal: '2026-11-16 00:00:00',
+          tanggalAgenda: '2026-11-16 00:00:00',
+          tanggalInput: '2026-11-16 00:00:00',
+          totalCaseIsu: 'SMOOA tidak diperpanjang',
+          caseTitle: 'SMOOA tidak diperpanjang',
+          issueDetails: 'SMOOA tidak diperpanjang',
+          requestor: 'CHO Fixed CC Bandung',
+          inputBy: 'CHO Fixed CC Bandung',
+          status: 'Open',
+          urgency: 'Low',
+          pic: 'Galih',
+          picFacilitator: 'Galih',
+          terakhirUpdate: '2026-11-16 00:00:00'
+        },
+        {
+          id: 'CHO-F-20261116-2484',
+          ticketId: 'CHO-F-20261116-2484',
+          serviceType: 'FIXED',
+          bulan: 'November 2026',
+          tanggal: '2026-11-16 00:00:00',
+          tanggalAgenda: '2026-11-16 00:00:00',
+          tanggalInput: '2026-11-16 00:00:00',
+          totalCaseIsu: 'Benefit tidak didapatkan',
+          caseTitle: 'Benefit tidak didapatkan',
+          issueDetails: 'Benefit tidak didapatkan',
+          requestor: 'CHO Fixed CC Semarang',
+          inputBy: 'CHO Fixed CC Semarang',
+          status: 'Open',
+          urgency: 'Low',
+          pic: 'Reza',
+          picFacilitator: 'Reza',
+          terakhirUpdate: '2026-11-16 00:00:00'
+        },
+        {
+          id: 'CHO-F-20261117-8218',
+          ticketId: 'CHO-F-20261117-8218',
+          serviceType: 'FIXED',
+          bulan: 'November 2026',
+          tanggal: '2026-11-17 00:00:00',
+          tanggalAgenda: '2026-11-17 00:00:00',
+          tanggalInput: '2026-11-17 00:00:00',
+          totalCaseIsu: 'tes case menggunakan user input bdg',
+          caseTitle: 'tes case menggunakan user input bdg',
+          issueDetails: 'issue details tes case menggunakan user input bdg',
+          requestor: 'CHO Fixed CC Bandung',
+          inputBy: 'CHO Fixed CC Bandung',
+          status: 'Open',
+          urgency: 'Low',
+          progress: 'quick win tes case menggunakan user input bdg',
+          pic: 'Galih',
+          picFacilitator: 'Galih',
+          terakhirUpdate: '2026-11-17 00:00:00'
+        },
+        {
           id: '1',
           totalCaseIsu: 'Perhitungan Paket PDD (Juli 2026)',
           requestor: 'Customer Care',
@@ -5452,6 +5688,26 @@
 
   // Calendar default dataset
   const DEFAULT_CALENDAR_DATA = {
+    'november-2026': {
+      title: "November 2026",
+      badge: "Cycle CHO • Nov 2026",
+      startDayIndex: 6, // 1 Nov 2026 = Minggu (0: Sen .. 6: Min)
+      totalDays: 30,
+      prevMonthSpill: [26, 27, 28, 29, 30, 31],
+      nextMonthSpill: [1, 2, 3, 4, 5, 6],
+      summary: { agendas: 4, issues: 4, quickwins: 1 },
+      items: {
+        16: [
+          { type: 'issue', unit: 'fixed', text: 'Order tidak complete', ticketId: 'CHO-F-20261116-1867', serviceType: 'FIXED', urgency: 'Low', picFacilitator: 'Galih' },
+          { type: 'issue', unit: 'fixed', text: 'SMOOA tidak diperpanjang', ticketId: 'CHO-F-20261116-8911', serviceType: 'FIXED', urgency: 'Low', picFacilitator: 'Galih' },
+          { type: 'issue', unit: 'fixed', text: 'Benefit tidak didapatkan', ticketId: 'CHO-F-20261116-2484', serviceType: 'FIXED', urgency: 'Low', picFacilitator: 'Reza' }
+        ],
+        17: [
+          { type: 'issue', unit: 'fixed', text: 'tes case menggunakan user input bdg', ticketId: 'CHO-F-20261117-8218', serviceType: 'FIXED', urgency: 'Low', picFacilitator: 'Galih' }
+        ]
+      },
+      details: {}
+    },
     'oktober-2026': {
       title: "Oktober 2026",
       badge: "Cycle CHO • Okt 2026",
@@ -5652,7 +5908,7 @@
         if (!rec) return;
         const recMonthStr = (rec.bulan || '').trim().toLowerCase();
         const expectedMonthStr = title.toLowerCase();
-        const recParts = parseDateParts(rec.tanggal || rec.terakhirUpdate);
+        const recParts = parseDateParts(rec.tanggalAgenda || rec.tanggalInput || rec.tanggal || rec.terakhirUpdate);
         let matchesMonth = false;
         let recDay = null;
 
