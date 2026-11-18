@@ -5445,6 +5445,7 @@
 
     // 3. Pastikan filter Tasks tidak menyembunyikan kasus baru
     state.tasksFilterPeriod = 'all';
+  state.tasksFilterInbox = 'all';
     var periodFilterEl = document.getElementById('select-period-filter');
     if (periodFilterEl) periodFilterEl.value = 'all';
 
@@ -6546,6 +6547,54 @@
     }
   }
 
+  function updateInboxFilterStyle() {
+    const el = document.getElementById('select-inbox-filter');
+    if (!el) return;
+    if (state.tasksFilterInbox && state.tasksFilterInbox !== 'all') {
+      el.classList.add('bg-blue-50', 'border-blue-300', 'text-blue-900', 'font-bold');
+      el.classList.remove('bg-slate-50', 'border-slate-200', 'text-slate-700');
+    } else {
+      el.classList.remove('bg-blue-50', 'border-blue-300', 'text-blue-900', 'font-bold');
+      el.classList.add('bg-slate-50', 'border-slate-200', 'text-slate-700');
+    }
+  }
+
+  function updateInboxFilterOptions() {
+    const el = document.getElementById('select-inbox-filter');
+    if (!el) return;
+
+    const user = state.authUser;
+    const currentVal = state.tasksFilterInbox || el.value || 'all';
+    const role = user ? String(user.role || '').toLowerCase() : '';
+    const userName = user ? (user.name || 'Fasilitator') : 'Saya';
+
+    const targetTag = role + ':' + userName;
+    if (el.getAttribute('data-rendered-for') === targetTag) {
+      if (el.value !== currentVal) el.value = currentVal;
+      return;
+    }
+
+    let html = '<option value="all">Semua Kasus (All)</option>';
+    if (role === 'inputer') {
+      html += '<option value="inbox">⭐ Inputan Saya' + (userName ? ' (' + escapeHtml(userName) + ')' : '') + '</option>';
+    } else {
+      html += '<option value="inbox">⭐ Inbox Saya' + (role === 'facilitator' ? ' (' + escapeHtml(userName) + ')' : '') + '</option>';
+    }
+
+    if (role === 'administrator') {
+      html += '<optgroup label="Filter per Fasilitator">';
+      const facs = ['Galih', 'Reza', 'Ajun', 'Yurina', 'Kenny'];
+      facs.forEach(f => {
+        html += '<option value="fac:' + f + '">Inbox ' + f + '</option>';
+      });
+      html += '</optgroup>';
+    }
+
+    el.innerHTML = html;
+    el.setAttribute('data-rendered-for', targetTag);
+    el.value = currentVal;
+  }
+
   function renderTasksTable() {
     const tbody = document.getElementById('task-table-body');
     if (!tbody) return;
@@ -6562,6 +6611,30 @@
     }
     if (state.tasksFilterPeriod && state.tasksFilterPeriod !== 'all') {
       visible = visible.filter(r => (r.bulan || '').includes(state.tasksFilterPeriod));
+    }
+    if (typeof updateInboxFilterOptions === 'function') updateInboxFilterOptions();
+    if (typeof updateInboxFilterStyle === 'function') updateInboxFilterStyle();
+
+    if (state.tasksFilterInbox && state.tasksFilterInbox !== 'all') {
+      const currentRole = (state.authUser && state.authUser.role) ? state.authUser.role : 'Administrator';
+      if (state.tasksFilterInbox === 'inbox') {
+        if (currentRole === 'Inputer') {
+          const uName = (state.authUser && state.authUser.name || '').toLowerCase();
+          visible = visible.filter(r => {
+            const req = (r.requestor || '').toLowerCase();
+            const inp = (r.inputBy || '').toLowerCase();
+            return (uName && (req.includes(uName) || inp.includes(uName)));
+          });
+        } else {
+          visible = visible.filter(r => isTaskAssignedToCurrentFacilitator(r));
+        }
+      } else if (state.tasksFilterInbox.startsWith('fac:')) {
+        const targetFac = state.tasksFilterInbox.substring(4).toLowerCase();
+        visible = visible.filter(r => {
+          const tf = (r.picFacilitator || getFacilitatorForRequestor(r.requestor) || '').toLowerCase();
+          return tf.includes(targetFac) || targetFac.includes(tf);
+        });
+      }
     }
     if (state.searchQuery) {
       const q = state.searchQuery.toLowerCase();
@@ -7367,6 +7440,15 @@
       });
     });
 
+    const inboxFilter = document.getElementById('select-inbox-filter');
+    if (inboxFilter) {
+      inboxFilter.addEventListener('change', (e) => {
+        state.tasksFilterInbox = e.target.value;
+        if (typeof updateInboxFilterStyle === 'function') updateInboxFilterStyle();
+        renderTasksTable();
+      });
+    }
+
     const statusFilter = document.getElementById('select-status-filter');
     if (statusFilter) {
       statusFilter.addEventListener('change', (e) => {
@@ -7389,10 +7471,13 @@
         state.tasksFilterUnit = 'all';
         state.tasksFilterStatus = 'all';
         state.tasksFilterPeriod = 'all';
+        state.tasksFilterInbox = 'all';
         state.searchQuery = '';
         if (taskSearch) taskSearch.value = '';
+        if (inboxFilter) inboxFilter.value = 'all';
         if (statusFilter) statusFilter.value = 'all';
         if (periodFilter) periodFilter.value = 'all';
+        if (typeof updateInboxFilterStyle === 'function') updateInboxFilterStyle();
         if (calUnitFilter) calUnitFilter.value = 'all';
         unitBtns.forEach((b, i) => {
           if (i === 0) {

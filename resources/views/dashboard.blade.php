@@ -606,6 +606,11 @@
 
             <!-- Right: Status Dropdown, Period Dropdown & Reset -->
             <div class="flex flex-wrap items-center gap-2.5">
+              <select id="select-inbox-filter" class="h-9 pl-3 pr-8 bg-slate-50 border border-slate-200 text-slate-700 text-xs font-semibold rounded-lg focus:outline-none focus:ring-2 focus:ring-[#061345] cursor-pointer appearance-none" title="Filter tampilan kasus: Semua Kasus atau khusus Inbox Saya">
+                <option value="all">Semua Kasus (All)</option>
+                <option value="inbox">⭐ Inbox Saya</option>
+              </select>
+
               <select id="select-status-filter" class="h-9 pl-3 pr-8 bg-slate-50 border border-slate-200 text-slate-700 text-xs font-medium rounded-lg focus:outline-none focus:ring-2 focus:ring-[#061345] cursor-pointer appearance-none">
                 <option value="all">Semua Status</option>
                 <option value="Open">Open</option>
