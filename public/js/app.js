@@ -316,6 +316,30 @@
     return 'Galih';
   }
 
+  function isTaskAssignedToCurrentFacilitator(ticket) {
+    if (!ticket) return false;
+    var user = state.authUser;
+    if (!user) return true;
+    var role = String(user.role || '').trim().toLowerCase();
+    // Non-facilitator roles (misal Administrator) berwenang memproses semua kasus
+    if (role !== 'facilitator') return true;
+
+    var taskFac = ticket.picFacilitator || getFacilitatorForRequestor(ticket.requestor);
+    var userName = String(user.name || '').toLowerCase().trim();
+    var facNorm = String(taskFac || '').toLowerCase().trim();
+    var userSite = String(user.site || '').toLowerCase().trim();
+    var req = String(ticket.requestor || '').toLowerCase().trim();
+
+    if (facNorm && userName && (facNorm.indexOf(userName) >= 0 || userName.indexOf(facNorm) >= 0)) {
+      return true;
+    }
+    if (userSite && userSite !== 'semua unit' && req && (req.indexOf(userSite) >= 0 || userSite.indexOf(req) >= 0)) {
+      return true;
+    }
+    return false;
+  }
+  window.isTaskAssignedToCurrentFacilitator = isTaskAssignedToCurrentFacilitator;
+
   function getUrgencyBadgeHtml(urgency) {
     var u = String(urgency || 'Middle').trim().toLowerCase();
     if (u === 'high' || u === 'tinggi') {
@@ -3369,6 +3393,12 @@
     }) || state.records.find(function(r) { return String(r.id) === String(ticketId); });
     if (!ticket) return;
 
+    if (state.authUser && state.authUser.role === 'Facilitator' && !isTaskAssignedToCurrentFacilitator(ticket)) {
+      var facTarget = ticket.picFacilitator || getFacilitatorForRequestor(ticket.requestor);
+      showToast('Akses ditolak: Kasus ini ditugaskan ke Fasilitator ' + (facTarget || 'lain') + '.', 'warning');
+      return;
+    }
+
     state.currentActionTicket = ticket;
 
         state.currentActionIsUpdate = !!isUpdateOnly;
@@ -3564,6 +3594,12 @@
       return String(r.id) === String(ticketId) && (!serviceType || r.serviceType === serviceType);
     }) || state.records.find(function(r) { return String(r.id) === String(ticketId); });
     if (!ticket) return;
+
+    if (state.authUser && state.authUser.role === 'Facilitator' && !isTaskAssignedToCurrentFacilitator(ticket)) {
+      var facTarget = ticket.picFacilitator || getFacilitatorForRequestor(ticket.requestor);
+      showToast('Akses ditolak: Kasus ini ditugaskan ke Fasilitator ' + (facTarget || 'lain') + '.', 'warning');
+      return;
+    }
 
     state.currentActionTicket = ticket;
 
@@ -4186,6 +4222,12 @@
       return String(r.id) === String(ticketId) && (!serviceType || r.serviceType === serviceType);
     }) || (state.records || []).find(function(r) { return String(r.id) === String(ticketId); });
     if (!ticket) return;
+
+    if (state.authUser && state.authUser.role === 'Facilitator' && !isTaskAssignedToCurrentFacilitator(ticket)) {
+      var facTarget = ticket.picFacilitator || getFacilitatorForRequestor(ticket.requestor);
+      showToast('Akses ditolak: Kasus ini ditugaskan ke Fasilitator ' + (facTarget || 'lain') + '.', 'warning');
+      return;
+    }
 
     state.currentRescheduleTicket = ticket;
 
@@ -6398,14 +6440,27 @@
           const liveRec = (state.records || []).find(r => String(r.id) === String(iss.ticketId) && r.serviceType === sType);
           const stNorm = ((liveRec && liveRec.status) || iss.statusNorm || (iss.badge.includes('INVESTIGASI') ? 'inprogress' : 'open')).toLowerCase().replace(/\s+/g, '');
 
+          const facName = (liveRec && liveRec.picFacilitator) || iss.picFacilitator || getFacilitatorForRequestor((liveRec && (liveRec.requestor || liveRec.pic)) || iss.requestor || iss.pic);
+          const isMyCalTask = isTaskAssignedToCurrentFacilitator(liveRec || iss);
+          const canCalAction = isAdminRole || (currentRole === 'Facilitator' && isMyCalTask);
+
           let pickupBtnHtml = '';
           let rescheduleBtnHtml = '';
           if (canPickup && iss.ticketId) {
-            rescheduleBtnHtml = '<button type="button" class="py-2.5 px-3 rounded-xl text-xs font-bold border border-blue-200 bg-blue-50/90 hover:bg-blue-100 text-blue-700 shadow-xs flex items-center justify-center gap-1 transition-all cursor-pointer" onclick="openRescheduleModal(\'' + iss.ticketId + '\', \'' + sType + '\')" title="Ubah tanggal agenda kasus ini"><span>📅</span><span>Ubah Tanggal</span></button>';
-            if (stNorm === 'inprogress') {
-              pickupBtnHtml = '<button type="button" class="flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-[13px] font-extrabold tracking-wide bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm flex items-center justify-center gap-1.5 transition-all cursor-pointer" onclick="openClosedModal(\'' + iss.ticketId + '\', \'' + sType + '\')"><span>✅</span><span>Selesaikan (Closed)</span></button>';
-            } else if (stNorm !== 'closed') {
-              pickupBtnHtml = '<button type="button" class="flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-[13px] font-extrabold tracking-wide bg-[#061345] hover:bg-[#1e295a] text-white shadow-sm flex items-center justify-center gap-1.5 transition-all cursor-pointer" onclick="openInProgressModal(\'' + iss.ticketId + '\', false, \'' + sType + '\')"><span>🚀</span><span>Pickup Case</span></button>';
+            if (canCalAction) {
+              rescheduleBtnHtml = '<button type="button" class="py-2.5 px-3 rounded-xl text-xs font-bold border border-blue-200 bg-blue-50/90 hover:bg-blue-100 text-blue-700 shadow-xs flex items-center justify-center gap-1 transition-all cursor-pointer" onclick="openRescheduleModal(\'' + iss.ticketId + '\', \'' + sType + '\')" title="Ubah tanggal agenda kasus ini"><span>📅</span><span>Ubah Tanggal</span></button>';
+              if (stNorm === 'inprogress') {
+                pickupBtnHtml = '<button type="button" class="flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-[13px] font-extrabold tracking-wide bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm flex items-center justify-center gap-1.5 transition-all cursor-pointer" onclick="openClosedModal(\'' + iss.ticketId + '\', \'' + sType + '\')"><span>✅</span><span>Selesaikan (Closed)</span></button>';
+              } else if (stNorm !== 'closed') {
+                pickupBtnHtml = '<button type="button" class="flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-[13px] font-extrabold tracking-wide bg-[#061345] hover:bg-[#1e295a] text-white shadow-sm flex items-center justify-center gap-1.5 transition-all cursor-pointer" onclick="openInProgressModal(\'' + iss.ticketId + '\', false, \'' + sType + '\')"><span>🚀</span><span>Pickup Case</span></button>';
+              }
+            } else {
+              rescheduleBtnHtml = '<button type="button" disabled class="py-2.5 px-3 rounded-xl text-xs font-bold border border-slate-300 bg-slate-200 text-slate-400 cursor-not-allowed opacity-75 flex items-center justify-center gap-1 shadow-none" title="Kasus ditugaskan ke Fasilitator ' + escapeHtml(facName) + '"><span>📅</span><span>Ubah Tanggal</span></button>';
+              if (stNorm === 'inprogress') {
+                pickupBtnHtml = '<button type="button" disabled class="flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-[13px] font-bold tracking-wide bg-slate-200 text-slate-400 border border-slate-300 cursor-not-allowed opacity-75 flex items-center justify-center gap-1.5 shadow-none" title="Kasus ditugaskan ke Fasilitator ' + escapeHtml(facName) + '"><span>✅</span><span>Selesaikan (Closed)</span></button>';
+              } else if (stNorm !== 'closed') {
+                pickupBtnHtml = '<button type="button" disabled class="flex-1 py-2.5 px-4 rounded-xl text-xs sm:text-[13px] font-bold tracking-wide bg-slate-200 text-slate-400 border border-slate-300 cursor-not-allowed opacity-75 flex items-center justify-center gap-1.5 shadow-none" title="Kasus ditugaskan ke Fasilitator ' + escapeHtml(facName) + '"><span>🚀</span><span>Pickup Case</span></button>';
+              }
             }
           }
 
@@ -6417,7 +6472,6 @@
 
           const urg = (liveRec && liveRec.urgency) || iss.urgency || 'Middle';
           const urgBadge = getUrgencyBadgeHtml(urg);
-          const facName = (liveRec && liveRec.picFacilitator) || iss.picFacilitator || getFacilitatorForRequestor((liveRec && (liveRec.requestor || liveRec.pic)) || iss.requestor || iss.pic);
 
           // PDF attachment section spesifik per masing-masing inputan case
           const casePdf = getCasePptAttachment(sType, iss.ticketId);
@@ -6541,20 +6595,48 @@
       const unitDisplay = getUnitDisplayLabel(item);
       const unitBadge = '<span class="px-2.5 py-1 rounded text-[10.5px] font-bold whitespace-nowrap inline-flex items-center justify-center ' + uMeta.badgeClass + '">' + escapeHtml(unitDisplay) + '</span>';
 
+      const taskUrgency = item.urgency || 'Middle';
+      const taskUrgencyBadge = getUrgencyBadgeHtml(taskUrgency);
+      const taskFacilitator = item.picFacilitator || getFacilitatorForRequestor(item.requestor);
+      const isMyTask = currentRole === 'Facilitator' && isTaskAssignedToCurrentFacilitator(item);
+      const canAction = isAdminRole || (currentRole === 'Facilitator' && isMyTask);
+
       const rawStatus = (item.status || 'Open').toLowerCase().replace(/\s+/g, '');
       let statusPill = '';
       if (rawStatus === 'inprogress') {
-        statusPill = '<div class="flex flex-wrap items-center gap-1.5">' +
-          '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800 cursor-pointer hover:bg-blue-200" onclick="openInProgressModal(\'' + item.id + '\', true, \'' + sType + '\')"><span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>In Progress</span>' +
-          (canPickup ? '<button type="button" class="px-3.5 py-1.5 rounded-lg text-xs font-extrabold tracking-wide bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition-colors cursor-pointer" onclick="openClosedModal(\'' + item.id + '\', \'' + sType + '\')">✅ Closed</button>' : '') +
-          '</div>';
+        if (canPickup) {
+          if (canAction) {
+            statusPill = '<div class="flex flex-wrap items-center gap-1.5">' +
+              '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800 cursor-pointer hover:bg-blue-200" onclick="openInProgressModal(\'' + item.id + '\', true, \'' + sType + '\')"><span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>In Progress</span>' +
+              '<button type="button" class="px-3.5 py-1.5 rounded-lg text-xs font-extrabold tracking-wide bg-emerald-600 hover:bg-emerald-700 text-white shadow-xs transition-colors cursor-pointer" onclick="openClosedModal(\'' + item.id + '\', \'' + sType + '\')">✅ Closed</button>' +
+              '</div>';
+          } else {
+            statusPill = '<div class="flex flex-wrap items-center gap-1.5">' +
+              '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-200 text-slate-500 border border-slate-300 cursor-not-allowed opacity-75" title="Kasus ditugaskan ke Fasilitator ' + escapeHtml(taskFacilitator) + '"><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>In Progress</span>' +
+              '<button type="button" disabled class="px-3.5 py-1.5 rounded-lg text-xs font-extrabold tracking-wide bg-slate-200 text-slate-400 border border-slate-300 cursor-not-allowed opacity-75 shadow-none" title="Kasus ditugaskan ke Fasilitator ' + escapeHtml(taskFacilitator) + '">✅ Closed</button>' +
+              '</div>';
+          }
+        } else {
+          statusPill = '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-blue-100 text-blue-800"><span class="w-1.5 h-1.5 rounded-full bg-blue-600"></span>In Progress</span>';
+        }
       } else if (rawStatus === 'closed') {
         statusPill = '<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-extrabold bg-emerald-100 text-emerald-800 border border-emerald-200"><span class="w-2 h-2 rounded-full bg-emerald-600"></span>Closed</span>';
       } else {
-        statusPill = '<div class="flex flex-wrap items-center gap-1.5">' +
-          '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 cursor-pointer hover:bg-amber-200" onclick="openInProgressModal(\'' + item.id + '\', false, \'' + sType + '\')"><span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>Open</span>' +
-          (canPickup ? '<button type="button" class="px-3.5 py-1.5 rounded-lg text-xs font-extrabold tracking-wide bg-[#061345] hover:bg-[#1e295a] text-white shadow-xs transition-colors cursor-pointer" onclick="openInProgressModal(\'' + item.id + '\', false, \'' + sType + '\')">🚀 Pickup</button>' : '') +
-          '</div>';
+        if (canPickup) {
+          if (canAction) {
+            statusPill = '<div class="flex flex-wrap items-center gap-1.5">' +
+              '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800 cursor-pointer hover:bg-amber-200" onclick="openInProgressModal(\'' + item.id + '\', false, \'' + sType + '\')"><span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>Open</span>' +
+              '<button type="button" class="px-3.5 py-1.5 rounded-lg text-xs font-extrabold tracking-wide bg-[#061345] hover:bg-[#1e295a] text-white shadow-xs transition-colors cursor-pointer" onclick="openInProgressModal(\'' + item.id + '\', false, \'' + sType + '\')">🚀 Pickup</button>' +
+              '</div>';
+          } else {
+            statusPill = '<div class="flex flex-wrap items-center gap-1.5">' +
+              '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-slate-200 text-slate-500 border border-slate-300 cursor-not-allowed opacity-75" title="Kasus ditugaskan ke Fasilitator ' + escapeHtml(taskFacilitator) + '"><span class="w-1.5 h-1.5 rounded-full bg-slate-400"></span>Open</span>' +
+              '<button type="button" disabled class="px-3.5 py-1.5 rounded-lg text-xs font-extrabold tracking-wide bg-slate-200 text-slate-400 border border-slate-300 cursor-not-allowed opacity-75 shadow-none" title="Kasus ditugaskan ke Fasilitator ' + escapeHtml(taskFacilitator) + '">🚀 Pickup</button>' +
+              '</div>';
+          }
+        } else {
+          statusPill = '<span class="inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-bold bg-amber-100 text-amber-800"><span class="w-1.5 h-1.5 rounded-full bg-amber-600"></span>Open</span>';
+        }
       }
 
       const ppt = getCasePptAttachment(sType, item.id);
@@ -6598,21 +6680,20 @@
         '</span>';
       }
 
-      const ubahTanggalBtn = canPickup ? (
-        '<button type="button" class="mt-1 text-[10.5px] font-bold text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-0.5 cursor-pointer" onclick="openRescheduleModal(\'' + item.id + '\', \'' + sType + '\')" title="Ubah tanggal agenda kasus ini">' +
-        '  <span class="material-symbols-outlined text-[12px]">edit_calendar</span>' +
-        '  <span>Ubah Tanggal</span>' +
-        '</button>'
-      ) : '';
-
-      const taskUrgency = item.urgency || 'Middle';
-      const taskUrgencyBadge = getUrgencyBadgeHtml(taskUrgency);
-      const taskFacilitator = item.picFacilitator || getFacilitatorForRequestor(item.requestor);
-      const isMyTask = currentRole === 'Facilitator' && state.authUser && (
-        (taskFacilitator && taskFacilitator.toLowerCase().includes((state.authUser.name || '').toLowerCase())) ||
-        ((state.authUser.name || '').toLowerCase().includes((taskFacilitator || '').toLowerCase())) ||
-        (state.authUser.site && state.authUser.site !== 'Semua Unit' && item.requestor && item.requestor.toLowerCase().includes(state.authUser.site.toLowerCase()))
-      );
+      let ubahTanggalBtn = '';
+      if (canPickup) {
+        if (canAction) {
+          ubahTanggalBtn = '<button type="button" class="mt-1 text-[10.5px] font-bold text-blue-600 hover:text-blue-800 hover:underline flex items-center gap-0.5 cursor-pointer" onclick="openRescheduleModal(\'' + item.id + '\', \'' + sType + '\')" title="Ubah tanggal agenda kasus ini">' +
+            '  <span class="material-symbols-outlined text-[12px]">edit_calendar</span>' +
+            '  <span>Ubah Tanggal</span>' +
+            '</button>';
+        } else {
+          ubahTanggalBtn = '<span class="mt-1 text-[10.5px] font-medium text-slate-400 flex items-center gap-0.5 cursor-not-allowed opacity-60" title="Kasus ditugaskan ke Fasilitator ' + escapeHtml(taskFacilitator) + '">' +
+            '  <span class="material-symbols-outlined text-[12px]">edit_calendar</span>' +
+            '  <span>Ubah Tanggal</span>' +
+            '</span>';
+        }
+      }
 
       return '<tr class="hover:bg-slate-50/80 transition-colors' + (isMyTask ? ' bg-blue-50/30' : '') + '">' +
         '<td class="py-3 px-4 text-center font-bold text-slate-500">' + (idx + 1) + '</td>' +
@@ -6648,7 +6729,7 @@
         '      <span class="text-slate-300">&bull;</span>' +
         '      ' + taskUrgencyBadge +
         '      <span class="inline-flex items-center gap-1 text-[10.5px] font-semibold text-slate-600"><span class="material-symbols-outlined text-[12px] text-blue-600">assignment_ind</span><span>Fasilitator: <strong class="text-slate-800">' + escapeHtml(taskFacilitator) + '</strong></span></span>' +
-        (isMyTask ? '<span class="px-1.5 py-0.5 rounded text-[9.5px] font-extrabold bg-blue-100 text-blue-800 border border-blue-200">⭐ Kasus Saya</span>' : '') +
+        (isMyTask ? '<span class="px-1.5 py-0.5 rounded text-[9.5px] font-extrabold bg-blue-100 text-blue-800 border border-blue-200">⭐ Inbox Saya</span>' : '') +
         '    </div>' +
         '  </div>' +
         '</td>' +
@@ -6964,24 +7045,48 @@
     if (pickupActionsEl) {
       const currentRole = (state.authUser && state.authUser.role) ? state.authUser.role : 'Administrator';
       const canPickup = currentRole !== 'Inputer' && currentRole !== 'Viewer';
+      const isAdminRole = currentRole === 'Administrator';
+      const isMyTask = isTaskAssignedToCurrentFacilitator(ticket);
+      const canAction = isAdminRole || (currentRole === 'Facilitator' && isMyTask);
+      const taskFac = ticket.picFacilitator || getFacilitatorForRequestor(ticket.requestor);
       const stNorm = (ticket.status || 'Open').toLowerCase().replace(/\s+/g, '');
 
       if (canPickup) {
         pickupActionsEl.className = 'mt-3 pt-3 border-t border-slate-200 flex flex-wrap items-center gap-2';
-        const reschedBtn = '<button type="button" class="px-3 py-1.5 rounded-lg text-xs font-bold border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors flex items-center gap-1 cursor-pointer" onclick="openRescheduleModal(\'' + ticket.id + '\', \'' + ticket.serviceType + '\')" title="Ubah tanggal agenda kasus ini"><span>📅</span><span>Ubah Tanggal</span></button>';
+        
+        let reschedBtn = '';
+        if (canAction) {
+          reschedBtn = '<button type="button" class="px-3 py-1.5 rounded-lg text-xs font-bold border border-blue-200 bg-blue-50 text-blue-700 hover:bg-blue-100 transition-colors flex items-center gap-1 cursor-pointer" onclick="openRescheduleModal(\'' + ticket.id + '\', \'' + ticket.serviceType + '\')" title="Ubah tanggal agenda kasus ini"><span>📅</span><span>Ubah Tanggal</span></button>';
+        } else {
+          reschedBtn = '<button type="button" disabled class="px-3 py-1.5 rounded-lg text-xs font-bold border border-slate-300 bg-slate-200 text-slate-400 cursor-not-allowed opacity-75 flex items-center gap-1 shadow-none" title="Kasus ditugaskan ke Fasilitator ' + escapeHtml(taskFac) + '"><span>📅</span><span>Ubah Tanggal</span></button>';
+        }
+
         if (stNorm === 'inprogress') {
-          pickupActionsEl.innerHTML =
-            '<button type="button" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition-colors cursor-pointer" onclick="openInProgressModal(\'' + ticket.id + '\', true, \'' + ticket.serviceType + '\')">📝 Update Progress</button>' +
-            '<button type="button" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 shadow-xs transition-colors cursor-pointer" onclick="openClosedModal(\'' + ticket.id + '\', \'' + ticket.serviceType + '\')">✅ Selesaikan (Closed)</button>' +
-            reschedBtn;
+          if (canAction) {
+            pickupActionsEl.innerHTML =
+              '<button type="button" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 transition-colors cursor-pointer" onclick="openInProgressModal(\'' + ticket.id + '\', true, \'' + ticket.serviceType + '\')">📝 Update Progress</button>' +
+              '<button type="button" class="px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-600 text-white hover:bg-emerald-700 shadow-xs transition-colors cursor-pointer" onclick="openClosedModal(\'' + ticket.id + '\', \'' + ticket.serviceType + '\')">✅ Selesaikan (Closed)</button>' +
+              reschedBtn;
+          } else {
+            pickupActionsEl.innerHTML =
+              '<button type="button" disabled class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-200 text-slate-400 border border-slate-300 cursor-not-allowed opacity-75 shadow-none" title="Kasus ditugaskan ke Fasilitator ' + escapeHtml(taskFac) + '">📝 Update Progress</button>' +
+              '<button type="button" disabled class="px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-200 text-slate-400 border border-slate-300 cursor-not-allowed opacity-75 shadow-none" title="Kasus ditugaskan ke Fasilitator ' + escapeHtml(taskFac) + '">✅ Selesaikan (Closed)</button>' +
+              reschedBtn;
+          }
         } else if (stNorm === 'closed') {
           pickupActionsEl.innerHTML =
             '<span class="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200">✅ Case Selesai (Ditutup oleh ' + escapeHtml(ticket.closedBy || ticket.pic || 'Tim CHO') + ')</span>' +
             reschedBtn;
         } else {
-          pickupActionsEl.innerHTML =
-            '<button type="button" class="w-full sm:w-auto px-3.5 py-2 rounded-lg text-xs font-bold bg-[#061345] hover:bg-[#1e295a] text-white shadow-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer" onclick="openInProgressModal(\'' + ticket.id + '\', false, \'' + ticket.serviceType + '\')">🚀 Pickup Case (Ubah ke In Progress)</button>' +
-            reschedBtn;
+          if (canAction) {
+            pickupActionsEl.innerHTML =
+              '<button type="button" class="w-full sm:w-auto px-3.5 py-2 rounded-lg text-xs font-bold bg-[#061345] hover:bg-[#1e295a] text-white shadow-xs transition-colors flex items-center justify-center gap-1.5 cursor-pointer" onclick="openInProgressModal(\'' + ticket.id + '\', false, \'' + ticket.serviceType + '\')">🚀 Pickup Case (Ubah ke In Progress)</button>' +
+              reschedBtn;
+          } else {
+            pickupActionsEl.innerHTML =
+              '<button type="button" disabled class="w-full sm:w-auto px-3.5 py-2 rounded-lg text-xs font-bold bg-slate-200 text-slate-400 border border-slate-300 cursor-not-allowed opacity-75 flex items-center justify-center gap-1.5 shadow-none" title="Kasus ditugaskan ke Fasilitator ' + escapeHtml(taskFac) + '">🚀 Pickup Case (Ubah ke In Progress)</button>' +
+              reschedBtn;
+          }
         }
       } else {
         pickupActionsEl.className = 'hidden';
