@@ -1126,30 +1126,30 @@
             <div id="closedIssueText" style="font-size: 12.5px; font-weight: 600; color: #1e293b; line-height: 1.4;">-</div>
           </div>
 
-          <!-- Form Inputs -->
-          <div class="form-group">
-            <label class="form-label" for="closedMessage">
-              Keterangan Closed / Solusi Penyelesaian <span class="req-star">*</span>
-            </label>
-            <textarea id="closedMessage" class="form-control" rows="4" placeholder="Jelaskan secara rinci solusi penyelesaian, hasil perbaikan, root cause kendala, atau konfirmasi bahwa layanan pelanggan sudah normal..."></textarea>
-            <span class="form-hint">Keterangan penyelesaian akan direkam sebagai catatan final kasus di sheet <strong>Log_Komunikasi</strong>.</span>
-          </div>
-
-          <div class="form-row-2">
-            <div class="form-group">
-              <label class="form-label" for="closedByUser">
-                PIC / Petugas Pelaksana (Di-Closed Oleh) <span class="req-star">*</span>
+          <!-- Form Inputs: Urutan (1. PIC Abu-Abu, 2. Follow Up terakhir, 3. Keterangan Closed) -->
+          <div class="form-row-2" style="display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-bottom: 14px;">
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="closedByUser" style="font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 4px; display: block;">
+                PIC / Petugas Pelaksana <span class="req-star" style="color: #ef4444;">*</span>
               </label>
-              <input type="text" id="closedByUser" class="form-control" placeholder="Contoh: Budi Santoso (CHO Specialist) / Ani (Care)">
-              <span class="form-hint">Identitas user/petugas yang bertanggung jawab menutup tiket.</span>
+              <input type="text" id="closedByUser" class="form-control" readonly disabled style="background: #f1f5f9; color: #475569; cursor: not-allowed; border: 1px solid #cbd5e1; font-weight: 600;" placeholder="Nama Petugas Pelaksana">
+              <span class="form-hint" style="font-size: 10.5px; color: #64748b; margin-top: 3px; display: block;">Sesuai akun login yang menutup tiket.</span>
             </div>
 
-            <div class="form-group">
-              <label class="form-label" for="closedFollowUp">
-                Follow Up Terakhir (Kolom I)
+            <div class="form-group" style="margin-bottom: 0;">
+              <label class="form-label" for="closedFollowUp" style="font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 4px; display: block;">
+                Follow Up terakhir
               </label>
               <input type="text" id="closedFollowUp" class="form-control" placeholder="Contoh: Selesai / Tim Maintenance">
             </div>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label" for="closedMessage" style="font-size: 12px; font-weight: 700; color: #334155; margin-bottom: 4px; display: block;">
+              Keterangan Closed / Solusi Penyelesaian <span class="req-star" style="color: #ef4444;">*</span>
+            </label>
+            <textarea id="closedMessage" class="form-control" rows="4" placeholder="Jelaskan secara rinci solusi penyelesaian, hasil perbaikan, root cause kendala, atau konfirmasi bahwa layanan pelanggan sudah normal..."></textarea>
+            <span class="form-hint" style="font-size: 10.5px; color: #64748b; margin-top: 3px; display: block;">Keterangan penyelesaian akan direkam sebagai catatan final kasus di sheet <strong>Log_Komunikasi</strong>.</span>
           </div>
 
         </div>

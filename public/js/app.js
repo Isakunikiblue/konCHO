@@ -1147,11 +1147,11 @@
       btnDownloadHead.style.display = isAdministrator ? 'inline-flex' : 'none';
     }
 
-    // 7. Kontrol Tombol Simpan Catatan di Quick Win Drawer (Hanya Facilitator & Administrator)
+    // 7. Kontrol Tombol Simpan Catatan di Quick Win Drawer (Hanya Administrator; Fasilitator, Inputer & Viewer di-hide)
     var btnDrawerSave = document.getElementById('btn-drawer-save');
-    var isInputerOrViewer = (role.toLowerCase() === 'inputer' || role.toLowerCase() === 'viewer');
+    var isHideQuickWinSave = (role.toLowerCase() === 'facilitator' || role.toLowerCase() === 'inputer' || role.toLowerCase() === 'viewer');
     if (btnDrawerSave) {
-      if (isInputerOrViewer) {
+      if (isHideQuickWinSave) {
         btnDrawerSave.style.setProperty('display', 'none', 'important');
         btnDrawerSave.classList.add('hidden');
         btnDrawerSave.hidden = true;
@@ -3602,8 +3602,15 @@
     dom.closedIssueText.textContent = ticket.totalCaseIsu || '-';
 
     dom.closedMessage.value = '';
-    dom.closedByUser.value = getCurrentLoggedInUserName();
-    dom.closedFollowUp.value = '';
+    var loggedInUser = getCurrentLoggedInUserName();
+    dom.closedByUser.value = loggedInUser;
+    dom.closedByUser.readOnly = true;
+    dom.closedByUser.disabled = true;
+    dom.closedByUser.style.background = '#f1f5f9';
+    dom.closedByUser.style.color = '#475569';
+    dom.closedByUser.style.cursor = 'not-allowed';
+    dom.closedByUser.style.border = '1px solid #cbd5e1';
+    dom.closedFollowUp.value = ticket.followUpTo && ticket.followUpTo !== '-' ? ticket.followUpTo : '';
 
     dom.modalClosed.classList.add('active');
     setTimeout(function() { dom.closedMessage.focus(); }, 100);
@@ -6923,10 +6930,10 @@
     if (noteInput) noteInput.value = ticket.progress && ticket.progress !== 'Belum Ada Update' ? ticket.progress : '';
 
     const currentRole = (state.authUser && state.authUser.role) ? state.authUser.role : 'Administrator';
-    const isInputerOrViewer = (currentRole.toLowerCase() === 'inputer' || currentRole.toLowerCase() === 'viewer');
+    const isHideQuickWinSave = (currentRole.toLowerCase() === 'facilitator' || currentRole.toLowerCase() === 'inputer' || currentRole.toLowerCase() === 'viewer');
     const btnDrawerSave = document.getElementById('btn-drawer-save');
     if (btnDrawerSave) {
-      if (isInputerOrViewer) {
+      if (isHideQuickWinSave) {
         btnDrawerSave.style.setProperty('display', 'none', 'important');
         btnDrawerSave.classList.add('hidden');
         btnDrawerSave.hidden = true;
@@ -6943,10 +6950,10 @@
       }
     }
     if (noteInput) {
-      noteInput.readOnly = isInputerOrViewer;
-      if (isInputerOrViewer) {
+      noteInput.readOnly = isHideQuickWinSave;
+      if (isHideQuickWinSave) {
         noteInput.classList.add('bg-slate-100', 'cursor-not-allowed');
-        noteInput.title = 'Quick Win hanya dapat diperbarui oleh Fasilitator & Administrator';
+        noteInput.title = 'Quick Win diperbarui melalui tombol Form Pengisian / Update Progress';
       } else {
         noteInput.classList.remove('bg-slate-100', 'cursor-not-allowed');
         noteInput.title = '';
