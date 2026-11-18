@@ -1920,34 +1920,7 @@
     var passInp = document.getElementById('loginPassword');
     if (passInp) passInp.addEventListener('input', hideLoginIdleNotification);
 
-    // Lamp Animation Interactive Toggle (Pull Cord & Lamp Head)
-    var lampContainer = document.getElementById('lampContainer');
-    var lampPullCord = document.getElementById('lampPullCord');
-    var lampHead = document.getElementById('lampHead');
-    var isLampOn = true;
 
-    function toggleLamp() {
-      isLampOn = !isLampOn;
-      if (lampContainer) {
-        if (isLampOn) {
-          lampContainer.classList.remove('lamp-off');
-        } else {
-          lampContainer.classList.add('lamp-off');
-        }
-      }
-      if (lampPullCord) {
-        lampPullCord.style.transform = 'translateY(14px)';
-        setTimeout(function() {
-          lampPullCord.style.transform = '';
-        }, 220);
-      }
-    }
-
-    if (lampPullCord) lampPullCord.addEventListener('click', toggleLamp);
-    if (lampHead) lampHead.addEventListener('click', function(e) {
-      if (e.target.id === 'lampPullCord' || (e.target.closest && e.target.closest('#lampPullCord'))) return;
-      toggleLamp();
-    });
 
     // Password Visibility Toggle (Show / Hide Password Eye Icon)
     var btnTogglePassword = document.getElementById('btnTogglePassword');
